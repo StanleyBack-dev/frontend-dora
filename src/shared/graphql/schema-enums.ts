@@ -3,6 +3,11 @@ export type BroadcastAudience =
   | 'GRUPO'
   | 'TODOS';
 
+/** Situação do condomínio na plataforma. */
+export type CondominiumStatus =
+  | 'ACTIVE'
+  | 'SUSPENDED';
+
 /** Situação do cadastro enviado pelo link público. */
 export type EnrollmentStatus =
   | 'APROVADA'
@@ -20,10 +25,12 @@ export type NotificationType =
 /** Capacidade verificada pela API. */
 export type Permission =
   | 'AUDIT_READ'
+  | 'CONDOMINIUMS_MANAGE'
   | 'DASHBOARD_READ'
   | 'NOTIFICATIONS_BROADCAST'
   | 'PERMISSIONS_MANAGE'
   | 'SUPPORT_MANAGE'
+  | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
 
 /** Do que se trata a solicitação de suporte. */

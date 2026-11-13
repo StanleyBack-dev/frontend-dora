@@ -1,7 +1,7 @@
 "use client";
 
 import { UserRound } from "lucide-react";
-import { Field, FormSection } from "@/design-system";
+import { Combobox, Field, FormSection } from "@/design-system";
 import type {
   EnrollmentErrors,
   EnrollmentForm,
@@ -14,6 +14,7 @@ export function EnrollmentFields({
   onChange,
   errors,
   showErrors,
+  units = [],
   autoFocus = false,
 }: {
   form: EnrollmentForm;
@@ -21,6 +22,8 @@ export function EnrollmentFields({
   errors: EnrollmentErrors;
   /** Errors appear after the first attempt to send. */
   showErrors: boolean;
+  /** The condominium's units (empty: it has none, no unit is asked). */
+  units?: { id: string; label: string }[];
   autoFocus?: boolean;
 }) {
   const set = <K extends keyof EnrollmentForm>(
@@ -69,6 +72,27 @@ export function EnrollmentFields({
           error={error("phone")}
         />
       </div>
+      {units.length > 0 && (
+        <div>
+          <Combobox
+            label="Unidade"
+            required
+            placeholder="Busque o bloco ou o número"
+            value={form.unitId || null}
+            onSelect={(value) => set("unitId", value ?? "")}
+            options={units.map((unit) => ({
+              value: unit.id,
+              label: unit.label,
+            }))}
+            emptyText="Nenhuma unidade com esse nome"
+          />
+          {error("unitId") && (
+            <p role="alert" className="mt-1.5 text-xs font-medium text-danger">
+              {error("unitId")}
+            </p>
+          )}
+        </div>
+      )}
     </FormSection>
   );
 }

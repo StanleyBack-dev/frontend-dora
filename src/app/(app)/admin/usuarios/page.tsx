@@ -10,11 +10,12 @@ import {
   Select,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
-import { GROUP_LABELS, GROUPS } from "@/features/access/model/access-labels";
+import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { CreateUserButton } from "@/features/admin/components/CreateUserButton";
 import { UsersTable } from "@/features/admin/components/UsersTable";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { adminService } from "@/server/services/admin.service";
+import { condominiumsService } from "@/server/services/condominiums.service";
 import { assignableGroups, can } from "@/shared/lib/access";
 import {
   buildHref,
@@ -28,9 +29,11 @@ import {
   type RawSearchParams,
 } from "@/shared/lib/search-params";
 
-export const metadata: Metadata = { title: "Usuários" };
+export const metadata: Metadata = { title: "Moradores" };
 
 const STATUSES = ["ativos", "desativados"] as const;
+// Roles inside a condominium.
+const ROLES = ["USER", "ADMIN"] as const;
 
 export default async function UsersPage({
   searchParams,
@@ -42,14 +45,20 @@ export default async function UsersPage({
 
   const params = await searchParams;
   const search = firstParam(params, "busca")?.slice(0, 100) ?? "";
-  const group = oneOf(firstParam(params, "grupo"), GROUPS);
+  const group = oneOf(firstParam(params, "grupo"), ROLES);
   const status = oneOf(firstParam(params, "status"), STATUSES);
+  const units = await authed((token) => condominiumsService.units(token));
+  const unitId = oneOf(
+    firstParam(params, "unidade"),
+    units.map((unit) => unit.id),
+  );
   const page = pageParam(params);
   const pageSize = pageSizeParam(params);
   const hrefWith = (overrides: Record<string, string | number | undefined>) =>
     buildHref("/admin/usuarios", {
       busca: search,
       grupo: group,
+      unidade: unitId,
       status,
       "por-pagina": pageSizeQuery(pageSize),
       ...overrides,
@@ -59,22 +68,26 @@ export default async function UsersPage({
     adminService.listUsers(token, {
       search,
       group,
+      unitId,
       active: status === undefined ? undefined : status === "ativos",
       page,
       limit: pageSize,
     }),
   );
-  const filtered = Boolean(search || group || status);
+  const filtered = Boolean(search || group || unitId || status);
 
   return (
     <>
       <div className="mb-4 flex justify-end">
-        <CreateUserButton assignableGroups={assignableGroups(user.group)} />
+        <CreateUserButton
+          assignableGroups={assignableGroups(user.group)}
+          units={units}
+        />
       </div>
       <FilterPanel hasActiveFilters={filtered}>
         <form
           role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
         >
           {pageSize !== DEFAULT_PAGE_SIZE && (
             <input type="hidden" name="por-pagina" value={pageSize} />
@@ -86,15 +99,27 @@ export default async function UsersPage({
             placeholder="Nome, usuário ou e-mail"
           />
           <Select
-            label="Grupo"
+            label="Papel"
             name="grupo"
             defaultValue={group ?? ""}
             placeholder="Todos"
-            options={GROUPS.map((value) => ({
+            options={ROLES.map((value) => ({
               value,
               label: GROUP_LABELS[value],
             }))}
           />
+          {units.length > 0 && (
+            <Select
+              label="Unidade"
+              name="unidade"
+              defaultValue={unitId ?? ""}
+              placeholder="Todas"
+              options={units.map((unit) => ({
+                value: unit.id,
+                label: unit.label,
+              }))}
+            />
+          )}
           <Select
             label="Situação"
             name="status"
@@ -117,12 +142,12 @@ export default async function UsersPage({
           <EmptyState
             icon={<Users className="size-5" />}
             title={
-              filtered ? "Nenhum usuário encontrado" : "Nenhum usuário ainda"
+              filtered ? "Ninguém encontrado" : "Ninguém no condomínio ainda"
             }
             description={
               filtered
                 ? "Tente outros filtros."
-                : "Crie o acesso dos moradores e da administração."
+                : "Adicione os moradores e a administração, ou envie um link de cadastro."
             }
           />
         ) : (

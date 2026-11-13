@@ -23,18 +23,46 @@ export type ChangePasswordInput = {
   newPassword: string;
 };
 
+export type CondominiumFilterInput = {
+  search?: string | null | undefined;
+  status?: CondominiumStatus | null | undefined;
+};
+
+export type CondominiumInput = {
+  city: string;
+  /** CNPJ (opcional). */
+  document?: string | null | undefined;
+  name: string;
+  /** UF. */
+  state: string;
+};
+
+/** Situação do condomínio na plataforma. */
+export type CondominiumStatus =
+  | 'ACTIVE'
+  | 'SUSPENDED';
+
 export type CreateEnrollmentInviteInput = {
   label: string;
   /** Validade em dias (1 a 30). */
   validDays: number;
 };
 
+export type CreateUnitsInput = {
+  /** Bloco ou torre. */
+  block?: string | null | undefined;
+  /** Números e faixas: "101-104, 201". */
+  numbers: string;
+};
+
 export type CreateUserInput = {
   email: string;
+  /** USER (morador) ou ADMIN (gestor). */
   group: UserGroup;
   name: string;
-  /** Login: 3 a 32 caracteres (a-z, 0-9, ., -, _). */
-  username: string;
+  unitId?: string | number | null | undefined;
+  /** Login: 3 a 32 caracteres (a-z, 0-9, ., -, _). Vazio: gerado do nome. */
+  username?: string | null | undefined;
 };
 
 /** Dados do cadastro (formulário ou correção). */
@@ -42,6 +70,8 @@ export type EnrollmentDataInput = {
   email: string;
   fullName: string;
   phone: string;
+  /** Unidade (obrigatória quando o condomínio tem unidades). Na aprovação, ausente mantém a escolhida. */
+  unitId?: string | number | null | undefined;
 };
 
 export type EnrollmentRequestFilterInput = {
@@ -77,10 +107,12 @@ export type PageInput = {
 /** Capacidade verificada pela API. */
 export type Permission =
   | 'AUDIT_READ'
+  | 'CONDOMINIUMS_MANAGE'
   | 'DASHBOARD_READ'
   | 'NOTIFICATIONS_BROADCAST'
   | 'PERMISSIONS_MANAGE'
   | 'SUPPORT_MANAGE'
+  | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
 
 /** PushSubscription do navegador (PushManager). */
@@ -148,10 +180,17 @@ export type UpdateMyProfileInput = {
   name: string;
 };
 
+export type UpdateUnitInput = {
+  block?: string | null | undefined;
+  number: string;
+};
+
 export type UpdateUserInput = {
   email?: string | null | undefined;
   group?: UserGroup | null | undefined;
   name?: string | null | undefined;
+  /** Ausente: não muda. null: sem unidade. */
+  unitId?: string | number | null | undefined;
   username?: string | null | undefined;
 };
 
@@ -159,6 +198,7 @@ export type UserFilterInput = {
   active?: boolean | null | undefined;
   group?: UserGroup | null | undefined;
   search?: string | null | undefined;
+  unitId?: string | number | null | undefined;
 };
 
 /** Perfil de acesso: Morador, Gestor ou Administrador geral. */
@@ -181,23 +221,23 @@ export type UsersQueryVariables = Exact<{
 }>;
 
 
-export type UsersQuery = { users: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string }> } };
+export type UsersQuery = { users: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string }> } };
 
-export type UserAccountFieldsFragment = { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string };
+export type UserAccountFieldsFragment = { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string };
 
 export type UserQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type UserQuery = { user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type UserQuery = { user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type CreateUserMutationVariables = Exact<{
   input: CreateUserInput;
 }>;
 
 
-export type CreateUserMutation = { createUser: { temporaryPassword: string, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } };
+export type CreateUserMutation = { createUser: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } };
 
 export type UpdateUserMutationVariables = Exact<{
   id: string | number;
@@ -205,7 +245,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { updateUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type UpdateUserMutation = { updateUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type SetUserActiveMutationVariables = Exact<{
   id: string | number;
@@ -213,28 +253,28 @@ export type SetUserActiveMutationVariables = Exact<{
 }>;
 
 
-export type SetUserActiveMutation = { setUserActive: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type SetUserActiveMutation = { setUserActive: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type ResetUserPasswordMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type ResetUserPasswordMutation = { resetUserPassword: { temporaryPassword: string, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } };
+export type ResetUserPasswordMutation = { resetUserPassword: { temporaryPassword: string | null, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } };
 
 export type UnlockUserMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type UnlockUserMutation = { unlockUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type UnlockUserMutation = { unlockUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type RevokeUserSessionsMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type RevokeUserSessionsMutation = { revokeUserSessions: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type RevokeUserSessionsMutation = { revokeUserSessions: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type UserPermissionsQueryVariables = Exact<{
   id: string | number;
@@ -263,7 +303,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean } } };
+export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
 
 export type RefreshSessionMutationVariables = Exact<{
   refreshToken: string;
@@ -280,7 +320,7 @@ export type LogoutMutation = { logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean } };
+export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type CompleteOnboardingMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -299,7 +339,7 @@ export type UpdateMyProfileMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean } };
+export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type SetMyPhotoMutationVariables = Exact<{
   photo: string;
@@ -334,6 +374,13 @@ export type ResetPasswordWithRecoveryMutationVariables = Exact<{
 
 export type ResetPasswordWithRecoveryMutation = { resetPasswordWithRecovery: boolean };
 
+export type SwitchCondominiumMutationVariables = Exact<{
+  condominiumId?: string | number | null | undefined;
+}>;
+
+
+export type SwitchCondominiumMutation = { switchCondominium: boolean };
+
 export type BroadcastFieldsFragment = { id: string, title: string, body: string, audience: BroadcastAudience, targetGroup: UserGroup | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string };
 
 export type BroadcastsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -348,10 +395,71 @@ export type SendBroadcastMutationVariables = Exact<{
 
 export type SendBroadcastMutation = { sendBroadcast: { id: string, title: string, body: string, audience: BroadcastAudience, targetGroup: UserGroup | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string } };
 
+export type CondominiumFieldsFragment = { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string };
+
+export type CondominiumsQueryVariables = Exact<{
+  filter?: CondominiumFilterInput | null | undefined;
+}>;
+
+
+export type CondominiumsQuery = { condominiums: Array<{ id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string }> };
+
+export type CreateCondominiumMutationVariables = Exact<{
+  input: CondominiumInput;
+}>;
+
+
+export type CreateCondominiumMutation = { createCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+
+export type UpdateCondominiumMutationVariables = Exact<{
+  id: string | number;
+  input: CondominiumInput;
+}>;
+
+
+export type UpdateCondominiumMutation = { updateCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+
+export type SetCondominiumStatusMutationVariables = Exact<{
+  id: string | number;
+  status: CondominiumStatus;
+}>;
+
+
+export type SetCondominiumStatusMutation = { setCondominiumStatus: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+
+export type UnitFieldsFragment = { id: string, block: string, number: string, label: string, residents: number };
+
+export type UnitsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UnitsQuery = { units: Array<{ id: string, block: string, number: string, label: string, residents: number }> };
+
+export type CreateUnitsMutationVariables = Exact<{
+  input: CreateUnitsInput;
+}>;
+
+
+export type CreateUnitsMutation = { createUnits: Array<{ id: string, block: string, number: string, label: string, residents: number }> };
+
+export type UpdateUnitMutationVariables = Exact<{
+  id: string | number;
+  input: UpdateUnitInput;
+}>;
+
+
+export type UpdateUnitMutation = { updateUnit: { id: string, block: string, number: string, label: string, residents: number } };
+
+export type DeleteUnitMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteUnitMutation = { deleteUnit: boolean };
+
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, openSupportRequests: number, failedNotifications: number } };
+export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, openSupportRequests: number | null, failedNotifications: number | null } };
 
 export type VerifyEnrollmentCodeMutationVariables = Exact<{
   code: string;
@@ -360,12 +468,12 @@ export type VerifyEnrollmentCodeMutationVariables = Exact<{
 
 export type VerifyEnrollmentCodeMutation = { verifyEnrollmentCode: string };
 
-export type EnrollmentFormValidQueryVariables = Exact<{
+export type EnrollmentFormQueryVariables = Exact<{
   formToken: string;
 }>;
 
 
-export type EnrollmentFormValidQuery = { enrollmentFormValid: boolean };
+export type EnrollmentFormQuery = { enrollmentForm: { condominiumName: string, units: Array<{ id: string, label: string }> } };
 
 export type SubmitEnrollmentMutationVariables = Exact<{
   input: SubmitEnrollmentInput;
@@ -376,7 +484,7 @@ export type SubmitEnrollmentMutation = { submitEnrollment: boolean };
 
 export type EnrollmentInviteFieldsFragment = { id: string, code: string, label: string, expiresAt: string, revokedAt: string | null, createdAt: string, requestCount: number };
 
-export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
+export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
 
 export type EnrollmentInvitesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -403,7 +511,7 @@ export type EnrollmentRequestsQueryVariables = Exact<{
 }>;
 
 
-export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
+export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
 
 export type ApproveEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -412,7 +520,7 @@ export type ApproveEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
+export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
 
 export type RejectEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -420,7 +528,7 @@ export type RejectEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
+export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -484,14 +592,14 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type SendTestPushMutation = { sendTestPush: number };
 
-export type SupportRequestFieldsFragment = { id: string, protocol: number, userId: string, userName: string, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string };
+export type SupportRequestFieldsFragment = { id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string };
 
 export type SupportPageQueryVariables = Exact<{
   page?: PageInput | null | undefined;
 }>;
 
 
-export type SupportPageQuery = { supportQuota: { limit: number, sentToday: number, remaining: number, nextAllowedAt: string | null }, mySupportRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, protocol: number, userId: string, userName: string, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string }> } };
+export type SupportPageQuery = { supportQuota: { limit: number, sentToday: number, remaining: number, nextAllowedAt: string | null }, mySupportRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string }> } };
 
 export type SupportRequestsQueryVariables = Exact<{
   status?: SupportStatus | null | undefined;
@@ -499,14 +607,14 @@ export type SupportRequestsQueryVariables = Exact<{
 }>;
 
 
-export type SupportRequestsQuery = { supportRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, protocol: number, userId: string, userName: string, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string }> } };
+export type SupportRequestsQuery = { supportRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string }> } };
 
 export type SendSupportRequestMutationVariables = Exact<{
   input: SupportRequestInput;
 }>;
 
 
-export type SendSupportRequestMutation = { sendSupportRequest: { id: string, protocol: number, userId: string, userName: string, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
+export type SendSupportRequestMutation = { sendSupportRequest: { id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
 
 export type ReplySupportRequestMutationVariables = Exact<{
   id: string | number;
@@ -514,14 +622,14 @@ export type ReplySupportRequestMutationVariables = Exact<{
 }>;
 
 
-export type ReplySupportRequestMutation = { replySupportRequest: { id: string, protocol: number, userId: string, userName: string, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
+export type ReplySupportRequestMutation = { replySupportRequest: { id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
 
 export type FinalizeSupportRequestMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type FinalizeSupportRequestMutation = { finalizeSupportRequest: { id: string, protocol: number, userId: string, userName: string, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
+export type FinalizeSupportRequestMutation = { finalizeSupportRequest: { id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
 
 export type SystemLogsQueryVariables = Exact<{
   filter?: SystemLogFilterInput | null | undefined;
@@ -571,6 +679,9 @@ export const UserAccountFieldsFragmentDoc = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -592,6 +703,31 @@ export const BroadcastFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"BroadcastFields"}) as unknown as TypedDocumentString<BroadcastFieldsFragment, unknown>;
+export const CondominiumFieldsFragmentDoc = new TypedDocumentString(`
+    fragment CondominiumFields on Condominium {
+  id
+  name
+  document
+  city
+  state
+  status
+  activeMembers
+  managers
+  units
+  pendingEnrollments
+  lastActivityAt
+  createdAt
+}
+    `, {"fragmentName":"CondominiumFields"}) as unknown as TypedDocumentString<CondominiumFieldsFragment, unknown>;
+export const UnitFieldsFragmentDoc = new TypedDocumentString(`
+    fragment UnitFields on Unit {
+  id
+  block
+  number
+  label
+  residents
+}
+    `, {"fragmentName":"UnitFields"}) as unknown as TypedDocumentString<UnitFieldsFragment, unknown>;
 export const EnrollmentInviteFieldsFragmentDoc = new TypedDocumentString(`
     fragment EnrollmentInviteFields on EnrollmentInvite {
   id
@@ -610,6 +746,8 @@ export const EnrollmentRequestFieldsFragmentDoc = new TypedDocumentString(`
   fullName
   email
   phone
+  unitId
+  unitLabel
   createdAt
   reviewedAt
   rejectionReason
@@ -623,6 +761,7 @@ export const SupportRequestFieldsFragmentDoc = new TypedDocumentString(`
   protocol
   userId
   userName
+  condominiumName
   category
   subject
   message
@@ -654,6 +793,9 @@ export const UsersDocument = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -674,6 +816,9 @@ export const UserDocument = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -686,6 +831,7 @@ export const CreateUserDocument = new TypedDocumentString(`
   createUser(input: $input) {
     temporaryPassword
     emailSent
+    existingAccount
     user {
       ...UserAccountFields
     }
@@ -698,6 +844,9 @@ export const CreateUserDocument = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -718,6 +867,9 @@ export const UpdateUserDocument = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -738,6 +890,9 @@ export const SetUserActiveDocument = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -762,6 +917,9 @@ export const ResetUserPasswordDocument = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -782,6 +940,9 @@ export const UnlockUserDocument = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -802,6 +963,9 @@ export const RevokeUserSessionsDocument = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -860,6 +1024,21 @@ export const LoginDocument = new TypedDocumentString(`
       permissions
       photoUrl
       onboardingCompleted
+      platformAdmin
+      condominium {
+        id
+        name
+        city
+        state
+        status
+      }
+      condominiums {
+        id
+        name
+        city
+        state
+        role
+      }
     }
   }
 }
@@ -891,6 +1070,21 @@ export const MeDocument = new TypedDocumentString(`
     permissions
     photoUrl
     onboardingCompleted
+    platformAdmin
+    condominium {
+      id
+      name
+      city
+      state
+      status
+    }
+    condominiums {
+      id
+      name
+      city
+      state
+      role
+    }
   }
 }
     `) as unknown as TypedDocumentString<MeQuery, MeQueryVariables>;
@@ -916,6 +1110,21 @@ export const UpdateMyProfileDocument = new TypedDocumentString(`
     permissions
     photoUrl
     onboardingCompleted
+    platformAdmin
+    condominium {
+      id
+      name
+      city
+      state
+      status
+    }
+    condominiums {
+      id
+      name
+      city
+      state
+      role
+    }
   }
 }
     `) as unknown as TypedDocumentString<UpdateMyProfileMutation, UpdateMyProfileMutationVariables>;
@@ -944,6 +1153,11 @@ export const ResetPasswordWithRecoveryDocument = new TypedDocumentString(`
   resetPasswordWithRecovery(input: $input)
 }
     `) as unknown as TypedDocumentString<ResetPasswordWithRecoveryMutation, ResetPasswordWithRecoveryMutationVariables>;
+export const SwitchCondominiumDocument = new TypedDocumentString(`
+    mutation SwitchCondominium($condominiumId: ID) {
+  switchCondominium(condominiumId: $condominiumId)
+}
+    `) as unknown as TypedDocumentString<SwitchCondominiumMutation, SwitchCondominiumMutationVariables>;
 export const BroadcastsDocument = new TypedDocumentString(`
     query Broadcasts {
   broadcasts {
@@ -978,11 +1192,136 @@ export const SendBroadcastDocument = new TypedDocumentString(`
   authorName
   createdAt
 }`) as unknown as TypedDocumentString<SendBroadcastMutation, SendBroadcastMutationVariables>;
+export const CondominiumsDocument = new TypedDocumentString(`
+    query Condominiums($filter: CondominiumFilterInput) {
+  condominiums(filter: $filter) {
+    ...CondominiumFields
+  }
+}
+    fragment CondominiumFields on Condominium {
+  id
+  name
+  document
+  city
+  state
+  status
+  activeMembers
+  managers
+  units
+  pendingEnrollments
+  lastActivityAt
+  createdAt
+}`) as unknown as TypedDocumentString<CondominiumsQuery, CondominiumsQueryVariables>;
+export const CreateCondominiumDocument = new TypedDocumentString(`
+    mutation CreateCondominium($input: CondominiumInput!) {
+  createCondominium(input: $input) {
+    ...CondominiumFields
+  }
+}
+    fragment CondominiumFields on Condominium {
+  id
+  name
+  document
+  city
+  state
+  status
+  activeMembers
+  managers
+  units
+  pendingEnrollments
+  lastActivityAt
+  createdAt
+}`) as unknown as TypedDocumentString<CreateCondominiumMutation, CreateCondominiumMutationVariables>;
+export const UpdateCondominiumDocument = new TypedDocumentString(`
+    mutation UpdateCondominium($id: ID!, $input: CondominiumInput!) {
+  updateCondominium(id: $id, input: $input) {
+    ...CondominiumFields
+  }
+}
+    fragment CondominiumFields on Condominium {
+  id
+  name
+  document
+  city
+  state
+  status
+  activeMembers
+  managers
+  units
+  pendingEnrollments
+  lastActivityAt
+  createdAt
+}`) as unknown as TypedDocumentString<UpdateCondominiumMutation, UpdateCondominiumMutationVariables>;
+export const SetCondominiumStatusDocument = new TypedDocumentString(`
+    mutation SetCondominiumStatus($id: ID!, $status: CondominiumStatus!) {
+  setCondominiumStatus(id: $id, status: $status) {
+    ...CondominiumFields
+  }
+}
+    fragment CondominiumFields on Condominium {
+  id
+  name
+  document
+  city
+  state
+  status
+  activeMembers
+  managers
+  units
+  pendingEnrollments
+  lastActivityAt
+  createdAt
+}`) as unknown as TypedDocumentString<SetCondominiumStatusMutation, SetCondominiumStatusMutationVariables>;
+export const UnitsDocument = new TypedDocumentString(`
+    query Units {
+  units {
+    ...UnitFields
+  }
+}
+    fragment UnitFields on Unit {
+  id
+  block
+  number
+  label
+  residents
+}`) as unknown as TypedDocumentString<UnitsQuery, UnitsQueryVariables>;
+export const CreateUnitsDocument = new TypedDocumentString(`
+    mutation CreateUnits($input: CreateUnitsInput!) {
+  createUnits(input: $input) {
+    ...UnitFields
+  }
+}
+    fragment UnitFields on Unit {
+  id
+  block
+  number
+  label
+  residents
+}`) as unknown as TypedDocumentString<CreateUnitsMutation, CreateUnitsMutationVariables>;
+export const UpdateUnitDocument = new TypedDocumentString(`
+    mutation UpdateUnit($id: ID!, $input: UpdateUnitInput!) {
+  updateUnit(id: $id, input: $input) {
+    ...UnitFields
+  }
+}
+    fragment UnitFields on Unit {
+  id
+  block
+  number
+  label
+  residents
+}`) as unknown as TypedDocumentString<UpdateUnitMutation, UpdateUnitMutationVariables>;
+export const DeleteUnitDocument = new TypedDocumentString(`
+    mutation DeleteUnit($id: ID!) {
+  deleteUnit(id: $id)
+}
+    `) as unknown as TypedDocumentString<DeleteUnitMutation, DeleteUnitMutationVariables>;
 export const DashboardDocument = new TypedDocumentString(`
     query Dashboard {
   dashboard {
     activeUsers
     pendingEnrollments
+    units
     openSupportRequests
     failedNotifications
   }
@@ -993,11 +1332,17 @@ export const VerifyEnrollmentCodeDocument = new TypedDocumentString(`
   verifyEnrollmentCode(code: $code)
 }
     `) as unknown as TypedDocumentString<VerifyEnrollmentCodeMutation, VerifyEnrollmentCodeMutationVariables>;
-export const EnrollmentFormValidDocument = new TypedDocumentString(`
-    query EnrollmentFormValid($formToken: String!) {
-  enrollmentFormValid(formToken: $formToken)
+export const EnrollmentFormDocument = new TypedDocumentString(`
+    query EnrollmentForm($formToken: String!) {
+  enrollmentForm(formToken: $formToken) {
+    condominiumName
+    units {
+      id
+      label
+    }
+  }
 }
-    `) as unknown as TypedDocumentString<EnrollmentFormValidQuery, EnrollmentFormValidQueryVariables>;
+    `) as unknown as TypedDocumentString<EnrollmentFormQuery, EnrollmentFormQueryVariables>;
 export const SubmitEnrollmentDocument = new TypedDocumentString(`
     mutation SubmitEnrollment($input: SubmitEnrollmentInput!) {
   submitEnrollment(input: $input)
@@ -1067,6 +1412,8 @@ export const EnrollmentRequestsDocument = new TypedDocumentString(`
   fullName
   email
   phone
+  unitId
+  unitLabel
   createdAt
   reviewedAt
   rejectionReason
@@ -1082,6 +1429,7 @@ export const ApproveEnrollmentRequestDocument = new TypedDocumentString(`
     access {
       temporaryPassword
       emailSent
+      existingAccount
       user {
         ...UserAccountFields
       }
@@ -1095,6 +1443,9 @@ export const ApproveEnrollmentRequestDocument = new TypedDocumentString(`
   username
   group
   active
+  unitId
+  unitLabel
+  sharedAccount
   mustChangePassword
   lockedUntil
   locked
@@ -1108,6 +1459,8 @@ fragment EnrollmentRequestFields on EnrollmentRequest {
   fullName
   email
   phone
+  unitId
+  unitLabel
   createdAt
   reviewedAt
   rejectionReason
@@ -1126,6 +1479,8 @@ export const RejectEnrollmentRequestDocument = new TypedDocumentString(`
   fullName
   email
   phone
+  unitId
+  unitLabel
   createdAt
   reviewedAt
   rejectionReason
@@ -1224,6 +1579,7 @@ export const SupportPageDocument = new TypedDocumentString(`
   protocol
   userId
   userName
+  condominiumName
   category
   subject
   message
@@ -1252,6 +1608,7 @@ export const SupportRequestsDocument = new TypedDocumentString(`
   protocol
   userId
   userName
+  condominiumName
   category
   subject
   message
@@ -1274,6 +1631,7 @@ export const SendSupportRequestDocument = new TypedDocumentString(`
   protocol
   userId
   userName
+  condominiumName
   category
   subject
   message
@@ -1296,6 +1654,7 @@ export const ReplySupportRequestDocument = new TypedDocumentString(`
   protocol
   userId
   userName
+  condominiumName
   category
   subject
   message
@@ -1318,6 +1677,7 @@ export const FinalizeSupportRequestDocument = new TypedDocumentString(`
   protocol
   userId
   userName
+  condominiumName
   category
   subject
   message

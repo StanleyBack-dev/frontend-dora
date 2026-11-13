@@ -24,15 +24,16 @@ export function canAny(
 export const ADMIN_AREA_PERMISSIONS: Permission[] = [
   "USERS_MANAGE",
   "PERMISSIONS_MANAGE",
+  "UNITS_MANAGE",
   "AUDIT_READ",
 ];
 
 /**
- * Groups `actor` may give to a user (mirrors the API rule: ADMIN_MASTER
- * assigns any group, everyone else only groups below their own).
+ * Roles `actor` may give to a member of the condominium (mirrors the API
+ * rule: the platform assigns resident or manager, a manager only resident).
  */
 export function assignableGroups(actor: UserGroup): UserGroup[] {
-  if (actor === "ADMIN_MASTER") return ["USER", "ADMIN", "ADMIN_MASTER"];
+  if (actor === "ADMIN_MASTER") return ["USER", "ADMIN"];
   if (actor === "ADMIN") return ["USER"];
   return [];
 }

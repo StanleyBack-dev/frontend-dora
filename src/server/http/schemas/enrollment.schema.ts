@@ -12,6 +12,8 @@ export const enrollmentDataSchema = z.object({
   fullName: z.string().trim().min(1).max(160),
   email: z.string().trim().min(1).max(254),
   phone: z.string().trim().min(1).max(20),
+  // Absent on approval: keeps the unit chosen on the form.
+  unitId: z.uuid().nullish(),
 });
 
 export const submitEnrollmentSchema = z.object({

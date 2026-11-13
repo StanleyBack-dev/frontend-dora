@@ -96,6 +96,11 @@ export function SupportRequestsTable({
                 <span className="block font-medium text-fg">
                   {request.userName}
                 </span>
+                {request.condominiumName && (
+                  <span className="block text-xs text-soft">
+                    {request.condominiumName}
+                  </span>
+                )}
               </span>
             ),
           },

@@ -34,7 +34,7 @@ const ACTIONS: Record<ActionKey, ActionSpec> = {
     label: "Redefinir senha",
     icon: KeyRound,
     confirm:
-      "Gera uma nova senha temporária, encerra as sessões do usuário e envia o novo acesso por e-mail.",
+      "Gera uma nova senha temporária, encerra as sessões da pessoa e envia o novo acesso por e-mail.",
   },
   unlock: {
     label: "Desbloquear",
@@ -44,23 +44,30 @@ const ACTIONS: Record<ActionKey, ActionSpec> = {
   "revoke-sessions": {
     label: "Encerrar sessões",
     icon: LogOut,
-    confirm: "Desconecta o usuário de todos os aparelhos.",
+    confirm: "Desconecta a pessoa de todos os aparelhos.",
   },
   deactivate: {
     label: "Desativar acesso",
     icon: PowerOff,
     danger: true,
     confirm:
-      "O usuário não consegue mais entrar e as sessões abertas são encerradas. Os dados e o histórico continuam guardados.",
+      "A pessoa perde o acesso a este condomínio (a conta e outros condomínios dela não mudam). Os dados e o histórico continuam guardados.",
   },
   activate: {
     label: "Reativar acesso",
     icon: Power,
-    confirm: "O usuário volta a poder entrar com a senha atual.",
+    confirm: "A pessoa volta a ter acesso a este condomínio.",
   },
 };
 
-export function UserAccountActions({ user }: { user: UserAccount }) {
+export function UserAccountActions({
+  user,
+  accountLocked = false,
+}: {
+  user: UserAccount;
+  /** Shared account: only this condominium's access can be switched. */
+  accountLocked?: boolean;
+}) {
   const router = useRouter();
   const [selected, setSelected] = useState<ActionKey | null>(null);
   const [result, setResult] = useState<TemporaryAccess | null>(null);
@@ -68,9 +75,13 @@ export function UserAccountActions({ user }: { user: UserAccount }) {
   const [pending, setPending] = useState(false);
 
   const available: ActionKey[] = [
-    "reset-password",
-    ...(user.locked ? (["unlock"] as const) : []),
-    "revoke-sessions",
+    ...(accountLocked
+      ? []
+      : ([
+          "reset-password",
+          ...(user.locked ? (["unlock"] as const) : []),
+          "revoke-sessions",
+        ] as const)),
     user.active ? "deactivate" : "activate",
   ];
 

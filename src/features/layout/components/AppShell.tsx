@@ -31,6 +31,7 @@ import {
 } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { authClient } from "@/features/auth/api/auth.client";
+import { CondominiumSwitcher } from "@/features/condominiums/components/CondominiumSwitcher";
 import { OnboardingTour } from "@/features/help/components/OnboardingTour";
 import { PageHelpButton } from "@/features/help/components/PageHelpButton";
 import { InstallAppInvite } from "@/features/install/components/InstallAppInvite";
@@ -189,7 +190,14 @@ export function AppShell({
 }: {
   user: Pick<
     SessionUser,
-    "name" | "group" | "permissions" | "photoUrl" | "onboardingCompleted"
+    | "name"
+    | "group"
+    | "permissions"
+    | "photoUrl"
+    | "onboardingCompleted"
+    | "platformAdmin"
+    | "condominium"
+    | "condominiums"
   >;
   showAdmin: boolean;
   /** Server-side count; the bell keeps it fresh afterwards. */
@@ -326,6 +334,14 @@ export function AppShell({
               </button>
             </div>
 
+            <div className={cn("px-4 pb-2", collapsed && "lg:px-3")}>
+              <CondominiumSwitcher
+                user={user}
+                collapsed={collapsed}
+                onNavigate={closeMobile}
+              />
+            </div>
+
             {/* min-h-0 lets the menu scroll inside the space the footer leaves. */}
             <nav
               aria-label="Principal"
@@ -433,7 +449,11 @@ export function AppShell({
                       {user.name}
                     </span>
                     <span className="block truncate text-[11px] text-chrome-subtle">
-                      {GROUP_LABELS[user.group]}
+                      {user.platformAdmin
+                        ? "Administração do Dora"
+                        : user.condominium
+                          ? GROUP_LABELS[user.group]
+                          : "Sem condomínio"}
                     </span>
                   </span>
                   <ChevronUp

@@ -28,6 +28,7 @@ export type UserListQuery = {
   limit?: number;
   search?: string;
   group?: UserGroup;
+  unitId?: string;
   active?: boolean;
   page: number;
 };
@@ -45,6 +46,7 @@ export const adminService = {
         filter: {
           search: query.search || undefined,
           group: query.group,
+          unitId: query.unitId,
           active: query.active,
         },
         page: { page: query.page, limit: query.limit ?? PAGE_SIZE },

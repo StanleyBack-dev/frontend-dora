@@ -16,6 +16,7 @@ import {
   toEnrollmentData,
   type EnrollmentForm,
 } from "@/features/enrollment/model/enrollment-form";
+import type { EnrollmentForm as FormContext } from "@/shared/contracts/enrollment";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
@@ -36,20 +37,22 @@ export function EnrollmentFlow() {
   const [step, setStep] = useState<Step>("code");
   const [code, setCode] = useState("");
   const [form, setForm] = useState<EnrollmentForm>(EMPTY_ENROLLMENT);
+  const [context, setContext] = useState<FormContext | null>(null);
   const [consent, setConsent] = useState(false);
   const [photo, setPhoto] = useState<ProfilePhoto | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
-  const errors = enrollmentErrors(form);
+  const units = context?.units ?? [];
+  const errors = enrollmentErrors(form, units.length > 0);
   const invalid = Object.keys(errors).length > 0;
 
   async function verify(event: FormEvent) {
     event.preventDefault();
     setPending(true);
     try {
-      await enrollmentClient.verifyCode(code);
+      setContext(await enrollmentClient.verifyCode(code));
       setStep("form");
     } catch (cause) {
       showError(message(cause, "Não foi possível conferir o código."));
@@ -91,8 +94,10 @@ export function EnrollmentFlow() {
         <CheckCircle2 className="mx-auto size-12 text-success" aria-hidden />
         <p className="text-lg font-semibold text-fg">Cadastro enviado!</p>
         <p className="text-sm text-muted">
-          A administração do condomínio vai conferir os seus dados. Quando o
-          acesso for aprovado, você recebe o usuário e a senha no e-mail{" "}
+          A administração do{" "}
+          {context ? <strong>{context.condominiumName}</strong> : "condomínio"}{" "}
+          vai conferir os seus dados. Quando o acesso for aprovado, você recebe
+          o usuário e a senha no e-mail{" "}
           <strong className="text-fg">{form.email.trim()}</strong>.
         </p>
       </div>
@@ -137,6 +142,14 @@ export function EnrollmentFlow() {
   return (
     <form className="space-y-5" onSubmit={submit} noValidate>
       <Heading />
+      {context && (
+        <div className="rounded-2xl bg-brand-soft px-4 py-3 text-center">
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">
+            Cadastro para
+          </p>
+          <p className="text-lg font-bold text-fg">{context.condominiumName}</p>
+        </div>
+      )}
       <p className="text-sm text-muted">
         Código confirmado. Preencha os seus dados: o acesso ao app é liberado
         depois da aprovação da administração.
@@ -153,6 +166,7 @@ export function EnrollmentFlow() {
         onChange={setForm}
         errors={errors}
         showErrors={submitted}
+        units={units}
       />
       <label className="flex cursor-pointer items-start gap-2 text-sm text-muted">
         <input

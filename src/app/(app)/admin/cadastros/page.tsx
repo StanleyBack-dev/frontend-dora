@@ -16,6 +16,7 @@ import {
   ENROLLMENT_STATUSES,
 } from "@/features/enrollment/model/enrollment-form";
 import { authed, getSessionUser } from "@/server/auth/current-user";
+import { condominiumsService } from "@/server/services/condominiums.service";
 import { enrollmentService } from "@/server/services/enrollment.service";
 import { assignableGroups, can } from "@/shared/lib/access";
 import {
@@ -57,13 +58,16 @@ export default async function EnrollmentsPage({
       ...overrides,
     });
 
-  const requests = await authed((token) =>
-    enrollmentService.requests(token, {
-      status: situation === "TODAS" ? undefined : situation,
-      search,
-      page,
-      limit: pageSize,
-    }),
+  const [requests, units] = await authed((token) =>
+    Promise.all([
+      enrollmentService.requests(token, {
+        status: situation === "TODAS" ? undefined : situation,
+        search,
+        page,
+        limit: pageSize,
+      }),
+      condominiumsService.units(token),
+    ]),
   );
   const filtered = Boolean(search) || situation !== "PENDENTE";
 
@@ -121,6 +125,7 @@ export default async function EnrollmentsPage({
           <EnrollmentRequestsTable
             requests={requests.page.items}
             assignableGroups={assignableGroups(user.group)}
+            units={units}
           />
         )}
 

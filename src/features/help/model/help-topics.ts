@@ -218,15 +218,19 @@ export const HELP_TOPICS: HelpTopic[] = [
     icon: ShieldCheck,
     admin: true,
     area: "account",
-    tour: "Contas de acesso, permissões, cadastros pelo link público, links de convite e os logs do sistema.",
+    tour: "Moradores e gestores do condomínio, unidades, cadastros pelo link público, links de convite e os logs do sistema.",
     sections: {
       howto: [
         {
-          text: "Usuários: crie contas, defina o grupo (Morador, Gestor, Administrador geral), abra exceções de permissão, redefina senhas e desative contas.",
+          text: "Moradores: adicione pessoas ao condomínio, defina o papel (Morador ou Gestor) e a unidade, abra exceções de permissão, redefina senhas e desative o acesso. Quem já usa o Dora em outro condomínio entra com a mesma conta.",
           only: ["USERS_MANAGE"],
         },
         {
-          text: "Cadastros: aprove ou recuse quem se cadastrou pelo link; ao aprovar, a conta é criada e a senha temporária vai por e-mail.",
+          text: "Unidades: cadastre blocos e números de uma vez (ex.: 101-110, 201). Os moradores ficam vinculados a uma unidade.",
+          only: ["UNITS_MANAGE"],
+        },
+        {
+          text: "Cadastros: aprove ou recuse quem se cadastrou pelo link; ao aprovar, a pessoa ganha acesso ao condomínio (conta nova: a senha temporária vai por e-mail).",
           only: ["USERS_MANAGE"],
         },
         {
@@ -240,7 +244,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       ],
       rules: [
         {
-          text: "Algumas permissões só vêm do grupo e não podem ser dadas a uma pessoa (contas, permissões, histórico e suporte).",
+          text: "Tudo aqui vale só para o condomínio aberto no topo do menu. Algumas permissões só vêm do papel e não podem ser dadas a uma pessoa (moradores, permissões, histórico e suporte).",
         },
         {
           text: "Os logs ficam 90 dias e não guardam senhas, tokens ou e-mails completos.",

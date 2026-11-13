@@ -12,10 +12,11 @@ import { UserStatusBadges } from "@/features/admin/components/UserStatusBadges";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { BackendError } from "@/server/http/backend-error";
 import { adminService } from "@/server/services/admin.service";
+import { condominiumsService } from "@/server/services/condominiums.service";
 import { assignableGroups, can } from "@/shared/lib/access";
 import { formatDateTime } from "@/shared/lib/format";
 
-export const metadata: Metadata = { title: "Usuário" };
+export const metadata: Metadata = { title: "Morador" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -31,11 +32,12 @@ export default async function UserDetailPage({
   if (!UUID.test(id)) notFound();
 
   const showPermissions = can(viewer, "PERMISSIONS_MANAGE");
-  const [user, matrix] = await authed(async (token) => {
+  const [user, matrix, units] = await authed(async (token) => {
     try {
       return await Promise.all([
         adminService.getUser(token, id),
         showPermissions ? adminService.getPermissions(token, id) : null,
+        condominiumsService.units(token),
       ]);
     } catch (error) {
       if (error instanceof BackendError && error.code === "USER_NOT_FOUND") {
@@ -46,6 +48,8 @@ export default async function UserDetailPage({
   });
 
   const isSelf = user.id === viewer.id;
+  // A shared account's login data is not this condominium's to change.
+  const accountLocked = user.sharedAccount && !viewer.platformAdmin;
 
   return (
     <div className="space-y-6">
@@ -53,13 +57,15 @@ export default async function UserDetailPage({
         href="/admin/usuarios"
         className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
       >
-        <ArrowLeft className="size-4" /> Usuários
+        <ArrowLeft className="size-4" /> Moradores
       </Link>
 
       <Card>
         <CardHeader
           title={user.name}
-          description={`${user.username} · ${GROUP_LABELS[user.group]}`}
+          description={[user.username, GROUP_LABELS[user.group], user.unitLabel]
+            .filter(Boolean)
+            .join(" · ")}
           action={<UserStatusBadges user={user} />}
         />
         <CardBody>
@@ -85,7 +91,7 @@ export default async function UserDetailPage({
           </dl>
           {!isSelf && (
             <div className="mt-5 border-t border-border pt-5">
-              <UserAccountActions user={user} />
+              <UserAccountActions user={user} accountLocked={accountLocked} />
             </div>
           )}
         </CardBody>
@@ -110,6 +116,8 @@ export default async function UserDetailPage({
             <EditUserForm
               user={user}
               assignableGroups={assignableGroups(viewer.group)}
+              units={units}
+              accountLocked={accountLocked}
             />
           </CardBody>
         </Card>
@@ -119,7 +127,7 @@ export default async function UserDetailPage({
         <Card>
           <CardHeader
             title="Permissões"
-            description="Partem do padrão do grupo; marque ou desmarque para abrir uma exceção só para este usuário."
+            description="Partem do padrão do papel; marque ou desmarque para abrir uma exceção só para esta pessoa neste condomínio."
           />
           <CardBody>
             <PermissionsEditor

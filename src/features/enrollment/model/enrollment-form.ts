@@ -10,25 +10,34 @@ export type EnrollmentForm = {
   fullName: string;
   email: string;
   phone: string;
+  /** "" while none is chosen. */
+  unitId: string;
 };
 
 export const EMPTY_ENROLLMENT: EnrollmentForm = {
   fullName: "",
   email: "",
   phone: "",
+  unitId: "",
 };
 
 export const fromRequest = (request: EnrollmentRequest): EnrollmentForm => ({
   fullName: request.fullName,
   email: request.email,
   phone: formatPhone(request.phone),
+  unitId: request.unitId ?? "",
 });
 
 export type EnrollmentErrors = Partial<Record<keyof EnrollmentForm, string>>;
 
 /** Same rules as the API, to show them while typing. */
-export function enrollmentErrors(form: EnrollmentForm): EnrollmentErrors {
+export function enrollmentErrors(
+  form: EnrollmentForm,
+  /** The condominium has units: one must be chosen. */
+  requireUnit = false,
+): EnrollmentErrors {
   const errors: EnrollmentErrors = {};
+  if (requireUnit && !form.unitId) errors.unitId = "Escolha a sua unidade.";
   const name = form.fullName.trim();
   if (name.length < 5 || !name.includes(" ")) {
     errors.fullName = "Informe o nome completo (nome e sobrenome).";
@@ -48,6 +57,7 @@ export const toEnrollmentData = (form: EnrollmentForm): EnrollmentData => ({
   fullName: form.fullName.trim(),
   email: form.email.trim(),
   phone: form.phone,
+  unitId: form.unitId || null,
 });
 
 export const ENROLLMENT_STATUS: Record<

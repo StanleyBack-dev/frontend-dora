@@ -22,6 +22,9 @@ export const userAccountFieldsFragment = graphql(`
     username
     group
     active
+    unitId
+    unitLabel
+    sharedAccount
     mustChangePassword
     lockedUntil
     locked
@@ -44,6 +47,7 @@ export const createUserDocument = graphql(`
     createUser(input: $input) {
       temporaryPassword
       emailSent
+      existingAccount
       user {
         ...UserAccountFields
       }

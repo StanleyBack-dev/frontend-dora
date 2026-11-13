@@ -11,6 +11,8 @@ export type SupportRequest = {
   protocol: number;
   userId: string;
   userName: string;
+  /** Condominium the person was in when asking. */
+  condominiumName: string | null;
   category: SupportCategory;
   subject: string;
   message: string;

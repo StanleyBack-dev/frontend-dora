@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Megaphone, Send } from "lucide-react";
 import { Alert, Button, Field, Modal, Select, TextArea } from "@/design-system";
-import { GROUP_LABELS, GROUPS } from "@/features/access/model/access-labels";
+import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { broadcastsClient } from "@/features/broadcasts/api/broadcasts.client";
 import {
   AUDIENCES,
@@ -14,6 +14,9 @@ import type { UserGroup } from "@/shared/contracts/api";
 import type { BroadcastAudience } from "@/shared/contracts/broadcasts";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
+
+/** Roles inside the condominium that can receive an announcement. */
+const ROLES: UserGroup[] = ["USER", "ADMIN"];
 
 /** "Moradores", "Gestores"…: how a group reads as recipients. */
 const GROUP_AUDIENCE: Record<UserGroup, string> = {
@@ -88,11 +91,11 @@ export function BroadcastForm() {
         />
         {audience === "GRUPO" && (
           <Select
-            label="Grupo"
+            label="Papel"
             required
             placeholder="Escolha"
             value={targetGroup}
-            options={GROUPS.map((value) => ({
+            options={ROLES.map((value) => ({
               value,
               label: GROUP_LABELS[value],
             }))}

@@ -1,4 +1,5 @@
 import {
+  Building,
   ClipboardList,
   Link2,
   ScrollText,
@@ -21,8 +22,8 @@ export type AdminSection = {
 export const ADMIN_SECTIONS: AdminSection[] = [
   {
     href: "/admin/usuarios",
-    label: "Usuários",
-    description: "Contas, grupos e permissões",
+    label: "Moradores",
+    description: "Acessos, unidades e permissões",
     icon: UsersRound,
     group: "Acessos",
     permission: "USERS_MANAGE",
@@ -42,6 +43,14 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     icon: Link2,
     group: "Acessos",
     permission: "USERS_MANAGE",
+  },
+  {
+    href: "/admin/unidades",
+    label: "Unidades",
+    description: "Blocos, apartamentos e casas",
+    icon: Building,
+    group: "Acessos",
+    permission: "UNITS_MANAGE",
   },
   {
     href: "/admin/logs",

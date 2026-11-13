@@ -1,3 +1,4 @@
+import type { EnrollmentForm as EnrollmentFormContext } from "@/shared/contracts/enrollment";
 import type { UserGroup } from "@/shared/contracts/api";
 import type {
   EnrollmentApproval,
@@ -10,8 +11,9 @@ import { apiRequest } from "@/shared/lib/api-client";
 export const enrollmentClient = {
   // === public sign-up ===
 
+  /** Opens the form: which condominium it is for and its units. */
   verifyCode: (code: string) =>
-    apiRequest<{ ok: true }>("/public/cadastro/codigo", {
+    apiRequest<EnrollmentFormContext>("/public/cadastro/codigo", {
       method: "POST",
       body: JSON.stringify({ code }),
     }),
