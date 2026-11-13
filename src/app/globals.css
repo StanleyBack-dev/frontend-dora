@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+/*
+ * Dora design tokens: white, orange and black.
+ *   - content: clean white surfaces on a warm off-white page;
+ *   - chrome:  near-black (sidebar, drawer and dialog headers);
+ *   - accent:  black for the main actions (buttons), white text on it;
+ *   - brand:   Dora orange for highlights, the logo, active states and
+ *              focus. Text on orange is always black (contrast); orange
+ *              text on white uses `brand-ink`, a deeper shade that reads.
+ * Semantic CSS variables are the source of truth, exposed to Tailwind via
+ * @theme, so components use intent-based classes (bg-surface, text-muted,
+ * bg-chrome...) and never raw colors.
+ */
+
+:root {
+  /* Content */
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --surface-muted: #f7f6f4;
+  --surface-sunken: #efeeeb;
+  --border: #e9e7e4;
+  --border-strong: #d6d3cf;
+  --fg: #0a0a0a;
+  --muted: #57534e;
+  --soft: #8a847d;
+
+  /* Main action: black */
+  --accent: #0a0a0a;
+  --accent-hover: #262626;
+  --accent-fg: #ffffff;
+  --accent-soft: #fff1e8;
+  --accent-border: #ffd4bb;
+
+  /* Brand: Dora orange */
+  --brand: #ff6b1a;
+  --brand-hover: #f25c0a;
+  --brand-fg: #0a0a0a;
+  --brand-soft: #fff1e8;
+  --brand-border: #ffd4bb;
+  /* Orange text on white (links, small labels): 4.5:1+ contrast. */
+  --brand-ink: #c2410c;
+
+  /* Chrome (sidebar, drawer and dialog headers) */
+  --chrome: #0a0a0a;
+  --chrome-top: #141414;
+  --chrome-bottom: #050505;
+  --chrome-line: #262626;
+  --chrome-hover: rgb(255 255 255 / 0.07);
+  --chrome-fg: #fafafa;
+  --chrome-muted: #b5b0a9;
+  --chrome-subtle: #7c7770;
+
+  /* Status (light-surface friendly) */
+  --success: #15803d;
+  --success-soft: #ecfdf3;
+  --success-border: #bbe5c8;
+  --danger: #c0362c;
+  --danger-soft: #fdecea;
+  --danger-border: #f3c6c1;
+  --warning: #92400e;
+  --warning-soft: #fff7e6;
+  --warning-border: #f5dcaa;
+  --info: #1d4ed8;
+  --info-soft: #eef3ff;
+  --info-border: #cad8fb;
+
+  --ring: rgb(255 107 26 / 0.45);
+  --shadow-card:
+    0 1px 2px rgb(10 10 10 / 0.04), 0 12px 32px -18px rgb(10 10 10 / 0.18);
+  --shadow-pop: 0 24px 64px -20px rgb(10 10 10 / 0.4);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-soft: var(--soft);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-border: var(--accent-border);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-border: var(--brand-border);
+  --color-brand-ink: var(--brand-ink);
+  --color-chrome: var(--chrome);
+  --color-chrome-top: var(--chrome-top);
+  --color-chrome-bottom: var(--chrome-bottom);
+  --color-chrome-line: var(--chrome-line);
+  --color-chrome-hover: var(--chrome-hover);
+  --color-chrome-fg: var(--chrome-fg);
+  --color-chrome-muted: var(--chrome-muted);
+  --color-chrome-subtle: var(--chrome-subtle);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-border: var(--success-border);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-border: var(--danger-border);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-border: var(--warning-border);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-border: var(--info-border);
+  --color-ring: var(--ring);
+
+  --font-sans:
+    var(--font-jakarta), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+
+  /* Softer, rounder corners than the browser defaults. */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-pop: var(--shadow-pop);
+
+  /* Loading states appear only if the wait is noticeable. */
+  --animate-fade-in-delayed: dora-fade-in 0.25s ease-out 0.15s both;
+
+  @keyframes dora-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(255 107 26 / 0.25);
+  color: var(--fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Sidebar scroll track blends into the dark chrome. */
+.chrome-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--chrome-line) transparent;
+}
+
+/* Filter panels sit on the dark chrome: their field labels go light. */
+.filter-panel label {
+  color: var(--chrome-muted);
+}
+
+/* Autofilled fields keep the light field look (Chrome overrides styles). */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--fg);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+  caret-color: var(--fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Opening screen (AppSplash): if scripts never take it away, it leaves by
+   itself after a while so the page is never stuck behind it. */
+.app-splash {
+  animation: app-splash-out 0.3s ease 10s forwards;
+}
+
+@keyframes app-splash-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

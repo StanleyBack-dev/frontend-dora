@@ -1,0 +1,118 @@
+"use client";
+
+import { useEffect, useId, useRef, type ReactNode } from "react";
+import { X } from "lucide-react";
+import { cn } from "@/design-system/utils/cn";
+
+type ModalProps = {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  /** Shown next to the title (e.g. a warning icon). */
+  icon?: ReactNode;
+  tone?: "neutral" | "danger";
+  children: ReactNode;
+  /** Action buttons, right-aligned in the footer. */
+  footer?: ReactNode;
+  /** Blocks closing (Esc / backdrop) while an action is in flight. */
+  busy?: boolean;
+  /**
+   * "lg" for dialogs that show a list (e.g. search results); "xl" for a
+   * full workspace (e.g. a long editor).
+   */
+  size?: "md" | "lg" | "xl";
+};
+
+// Centered dialog for short, focused steps (confirmations, a reason to
+// type). Forms with several fields open in a Drawer instead. Built on the
+// native <dialog>: showModal() gives the focus trap, Esc handling and the
+// top layer for free.
+export function Modal({
+  open,
+  onClose,
+  title,
+  icon,
+  tone = "neutral",
+  children,
+  footer,
+  busy = false,
+  size = "md",
+}: ModalProps) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // showModal() focuses the first control (the close button); a field
+      // marked data-autofocus takes the focus instead (React's autoFocus
+      // runs before the dialog opens and is lost).
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    }
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+
+  return (
+    <dialog
+      ref={ref}
+      aria-labelledby={titleId}
+      onCancel={(event) => {
+        // Keep the open state owned by the parent.
+        event.preventDefault();
+        if (!busy) onClose();
+      }}
+      onClick={(event) => {
+        if (event.target === ref.current && !busy) onClose();
+      }}
+      // The dialog renders where it's declared (often a table cell), so it
+      // resets the text styles it would inherit from there (nowrap,
+      // right-aligned…).
+      className={cn(
+        "m-auto w-[calc(100%-2rem)] overflow-hidden whitespace-normal text-left font-normal normal-case tracking-normal",
+        "rounded-2xl border border-border bg-surface p-0 text-fg shadow-pop backdrop:bg-black/55 backdrop:backdrop-blur-sm",
+        size === "xl" ? "max-w-6xl" : size === "lg" ? "max-w-2xl" : "max-w-md",
+      )}
+    >
+      <div className="flex items-center gap-3 border-b border-chrome-line bg-chrome px-5 py-4">
+        {icon && (
+          <span
+            className={cn(
+              "grid size-9 shrink-0 place-items-center rounded-full",
+              tone === "danger"
+                ? "bg-danger text-white"
+                : "bg-brand/15 text-brand",
+            )}
+          >
+            {icon}
+          </span>
+        )}
+        <h2
+          id={titleId}
+          className="min-w-0 flex-1 truncate text-[15px] font-semibold text-chrome-fg"
+        >
+          {title}
+        </h2>
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={busy}
+          aria-label="Fechar"
+          className="grid size-8 shrink-0 place-items-center rounded-full text-chrome-subtle transition-colors hover:bg-chrome-hover hover:text-chrome-fg disabled:opacity-40"
+        >
+          <X className="size-[18px]" />
+        </button>
+      </div>
+      {/* Long content scrolls inside, header and footer stay put. */}
+      <div className="max-h-[calc(100dvh-11rem)] overflow-y-auto px-5 py-5 text-[13px] leading-relaxed text-muted">
+        {children}
+      </div>
+      {footer && (
+        <div className="flex flex-wrap justify-end gap-2 border-t border-border bg-surface-muted px-5 py-3.5 max-sm:[&>*]:flex-1 max-sm:[&>*]:justify-center">
+          {footer}
+        </div>
+      )}
+    </dialog>
+  );
+}
