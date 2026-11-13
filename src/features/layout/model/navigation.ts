@@ -1,5 +1,6 @@
 import {
   Bell,
+  Building2,
   CircleHelp,
   CircleUserRound,
   House,
@@ -39,6 +40,13 @@ export const PRIMARY_NAV: NavItem[] = [
     label: "Comunicados",
     icon: Megaphone,
     permission: "NOTIFICATIONS_BROADCAST",
+  },
+  // The platform console (every condominium): only the Dora administration.
+  {
+    href: "/plataforma",
+    label: "Condomínios",
+    icon: Building2,
+    permission: "CONDOMINIUMS_MANAGE",
   },
 ];
 

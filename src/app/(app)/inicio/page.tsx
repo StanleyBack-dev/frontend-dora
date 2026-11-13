@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import {
   ArrowUpRight,
   Bell,
+  Building2,
   CalendarClock,
   CircleUserRound,
   LifeBuoy,
@@ -68,7 +69,9 @@ function Shortcut({
 
 export default async function HomePage() {
   const user = await getSessionUser();
-  const isManager = can(user, "DASHBOARD_READ");
+  const condominium = user.condominium;
+  // The overview is the condominium's: none without one.
+  const isManager = Boolean(condominium) && can(user, "DASHBOARD_READ");
   const dashboard = isManager
     ? await authed((token) => dashboardService.get(token))
     : null;
@@ -87,22 +90,40 @@ export default async function HomePage() {
         />
         <div className="relative max-w-lg">
           <p className="text-sm font-semibold text-chrome-muted">
-            {greeting()}, {GROUP_LABELS[user.group].toLowerCase()}
+            {greeting()}
+            {condominium
+              ? ` · ${condominium.name}`
+              : user.platformAdmin
+                ? " · administração do Dora"
+                : ""}
           </p>
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight sm:text-4xl">
             Olá, {firstName}!
           </h1>
           <p className="mt-3 text-[15px] text-chrome-muted">
-            Tudo do seu condomínio em um só lugar. As reservas de quadras e
-            espaços chegam aqui em breve.
+            {condominium
+              ? `Você está como ${GROUP_LABELS[user.group].toLowerCase()}. Tudo do condomínio em um só lugar; as reservas de quadras e espaços chegam aqui em breve.`
+              : user.platformAdmin
+                ? "Você está na visão da plataforma. Escolha um condomínio para trabalhar nele, ou gerencie todos no console."
+                : "Você ainda não tem acesso a um condomínio. Peça à administração do seu condomínio o link de cadastro."}
           </p>
         </div>
       </section>
+
+      {!condominium && user.platformAdmin && (
+        <Shortcut
+          href="/plataforma"
+          icon={<Building2 aria-hidden />}
+          title="Condomínios"
+          description="Cadastre condomínios, veja os números de cada um e entre para administrar."
+        />
+      )}
 
       {dashboard && (
         <DashboardPanel
           dashboard={dashboard}
           canManageUsers={can(user, "USERS_MANAGE")}
+          canManageUnits={can(user, "UNITS_MANAGE")}
           canManageSupport={can(user, "SUPPORT_MANAGE")}
         />
       )}

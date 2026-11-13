@@ -53,3 +53,13 @@ export const maskUsername = (value: string) =>
 export function usernameError(value: string): string | null {
   return value && value.length < 3 ? "Mínimo de 3 caracteres." : null;
 }
+
+/** CNPJ while typing: 00.000.000/0000-00. */
+export function maskCnpj(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 14);
+  return digits
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/\.(\d{3})(\d)/, ".$1/$2")
+    .replace(/(\d{4})(\d)/, "$1-$2");
+}

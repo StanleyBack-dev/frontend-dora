@@ -7,15 +7,21 @@ import { Alert, Button } from "@/design-system";
 import { adminClient } from "@/features/admin/api/admin.client";
 import { UserFormFields } from "@/features/admin/components/UserFormFields";
 import type { UserAccount, UserGroup, UserInput } from "@/shared/contracts/api";
+import type { Unit } from "@/shared/contracts/condominiums";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
 export function EditUserForm({
   user,
   assignableGroups,
+  units,
+  accountLocked,
 }: {
   user: UserAccount;
   assignableGroups: UserGroup[];
+  units: Pick<Unit, "id" | "label">[];
+  /** Shared account: only role and unit can change here. */
+  accountLocked: boolean;
 }) {
   const router = useRouter();
   const initial: UserInput = {
@@ -23,6 +29,7 @@ export function EditUserForm({
     email: user.email,
     username: user.username,
     group: user.group,
+    unitId: user.unitId,
   };
   const [form, setForm] = useState<UserInput>(initial);
   const { showError } = useToast();
@@ -60,8 +67,8 @@ export function EditUserForm({
       {saved && <Alert tone="success">Alterações salvas.</Alert>}
       {changes.group && (
         <Alert tone="info">
-          Ao trocar o grupo, as permissões personalizadas deste usuário voltam
-          ao padrão do novo grupo.
+          Ao trocar o papel, as permissões personalizadas desta pessoa voltam ao
+          padrão do novo papel.
         </Alert>
       )}
       <UserFormFields
@@ -72,6 +79,9 @@ export function EditUserForm({
             ? assignableGroups
             : [user.group, ...assignableGroups]
         }
+        units={units}
+        mode="edit"
+        accountLocked={accountLocked}
       />
       <Button
         type="submit"

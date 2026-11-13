@@ -17,6 +17,21 @@ export const loginDocument = graphql(`
         permissions
         photoUrl
         onboardingCompleted
+        platformAdmin
+        condominium {
+          id
+          name
+          city
+          state
+          status
+        }
+        condominiums {
+          id
+          name
+          city
+          state
+          role
+        }
       }
     }
   }
@@ -51,6 +66,21 @@ export const meDocument = graphql(`
       permissions
       photoUrl
       onboardingCompleted
+      platformAdmin
+      condominium {
+        id
+        name
+        city
+        state
+        status
+      }
+      condominiums {
+        id
+        name
+        city
+        state
+        role
+      }
     }
   }
 `);
@@ -79,6 +109,21 @@ export const updateMyProfileDocument = graphql(`
       permissions
       photoUrl
       onboardingCompleted
+      platformAdmin
+      condominium {
+        id
+        name
+        city
+        state
+        status
+      }
+      condominiums {
+        id
+        name
+        city
+        state
+        role
+      }
     }
   }
 `);
@@ -110,5 +155,11 @@ export const verifyPasswordRecoveryCodeDocument = graphql(`
 export const resetPasswordWithRecoveryDocument = graphql(`
   mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {
     resetPasswordWithRecovery(input: $input)
+  }
+`);
+
+export const switchCondominiumDocument = graphql(`
+  mutation SwitchCondominium($condominiumId: ID) {
+    switchCondominium(condominiumId: $condominiumId)
   }
 `);

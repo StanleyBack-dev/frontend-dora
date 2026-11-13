@@ -5,9 +5,22 @@ import { Check, Copy } from "lucide-react";
 import { Alert, Button } from "@/design-system";
 import type { TemporaryAccess } from "@/shared/contracts/api";
 
-// The temporary password is shown once: the API keeps only its hash.
+// The temporary password is shown once: the API keeps only its hash. A person
+// who already had a Dora account gets no new password: they just see this
+// condominium next time they open the app.
 export function TemporaryAccessPanel({ access }: { access: TemporaryAccess }) {
   const [copied, setCopied] = useState(false);
+
+  if (access.temporaryPassword === null) {
+    return (
+      <Alert tone="success">
+        {access.user.name} já tinha conta no Dora (outro condomínio) e agora
+        também tem acesso a este. É só entrar com o login e a senha de sempre:{" "}
+        <strong>{access.user.username}</strong> ou {access.user.email}.
+      </Alert>
+    );
+  }
+
   const text = `Usuário: ${access.user.username}\nSenha temporária: ${access.temporaryPassword}`;
 
   async function copy() {
@@ -24,7 +37,7 @@ export function TemporaryAccessPanel({ access }: { access: TemporaryAccess }) {
       <Alert tone={access.emailSent ? "success" : "warning"}>
         {access.emailSent
           ? `Enviamos o acesso para ${access.user.email}. Você também pode repassar os dados abaixo.`
-          : "Não foi possível enviar o e-mail. Repasse os dados abaixo diretamente ao usuário."}
+          : "Não foi possível enviar o e-mail. Repasse os dados abaixo diretamente à pessoa."}
       </Alert>
       <dl className="rounded-lg border border-border bg-surface-muted p-4 text-sm">
         <div className="flex justify-between gap-4">
@@ -41,8 +54,8 @@ export function TemporaryAccessPanel({ access }: { access: TemporaryAccess }) {
         </div>
       </dl>
       <p className="text-xs text-soft">
-        Esta senha não será exibida de novo. No primeiro acesso, o usuário cria
-        a própria senha.
+        Esta senha não será exibida de novo. No primeiro acesso, a pessoa cria a
+        própria senha.
       </p>
       <Button
         variant="secondary"

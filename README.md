@@ -32,6 +32,15 @@ src/
 Lint enforces the layers: `design-system` does not import `features` or
 `server`, and feature components do not import `server`.
 
+### Condominiums (multi-tenant)
+
+The session works in one condominium at a time (`SessionUser.condominium`).
+The switcher at the top of the sidebar (`features/condominiums`) changes it
+through `PUT /api/me/condominium`, then refreshes the page: every screen and
+API call is scoped to it by the backend. Pages of one condominium render
+`NoCondominium` when none is open. The platform administrator manages every
+condominium in **Condomínios** (`/plataforma`).
+
 ## Typed GraphQL
 
 1. In the backend: `npm run schema:generate` (writes `src/graphql/schema.gql`).

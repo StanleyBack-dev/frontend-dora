@@ -6,6 +6,7 @@ export const supportRequestFieldsFragment = graphql(`
     protocol
     userId
     userName
+    condominiumName
     category
     subject
     message

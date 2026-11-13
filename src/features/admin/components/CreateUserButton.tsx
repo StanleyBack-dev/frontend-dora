@@ -12,15 +12,24 @@ import type {
   UserGroup,
   UserInput,
 } from "@/shared/contracts/api";
+import type { Unit } from "@/shared/contracts/condominiums";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
-const EMPTY: UserInput = { name: "", email: "", username: "", group: "USER" };
+const EMPTY: UserInput = {
+  name: "",
+  email: "",
+  username: "",
+  group: "USER",
+  unitId: null,
+};
 
 export function CreateUserButton({
   assignableGroups,
+  units,
 }: {
   assignableGroups: UserGroup[];
+  units: Pick<Unit, "id" | "label">[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -44,13 +53,13 @@ export function CreateUserButton({
       showError(
         cause instanceof ApiClientError
           ? cause.message
-          : "Não foi possível criar o usuário.",
+          : "Não foi possível adicionar a pessoa.",
       );
     }
     setPending(false);
   }
 
-  const complete = form.name && form.email && form.username;
+  const complete = form.name && form.email;
 
   return (
     <>
@@ -58,12 +67,18 @@ export function CreateUserButton({
         onClick={() => setOpen(true)}
         icon={<UserPlus className="size-4" />}
       >
-        Novo usuário
+        Adicionar pessoa
       </Button>
       <Drawer
         open={open}
         onClose={close}
-        title={created ? "Usuário criado" : "Novo usuário"}
+        title={
+          created
+            ? created.temporaryPassword
+              ? "Acesso criado"
+              : "Acesso liberado"
+            : "Adicionar pessoa"
+        }
         busy={pending}
         footer={
           created ? (
@@ -74,7 +89,7 @@ export function CreateUserButton({
                 Cancelar
               </Button>
               <Button onClick={submit} loading={pending} disabled={!complete}>
-                Criar e enviar acesso
+                Adicionar e enviar acesso
               </Button>
             </>
           )
@@ -88,9 +103,13 @@ export function CreateUserButton({
               value={form}
               onChange={setForm}
               assignableGroups={assignableGroups}
+              units={units}
+              mode="create"
             />
             <p className="text-xs text-soft">
-              O sistema gera uma senha temporária e envia por e-mail.
+              Conta nova: o sistema gera uma senha temporária e envia por
+              e-mail. Se o e-mail já tiver conta no Dora (outro condomínio), a
+              pessoa só ganha acesso a este.
             </p>
           </div>
         )}

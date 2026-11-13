@@ -9,9 +9,9 @@ export const GROUP_LABELS: Record<UserGroup, string> = {
 export const GROUP_DESCRIPTIONS: Record<UserGroup, string> = {
   USER: "Usa o app do condomínio: recebe avisos e comunicados e pede ajuda ao suporte.",
   ADMIN:
-    "Tudo do morador, mais o painel de gestão e o envio de comunicados (síndico, administração).",
+    "Administra este condomínio (síndico, administração): moradores, cadastros, unidades, comunicados e painel.",
   ADMIN_MASTER:
-    "Acesso total: inclusive usuários, cadastros, permissões e histórico dos registros.",
+    "Administra a plataforma Dora: todos os condomínios, suporte e histórico dos registros.",
 };
 
 /** Groups in rank order (lowest first). */
@@ -29,7 +29,11 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Enviar comunicados",
     area: "Comunicação",
   },
-  USERS_MANAGE: { label: "Gerenciar usuários", area: "Administração" },
+  USERS_MANAGE: {
+    label: "Gerenciar moradores e cadastros",
+    area: "Administração",
+  },
+  UNITS_MANAGE: { label: "Gerenciar unidades", area: "Administração" },
   PERMISSIONS_MANAGE: {
     label: "Gerenciar permissões",
     area: "Administração",
@@ -42,14 +46,19 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Responder solicitações de suporte",
     area: "Administração",
   },
+  CONDOMINIUMS_MANAGE: {
+    label: "Gerenciar os condomínios da plataforma",
+    area: "Administração",
+  },
 };
 
-/** Only granted by the user's group; never per user. */
+/** Only granted by the role; never per member. */
 export const LOCKED_PERMISSIONS: ReadonlySet<Permission> = new Set<Permission>([
   "USERS_MANAGE",
   "PERMISSIONS_MANAGE",
   "AUDIT_READ",
   "SUPPORT_MANAGE",
+  "CONDOMINIUMS_MANAGE",
 ]);
 
 export const PERMISSION_AREAS: PermissionArea[] = [

@@ -14,7 +14,7 @@ import { auditColumn } from "@/features/audit/components/RecordAudit";
 import type { UserAccount } from "@/shared/contracts/api";
 import { formatDateTime } from "@/shared/lib/format";
 
-// Accounts of the admin area (table with the audit column). The
+// Members of the condominium (table with the audit column). The
 // pencil (first column; on phones next to the name) opens the account's page.
 export function UsersTable({ users }: { users: UserAccount[] }) {
   const audit = auditColumn((user: UserAccount) => ({
@@ -52,6 +52,12 @@ export function UsersTable({ users }: { users: UserAccount[] }) {
       ),
     },
     {
+      key: "unit",
+      label: "Unidade",
+      className: "whitespace-nowrap",
+      render: (user) => user.unitLabel ?? <span className="text-soft">—</span>,
+    },
+    {
       key: "username",
       label: "Usuário",
       render: (user) => (
@@ -65,7 +71,7 @@ export function UsersTable({ users }: { users: UserAccount[] }) {
     },
     {
       key: "group",
-      label: "Grupo",
+      label: "Papel",
       render: (user) => GROUP_LABELS[user.group],
     },
     {

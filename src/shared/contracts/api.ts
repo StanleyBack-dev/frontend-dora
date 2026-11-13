@@ -1,9 +1,13 @@
 // Contract types shared by the BFF routes and the UI — types only, no runtime
 // code. Dates are ISO strings. Enums come from the GraphQL schema
 // (codegen: shared/graphql/schema-enums.ts).
-import type { Permission, UserGroup } from "@/shared/graphql/schema-enums";
+import type {
+  CondominiumStatus,
+  Permission,
+  UserGroup,
+} from "@/shared/graphql/schema-enums";
 
-export type { Permission, UserGroup };
+export type { CondominiumStatus, Permission, UserGroup };
 
 /** Error shape returned by every BFF route. */
 export type ApiError = {
@@ -20,12 +24,37 @@ export type Paginated<T> = {
   totalPages: number;
 };
 
+/** The condominium the session works in. */
+export type CurrentCondominium = {
+  id: string;
+  name: string;
+  city: string;
+  state: string;
+  status: CondominiumStatus;
+};
+
+/** A condominium the person can open (active member). */
+export type MemberCondominium = {
+  id: string;
+  name: string;
+  city: string;
+  state: string;
+  /** Role there: USER (resident) or ADMIN (manager). */
+  role: UserGroup;
+};
+
 export type SessionUser = {
   id: string;
   name: string;
   username: string;
   email: string;
+  /** Group in the current context (role in the condominium, or the platform). */
   group: UserGroup;
+  /** Runs the platform (every condominium). */
+  platformAdmin: boolean;
+  /** Null: no condominium chosen or available. */
+  condominium: CurrentCondominium | null;
+  condominiums: MemberCondominium[];
   mustChangePassword: boolean;
   permissions: Permission[];
   /** Short-lived link to the profile photo (null: none). */
@@ -39,8 +68,18 @@ export type UserAccount = {
   name: string;
   email: string;
   username: string;
+  /** Role in the current condominium (ADMIN_MASTER: the platform). */
   group: UserGroup;
+  /** Access to this condominium. */
   active: boolean;
+  unitId: string | null;
+  /** "Bloco A · 101". */
+  unitLabel: string | null;
+  /**
+   * Also used outside this condominium: login data only changes through the
+   * person or the platform.
+   */
+  sharedAccount: boolean;
   mustChangePassword: boolean;
   lockedUntil: string | null;
   /** Locked right now by failed logins (computed by the API). */
@@ -53,15 +92,20 @@ export type UserAccount = {
 /** Shown once to the admin who generated it. */
 export type TemporaryAccess = {
   user: UserAccount;
-  temporaryPassword: string;
+  /** Null when the person already had a Dora account. */
+  temporaryPassword: string | null;
   emailSent: boolean;
+  /** The person already had an account: they only gained this condominium. */
+  existingAccount?: boolean;
 };
 
 export type UserInput = {
   name: string;
   email: string;
-  username: string;
+  /** Empty: generated from the name. */
+  username?: string | null;
   group: UserGroup;
+  unitId?: string | null;
 };
 
 export type PermissionMatrix = {
@@ -73,6 +117,9 @@ export type PermissionMatrix = {
 /** Records whose trail the tables show (entity names of the audit log). */
 export const AUDITED_ENTITIES = [
   "user",
+  "membership",
+  "condominium",
+  "unit",
   "enrollment_invite",
   "enrollment_request",
   "broadcast",

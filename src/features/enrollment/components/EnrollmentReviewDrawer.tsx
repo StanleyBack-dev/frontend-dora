@@ -39,15 +39,18 @@ const failure = (cause: unknown, fallback: string) =>
   cause instanceof ApiClientError ? cause.message : fallback;
 
 // Review of one sign-up. Pending: the manager can correct the data, then
-// approve (creates the account) or reject it.
+// approve (gives access to the condominium) or reject it.
 export function EnrollmentReviewDrawer({
   request,
   assignableGroups,
+  units,
   onClose,
 }: {
   request: EnrollmentRequest;
-  /** Groups the current admin may give to the new account. */
+  /** Roles the current manager may give. */
   assignableGroups: UserGroup[];
+  /** The condominium's units (the choice can be corrected). */
+  units: { id: string; label: string }[];
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -62,7 +65,7 @@ export function EnrollmentReviewDrawer({
   const status = ENROLLMENT_STATUS[request.status];
   const reviewable = request.status === "PENDENTE" && !access;
 
-  const errors = enrollmentErrors(form);
+  const errors = enrollmentErrors(form, units.length > 0);
 
   const finish = () => {
     router.refresh();
@@ -93,7 +96,13 @@ export function EnrollmentReviewDrawer({
       open
       width="lg"
       onClose={access ? finish : onClose}
-      title={access ? "Acesso criado" : "Cadastro recebido"}
+      title={
+        access
+          ? access.temporaryPassword
+            ? "Acesso criado"
+            : "Acesso liberado"
+          : "Cadastro recebido"
+      }
       busy={pending}
       footer={
         access ? (
@@ -190,6 +199,7 @@ export function EnrollmentReviewDrawer({
                 onChange={setForm}
                 errors={errors}
                 showErrors={submitted}
+                units={units}
               />
             </>
           ) : (
@@ -214,6 +224,7 @@ function ReviewedSummary({ request }: { request: EnrollmentRequest }) {
     ["Nome completo", request.fullName],
     ["E-mail", request.email],
     ["Telefone", formatPhone(request.phone)],
+    ["Unidade", request.unitLabel ?? "—"],
     ["Analisado em", formatDateTime(request.reviewedAt)],
   ];
   return (
@@ -234,7 +245,7 @@ function ReviewedSummary({ request }: { request: EnrollmentRequest }) {
           href={`/admin/usuarios/${request.userId}`}
           className="text-sm font-medium text-brand-ink hover:underline"
         >
-          Ver o usuário criado
+          Ver o morador
         </Link>
       )}
     </div>

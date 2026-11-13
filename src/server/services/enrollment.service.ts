@@ -4,7 +4,7 @@ import { BackendError } from "@/server/http/backend-error";
 import {
   approveEnrollmentRequestDocument,
   createEnrollmentInviteDocument,
-  enrollmentFormValidDocument,
+  enrollmentFormDocument,
   enrollmentInvitesDocument,
   enrollmentRequestsDocument,
   rejectEnrollmentRequestDocument,
@@ -16,6 +16,7 @@ import type { Paginated, UserGroup } from "@/shared/contracts/api";
 import type {
   EnrollmentApproval,
   EnrollmentData,
+  EnrollmentForm,
   EnrollmentInvite,
   EnrollmentRequest,
   EnrollmentStatus,
@@ -47,11 +48,15 @@ export const enrollmentService = {
     return verifyEnrollmentCode;
   },
 
-  /** Throws ENROLLMENT_FORM_EXPIRED when the form token no longer works. */
-  async checkForm(formToken: string): Promise<void> {
-    await backendGraphql(enrollmentFormValidDocument, {
+  /**
+   * The condominium and units the form shows. Throws ENROLLMENT_FORM_EXPIRED
+   * when the form token no longer works.
+   */
+  async form(formToken: string): Promise<EnrollmentForm> {
+    const { enrollmentForm } = await backendGraphql(enrollmentFormDocument, {
       variables: { formToken },
     });
+    return enrollmentForm;
   },
 
   async submit(

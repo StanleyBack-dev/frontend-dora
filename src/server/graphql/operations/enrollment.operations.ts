@@ -8,9 +8,15 @@ export const verifyEnrollmentCodeDocument = graphql(`
   }
 `);
 
-export const enrollmentFormValidDocument = graphql(`
-  query EnrollmentFormValid($formToken: String!) {
-    enrollmentFormValid(formToken: $formToken)
+export const enrollmentFormDocument = graphql(`
+  query EnrollmentForm($formToken: String!) {
+    enrollmentForm(formToken: $formToken) {
+      condominiumName
+      units {
+        id
+        label
+      }
+    }
   }
 `);
 
@@ -41,6 +47,8 @@ export const enrollmentRequestFieldsFragment = graphql(`
     fullName
     email
     phone
+    unitId
+    unitLabel
     createdAt
     reviewedAt
     rejectionReason
@@ -104,6 +112,7 @@ export const approveEnrollmentRequestDocument = graphql(`
       access {
         temporaryPassword
         emailSent
+        existingAccount
         user {
           ...UserAccountFields
         }

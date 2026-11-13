@@ -21,10 +21,13 @@ import { formatPhone } from "@/shared/lib/masks";
 export function EnrollmentRequestsTable({
   requests,
   assignableGroups,
+  units,
 }: {
   requests: EnrollmentRequest[];
-  /** Groups the current admin may give to the new account. */
+  /** Roles the current manager may give. */
   assignableGroups: UserGroup[];
+  /** The condominium's units (the manager may correct the choice). */
+  units: { id: string; label: string }[];
 }) {
   const [open, setOpen] = useState<EnrollmentRequest | null>(null);
 
@@ -41,6 +44,13 @@ export function EnrollmentRequestsTable({
       render: (request) => (
         <span className="font-medium text-fg">{request.fullName}</span>
       ),
+    },
+    {
+      key: "unit",
+      label: "Unidade",
+      className: "whitespace-nowrap",
+      render: (request) =>
+        request.unitLabel ?? <span className="text-soft">—</span>,
     },
     {
       key: "phone",
@@ -112,6 +122,7 @@ export function EnrollmentRequestsTable({
           key={open.id}
           request={open}
           assignableGroups={assignableGroups}
+          units={units}
           onClose={() => setOpen(null)}
         />
       )}

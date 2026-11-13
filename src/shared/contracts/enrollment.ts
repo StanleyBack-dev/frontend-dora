@@ -19,10 +19,19 @@ export type EnrollmentData = {
   fullName: string;
   email: string;
   phone: string;
+  /** Unit picked on the form (required when the condominium has units). */
+  unitId?: string | null;
+};
+
+/** What the public form shows once the code is accepted. */
+export type EnrollmentForm = {
+  condominiumName: string;
+  units: { id: string; label: string }[];
 };
 
 export type EnrollmentRequest = EnrollmentData & {
   id: string;
+  unitLabel: string | null;
   status: EnrollmentStatus;
   createdAt: string;
   reviewedAt: string | null;
