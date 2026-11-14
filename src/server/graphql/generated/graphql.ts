@@ -95,6 +95,10 @@ export type CreateUserInput = {
   /** USER (morador) ou ADMIN (gestor). */
   group: UserGroup;
   name: string;
+  /** Telefone de contato. */
+  phone?: string | null | undefined;
+  /** Complemento do endereço no condomínio ("casa dos fundos"). */
+  unitComplement?: string | null | undefined;
   unitId?: string | number | null | undefined;
   /** Login: 3 a 32 caracteres (a-z, 0-9, ., -, _). Vazio: gerado do nome. */
   username?: string | null | undefined;
@@ -105,8 +109,14 @@ export type EnrollmentDataInput = {
   email: string;
   fullName: string;
   phone: string;
+  /** Bloco ou torre digitado (quando o condomínio ainda não tem unidades). */
+  unitBlock?: string | null | undefined;
+  /** Complemento do endereço no condomínio ("casa dos fundos"). */
+  unitComplement?: string | null | undefined;
   /** Unidade (obrigatória quando o condomínio tem unidades). Na aprovação, ausente mantém a escolhida. */
   unitId?: string | number | null | undefined;
+  /** Número da casa ou apartamento digitado (quando o condomínio ainda não tem unidades). Na aprovação, ausente mantém o informado. */
+  unitNumber?: string | null | undefined;
 };
 
 export type EnrollmentRequestFilterInput = {
@@ -278,6 +288,8 @@ export type UnitLimitInput = {
 export type UpdateMyProfileInput = {
   email: string;
   name: string;
+  /** Telefone de contato (ausente: mantém; vazio: remove). */
+  phone?: string | null | undefined;
 };
 
 export type UpdateUnitInput = {
@@ -289,6 +301,10 @@ export type UpdateUserInput = {
   email?: string | null | undefined;
   group?: UserGroup | null | undefined;
   name?: string | null | undefined;
+  /** Telefone de contato. */
+  phone?: string | null | undefined;
+  /** Complemento do endereço no condomínio ("casa dos fundos"). */
+  unitComplement?: string | null | undefined;
   /** Ausente: não muda. null: sem unidade. */
   unitId?: string | number | null | undefined;
   username?: string | null | undefined;
@@ -321,23 +337,23 @@ export type UsersQueryVariables = Exact<{
 }>;
 
 
-export type UsersQuery = { users: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string }> } };
+export type UsersQuery = { users: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string }> } };
 
-export type UserAccountFieldsFragment = { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string };
+export type UserAccountFieldsFragment = { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string };
 
 export type UserQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type UserQuery = { user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type UserQuery = { user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type CreateUserMutationVariables = Exact<{
   input: CreateUserInput;
 }>;
 
 
-export type CreateUserMutation = { createUser: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } };
+export type CreateUserMutation = { createUser: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } };
 
 export type UpdateUserMutationVariables = Exact<{
   id: string | number;
@@ -345,7 +361,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { updateUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type UpdateUserMutation = { updateUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type SetUserActiveMutationVariables = Exact<{
   id: string | number;
@@ -353,28 +369,28 @@ export type SetUserActiveMutationVariables = Exact<{
 }>;
 
 
-export type SetUserActiveMutation = { setUserActive: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type SetUserActiveMutation = { setUserActive: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type ResetUserPasswordMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type ResetUserPasswordMutation = { resetUserPassword: { temporaryPassword: string | null, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } };
+export type ResetUserPasswordMutation = { resetUserPassword: { temporaryPassword: string | null, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } };
 
 export type UnlockUserMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type UnlockUserMutation = { unlockUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type UnlockUserMutation = { unlockUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type RevokeUserSessionsMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type RevokeUserSessionsMutation = { revokeUserSessions: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
+export type RevokeUserSessionsMutation = { revokeUserSessions: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } };
 
 export type UserPermissionsQueryVariables = Exact<{
   id: string | number;
@@ -403,7 +419,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
+export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
 
 export type RefreshSessionMutationVariables = Exact<{
   refreshToken: string;
@@ -420,7 +436,7 @@ export type LogoutMutation = { logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type CompleteOnboardingMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -439,7 +455,7 @@ export type UpdateMyProfileMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type SetMyPhotoMutationVariables = Exact<{
   photo: string;
@@ -661,7 +677,7 @@ export type SubmitEnrollmentMutation = { submitEnrollment: boolean };
 
 export type EnrollmentInviteFieldsFragment = { id: string, code: string, label: string, expiresAt: string, revokedAt: string | null, createdAt: string, requestCount: number };
 
-export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
+export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
 
 export type EnrollmentInvitesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -688,7 +704,7 @@ export type EnrollmentRequestsQueryVariables = Exact<{
 }>;
 
 
-export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
+export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
 
 export type ApproveEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -697,7 +713,7 @@ export type ApproveEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
+export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
 
 export type RejectEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -705,7 +721,7 @@ export type RejectEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
+export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -920,6 +936,9 @@ export const UserAccountFieldsFragmentDoc = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1008,6 +1027,10 @@ export const EnrollmentRequestFieldsFragmentDoc = new TypedDocumentString(`
   phone
   unitId
   unitLabel
+  unitComplement
+  typedUnitLabel
+  typedUnitBlock
+  typedUnitNumber
   createdAt
   reviewedAt
   rejectionReason
@@ -1088,6 +1111,9 @@ export const UsersDocument = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1111,6 +1137,9 @@ export const UserDocument = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1139,6 +1168,9 @@ export const CreateUserDocument = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1162,6 +1194,9 @@ export const UpdateUserDocument = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1185,6 +1220,9 @@ export const SetUserActiveDocument = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1212,6 +1250,9 @@ export const ResetUserPasswordDocument = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1235,6 +1276,9 @@ export const UnlockUserDocument = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1258,6 +1302,9 @@ export const RevokeUserSessionsDocument = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1316,6 +1363,7 @@ export const LoginDocument = new TypedDocumentString(`
       mustChangePassword
       permissions
       photoUrl
+      phone
       onboardingCompleted
       platformAdmin
       condominium {
@@ -1362,6 +1410,7 @@ export const MeDocument = new TypedDocumentString(`
     mustChangePassword
     permissions
     photoUrl
+    phone
     onboardingCompleted
     platformAdmin
     condominium {
@@ -1402,6 +1451,7 @@ export const UpdateMyProfileDocument = new TypedDocumentString(`
     mustChangePassword
     permissions
     photoUrl
+    phone
     onboardingCompleted
     platformAdmin
     condominium {
@@ -1915,6 +1965,10 @@ export const EnrollmentRequestsDocument = new TypedDocumentString(`
   phone
   unitId
   unitLabel
+  unitComplement
+  typedUnitLabel
+  typedUnitBlock
+  typedUnitNumber
   createdAt
   reviewedAt
   rejectionReason
@@ -1946,6 +2000,9 @@ export const ApproveEnrollmentRequestDocument = new TypedDocumentString(`
   active
   unitId
   unitLabel
+  unitComplement
+  phone
+  photoUrl
   sharedAccount
   mustChangePassword
   lockedUntil
@@ -1962,6 +2019,10 @@ fragment EnrollmentRequestFields on EnrollmentRequest {
   phone
   unitId
   unitLabel
+  unitComplement
+  typedUnitLabel
+  typedUnitBlock
+  typedUnitNumber
   createdAt
   reviewedAt
   rejectionReason
@@ -1982,6 +2043,10 @@ export const RejectEnrollmentRequestDocument = new TypedDocumentString(`
   phone
   unitId
   unitLabel
+  unitComplement
+  typedUnitLabel
+  typedUnitBlock
+  typedUnitNumber
   createdAt
   reviewedAt
   rejectionReason

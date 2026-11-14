@@ -6,11 +6,13 @@ import {
   Field,
   FilterActions,
   FilterPanel,
+  PageHeader,
   Pagination,
   Select,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
+import { NoCondominium } from "@/features/condominiums/components/NoCondominium";
 import { CreateUserButton } from "@/features/admin/components/CreateUserButton";
 import { UsersTable } from "@/features/admin/components/UsersTable";
 import { authed, getSessionUser } from "@/server/auth/current-user";
@@ -41,7 +43,10 @@ export default async function UsersPage({
   searchParams: Promise<RawSearchParams>;
 }) {
   const user = await getSessionUser();
+  // Checked here, not only in the layout: Next renders the page alongside
+  // the layout, so a layout check alone would still send its data.
   if (!can(user, "USERS_MANAGE")) return <AccessDenied />;
+  if (!user.condominium) return <NoCondominium user={user} />;
 
   const params = await searchParams;
   const search = firstParam(params, "busca")?.slice(0, 100) ?? "";
@@ -55,7 +60,7 @@ export default async function UsersPage({
   const page = pageParam(params);
   const pageSize = pageSizeParam(params);
   const hrefWith = (overrides: Record<string, string | number | undefined>) =>
-    buildHref("/admin/usuarios", {
+    buildHref("/moradores", {
       busca: search,
       grupo: group,
       unidade: unitId,
@@ -78,12 +83,16 @@ export default async function UsersPage({
 
   return (
     <>
-      <div className="mb-4 flex justify-end">
-        <CreateUserButton
-          assignableGroups={assignableGroups(user.group)}
-          units={units}
-        />
-      </div>
+      <PageHeader
+        title="Moradores"
+        description={`Quem mora e quem administra o ${user.condominium.name}: unidade, contato, papel e acesso.`}
+        actions={
+          <CreateUserButton
+            assignableGroups={assignableGroups(user.group)}
+            units={units}
+          />
+        }
+      />
       <FilterPanel hasActiveFilters={filtered}>
         <form
           role="search"
@@ -96,7 +105,7 @@ export default async function UsersPage({
             label="Buscar"
             name="busca"
             defaultValue={search}
-            placeholder="Nome, usuário ou e-mail"
+            placeholder="Nome, e-mail ou telefone"
           />
           <Select
             label="Papel"
@@ -130,10 +139,7 @@ export default async function UsersPage({
               { value: "desativados", label: "Desativados" },
             ]}
           />
-          <FilterActions
-            clearHref="/admin/usuarios"
-            hasActiveFilters={filtered}
-          />
+          <FilterActions clearHref="/moradores" hasActiveFilters={filtered} />
         </form>
       </FilterPanel>
 

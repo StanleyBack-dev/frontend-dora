@@ -53,6 +53,7 @@ import {
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { PushNotificationsInvite } from "@/features/notifications/components/PushNotificationsInvite";
 import type { SessionUser } from "@/shared/contracts/api";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import { apiRequest } from "@/shared/lib/api-client";
 
 // The collapsed state is a per-browser preference. It lives in localStorage
@@ -272,6 +273,7 @@ export function AppShell({
   async function logout() {
     setLeaving(true);
     await authClient.logout().catch(() => undefined);
+    startNavigation();
     router.replace("/entrar");
     router.refresh();
   }
@@ -412,12 +414,19 @@ export function AppShell({
                         item={item}
                         active={isActive(pathname, item)}
                         collapsed={false}
-                        onNavigate={closeMobile}
+                        onNavigate={() => {
+                          // Picking an item folds the "Conta" section back.
+                          setAccountOpen(false);
+                          closeMobile();
+                        }}
                       />
                     ))}
                     <button
                       type="button"
-                      onClick={openLogout}
+                      onClick={() => {
+                        setAccountOpen(false);
+                        openLogout();
+                      }}
                       className="group flex w-full items-center gap-3 rounded-full px-3.5 py-2.5 text-[13px] font-semibold text-chrome-muted transition-colors hover:bg-chrome-hover hover:text-chrome-fg"
                     >
                       <LogOut

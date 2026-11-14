@@ -17,6 +17,7 @@ import {
   rememberedLogin,
 } from "@/features/auth/model/remembered-login";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useToast } from "@/shared/toast/useToast";
 
 // The remembered login only changes when this form saves it, so there is
@@ -57,6 +58,7 @@ export function LoginForm({
       const { mustChangePassword } = await authClient.login(login, password);
       // Only a login that worked is worth remembering.
       rememberLogin(remember ? login.trim() : null);
+      startNavigation();
       router.replace(
         mustChangePassword ? "/primeiro-acesso" : (next ?? "/inicio"),
       );

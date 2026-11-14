@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { Card, CardBody, CardHeader } from "@/design-system";
+import { Avatar, Card, CardBody, CardHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
+import { NoCondominium } from "@/features/condominiums/components/NoCondominium";
 import { EditUserForm } from "@/features/admin/components/EditUserForm";
 import { PermissionsEditor } from "@/features/admin/components/PermissionsEditor";
 import { UserAccountActions } from "@/features/admin/components/UserAccountActions";
@@ -15,6 +16,7 @@ import { adminService } from "@/server/services/admin.service";
 import { condominiumsService } from "@/server/services/condominiums.service";
 import { assignableGroups, can } from "@/shared/lib/access";
 import { formatDateTime } from "@/shared/lib/format";
+import { formatPhone } from "@/shared/lib/masks";
 
 export const metadata: Metadata = { title: "Morador" };
 
@@ -27,6 +29,7 @@ export default async function UserDetailPage({
 }) {
   const viewer = await getSessionUser();
   if (!can(viewer, "USERS_MANAGE")) return <AccessDenied />;
+  if (!viewer.condominium) return <NoCondominium user={viewer} />;
 
   const { id } = await params;
   if (!UUID.test(id)) notFound();
@@ -54,7 +57,7 @@ export default async function UserDetailPage({
   return (
     <div className="space-y-6">
       <Link
-        href="/admin/usuarios"
+        href="/moradores"
         className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
       >
         <ArrowLeft className="size-4" /> Moradores
@@ -62,14 +65,32 @@ export default async function UserDetailPage({
 
       <Card>
         <CardHeader
-          title={user.name}
-          description={[user.username, GROUP_LABELS[user.group], user.unitLabel]
+          title={
+            <span className="flex items-center gap-3">
+              <Avatar name={user.name} src={user.photoUrl} />
+              {user.name}
+            </span>
+          }
+          description={[
+            user.username,
+            GROUP_LABELS[user.group],
+            user.unitLabel,
+            user.unitComplement,
+          ]
             .filter(Boolean)
             .join(" · ")}
           action={<UserStatusBadges user={user} />}
         />
         <CardBody>
           <dl className="grid gap-3 text-sm sm:grid-cols-3">
+            <div>
+              <dt className="text-soft">Telefone</dt>
+              <dd className="text-fg">{formatPhone(user.phone)}</dd>
+            </div>
+            <div>
+              <dt className="text-soft">E-mail</dt>
+              <dd className="break-all text-fg">{user.email}</dd>
+            </div>
             <div>
               <dt className="text-soft">Criado em</dt>
               <dd className="text-fg">{formatDateTime(user.createdAt)}</dd>

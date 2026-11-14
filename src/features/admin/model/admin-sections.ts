@@ -1,10 +1,8 @@
 import {
   Building,
-  Building2,
   ClipboardList,
   Link2,
   ScrollText,
-  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 import type { Permission } from "@/shared/contracts/api";
@@ -14,7 +12,7 @@ export type AdminSection = {
   label: string;
   description: string;
   icon: LucideIcon;
-  group: "Acessos" | "Plataforma" | "Sistema";
+  group: "Acessos" | "Sistema";
   permission: Permission;
   /** Belongs to one condominium (needs one open). */
   tenant: boolean;
@@ -23,15 +21,6 @@ export type AdminSection = {
 // The areas of Administração, in menu order; each shows only to whoever has
 // its permission.
 export const ADMIN_SECTIONS: AdminSection[] = [
-  {
-    href: "/admin/usuarios",
-    label: "Moradores",
-    description: "Acessos, unidades e permissões",
-    icon: UsersRound,
-    group: "Acessos",
-    permission: "USERS_MANAGE",
-    tenant: true,
-  },
   {
     href: "/admin/cadastros",
     label: "Cadastros",
@@ -58,15 +47,6 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     group: "Acessos",
     permission: "UNITS_MANAGE",
     tenant: true,
-  },
-  {
-    href: "/admin/condominios",
-    label: "Condomínios",
-    description: "Clientes do Dora e seus números",
-    icon: Building2,
-    group: "Plataforma",
-    permission: "CONDOMINIUMS_MANAGE",
-    tenant: false,
   },
   {
     href: "/admin/logs",

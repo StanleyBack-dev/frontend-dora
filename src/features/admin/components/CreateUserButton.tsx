@@ -22,6 +22,8 @@ const EMPTY: UserInput = {
   username: "",
   group: "USER",
   unitId: null,
+  unitComplement: "",
+  phone: "",
 };
 
 export function CreateUserButton({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CalendarCheck, Lock, ShieldCheck } from "lucide-react";
@@ -41,13 +41,22 @@ type Props = {
   canBook: boolean;
 };
 
+// The person's own bookings in the app's orange, someone else's in dark red.
+// Free ones stay neutral (the hover only outlines them).
 const SLOT_STYLES: Record<AvailabilitySlot["state"], string> = {
-  FREE: "border-border bg-surface text-fg hover:border-brand hover:bg-brand-soft",
-  MINE: "border-brand bg-brand text-brand-fg",
-  TAKEN: "border-border bg-surface-muted text-soft",
+  FREE: "border-border bg-surface text-fg hover:border-brand hover:text-brand-ink",
+  MINE: "border-brand bg-brand text-brand-fg shadow-sm",
+  TAKEN: "border-booked bg-booked text-booked-fg",
   BLOCKED: "border-dashed border-border bg-surface-muted text-soft",
   UNAVAILABLE: "border-border bg-surface-muted/60 text-soft/70",
 };
+
+const LEGEND: { state: AvailabilitySlot["state"]; label: string }[] = [
+  { state: "FREE", label: "Livre" },
+  { state: "TAKEN", label: "Reservado" },
+  { state: "MINE", label: "Sua reserva" },
+  { state: "BLOCKED", label: "Bloqueado" },
+];
 
 const SLOT_HINT: Record<AvailabilitySlot["state"], string> = {
   FREE: "Livre",
@@ -70,6 +79,18 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
   const [pending, setPending] = useState(false);
 
   const dates = datesBetween(availability.firstDate, availability.lastDate);
+  const strip = useRef<HTMLDivElement>(null);
+
+  // Keep the chosen day in view inside the strip (it scrolls sideways).
+  useEffect(() => {
+    strip.current
+      ?.querySelector<HTMLElement>('[aria-selected="true"]')
+      ?.scrollIntoView({
+        block: "nearest",
+        inline: "center",
+        behavior: "smooth",
+      });
+  }, [availability.date]);
 
   async function load(date: string) {
     setLoadingDate(date);
@@ -127,7 +148,7 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
   const free = availability.slots.filter((slot) => slot.state === "FREE");
 
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardHeader
         title="Reservar"
         description={
@@ -137,12 +158,13 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
         }
         action={<CalendarCheck aria-hidden className="size-5 text-soft" />}
       />
-      <CardBody className="space-y-5 pt-0">
-        {/* Days of the booking window. */}
+      <CardBody className="min-w-0 space-y-5 pt-0">
+        {/* Days of the booking window: a strip that scrolls sideways. */}
         <div
+          ref={strip}
           role="tablist"
           aria-label="Dias"
-          className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
+          className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-5 sm:scroll-px-5 sm:px-5 [&::-webkit-scrollbar]:hidden"
         >
           {dates.map((date) => {
             const parts = dateParts(noonOf(date));
@@ -156,7 +178,7 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
                 disabled={loadingDate !== null}
                 onClick={() => load(date)}
                 className={cn(
-                  "flex w-14 shrink-0 flex-col items-center rounded-2xl border py-2 transition-colors",
+                  "flex w-14 shrink-0 snap-start flex-col items-center rounded-2xl border py-2 transition-colors",
                   active
                     ? "border-fg bg-fg text-surface"
                     : "border-border bg-surface text-fg hover:border-fg",
@@ -177,17 +199,37 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
         </div>
 
         <div>
-          <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-fg capitalize">
+          <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-fg capitalize">
             {formatLongDay(noonOf(availability.date))}
             {loadingDate && <Spinner size="sm" label="Carregando horários" />}
           </p>
+          <ul className="mb-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted">
+            {LEGEND.map((item) => (
+              <li key={item.state} className="flex items-center gap-1.5">
+                <span
+                  aria-hidden
+                  className={cn(
+                    "size-3 rounded border",
+                    SLOT_STYLES[item.state],
+                  )}
+                />
+                {item.label}
+              </li>
+            ))}
+          </ul>
           {availability.slots.length === 0 ? (
             <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted">
               O espaço não abre neste dia.
             </p>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              <div
+                aria-busy={loadingDate !== null}
+                className={cn(
+                  "grid grid-cols-2 gap-2 transition-opacity sm:grid-cols-3 xl:grid-cols-4",
+                  loadingDate && "opacity-50",
+                )}
+              >
                 {availability.slots.map((slot) => {
                   const clickable = slot.state === "FREE" && canBook;
                   return (
@@ -198,11 +240,11 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
                       onClick={() => choose(slot)}
                       title={slot.label ?? undefined}
                       className={cn(
-                        "flex flex-col items-start rounded-xl border px-3 py-2.5 text-left transition-colors disabled:cursor-default",
+                        "flex min-w-0 flex-col items-start rounded-xl border px-3 py-2.5 text-left transition-colors disabled:cursor-default",
                         SLOT_STYLES[slot.state],
                       )}
                     >
-                      <span className="text-sm font-bold">
+                      <span className="text-sm font-bold whitespace-nowrap tabular-nums">
                         {formatSlot(slot.startsAt, slot.endsAt)}
                       </span>
                       <span className="flex items-center gap-1 text-[11px] font-medium opacity-80">

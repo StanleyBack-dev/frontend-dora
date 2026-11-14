@@ -14,6 +14,10 @@ export const enrollmentDataSchema = z.object({
   phone: z.string().trim().min(1).max(20),
   // Absent on approval: keeps the unit chosen on the form.
   unitId: z.uuid().nullish(),
+  unitComplement: z.string().trim().max(80).nullish(),
+  // Only when the condominium has no units (absent: keeps what was typed).
+  unitBlock: z.string().trim().max(30).nullish(),
+  unitNumber: z.string().trim().max(20).nullish(),
 });
 
 export const submitEnrollmentSchema = z.object({

@@ -26,6 +26,7 @@ import {
   enrollmentErrors,
   fromRequest,
   toEnrollmentData,
+  unitModeFor,
   type EnrollmentForm,
 } from "@/features/enrollment/model/enrollment-form";
 import type { TemporaryAccess, UserGroup } from "@/shared/contracts/api";
@@ -65,7 +66,8 @@ export function EnrollmentReviewDrawer({
   const status = ENROLLMENT_STATUS[request.status];
   const reviewable = request.status === "PENDENTE" && !access;
 
-  const errors = enrollmentErrors(form, units.length > 0);
+  const unitMode = unitModeFor(units);
+  const errors = enrollmentErrors(form, unitMode);
 
   const finish = () => {
     router.refresh();
@@ -81,7 +83,7 @@ export function EnrollmentReviewDrawer({
     try {
       const approval = await enrollmentClient.approve(
         request.id,
-        toEnrollmentData(form),
+        toEnrollmentData(form, unitMode),
         group,
       );
       setAccess(approval.access);
@@ -200,6 +202,8 @@ export function EnrollmentReviewDrawer({
                 errors={errors}
                 showErrors={submitted}
                 units={units}
+                typedUnitLabel={request.typedUnitLabel}
+                reviewing
               />
             </>
           ) : (
@@ -224,7 +228,8 @@ function ReviewedSummary({ request }: { request: EnrollmentRequest }) {
     ["Nome completo", request.fullName],
     ["E-mail", request.email],
     ["Telefone", formatPhone(request.phone)],
-    ["Unidade", request.unitLabel ?? "—"],
+    ["Unidade", request.unitLabel ?? request.typedUnitLabel ?? "—"],
+    ["Complemento", request.unitComplement ?? "—"],
     ["Analisado em", formatDateTime(request.reviewedAt)],
   ];
   return (
@@ -242,7 +247,7 @@ function ReviewedSummary({ request }: { request: EnrollmentRequest }) {
       </dl>
       {request.userId && (
         <Link
-          href={`/admin/usuarios/${request.userId}`}
+          href={`/moradores/${request.userId}`}
           className="text-sm font-medium text-brand-ink hover:underline"
         >
           Ver o morador

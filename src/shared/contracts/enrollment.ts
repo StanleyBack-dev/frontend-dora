@@ -21,6 +21,11 @@ export type EnrollmentData = {
   phone: string;
   /** Unit picked on the form (required when the condominium has units). */
   unitId?: string | null;
+  /** Address detail inside the condominium ("casa dos fundos"). */
+  unitComplement?: string | null;
+  /** Typed when the condominium has no units registered yet. */
+  unitBlock?: string | null;
+  unitNumber?: string | null;
 };
 
 /** What the public form shows once the code is accepted. */
@@ -32,6 +37,11 @@ export type EnrollmentForm = {
 export type EnrollmentRequest = EnrollmentData & {
   id: string;
   unitLabel: string | null;
+  unitComplement: string | null;
+  /** Unit typed on the form (no units registered then): "Bloco A · 101". */
+  typedUnitLabel: string | null;
+  typedUnitBlock: string | null;
+  typedUnitNumber: string | null;
   status: EnrollmentStatus;
   createdAt: string;
   reviewedAt: string | null;

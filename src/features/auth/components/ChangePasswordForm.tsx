@@ -8,6 +8,7 @@ import { authClient } from "@/features/auth/api/auth.client";
 import { NewPasswordFields } from "@/features/auth/components/NewPasswordFields";
 import { passwordProblem } from "@/features/auth/model/password-rules";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useToast } from "@/shared/toast/useToast";
 
 // Used on the first access (temporary password → own password) and on the
@@ -39,6 +40,7 @@ export function ChangePasswordForm({
     try {
       await authClient.changePassword(current, password);
       if (redirectTo) {
+        startNavigation();
         router.replace(redirectTo);
         router.refresh();
         return;

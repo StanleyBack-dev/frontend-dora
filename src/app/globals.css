@@ -58,6 +58,9 @@
   --danger: #c0362c;
   --danger-soft: #fdecea;
   --danger-border: #f3c6c1;
+  /* Slots booked by someone else (booking calendar): dark red. */
+  --booked: #8b1a1a;
+  --booked-fg: #ffffff;
   --warning: #92400e;
   --warning-soft: #fff7e6;
   --warning-border: #f5dcaa;
@@ -107,6 +110,8 @@
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --color-danger-border: var(--danger-border);
+  --color-booked: var(--booked);
+  --color-booked-fg: var(--booked-fg);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
   --color-warning-border: var(--warning-border);
@@ -136,6 +141,20 @@
     }
     to {
       opacity: 1;
+    }
+  }
+
+  /* Top navigation bar: fast at first, then creeping toward the end while
+     the page is still on its way (it completes when the page arrives). */
+  --animate-nav-progress: dora-nav-progress 8s cubic-bezier(0.1, 0.7, 0.2, 1)
+    forwards;
+
+  @keyframes dora-nav-progress {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 92%;
     }
   }
 }
@@ -203,4 +222,20 @@ input:-webkit-autofill:focus {
     visibility: hidden;
     pointer-events: none;
   }
+}
+
+/* Native date/time pickers keep an intrinsic minimum width on iOS and
+   Android, which overflows narrow screens: let them follow their box. */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  min-width: 0;
+  max-width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value,
+input[type="datetime-local"]::-webkit-date-and-time-value {
+  text-align: left;
 }

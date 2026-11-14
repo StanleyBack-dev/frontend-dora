@@ -24,8 +24,8 @@ export default async function AdminLayout({
         title="Administração"
         description={
           user.condominium
-            ? `${user.condominium.name}: moradores, unidades, cadastros pelo link e a saúde do sistema.`
-            : "Visão da plataforma: os condomínios do Dora e os logs do sistema. Entre em um condomínio para administrar os moradores."
+            ? `${user.condominium.name}: unidades, cadastros pelo link e a saúde do sistema.`
+            : "Os logs do sistema. Entre em um condomínio (menu Condomínios) para administrar as unidades e os cadastros."
         }
       />
       <AdminNav allowed={allowed} />

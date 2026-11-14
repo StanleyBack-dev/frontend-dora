@@ -23,10 +23,16 @@ type ComboboxProps = {
   options: ComboboxOption[];
   /** Selected value (null = nothing selected). */
   value: string | null;
-  /** Text shown in the input while a value is selected and the list is closed. */
+  /**
+   * Text shown in the input while a value is selected and the list is closed
+   * (default: the label of the selected option).
+   */
   selectedLabel?: string;
   onSelect: (value: string | null) => void;
-  /** Called on every keystroke; the parent decides how to fetch options. */
+  /**
+   * Called on every keystroke; the parent decides how to fetch options.
+   * Without it, the list is filtered here by what was typed.
+   */
   onInputChange?: (text: string) => void;
   loading?: boolean;
   emptyText?: string;
@@ -37,15 +43,24 @@ type ComboboxProps = {
   className?: string;
 };
 
+// Lowercase without accents, so "torre" finds "Tórre" and "bloco a" "Bloco A".
+const normalize = (value: string) =>
+  value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/s+/g, " ")
+    .trim();
+
 // Searchable select following the WAI-ARIA combobox pattern: type to narrow
 // the list, ↑/↓ to move, Enter to pick, Esc to close.
 export function Combobox({
   label,
   hideLabel = false,
   placeholder,
-  options,
+  options: allOptions,
   value,
-  selectedLabel,
+  selectedLabel: selectedLabelProp,
   onSelect,
   onInputChange,
   loading = false,
@@ -62,6 +77,18 @@ export function Combobox({
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [activeIndex, setActiveIndex] = useState(-1);
+  // The parent filters (remote search) or, without onInputChange, we do.
+  const options =
+    onInputChange || !text.trim()
+      ? allOptions
+      : allOptions.filter((option) =>
+          normalize(`${option.label} ${option.description ?? ""}`).includes(
+            normalize(text),
+          ),
+        );
+  const selectedLabel =
+    selectedLabelProp ??
+    allOptions.find((option) => option.value === value)?.label;
 
   // Close when clicking anywhere else.
   useEffect(() => {

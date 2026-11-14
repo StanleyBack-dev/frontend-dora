@@ -22,6 +22,9 @@ export const userInputSchema = z.object({
   group: userGroupSchema,
   // null: no unit (on update: remove it).
   unitId: z.uuid().nullish(),
+  // "" or null: none (on update: clear it). The API validates the content.
+  unitComplement: z.string().trim().max(80).nullish(),
+  phone: z.string().trim().max(30).nullish(),
 });
 
 // The API checks the value against its own enum; here it only has to look

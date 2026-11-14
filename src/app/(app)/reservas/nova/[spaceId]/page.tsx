@@ -44,7 +44,9 @@ export default async function BookSpacePage({
   );
 
   return (
-    <div className="space-y-6">
+    // min-w-0 everywhere: the calendar's strip of days scrolls inside its card
+    // instead of widening the page on phones.
+    <div className="min-w-0 space-y-6">
       <Link
         href="/reservas/nova"
         className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
@@ -62,7 +64,7 @@ export default async function BookSpacePage({
         </p>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <BookingCalendar
           space={{
             id: space.id,
@@ -74,7 +76,7 @@ export default async function BookSpacePage({
           canBook={can(user, "BOOKINGS_CREATE")}
         />
 
-        <div className="space-y-6 self-start">
+        <div className="min-w-0 space-y-6 self-start">
           <Card>
             <CardHeader
               title="Como reservar"

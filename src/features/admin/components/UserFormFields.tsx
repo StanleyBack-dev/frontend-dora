@@ -7,7 +7,12 @@ import {
 } from "@/features/access/model/access-labels";
 import type { UserGroup, UserInput } from "@/shared/contracts/api";
 import type { Unit } from "@/shared/contracts/condominiums";
-import { maskUsername, usernameError } from "@/shared/lib/masks";
+import {
+  maskPhone,
+  maskUsername,
+  phoneError,
+  usernameError,
+} from "@/shared/lib/masks";
 
 export function UserFormFields({
   value,
@@ -34,14 +39,16 @@ export function UserFormFields({
   const set = <K extends keyof UserInput>(key: K, field: UserInput[K]) =>
     onChange({ ...value, [key]: field });
   const username = value.username ?? "";
+  const phone = value.phone ?? "";
 
   return (
     <div className="space-y-4">
       {accountLocked && (
         <Alert tone="info">
-          Esta pessoa também usa o Dora em outro condomínio. Nome, e-mail e
-          login só podem ser alterados por ela mesma (em Meu perfil) ou pela
-          administração do Dora. Aqui você ajusta o papel e a unidade.
+          Esta pessoa também usa o Dora em outro condomínio. Nome, e-mail,
+          telefone e login só podem ser alterados por ela mesma (em Meu perfil)
+          ou pela administração do Dora. Aqui você ajusta o papel, a unidade e o
+          complemento.
         </Alert>
       )}
       <Field
@@ -79,6 +86,16 @@ export function UserFormFields({
             : "3 a 32 caracteres: letras minúsculas, números, ponto, hífen ou sublinhado."}
         </p>
       </div>
+      <Field
+        label="Telefone (WhatsApp)"
+        type="tel"
+        inputMode="tel"
+        disabled={accountLocked}
+        placeholder="(62) 99999-0000"
+        value={phone}
+        onChange={(event) => set("phone", maskPhone(event.target.value))}
+        error={(phone && phoneError(phone)) || undefined}
+      />
       {units.length > 0 ? (
         <Select
           label="Unidade"
@@ -96,6 +113,13 @@ export function UserFormFields({
           Administração → Unidades para vincular moradores.
         </p>
       )}
+      <Field
+        label="Complemento"
+        placeholder="Ex.: casa dos fundos, sala 2 (opcional)"
+        maxLength={80}
+        value={value.unitComplement ?? ""}
+        onChange={(event) => set("unitComplement", event.target.value)}
+      />
       <div>
         <Select
           label="Papel no condomínio"

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Pencil } from "lucide-react";
 import {
+  Avatar,
   DataTable,
   LinkPendingSwap,
   type DataTableColumn,
@@ -13,9 +14,11 @@ import { UserStatusBadges } from "@/features/admin/components/UserStatusBadges";
 import { auditColumn } from "@/features/audit/components/RecordAudit";
 import type { UserAccount } from "@/shared/contracts/api";
 import { formatDateTime } from "@/shared/lib/format";
+import { formatPhone } from "@/shared/lib/masks";
 
-// Members of the condominium (table with the audit column). The
-// pencil (first column; on phones next to the name) opens the account's page.
+// Residents of the condominium (table with the audit column): photo, where
+// they live, contact and access. The pencil (first column; on phones next to
+// the name) opens the person's page.
 export function UsersTable({ users }: { users: UserAccount[] }) {
   const audit = auditColumn((user: UserAccount) => ({
     entity: "user" as const,
@@ -31,7 +34,7 @@ export function UsersTable({ users }: { users: UserAccount[] }) {
       mobile: "control",
       render: (user) => (
         <Link
-          href={`/admin/usuarios/${user.id}`}
+          href={`/moradores/${user.id}`}
           aria-label={`Editar ${user.name}`}
           title="Editar usuário"
           className="grid size-8 place-items-center rounded-md text-accent transition-colors hover:bg-accent-soft"
@@ -48,14 +51,43 @@ export function UsersTable({ users }: { users: UserAccount[] }) {
       label: "Nome",
       mobile: "title",
       render: (user) => (
-        <span className="font-medium text-fg">{user.name}</span>
+        <span className="flex items-center gap-2.5">
+          <Avatar name={user.name} src={user.photoUrl} size="sm" />
+          <span className="font-medium text-fg">{user.name}</span>
+        </span>
       ),
     },
     {
       key: "unit",
       label: "Unidade",
+      render: (user) =>
+        user.unitLabel || user.unitComplement ? (
+          <span className="flex flex-col">
+            <span className="whitespace-nowrap">
+              {user.unitLabel ?? "Sem unidade"}
+            </span>
+            {user.unitComplement && (
+              <span className="text-xs text-soft">{user.unitComplement}</span>
+            )}
+          </span>
+        ) : (
+          <span className="text-soft">—</span>
+        ),
+    },
+    {
+      key: "phone",
+      label: "Telefone",
       className: "whitespace-nowrap",
-      render: (user) => user.unitLabel ?? <span className="text-soft">—</span>,
+      render: (user) =>
+        user.phone ? (
+          <CopyShareValue
+            value={formatPhone(user.phone)}
+            label="Telefone"
+            share={false}
+          />
+        ) : (
+          <span className="text-soft">—</span>
+        ),
     },
     {
       key: "username",

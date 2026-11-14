@@ -79,13 +79,14 @@ export default async function NotificationsPage({
         <Card>
           <EmptyState
             icon={<Bell className="size-5" />}
-            title={unreadOnly ? "Tudo lido" : "Nenhuma notificação ainda"}
+            title={unreadOnly ? "Nada novo" : "Nenhuma notificação ainda"}
             description="Quando a administração enviar um aviso ou o suporte responder, ele aparece aqui."
           />
         </Card>
       ) : (
         <>
           <NotificationList
+            key={`${unreadOnly}-${result.page}-${pageSize}`}
             notifications={result.items}
             now={now.toISOString()}
           />

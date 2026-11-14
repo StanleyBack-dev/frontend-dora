@@ -104,7 +104,7 @@ export default async function HomePage() {
             {condominium
               ? `Você está como ${GROUP_LABELS[user.group].toLowerCase()}. Reserve quadras e espaços, acompanhe avisos e fale com a administração.`
               : user.platformAdmin
-                ? "Você está na visão da plataforma. Escolha um condomínio para trabalhar nele, ou gerencie todos em Administração → Condomínios."
+                ? "Você está na visão da plataforma. Escolha um condomínio para trabalhar nele, ou gerencie todos no menu Condomínios."
                 : "Você ainda não tem acesso a um condomínio. Peça à administração do seu condomínio o link de cadastro."}
           </p>
         </div>
@@ -112,7 +112,7 @@ export default async function HomePage() {
 
       {!condominium && user.platformAdmin && (
         <Shortcut
-          href="/admin/condominios"
+          href="/condominios"
           icon={<Building2 aria-hidden />}
           title="Condomínios"
           description="Cadastre condomínios, veja os números de cada um e entre para administrar."

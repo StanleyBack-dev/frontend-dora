@@ -1,5 +1,6 @@
 import {
   Bell,
+  Building2,
   CalendarDays,
   CircleHelp,
   CircleUserRound,
@@ -9,6 +10,7 @@ import {
   Megaphone,
   Settings,
   ShieldCheck,
+  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 import type { Permission } from "@/shared/contracts/api";
@@ -75,6 +77,9 @@ export const HELP_TOPICS: HelpTopic[] = [
       howto: [
         {
           text: "Use os cartões de acesso rápido para ir direto a notificações, suporte e perfil.",
+        },
+        {
+          text: "Participa de mais de um condomínio? Troque pelo seletor no topo do menu lateral. O app lembra a escolha: ao entrar de novo, você volta para o mesmo condomínio.",
         },
         {
           text: "Os cartões do painel levam direto à lista correspondente quando você pode abri-la.",
@@ -207,7 +212,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     sections: {
       howto: [
         {
-          text: "Toque num aviso para abrir o que ele trata e marcá-lo como lido.",
+          text: "Ao abrir as notificações, todas ficam lidas; as novas continuam destacadas enquanto você está na página. Toque num aviso para abrir o que ele trata.",
         },
         {
           text: "Escolha quais avisos também chegam por e-mail em Configurações → Notificações.",
@@ -292,25 +297,83 @@ export const HELP_TOPICS: HelpTopic[] = [
     },
   },
   {
+    id: "moradores",
+    href: "/moradores",
+    title: "Moradores",
+    icon: UsersRound,
+    permission: "USERS_MANAGE",
+    area: "main",
+    tour: "Quem mora e quem administra o condomínio: unidade, complemento, telefone, papel e acesso de cada pessoa.",
+    sections: {
+      purpose: [
+        {
+          text: "A lista de todas as pessoas do condomínio aberto, com a foto, a unidade e o complemento (ex.: casa dos fundos), o telefone, o e-mail, o papel e o último acesso.",
+        },
+      ],
+      howto: [
+        {
+          text: "Use “Adicionar” para incluir alguém: nome, e-mail, papel (Morador ou Gestor), unidade, complemento e telefone. Conta nova recebe a senha temporária por e-mail.",
+        },
+        {
+          text: "Toque no lápis para abrir a pessoa: corrija os dados, redefina a senha, desative o acesso ou abra exceções de permissão.",
+        },
+        {
+          text: "Filtre por nome, e-mail ou telefone, por papel, unidade ou situação.",
+        },
+      ],
+      rules: [
+        {
+          text: "O login é sempre o e-mail. Quem já usa o Dora em outro condomínio entra com a mesma conta; os dados de acesso dela (nome, e-mail, telefone e senha) só a própria pessoa altera.",
+        },
+        {
+          text: "Unidade, complemento e papel valem só para este condomínio.",
+        },
+      ],
+    },
+  },
+  {
+    id: "condominios",
+    href: "/condominios",
+    title: "Condomínios",
+    icon: Building2,
+    permission: "CONDOMINIUMS_MANAGE",
+    area: "main",
+    tour: "Todos os condomínios que usam o Dora: situação, gestores, membros e cadastros pendentes.",
+    sections: {
+      howto: [
+        {
+          text: "Crie um condomínio, entre nele para administrar como gestor, edite os dados ou suspenda o acesso.",
+        },
+        {
+          text: "Para trocar de condomínio a qualquer momento, use o seletor no topo do menu lateral; “Visão da plataforma” sai de todos. A escolha fica salva e o próximo login abre no mesmo lugar.",
+        },
+        {
+          text: "Filtre por nome, cidade ou situação. Os números do topo somam todos os condomínios.",
+        },
+      ],
+      rules: [
+        {
+          text: "Só a administração da plataforma vê esta tela; gestores nunca recebem esta permissão.",
+        },
+      ],
+    },
+  },
+  {
     id: "admin",
     href: "/admin",
     title: "Administração",
     icon: ShieldCheck,
     admin: true,
     area: "account",
-    tour: "Moradores e gestores do condomínio, unidades, cadastros pelo link público, links de convite e os logs do sistema.",
+    tour: "Unidades, cadastros pelo link público, links de convite e os logs do sistema.",
     sections: {
       howto: [
-        {
-          text: "Moradores: adicione pessoas ao condomínio, defina o papel (Morador ou Gestor) e a unidade, abra exceções de permissão, redefina senhas e desative o acesso. Quem já usa o Dora em outro condomínio entra com a mesma conta.",
-          only: ["USERS_MANAGE"],
-        },
         {
           text: "Unidades: cadastre blocos e números de uma vez (ex.: 101-110, 201). Os moradores ficam vinculados a uma unidade.",
           only: ["UNITS_MANAGE"],
         },
         {
-          text: "Cadastros: aprove ou recuse quem se cadastrou pelo link; ao aprovar, a pessoa ganha acesso ao condomínio (conta nova: a senha temporária vai por e-mail).",
+          text: "Cadastros: aprove ou recuse quem se cadastrou pelo link, conferindo a unidade e o complemento informados; ao aprovar, a pessoa ganha acesso ao condomínio (conta nova: a senha temporária vai por e-mail). Se o condomínio ainda não tem unidades, a pessoa digita o bloco e o número, e a unidade é criada na aprovação.",
           only: ["USERS_MANAGE"],
         },
         {
@@ -324,7 +387,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       ],
       rules: [
         {
-          text: "Tudo aqui vale só para o condomínio aberto no topo do menu. Algumas permissões só vêm do papel e não podem ser dadas a uma pessoa (moradores, permissões, histórico e suporte).",
+          text: "Tudo aqui vale só para o condomínio aberto no topo do menu. Algumas permissões só vêm do papel e não podem ser dadas a uma pessoa (moradores, permissões, histórico, suporte e condomínios).",
         },
         {
           text: "Os logs ficam 90 dias e não guardam senhas, tokens ou e-mails completos.",

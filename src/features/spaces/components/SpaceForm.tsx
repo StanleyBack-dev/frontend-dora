@@ -41,6 +41,7 @@ import type {
   SpaceKind,
 } from "@/shared/contracts/spaces";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useToast } from "@/shared/toast/useToast";
 
 type DayForm = { open: boolean; opensAt: string; closesAt: string };
@@ -194,9 +195,11 @@ export function SpaceForm({ space }: { space: Space | null }) {
           [...new Set(failures)].join(" "),
         );
         // Back to the form (edit) so the photos can be sent again.
+        startNavigation();
         router.push(`/espacos/${saved.id}/editar`);
       } else {
         showSuccess(space ? "Espaço atualizado." : `${saved.name} cadastrado.`);
+        startNavigation();
         router.push(`/espacos/${saved.id}`);
       }
       router.refresh();

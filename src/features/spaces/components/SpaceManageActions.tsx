@@ -8,6 +8,7 @@ import { Button, buttonClasses, Modal } from "@/design-system";
 import { spacesClient } from "@/features/spaces/api/spaces.client";
 import type { Space } from "@/shared/contracts/spaces";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useToast } from "@/shared/toast/useToast";
 
 type Confirming = "toggle" | "delete" | null;
@@ -31,6 +32,7 @@ export function SpaceManageActions({ space }: { space: Space }) {
       } else if (confirming === "delete") {
         await spacesClient.remove(space.id);
         showSuccess(`${space.name} excluído.`);
+        startNavigation();
         router.push("/espacos");
         router.refresh();
       }

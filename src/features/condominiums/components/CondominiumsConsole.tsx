@@ -23,6 +23,7 @@ import type {
 import { ApiClientError } from "@/shared/lib/api-client";
 import { formatNumber, formatRelative } from "@/shared/lib/format";
 import { maskCnpj } from "@/shared/lib/masks";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useToast } from "@/shared/toast/useToast";
 
 const STATES = [
@@ -145,6 +146,7 @@ export function CondominiumsConsole({
     setEntering(condominium.id);
     try {
       await condominiumsClient.switchTo(condominium.id);
+      startNavigation();
       router.push("/inicio");
       router.refresh();
     } catch (cause) {

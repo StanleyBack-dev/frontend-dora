@@ -1,5 +1,6 @@
 import {
   Bell,
+  Building2,
   CalendarDays,
   CircleHelp,
   CircleUserRound,
@@ -10,6 +11,7 @@ import {
   Megaphone,
   Settings,
   ShieldCheck,
+  UsersRound,
 } from "lucide-react";
 import type { Permission } from "@/shared/contracts/api";
 
@@ -50,6 +52,20 @@ export const PRIMARY_NAV: NavItem[] = [
     label: "Comunicados",
     icon: Megaphone,
     permission: "NOTIFICATIONS_BROADCAST",
+  },
+  // The residents of the open condominium: managers and the platform.
+  {
+    href: "/moradores",
+    label: "Moradores",
+    icon: UsersRound,
+    permission: "USERS_MANAGE",
+  },
+  // Every condominium using Dora: the platform administrator only.
+  {
+    href: "/condominios",
+    label: "Condomínios",
+    icon: Building2,
+    permission: "CONDOMINIUMS_MANAGE",
   },
 ];
 

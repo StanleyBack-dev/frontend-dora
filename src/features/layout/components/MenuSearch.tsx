@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { cn, inputClasses } from "@/design-system";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import type { NavItem } from "@/features/layout/model/navigation";
 
 const normalize = (value: string) =>
@@ -31,6 +32,7 @@ export function MenuSearch({
 
   function go(href: string) {
     setQuery("");
+    startNavigation();
     router.push(href);
   }
 

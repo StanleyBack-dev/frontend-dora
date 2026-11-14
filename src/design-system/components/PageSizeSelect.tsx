@@ -2,6 +2,7 @@
 
 import { useId, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import { Spinner } from "@/design-system/components/Spinner";
 
 // "Itens por página" of the Pagination footer: each size is a URL (built on
@@ -29,7 +30,10 @@ export function PageSizeSelect({
           const option = options.find(
             (item) => item.size === Number(event.target.value),
           );
-          if (option) startTransition(() => router.push(option.href));
+          if (option) {
+            startNavigation();
+            startTransition(() => router.push(option.href));
+          }
         }}
         className="h-8 rounded-md border border-border-strong bg-surface px-2 text-[13px] text-fg focus:border-brand focus:ring-2 focus:ring-ring focus:outline-none"
       >
