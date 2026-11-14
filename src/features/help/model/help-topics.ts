@@ -1,5 +1,6 @@
 import {
   Bell,
+  CalendarDays,
   CircleHelp,
   CircleUserRound,
   House,
@@ -87,8 +88,9 @@ export const HELP_TOPICS: HelpTopic[] = [
     href: "/espacos",
     title: "Espaços",
     icon: MapPin,
+    permission: "SPACES_MANAGE",
     area: "main",
-    tour: "Quadras, salão de festas e os outros espaços do condomínio, com o horário e as regras de cada um. As reservas chegam em breve.",
+    tour: "Os espaços do condomínio: cadastre, edite e desative quadras, salão e outros, com fotos, horário e regras de reserva e de uso.",
     sections: {
       purpose: [
         {
@@ -96,9 +98,6 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
       ],
       howto: [
-        {
-          text: "Toque num espaço para ver o horário de cada dia e as regras.",
-        },
         {
           text: "Use “Novo espaço” para cadastrar: dados, horário de funcionamento, regras de reserva e regras de uso.",
           only: ["SPACES_MANAGE"],
@@ -112,6 +111,52 @@ export const HELP_TOPICS: HelpTopic[] = [
         {
           text: "As regras de reserva (antecedência, limite por unidade, prazo para cancelar e aprovação) valem para as próximas reservas.",
           only: ["SPACES_MANAGE"],
+        },
+      ],
+    },
+  },
+  {
+    id: "reservas",
+    href: "/reservas",
+    title: "Reservas",
+    icon: CalendarDays,
+    area: "main",
+    tour: "Reserve quadras e espaços em “Nova reserva” e acompanhe as suas reservas: as próximas e as passadas, com a situação de cada uma.",
+    sections: {
+      howto: [
+        {
+          text: "Toque em “Nova reserva”, escolha o espaço, o dia e um horário livre e confirme. Espaços com aprovação guardam o horário até a administração decidir.",
+        },
+        {
+          text: "Na grade, horários em cinza já estão reservados, bloqueados ou fora do prazo.",
+        },
+        {
+          text: "Na tela de reserva do espaço, use “Bloquear período” para fechá-lo numa manutenção ou evento; se houver reservas no período, você confirma o cancelamento e os moradores são avisados.",
+          only: ["BOOKINGS_MANAGE"],
+        },
+        {
+          text: "Em “Próximas”, veja as reservas marcadas e cancele se precisar.",
+        },
+        {
+          text: "Em “Gestão”, veja todas as reservas do condomínio, aprove ou recuse as pendentes (com motivo) e cancele quando necessário.",
+          only: ["BOOKINGS_MANAGE"],
+        },
+      ],
+      rules: [
+        {
+          text: "Cada espaço tem o seu prazo para cancelar; depois dele, só a administração cancela.",
+        },
+        {
+          text: "O limite de reservas é por unidade: vale para todos os moradores da mesma unidade.",
+        },
+      ],
+      notices: [
+        {
+          text: "Reserva confirmada chega no app e no e-mail, com um convite que coloca o horário na agenda do celular. Recusa e cancelamento também são avisados.",
+        },
+        {
+          text: "Você é avisado quando uma reserva precisa da sua aprovação.",
+          only: ["BOOKINGS_MANAGE"],
         },
       ],
     },

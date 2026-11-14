@@ -102,9 +102,9 @@ export default async function HomePage() {
           </h1>
           <p className="mt-3 text-[15px] text-chrome-muted">
             {condominium
-              ? `Você está como ${GROUP_LABELS[user.group].toLowerCase()}. Tudo do condomínio em um só lugar; as reservas de quadras e espaços chegam aqui em breve.`
+              ? `Você está como ${GROUP_LABELS[user.group].toLowerCase()}. Reserve quadras e espaços, acompanhe avisos e fale com a administração.`
               : user.platformAdmin
-                ? "Você está na visão da plataforma. Escolha um condomínio para trabalhar nele, ou gerencie todos no console."
+                ? "Você está na visão da plataforma. Escolha um condomínio para trabalhar nele, ou gerencie todos em Administração → Condomínios."
                 : "Você ainda não tem acesso a um condomínio. Peça à administração do seu condomínio o link de cadastro."}
           </p>
         </div>
@@ -112,7 +112,7 @@ export default async function HomePage() {
 
       {!condominium && user.platformAdmin && (
         <Shortcut
-          href="/plataforma"
+          href="/admin/condominios"
           icon={<Building2 aria-hidden />}
           title="Condomínios"
           description="Cadastre condomínios, veja os números de cada um e entre para administrar."
@@ -125,6 +125,8 @@ export default async function HomePage() {
           canManageUsers={can(user, "USERS_MANAGE")}
           canManageUnits={can(user, "UNITS_MANAGE")}
           canManageSupport={can(user, "SUPPORT_MANAGE")}
+          canManageBookings={can(user, "BOOKINGS_MANAGE")}
+          canManageSpaces={can(user, "SPACES_MANAGE")}
         />
       )}
 
@@ -135,10 +137,10 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
           {condominium ? (
             <Shortcut
-              href="/espacos"
+              href="/reservas/nova"
               icon={<CalendarClock aria-hidden />}
-              title="Espaços"
-              description="Quadras, salão de festas e outros espaços. Reservas em breve."
+              title="Reservar"
+              description="Quadras, salão de festas e outros espaços do condomínio."
             />
           ) : (
             <Card className="flex h-full flex-col gap-4 border-dashed bg-surface-muted p-5 shadow-none">

@@ -1,8 +1,10 @@
 import "server-only";
 import { backendGraphql } from "@/server/graphql/client";
 import {
+  addSpacePhotoDocument,
   createSpaceDocument,
   deleteSpaceDocument,
+  removeSpacePhotoDocument,
   setSpaceActiveDocument,
   spaceDocument,
   spacesDocument,
@@ -50,6 +52,31 @@ export const spacesService = {
       variables: { id, active },
     });
     return setSpaceActive;
+  },
+
+  /** `photo`: base64 the browser already shrank (the API checks it). */
+  async addPhoto(
+    token: string,
+    spaceId: string,
+    photo: string,
+  ): Promise<Space> {
+    const { addSpacePhoto } = await backendGraphql(addSpacePhotoDocument, {
+      token,
+      variables: { spaceId, photo },
+    });
+    return addSpacePhoto;
+  },
+
+  async removePhoto(
+    token: string,
+    spaceId: string,
+    photoId: string,
+  ): Promise<Space> {
+    const { removeSpacePhoto } = await backendGraphql(
+      removeSpacePhotoDocument,
+      { token, variables: { spaceId, photoId } },
+    );
+    return removeSpacePhoto;
   },
 
   async remove(token: string, id: string): Promise<void> {

@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import {
   AlertTriangle,
   Building,
+  CalendarCheck,
+  CalendarClock,
   MapPin,
   LifeBuoy,
   MailWarning,
@@ -33,22 +35,45 @@ export function DashboardPanel({
   canManageUsers,
   canManageUnits,
   canManageSupport,
+  canManageBookings,
+  canManageSpaces,
 }: {
   dashboard: Dashboard;
   /** Links to the admin pages only for who can open them. */
   canManageUsers: boolean;
   canManageUnits: boolean;
   canManageSupport: boolean;
+  canManageBookings: boolean;
+  canManageSpaces: boolean;
 }) {
   const failed = dashboard.failedNotifications;
   const cards: DashboardCard[] = [
+    {
+      href: canManageBookings ? "/reservas/gestao?situacao=PENDING" : null,
+      label: "Reservas para aprovar",
+      value: dashboard.pendingBookings,
+      hint:
+        dashboard.pendingBookings > 0
+          ? "Aguardando sua decisão"
+          : "Nada pendente",
+      icon: <CalendarClock className="size-5" />,
+      tone: dashboard.pendingBookings > 0 ? "warning" : "neutral",
+    },
+    {
+      href: canManageBookings ? "/reservas/gestao" : null,
+      label: "Reservas hoje",
+      value: dashboard.bookingsToday,
+      hint: "Confirmadas ou aguardando",
+      icon: <CalendarCheck className="size-5" />,
+      tone: "brand",
+    },
     {
       href: canManageUsers ? "/admin/usuarios" : null,
       label: "Moradores ativos",
       value: dashboard.activeUsers,
       hint: "Moradores e gestores com acesso",
       icon: <Users className="size-5" />,
-      tone: "brand",
+      tone: "neutral",
     },
     {
       href: canManageUsers ? "/admin/cadastros" : null,
@@ -62,7 +87,7 @@ export function DashboardPanel({
       tone: dashboard.pendingEnrollments > 0 ? "warning" : "neutral",
     },
     {
-      href: "/espacos",
+      href: canManageSpaces ? "/espacos" : null,
       label: "Espaços ativos",
       value: dashboard.activeSpaces,
       hint:

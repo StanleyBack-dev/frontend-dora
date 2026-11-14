@@ -27,6 +27,16 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   allowedDevOrigins,
   reactStrictMode: true,
+  // The condominiums console moved into Administração.
+  async redirects() {
+    return [
+      {
+        source: "/plataforma",
+        destination: "/admin/condominios",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

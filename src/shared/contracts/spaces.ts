@@ -24,6 +24,12 @@ export type SpaceRules = {
   cancelUntilHours: number;
 };
 
+/** A photo of a space: a short-lived signed link. */
+export type SpacePhoto = { id: string; url: string };
+
+/** Photos per space (the API enforces it too). */
+export const SPACE_PHOTO_LIMIT = 3;
+
 export type Space = {
   id: string;
   name: string;
@@ -34,6 +40,8 @@ export type Space = {
   /** Inactive: hidden from residents (maintenance). */
   active: boolean;
   rules: SpaceRules;
+  /** Up to 3, in the order they were added. */
+  photos: SpacePhoto[];
   createdAt: string;
   updatedAt: string;
 };

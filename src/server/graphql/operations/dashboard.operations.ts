@@ -7,6 +7,8 @@ export const dashboardDocument = graphql(`
       pendingEnrollments
       units
       activeSpaces
+      pendingBookings
+      bookingsToday
       openSupportRequests
       failedNotifications
     }

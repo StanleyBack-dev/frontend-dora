@@ -4,7 +4,6 @@ import {
   Field,
   FilterActions,
   FilterPanel,
-  PageHeader,
   Select,
   StatCard,
 } from "@/design-system";
@@ -24,8 +23,9 @@ export const metadata: Metadata = { title: "Condomínios" };
 
 const STATUSES = { ativos: "ACTIVE", suspensos: "SUSPENDED" } as const;
 
-// Platform console: only the Dora administration (CONDOMINIUMS_MANAGE).
-export default async function PlatformPage({
+// Administração → Condomínios: every condominium using Dora. Only the
+// platform administrator (CONDOMINIUMS_MANAGE, never granted to managers).
+export default async function CondominiumsAdminPage({
   searchParams,
 }: {
   searchParams: Promise<RawSearchParams>;
@@ -56,11 +56,6 @@ export default async function PlatformPage({
 
   return (
     <>
-      <PageHeader
-        title="Condomínios"
-        description="Todos os condomínios que usam o Dora: cadastre, acompanhe os números e entre em cada um para administrar."
-      />
-
       <section
         aria-label="Resumo da plataforma"
         className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4"
@@ -115,7 +110,10 @@ export default async function PlatformPage({
               { value: "suspensos", label: "Suspensos" },
             ]}
           />
-          <FilterActions clearHref="/plataforma" hasActiveFilters={filtered} />
+          <FilterActions
+            clearHref="/admin/condominios"
+            hasActiveFilters={filtered}
+          />
         </form>
       </FilterPanel>
 

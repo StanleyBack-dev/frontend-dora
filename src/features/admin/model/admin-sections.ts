@@ -1,5 +1,6 @@
 import {
   Building,
+  Building2,
   ClipboardList,
   Link2,
   ScrollText,
@@ -13,8 +14,10 @@ export type AdminSection = {
   label: string;
   description: string;
   icon: LucideIcon;
-  group: "Acessos" | "Sistema";
+  group: "Acessos" | "Plataforma" | "Sistema";
   permission: Permission;
+  /** Belongs to one condominium (needs one open). */
+  tenant: boolean;
 };
 
 // The areas of Administração, in menu order; each shows only to whoever has
@@ -27,6 +30,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     icon: UsersRound,
     group: "Acessos",
     permission: "USERS_MANAGE",
+    tenant: true,
   },
   {
     href: "/admin/cadastros",
@@ -35,6 +39,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     icon: ClipboardList,
     group: "Acessos",
     permission: "USERS_MANAGE",
+    tenant: true,
   },
   {
     href: "/admin/links",
@@ -43,6 +48,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     icon: Link2,
     group: "Acessos",
     permission: "USERS_MANAGE",
+    tenant: true,
   },
   {
     href: "/admin/unidades",
@@ -51,6 +57,16 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     icon: Building,
     group: "Acessos",
     permission: "UNITS_MANAGE",
+    tenant: true,
+  },
+  {
+    href: "/admin/condominios",
+    label: "Condomínios",
+    description: "Clientes do Dora e seus números",
+    icon: Building2,
+    group: "Plataforma",
+    permission: "CONDOMINIUMS_MANAGE",
+    tenant: false,
   },
   {
     href: "/admin/logs",
@@ -59,5 +75,17 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     icon: ScrollText,
     group: "Sistema",
     permission: "AUDIT_READ",
+    tenant: false,
   },
 ];
+
+/** The sections this person can open now (tenant ones need a condominium). */
+export const openableSections = (
+  user: { permissions: readonly Permission[] },
+  hasCondominium: boolean,
+): AdminSection[] =>
+  ADMIN_SECTIONS.filter(
+    (section) =>
+      user.permissions.includes(section.permission) &&
+      (hasCondominium || !section.tenant),
+  );

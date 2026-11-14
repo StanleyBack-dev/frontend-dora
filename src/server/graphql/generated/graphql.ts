@@ -4,6 +4,24 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
+export type BookingFilterInput = {
+  spaceId?: string | number | null | undefined;
+  status?: BookingStatus | null | undefined;
+  when?: BookingWhen | null | undefined;
+};
+
+/** Situação da reserva. */
+export type BookingStatus =
+  | 'CANCELLED'
+  | 'CONFIRMED'
+  | 'PENDING'
+  | 'REJECTED';
+
+/** Próximas (ainda não terminaram) ou passadas. */
+export type BookingWhen =
+  | 'PAST'
+  | 'UPCOMING';
+
 /** Quem recebe o comunicado. */
 export type BroadcastAudience =
   | 'GRUPO'
@@ -42,10 +60,27 @@ export type CondominiumStatus =
   | 'ACTIVE'
   | 'SUSPENDED';
 
+export type CreateBookingInput = {
+  /** Observação (até 300). */
+  notes?: string | null | undefined;
+  spaceId: string | number;
+  /** Início de um dos horários da grade. */
+  startsAt: string;
+};
+
 export type CreateEnrollmentInviteInput = {
   label: string;
   /** Validade em dias (1 a 30). */
   validDays: number;
+};
+
+export type CreateSpaceBlockInput = {
+  /** Cancela as reservas ativas do período (cada morador é avisado). Sem isso, a API diz quantas há. */
+  cancelOverlapping: boolean;
+  endsAt: string;
+  reason: string;
+  spaceId: string | number;
+  startsAt: string;
 };
 
 export type CreateUnitsInput = {
@@ -98,6 +133,10 @@ export type LoginInput = {
 };
 
 export type NotificationType =
+  | 'BOOKING_CANCELLED'
+  | 'BOOKING_CONFIRMED'
+  | 'BOOKING_PENDING'
+  | 'BOOKING_REJECTED'
   | 'BROADCAST'
   | 'ENROLLMENT_SUBMITTED'
   | 'SUPPORT_ANSWERED'
@@ -122,6 +161,8 @@ export type PageInput = {
 /** Capacidade verificada pela API. */
 export type Permission =
   | 'AUDIT_READ'
+  | 'BOOKINGS_CREATE'
+  | 'BOOKINGS_MANAGE'
   | 'CONDOMINIUMS_MANAGE'
   | 'DASHBOARD_READ'
   | 'NOTIFICATIONS_BROADCAST'
@@ -152,6 +193,14 @@ export type SetUserPermissionsInput = {
   useGroupDefaults: boolean;
   userId: string | number;
 };
+
+/** Situação de um horário na grade do dia. */
+export type SlotState =
+  | 'BLOCKED'
+  | 'FREE'
+  | 'MINE'
+  | 'TAKEN'
+  | 'UNAVAILABLE';
 
 /** O formulário completo do espaço. */
 export type SpaceInput = {
@@ -432,6 +481,83 @@ export type SwitchCondominiumMutationVariables = Exact<{
 
 export type SwitchCondominiumMutation = { switchCondominium: boolean };
 
+export type BookingFieldsFragment = { id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, createdAt: string };
+
+export type MyBookingsQueryVariables = Exact<{
+  when: BookingWhen;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type MyBookingsQuery = { myBookings: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, createdAt: string }> } };
+
+export type BookingsQueryVariables = Exact<{
+  filter?: BookingFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type BookingsQuery = { bookings: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, createdAt: string }> } };
+
+export type SpaceAvailabilityQueryVariables = Exact<{
+  spaceId: string | number;
+  date: string;
+}>;
+
+
+export type SpaceAvailabilityQuery = { spaceAvailability: { spaceId: string, date: string, firstDate: string, lastDate: string, slots: Array<{ startsAt: string, endsAt: string, state: SlotState, bookingId: string | null, bookingStatus: BookingStatus | null, label: string | null }> } };
+
+export type CreateBookingMutationVariables = Exact<{
+  input: CreateBookingInput;
+}>;
+
+
+export type CreateBookingMutation = { createBooking: { id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, createdAt: string } };
+
+export type CancelBookingMutationVariables = Exact<{
+  id: string | number;
+  reason?: string | null | undefined;
+}>;
+
+
+export type CancelBookingMutation = { cancelBooking: { id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, createdAt: string } };
+
+export type ApproveBookingMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ApproveBookingMutation = { approveBooking: { id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, createdAt: string } };
+
+export type RejectBookingMutationVariables = Exact<{
+  id: string | number;
+  reason: string;
+}>;
+
+
+export type RejectBookingMutation = { rejectBooking: { id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, createdAt: string } };
+
+export type SpaceBlocksQueryVariables = Exact<{
+  spaceId: string | number;
+}>;
+
+
+export type SpaceBlocksQuery = { spaceBlocks: Array<{ id: string, spaceId: string, startsAt: string, endsAt: string, reason: string, createdByName: string | null, createdAt: string }> };
+
+export type CreateSpaceBlockMutationVariables = Exact<{
+  input: CreateSpaceBlockInput;
+}>;
+
+
+export type CreateSpaceBlockMutation = { createSpaceBlock: { id: string } };
+
+export type DeleteSpaceBlockMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteSpaceBlockMutation = { deleteSpaceBlock: boolean };
+
 export type BroadcastFieldsFragment = { id: string, title: string, body: string, audience: BroadcastAudience, targetGroup: UserGroup | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string };
 
 export type BroadcastsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -510,7 +636,7 @@ export type DeleteUnitMutation = { deleteUnit: boolean };
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, activeSpaces: number, openSupportRequests: number | null, failedNotifications: number | null } };
+export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, activeSpaces: number, pendingBookings: number, bookingsToday: number, openSupportRequests: number | null, failedNotifications: number | null } };
 
 export type VerifyEnrollmentCodeMutationVariables = Exact<{
   code: string;
@@ -643,28 +769,28 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type SendTestPushMutation = { sendTestPush: number };
 
-export type SpaceFieldsFragment = { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } };
+export type SpaceFieldsFragment = { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } };
 
 export type SpacesQueryVariables = Exact<{
   includeInactive: boolean;
 }>;
 
 
-export type SpacesQuery = { spaces: Array<{ id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } }> };
+export type SpacesQuery = { spaces: Array<{ id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } }> };
 
 export type SpaceQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type SpaceQuery = { space: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+export type SpaceQuery = { space: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
 
 export type CreateSpaceMutationVariables = Exact<{
   input: SpaceInput;
 }>;
 
 
-export type CreateSpaceMutation = { createSpace: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+export type CreateSpaceMutation = { createSpace: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
 
 export type UpdateSpaceMutationVariables = Exact<{
   id: string | number;
@@ -672,7 +798,7 @@ export type UpdateSpaceMutationVariables = Exact<{
 }>;
 
 
-export type UpdateSpaceMutation = { updateSpace: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+export type UpdateSpaceMutation = { updateSpace: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
 
 export type SetSpaceActiveMutationVariables = Exact<{
   id: string | number;
@@ -680,7 +806,23 @@ export type SetSpaceActiveMutationVariables = Exact<{
 }>;
 
 
-export type SetSpaceActiveMutation = { setSpaceActive: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+export type SetSpaceActiveMutation = { setSpaceActive: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+
+export type AddSpacePhotoMutationVariables = Exact<{
+  spaceId: string | number;
+  photo: string;
+}>;
+
+
+export type AddSpacePhotoMutation = { addSpacePhoto: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+
+export type RemoveSpacePhotoMutationVariables = Exact<{
+  spaceId: string | number;
+  photoId: string | number;
+}>;
+
+
+export type RemoveSpacePhotoMutation = { removeSpacePhoto: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
 
 export type DeleteSpaceMutationVariables = Exact<{
   id: string | number;
@@ -787,6 +929,27 @@ export const UserAccountFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"UserAccountFields"}) as unknown as TypedDocumentString<UserAccountFieldsFragment, unknown>;
+export const BookingFieldsFragmentDoc = new TypedDocumentString(`
+    fragment BookingFields on Booking {
+  id
+  spaceId
+  spaceName
+  spaceKind
+  userId
+  userName
+  unitLabel
+  startsAt
+  endsAt
+  status
+  notes
+  cancelUntil
+  reason
+  decidedAt
+  cancelledAt
+  cancelledByManager
+  createdAt
+}
+    `, {"fragmentName":"BookingFields"}) as unknown as TypedDocumentString<BookingFieldsFragment, unknown>;
 export const BroadcastFieldsFragmentDoc = new TypedDocumentString(`
     fragment BroadcastFields on Broadcast {
   id
@@ -861,6 +1024,10 @@ export const SpaceFieldsFragmentDoc = new TypedDocumentString(`
   capacity
   usageRules
   active
+  photos {
+    id
+    url
+  }
   createdAt
   updatedAt
   rules {
@@ -1284,6 +1451,211 @@ export const SwitchCondominiumDocument = new TypedDocumentString(`
   switchCondominium(condominiumId: $condominiumId)
 }
     `) as unknown as TypedDocumentString<SwitchCondominiumMutation, SwitchCondominiumMutationVariables>;
+export const MyBookingsDocument = new TypedDocumentString(`
+    query MyBookings($when: BookingWhen!, $page: PageInput) {
+  myBookings(when: $when, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      ...BookingFields
+    }
+  }
+}
+    fragment BookingFields on Booking {
+  id
+  spaceId
+  spaceName
+  spaceKind
+  userId
+  userName
+  unitLabel
+  startsAt
+  endsAt
+  status
+  notes
+  cancelUntil
+  reason
+  decidedAt
+  cancelledAt
+  cancelledByManager
+  createdAt
+}`) as unknown as TypedDocumentString<MyBookingsQuery, MyBookingsQueryVariables>;
+export const BookingsDocument = new TypedDocumentString(`
+    query Bookings($filter: BookingFilterInput, $page: PageInput) {
+  bookings(filter: $filter, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      ...BookingFields
+    }
+  }
+}
+    fragment BookingFields on Booking {
+  id
+  spaceId
+  spaceName
+  spaceKind
+  userId
+  userName
+  unitLabel
+  startsAt
+  endsAt
+  status
+  notes
+  cancelUntil
+  reason
+  decidedAt
+  cancelledAt
+  cancelledByManager
+  createdAt
+}`) as unknown as TypedDocumentString<BookingsQuery, BookingsQueryVariables>;
+export const SpaceAvailabilityDocument = new TypedDocumentString(`
+    query SpaceAvailability($spaceId: ID!, $date: String!) {
+  spaceAvailability(spaceId: $spaceId, date: $date) {
+    spaceId
+    date
+    firstDate
+    lastDate
+    slots {
+      startsAt
+      endsAt
+      state
+      bookingId
+      bookingStatus
+      label
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<SpaceAvailabilityQuery, SpaceAvailabilityQueryVariables>;
+export const CreateBookingDocument = new TypedDocumentString(`
+    mutation CreateBooking($input: CreateBookingInput!) {
+  createBooking(input: $input) {
+    ...BookingFields
+  }
+}
+    fragment BookingFields on Booking {
+  id
+  spaceId
+  spaceName
+  spaceKind
+  userId
+  userName
+  unitLabel
+  startsAt
+  endsAt
+  status
+  notes
+  cancelUntil
+  reason
+  decidedAt
+  cancelledAt
+  cancelledByManager
+  createdAt
+}`) as unknown as TypedDocumentString<CreateBookingMutation, CreateBookingMutationVariables>;
+export const CancelBookingDocument = new TypedDocumentString(`
+    mutation CancelBooking($id: ID!, $reason: String) {
+  cancelBooking(id: $id, reason: $reason) {
+    ...BookingFields
+  }
+}
+    fragment BookingFields on Booking {
+  id
+  spaceId
+  spaceName
+  spaceKind
+  userId
+  userName
+  unitLabel
+  startsAt
+  endsAt
+  status
+  notes
+  cancelUntil
+  reason
+  decidedAt
+  cancelledAt
+  cancelledByManager
+  createdAt
+}`) as unknown as TypedDocumentString<CancelBookingMutation, CancelBookingMutationVariables>;
+export const ApproveBookingDocument = new TypedDocumentString(`
+    mutation ApproveBooking($id: ID!) {
+  approveBooking(id: $id) {
+    ...BookingFields
+  }
+}
+    fragment BookingFields on Booking {
+  id
+  spaceId
+  spaceName
+  spaceKind
+  userId
+  userName
+  unitLabel
+  startsAt
+  endsAt
+  status
+  notes
+  cancelUntil
+  reason
+  decidedAt
+  cancelledAt
+  cancelledByManager
+  createdAt
+}`) as unknown as TypedDocumentString<ApproveBookingMutation, ApproveBookingMutationVariables>;
+export const RejectBookingDocument = new TypedDocumentString(`
+    mutation RejectBooking($id: ID!, $reason: String!) {
+  rejectBooking(id: $id, reason: $reason) {
+    ...BookingFields
+  }
+}
+    fragment BookingFields on Booking {
+  id
+  spaceId
+  spaceName
+  spaceKind
+  userId
+  userName
+  unitLabel
+  startsAt
+  endsAt
+  status
+  notes
+  cancelUntil
+  reason
+  decidedAt
+  cancelledAt
+  cancelledByManager
+  createdAt
+}`) as unknown as TypedDocumentString<RejectBookingMutation, RejectBookingMutationVariables>;
+export const SpaceBlocksDocument = new TypedDocumentString(`
+    query SpaceBlocks($spaceId: ID!) {
+  spaceBlocks(spaceId: $spaceId) {
+    id
+    spaceId
+    startsAt
+    endsAt
+    reason
+    createdByName
+    createdAt
+  }
+}
+    `) as unknown as TypedDocumentString<SpaceBlocksQuery, SpaceBlocksQueryVariables>;
+export const CreateSpaceBlockDocument = new TypedDocumentString(`
+    mutation CreateSpaceBlock($input: CreateSpaceBlockInput!) {
+  createSpaceBlock(input: $input) {
+    id
+  }
+}
+    `) as unknown as TypedDocumentString<CreateSpaceBlockMutation, CreateSpaceBlockMutationVariables>;
+export const DeleteSpaceBlockDocument = new TypedDocumentString(`
+    mutation DeleteSpaceBlock($id: ID!) {
+  deleteSpaceBlock(id: $id)
+}
+    `) as unknown as TypedDocumentString<DeleteSpaceBlockMutation, DeleteSpaceBlockMutationVariables>;
 export const BroadcastsDocument = new TypedDocumentString(`
     query Broadcasts {
   broadcasts {
@@ -1449,6 +1821,8 @@ export const DashboardDocument = new TypedDocumentString(`
     pendingEnrollments
     units
     activeSpaces
+    pendingBookings
+    bookingsToday
     openSupportRequests
     failedNotifications
   }
@@ -1697,6 +2071,10 @@ export const SpacesDocument = new TypedDocumentString(`
   capacity
   usageRules
   active
+  photos {
+    id
+    url
+  }
   createdAt
   updatedAt
   rules {
@@ -1730,6 +2108,10 @@ export const SpaceDocument = new TypedDocumentString(`
   capacity
   usageRules
   active
+  photos {
+    id
+    url
+  }
   createdAt
   updatedAt
   rules {
@@ -1763,6 +2145,10 @@ export const CreateSpaceDocument = new TypedDocumentString(`
   capacity
   usageRules
   active
+  photos {
+    id
+    url
+  }
   createdAt
   updatedAt
   rules {
@@ -1796,6 +2182,10 @@ export const UpdateSpaceDocument = new TypedDocumentString(`
   capacity
   usageRules
   active
+  photos {
+    id
+    url
+  }
   createdAt
   updatedAt
   rules {
@@ -1829,6 +2219,10 @@ export const SetSpaceActiveDocument = new TypedDocumentString(`
   capacity
   usageRules
   active
+  photos {
+    id
+    url
+  }
   createdAt
   updatedAt
   rules {
@@ -1848,6 +2242,80 @@ export const SetSpaceActiveDocument = new TypedDocumentString(`
     cancelUntilHours
   }
 }`) as unknown as TypedDocumentString<SetSpaceActiveMutation, SetSpaceActiveMutationVariables>;
+export const AddSpacePhotoDocument = new TypedDocumentString(`
+    mutation AddSpacePhoto($spaceId: ID!, $photo: String!) {
+  addSpacePhoto(spaceId: $spaceId, photo: $photo) {
+    ...SpaceFields
+  }
+}
+    fragment SpaceFields on Space {
+  id
+  name
+  kind
+  description
+  capacity
+  usageRules
+  active
+  photos {
+    id
+    url
+  }
+  createdAt
+  updatedAt
+  rules {
+    openingHours {
+      weekday
+      opensAt
+      closesAt
+    }
+    slotMinutes
+    minAdvanceHours
+    maxAdvanceDays
+    unitLimit {
+      count
+      period
+    }
+    requiresApproval
+    cancelUntilHours
+  }
+}`) as unknown as TypedDocumentString<AddSpacePhotoMutation, AddSpacePhotoMutationVariables>;
+export const RemoveSpacePhotoDocument = new TypedDocumentString(`
+    mutation RemoveSpacePhoto($spaceId: ID!, $photoId: ID!) {
+  removeSpacePhoto(spaceId: $spaceId, photoId: $photoId) {
+    ...SpaceFields
+  }
+}
+    fragment SpaceFields on Space {
+  id
+  name
+  kind
+  description
+  capacity
+  usageRules
+  active
+  photos {
+    id
+    url
+  }
+  createdAt
+  updatedAt
+  rules {
+    openingHours {
+      weekday
+      opensAt
+      closesAt
+    }
+    slotMinutes
+    minAdvanceHours
+    maxAdvanceDays
+    unitLimit {
+      count
+      period
+    }
+    requiresApproval
+    cancelUntilHours
+  }
+}`) as unknown as TypedDocumentString<RemoveSpacePhotoMutation, RemoveSpacePhotoMutationVariables>;
 export const DeleteSpaceDocument = new TypedDocumentString(`
     mutation DeleteSpace($id: ID!) {
   deleteSpace(id: $id)
