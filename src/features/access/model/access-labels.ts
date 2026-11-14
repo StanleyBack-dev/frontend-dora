@@ -9,7 +9,7 @@ export const GROUP_LABELS: Record<UserGroup, string> = {
 export const GROUP_DESCRIPTIONS: Record<UserGroup, string> = {
   USER: "Usa o app do condomínio: recebe avisos e comunicados e pede ajuda ao suporte.",
   ADMIN:
-    "Administra este condomínio (síndico, administração): moradores, cadastros, unidades, comunicados e painel.",
+    "Administra este condomínio (síndico, administração): moradores, cadastros, unidades, espaços, comunicados e painel.",
   ADMIN_MASTER:
     "Administra a plataforma Dora: todos os condomínios, suporte e histórico dos registros.",
 };
@@ -34,6 +34,10 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     area: "Administração",
   },
   UNITS_MANAGE: { label: "Gerenciar unidades", area: "Administração" },
+  SPACES_MANAGE: {
+    label: "Gerenciar espaços e regras de reserva",
+    area: "Gestão",
+  },
   PERMISSIONS_MANAGE: {
     label: "Gerenciar permissões",
     area: "Administração",

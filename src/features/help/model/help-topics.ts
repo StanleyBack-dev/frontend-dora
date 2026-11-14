@@ -4,6 +4,7 @@ import {
   CircleUserRound,
   House,
   LifeBuoy,
+  MapPin,
   Megaphone,
   Settings,
   ShieldCheck,
@@ -59,14 +60,14 @@ export const HELP_TOPICS: HelpTopic[] = [
     title: "Início",
     icon: House,
     area: "main",
-    tour: "Sua página inicial: atalhos para o que você mais usa. As reservas de quadras e espaços chegam aqui em breve.",
+    tour: "Sua página inicial: atalhos para o que você mais usa no condomínio aberto no topo do menu.",
     sections: {
       purpose: [
         {
           text: "Mostrar logo ao entrar o que importa agora e os atalhos do app.",
         },
         {
-          text: "Gestores também veem o painel de gestão: contas ativas, cadastros pendentes, suporte em aberto e avisos que não foram entregues.",
+          text: "Gestores também veem o painel de gestão: moradores ativos, cadastros pendentes, espaços e unidades.",
           only: ["DASHBOARD_READ"],
         },
       ],
@@ -77,6 +78,40 @@ export const HELP_TOPICS: HelpTopic[] = [
         {
           text: "Os cartões do painel levam direto à lista correspondente quando você pode abri-la.",
           only: ["DASHBOARD_READ"],
+        },
+      ],
+    },
+  },
+  {
+    id: "espacos",
+    href: "/espacos",
+    title: "Espaços",
+    icon: MapPin,
+    area: "main",
+    tour: "Quadras, salão de festas e os outros espaços do condomínio, com o horário e as regras de cada um. As reservas chegam em breve.",
+    sections: {
+      purpose: [
+        {
+          text: "Ver os espaços do condomínio: quando funcionam, quanto dura cada reserva e as regras de uso.",
+        },
+      ],
+      howto: [
+        {
+          text: "Toque num espaço para ver o horário de cada dia e as regras.",
+        },
+        {
+          text: "Use “Novo espaço” para cadastrar: dados, horário de funcionamento, regras de reserva e regras de uso.",
+          only: ["SPACES_MANAGE"],
+        },
+        {
+          text: "No espaço, “Desativar” tira o espaço da lista dos moradores durante uma reforma ou manutenção, sem perder nada.",
+          only: ["SPACES_MANAGE"],
+        },
+      ],
+      rules: [
+        {
+          text: "As regras de reserva (antecedência, limite por unidade, prazo para cancelar e aprovação) valem para as próximas reservas.",
+          only: ["SPACES_MANAGE"],
         },
       ],
     },

@@ -24,6 +24,8 @@ export const labelClasses = "mb-1.5 block text-[13px] font-semibold text-fg";
 
 type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
+  /** Visually hide the label (still read by screen readers). */
+  hideLabel?: boolean;
   error?: string;
   /** Decorative icon inside the field, on the left. */
   icon?: ReactNode;
@@ -35,6 +37,7 @@ type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
 
 export function Field({
   label,
+  hideLabel = false,
   error,
   icon,
   trailing,
@@ -49,7 +52,10 @@ export function Field({
 
   return (
     <div className={className}>
-      <label htmlFor={inputId} className={labelClasses}>
+      <label
+        htmlFor={inputId}
+        className={cn(labelClasses, hideLabel && "sr-only")}
+      >
         {label}
         {props.required && <RequiredMark />}
       </label>

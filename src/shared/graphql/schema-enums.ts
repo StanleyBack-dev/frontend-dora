@@ -14,6 +14,12 @@ export type EnrollmentStatus =
   | 'PENDENTE'
   | 'RECUSADA';
 
+/** Período do limite de reservas por unidade. */
+export type LimitPeriod =
+  | 'DAY'
+  | 'MONTH'
+  | 'WEEK';
+
 export type NotificationType =
   | 'BROADCAST'
   | 'ENROLLMENT_SUBMITTED'
@@ -29,9 +35,20 @@ export type Permission =
   | 'DASHBOARD_READ'
   | 'NOTIFICATIONS_BROADCAST'
   | 'PERMISSIONS_MANAGE'
+  | 'SPACES_MANAGE'
   | 'SUPPORT_MANAGE'
   | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
+
+/** Tipo de espaço (quadra, salão de festas…). */
+export type SpaceKind =
+  | 'BARBECUE'
+  | 'COURT'
+  | 'GAME_ROOM'
+  | 'GYM'
+  | 'OTHER'
+  | 'PARTY_ROOM'
+  | 'POOL';
 
 /** Do que se trata a solicitação de suporte. */
 export type SupportCategory =
