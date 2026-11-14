@@ -142,6 +142,12 @@ export type LoginInput = {
   password: string;
 };
 
+/** Tamanho de cada intervalo da série: dia, semana ou mês. */
+export type MetricsGranularity =
+  | 'DAY'
+  | 'MONTH'
+  | 'WEEK';
+
 export type NotificationType =
   | 'BOOKING_CANCELLED'
   | 'BOOKING_CONFIRMED'
@@ -181,6 +187,15 @@ export type Permission =
   | 'SUPPORT_MANAGE'
   | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
+
+export type PlatformMetricsFilterInput = {
+  /** Um condomínio (vazio: todos). */
+  condominiumId?: string | number | null | undefined;
+  /** Primeiro dia (YYYY-MM-DD). Padrão: 30 dias antes do fim. */
+  from?: string | null | undefined;
+  /** Último dia (YYYY-MM-DD). Padrão: hoje. */
+  to?: string | null | undefined;
+};
 
 /** PushSubscription do navegador (PushManager). */
 export type PushSubscriptionInput = {
@@ -784,6 +799,13 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SendTestPushMutation = { sendTestPush: number };
+
+export type PlatformMetricsQueryVariables = Exact<{
+  filter?: PlatformMetricsFilterInput | null | undefined;
+}>;
+
+
+export type PlatformMetricsQuery = { platformMetrics: { from: string, to: string, days: number, condominiumId: string | null, bookings: { total: number, confirmed: number, pending: number, cancelled: number, rejected: number, stalePending: number, granularity: MetricsGranularity, series: Array<{ bucket: string, total: number, cancelled: number }>, byCondominium: Array<{ condominiumId: string, name: string, total: number, cancelled: number }> }, spaces: { activeSpaces: number, unusedCount: number, mostUsed: Array<{ spaceId: string, name: string, condominiumName: string, bookings: number, hours: number }>, unused: Array<{ spaceId: string, name: string, condominiumName: string, bookings: number, hours: number }>, byWeekday: Array<{ weekday: number, bookings: number }>, byHour: Array<{ hour: number, bookings: number }> }, engagement: { members: number, active7d: number, active30d: number, newMembers: number, enrollments: number, inactiveCount: number, inactiveCondominiums: Array<{ condominiumId: string, name: string, lastActivityAt: string | null }> }, health: { staleEnrollments: number, failedNotifications: number, delayedNotifications: number, withoutManager: number, withoutUnits: number, openSupport: number } } };
 
 export type SpaceFieldsFragment = { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } };
 
@@ -2122,6 +2144,83 @@ export const SendTestPushDocument = new TypedDocumentString(`
   sendTestPush
 }
     `) as unknown as TypedDocumentString<SendTestPushMutation, SendTestPushMutationVariables>;
+export const PlatformMetricsDocument = new TypedDocumentString(`
+    query PlatformMetrics($filter: PlatformMetricsFilterInput) {
+  platformMetrics(filter: $filter) {
+    from
+    to
+    days
+    condominiumId
+    bookings {
+      total
+      confirmed
+      pending
+      cancelled
+      rejected
+      stalePending
+      granularity
+      series {
+        bucket
+        total
+        cancelled
+      }
+      byCondominium {
+        condominiumId
+        name
+        total
+        cancelled
+      }
+    }
+    spaces {
+      activeSpaces
+      unusedCount
+      mostUsed {
+        spaceId
+        name
+        condominiumName
+        bookings
+        hours
+      }
+      unused {
+        spaceId
+        name
+        condominiumName
+        bookings
+        hours
+      }
+      byWeekday {
+        weekday
+        bookings
+      }
+      byHour {
+        hour
+        bookings
+      }
+    }
+    engagement {
+      members
+      active7d
+      active30d
+      newMembers
+      enrollments
+      inactiveCount
+      inactiveCondominiums {
+        condominiumId
+        name
+        lastActivityAt
+      }
+    }
+    health {
+      staleEnrollments
+      failedNotifications
+      delayedNotifications
+      withoutManager
+      withoutUnits
+      openSupport
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<PlatformMetricsQuery, PlatformMetricsQueryVariables>;
 export const SpacesDocument = new TypedDocumentString(`
     query Spaces($includeInactive: Boolean!) {
   spaces(includeInactive: $includeInactive) {

@@ -32,6 +32,12 @@ export type LimitPeriod =
   | 'MONTH'
   | 'WEEK';
 
+/** Tamanho de cada intervalo da série: dia, semana ou mês. */
+export type MetricsGranularity =
+  | 'DAY'
+  | 'MONTH'
+  | 'WEEK';
+
 export type NotificationType =
   | 'BOOKING_CANCELLED'
   | 'BOOKING_CONFIRMED'

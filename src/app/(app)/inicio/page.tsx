@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   Bell,
   Building2,
+  ChartColumn,
   CalendarClock,
   CircleUserRound,
   LifeBuoy,
@@ -111,12 +112,20 @@ export default async function HomePage() {
       </section>
 
       {!condominium && user.platformAdmin && (
-        <Shortcut
-          href="/condominios"
-          icon={<Building2 aria-hidden />}
-          title="Condomínios"
-          description="Cadastre condomínios, veja os números de cada um e entre para administrar."
-        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Shortcut
+            href="/painel"
+            icon={<ChartColumn aria-hidden />}
+            title="Painel"
+            description="Reservas, uso dos espaços, moradores e o que precisa de atenção em todos os condomínios."
+          />
+          <Shortcut
+            href="/condominios"
+            icon={<Building2 aria-hidden />}
+            title="Condomínios"
+            description="Cadastre condomínios, veja os números de cada um e entre para administrar."
+          />
+        </div>
       )}
 
       {dashboard && (
