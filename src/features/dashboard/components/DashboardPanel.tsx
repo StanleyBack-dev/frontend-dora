@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import {
   AlertTriangle,
   Building,
+  MapPin,
   LifeBuoy,
   MailWarning,
   UserPlus,
@@ -59,6 +60,17 @@ export function DashboardPanel({
           : "Nada pendente",
       icon: <UserPlus className="size-5" />,
       tone: dashboard.pendingEnrollments > 0 ? "warning" : "neutral",
+    },
+    {
+      href: "/espacos",
+      label: "Espaços ativos",
+      value: dashboard.activeSpaces,
+      hint:
+        dashboard.activeSpaces > 0
+          ? "Disponíveis para os moradores"
+          : "Cadastre os espaços",
+      icon: <MapPin className="size-5" />,
+      tone: dashboard.activeSpaces > 0 ? "neutral" : "warning",
     },
     {
       href: canManageUnits ? "/admin/unidades" : null,

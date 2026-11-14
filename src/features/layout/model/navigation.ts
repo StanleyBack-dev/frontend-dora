@@ -4,6 +4,7 @@ import {
   CircleHelp,
   CircleUserRound,
   House,
+  MapPin,
   LifeBuoy,
   type LucideIcon,
   Megaphone,
@@ -35,6 +36,8 @@ export const canSee = (item: NavItem, permissions: readonly Permission[]) =>
 // comes next, right after Início).
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/inicio", label: "Início", icon: House },
+  // Everyone in a condominium: its courts, party room… (bookings next).
+  { href: "/espacos", label: "Espaços", icon: MapPin },
   {
     href: "/comunicados",
     label: "Comunicados",

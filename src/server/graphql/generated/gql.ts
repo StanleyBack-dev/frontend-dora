@@ -53,7 +53,7 @@ type Documents = {
     "\n  mutation CreateUnits($input: CreateUnitsInput!) {\n    createUnits(input: $input) {\n      ...UnitFields\n    }\n  }\n": typeof types.CreateUnitsDocument,
     "\n  mutation UpdateUnit($id: ID!, $input: UpdateUnitInput!) {\n    updateUnit(id: $id, input: $input) {\n      ...UnitFields\n    }\n  }\n": typeof types.UpdateUnitDocument,
     "\n  mutation DeleteUnit($id: ID!) {\n    deleteUnit(id: $id)\n  }\n": typeof types.DeleteUnitDocument,
-    "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      openSupportRequests\n      failedNotifications\n    }\n  }\n": typeof types.DashboardDocument,
+    "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      openSupportRequests\n      failedNotifications\n    }\n  }\n": typeof types.DashboardDocument,
     "\n  mutation VerifyEnrollmentCode($code: String!) {\n    verifyEnrollmentCode(code: $code)\n  }\n": typeof types.VerifyEnrollmentCodeDocument,
     "\n  query EnrollmentForm($formToken: String!) {\n    enrollmentForm(formToken: $formToken) {\n      condominiumName\n      units {\n        id\n        label\n      }\n    }\n  }\n": typeof types.EnrollmentFormDocument,
     "\n  mutation SubmitEnrollment($input: SubmitEnrollmentInput!) {\n    submitEnrollment(input: $input)\n  }\n": typeof types.SubmitEnrollmentDocument,
@@ -75,6 +75,13 @@ type Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": typeof types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": typeof types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": typeof types.SendTestPushDocument,
+    "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n    }\n  }\n": typeof types.SpaceFieldsFragmentDoc,
+    "\n  query Spaces($includeInactive: Boolean!) {\n    spaces(includeInactive: $includeInactive) {\n      ...SpaceFields\n    }\n  }\n": typeof types.SpacesDocument,
+    "\n  query Space($id: ID!) {\n    space(id: $id) {\n      ...SpaceFields\n    }\n  }\n": typeof types.SpaceDocument,
+    "\n  mutation CreateSpace($input: SpaceInput!) {\n    createSpace(input: $input) {\n      ...SpaceFields\n    }\n  }\n": typeof types.CreateSpaceDocument,
+    "\n  mutation UpdateSpace($id: ID!, $input: SpaceInput!) {\n    updateSpace(id: $id, input: $input) {\n      ...SpaceFields\n    }\n  }\n": typeof types.UpdateSpaceDocument,
+    "\n  mutation SetSpaceActive($id: ID!, $active: Boolean!) {\n    setSpaceActive(id: $id, active: $active) {\n      ...SpaceFields\n    }\n  }\n": typeof types.SetSpaceActiveDocument,
+    "\n  mutation DeleteSpace($id: ID!) {\n    deleteSpace(id: $id)\n  }\n": typeof types.DeleteSpaceDocument,
     "\n  fragment SupportRequestFields on SupportRequest {\n    id\n    protocol\n    userId\n    userName\n    condominiumName\n    category\n    subject\n    message\n    status\n    reply\n    repliedAt\n    repliedByName\n    finalizedAt\n    finalizedByName\n    createdAt\n  }\n": typeof types.SupportRequestFieldsFragmentDoc,
     "\n  query SupportPage($page: PageInput) {\n    supportQuota {\n      limit\n      sentToday\n      remaining\n      nextAllowedAt\n    }\n    mySupportRequests(page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SupportPageDocument,
     "\n  query SupportRequests($status: SupportStatus, $page: PageInput) {\n    supportRequests(status: $status, page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SupportRequestsDocument,
@@ -124,7 +131,7 @@ const documents: Documents = {
     "\n  mutation CreateUnits($input: CreateUnitsInput!) {\n    createUnits(input: $input) {\n      ...UnitFields\n    }\n  }\n": types.CreateUnitsDocument,
     "\n  mutation UpdateUnit($id: ID!, $input: UpdateUnitInput!) {\n    updateUnit(id: $id, input: $input) {\n      ...UnitFields\n    }\n  }\n": types.UpdateUnitDocument,
     "\n  mutation DeleteUnit($id: ID!) {\n    deleteUnit(id: $id)\n  }\n": types.DeleteUnitDocument,
-    "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      openSupportRequests\n      failedNotifications\n    }\n  }\n": types.DashboardDocument,
+    "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      openSupportRequests\n      failedNotifications\n    }\n  }\n": types.DashboardDocument,
     "\n  mutation VerifyEnrollmentCode($code: String!) {\n    verifyEnrollmentCode(code: $code)\n  }\n": types.VerifyEnrollmentCodeDocument,
     "\n  query EnrollmentForm($formToken: String!) {\n    enrollmentForm(formToken: $formToken) {\n      condominiumName\n      units {\n        id\n        label\n      }\n    }\n  }\n": types.EnrollmentFormDocument,
     "\n  mutation SubmitEnrollment($input: SubmitEnrollmentInput!) {\n    submitEnrollment(input: $input)\n  }\n": types.SubmitEnrollmentDocument,
@@ -146,6 +153,13 @@ const documents: Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": types.SendTestPushDocument,
+    "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n    }\n  }\n": types.SpaceFieldsFragmentDoc,
+    "\n  query Spaces($includeInactive: Boolean!) {\n    spaces(includeInactive: $includeInactive) {\n      ...SpaceFields\n    }\n  }\n": types.SpacesDocument,
+    "\n  query Space($id: ID!) {\n    space(id: $id) {\n      ...SpaceFields\n    }\n  }\n": types.SpaceDocument,
+    "\n  mutation CreateSpace($input: SpaceInput!) {\n    createSpace(input: $input) {\n      ...SpaceFields\n    }\n  }\n": types.CreateSpaceDocument,
+    "\n  mutation UpdateSpace($id: ID!, $input: SpaceInput!) {\n    updateSpace(id: $id, input: $input) {\n      ...SpaceFields\n    }\n  }\n": types.UpdateSpaceDocument,
+    "\n  mutation SetSpaceActive($id: ID!, $active: Boolean!) {\n    setSpaceActive(id: $id, active: $active) {\n      ...SpaceFields\n    }\n  }\n": types.SetSpaceActiveDocument,
+    "\n  mutation DeleteSpace($id: ID!) {\n    deleteSpace(id: $id)\n  }\n": types.DeleteSpaceDocument,
     "\n  fragment SupportRequestFields on SupportRequest {\n    id\n    protocol\n    userId\n    userName\n    condominiumName\n    category\n    subject\n    message\n    status\n    reply\n    repliedAt\n    repliedByName\n    finalizedAt\n    finalizedByName\n    createdAt\n  }\n": types.SupportRequestFieldsFragmentDoc,
     "\n  query SupportPage($page: PageInput) {\n    supportQuota {\n      limit\n      sentToday\n      remaining\n      nextAllowedAt\n    }\n    mySupportRequests(page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SupportPageDocument,
     "\n  query SupportRequests($status: SupportStatus, $page: PageInput) {\n    supportRequests(status: $status, page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SupportRequestsDocument,
@@ -312,7 +326,7 @@ export function graphql(source: "\n  mutation DeleteUnit($id: ID!) {\n    delete
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      openSupportRequests\n      failedNotifications\n    }\n  }\n"): typeof import('./graphql').DashboardDocument;
+export function graphql(source: "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      openSupportRequests\n      failedNotifications\n    }\n  }\n"): typeof import('./graphql').DashboardDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -397,6 +411,34 @@ export function graphql(source: "\n  mutation UnsubscribePush($endpoint: String!
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation SendTestPush {\n    sendTestPush\n  }\n"): typeof import('./graphql').SendTestPushDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n    }\n  }\n"): typeof import('./graphql').SpaceFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Spaces($includeInactive: Boolean!) {\n    spaces(includeInactive: $includeInactive) {\n      ...SpaceFields\n    }\n  }\n"): typeof import('./graphql').SpacesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Space($id: ID!) {\n    space(id: $id) {\n      ...SpaceFields\n    }\n  }\n"): typeof import('./graphql').SpaceDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateSpace($input: SpaceInput!) {\n    createSpace(input: $input) {\n      ...SpaceFields\n    }\n  }\n"): typeof import('./graphql').CreateSpaceDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateSpace($id: ID!, $input: SpaceInput!) {\n    updateSpace(id: $id, input: $input) {\n      ...SpaceFields\n    }\n  }\n"): typeof import('./graphql').UpdateSpaceDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetSpaceActive($id: ID!, $active: Boolean!) {\n    setSpaceActive(id: $id, active: $active) {\n      ...SpaceFields\n    }\n  }\n"): typeof import('./graphql').SetSpaceActiveDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteSpace($id: ID!) {\n    deleteSpace(id: $id)\n  }\n"): typeof import('./graphql').DeleteSpaceDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -85,6 +85,12 @@ export type EnrollmentStatus =
   | 'PENDENTE'
   | 'RECUSADA';
 
+/** Período do limite de reservas por unidade. */
+export type LimitPeriod =
+  | 'DAY'
+  | 'MONTH'
+  | 'WEEK';
+
 export type LoginInput = {
   /** Usuário ou e-mail. */
   login: string;
@@ -99,6 +105,15 @@ export type NotificationType =
   | 'SUPPORT_REQUESTED'
   | 'SYSTEM_ALERT';
 
+export type OpeningHoursInput = {
+  /** "HH:MM" ("24:00" = até meia-noite). */
+  closesAt: string;
+  /** "HH:MM". */
+  opensAt: string;
+  /** 0 = domingo … 6 = sábado. */
+  weekday: number;
+};
+
 export type PageInput = {
   limit?: number;
   page?: number;
@@ -111,6 +126,7 @@ export type Permission =
   | 'DASHBOARD_READ'
   | 'NOTIFICATIONS_BROADCAST'
   | 'PERMISSIONS_MANAGE'
+  | 'SPACES_MANAGE'
   | 'SUPPORT_MANAGE'
   | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
@@ -135,6 +151,36 @@ export type SetUserPermissionsInput = {
   /** true descarta as exceções e volta ao padrão do grupo. */
   useGroupDefaults: boolean;
   userId: string | number;
+};
+
+/** O formulário completo do espaço. */
+export type SpaceInput = {
+  capacity?: number | null | undefined;
+  description?: string | null | undefined;
+  kind: SpaceKind;
+  name: string;
+  rules: SpaceRulesInput;
+  usageRules?: string | null | undefined;
+};
+
+/** Tipo de espaço (quadra, salão de festas…). */
+export type SpaceKind =
+  | 'BARBECUE'
+  | 'COURT'
+  | 'GAME_ROOM'
+  | 'GYM'
+  | 'OTHER'
+  | 'PARTY_ROOM'
+  | 'POOL';
+
+export type SpaceRulesInput = {
+  cancelUntilHours: number;
+  maxAdvanceDays: number;
+  minAdvanceHours: number;
+  openingHours: Array<OpeningHoursInput>;
+  requiresApproval: boolean;
+  slotMinutes: number;
+  unitLimit?: UnitLimitInput | null | undefined;
 };
 
 export type SubmitEnrollmentInput = {
@@ -173,6 +219,11 @@ export type SystemLogFilterInput = {
   levels?: Array<string> | null | undefined;
   search?: string | null | undefined;
   to?: string | null | undefined;
+};
+
+export type UnitLimitInput = {
+  count: number;
+  period: LimitPeriod;
 };
 
 export type UpdateMyProfileInput = {
@@ -459,7 +510,7 @@ export type DeleteUnitMutation = { deleteUnit: boolean };
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, openSupportRequests: number | null, failedNotifications: number | null } };
+export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, activeSpaces: number, openSupportRequests: number | null, failedNotifications: number | null } };
 
 export type VerifyEnrollmentCodeMutationVariables = Exact<{
   code: string;
@@ -591,6 +642,52 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SendTestPushMutation = { sendTestPush: number };
+
+export type SpaceFieldsFragment = { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } };
+
+export type SpacesQueryVariables = Exact<{
+  includeInactive: boolean;
+}>;
+
+
+export type SpacesQuery = { spaces: Array<{ id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } }> };
+
+export type SpaceQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type SpaceQuery = { space: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+
+export type CreateSpaceMutationVariables = Exact<{
+  input: SpaceInput;
+}>;
+
+
+export type CreateSpaceMutation = { createSpace: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+
+export type UpdateSpaceMutationVariables = Exact<{
+  id: string | number;
+  input: SpaceInput;
+}>;
+
+
+export type UpdateSpaceMutation = { updateSpace: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+
+export type SetSpaceActiveMutationVariables = Exact<{
+  id: string | number;
+  active: boolean;
+}>;
+
+
+export type SetSpaceActiveMutation = { setSpaceActive: { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null } } };
+
+export type DeleteSpaceMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteSpaceMutation = { deleteSpace: boolean };
 
 export type SupportRequestFieldsFragment = { id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string };
 
@@ -755,6 +852,35 @@ export const EnrollmentRequestFieldsFragmentDoc = new TypedDocumentString(`
   photoUrl
 }
     `, {"fragmentName":"EnrollmentRequestFields"}) as unknown as TypedDocumentString<EnrollmentRequestFieldsFragment, unknown>;
+export const SpaceFieldsFragmentDoc = new TypedDocumentString(`
+    fragment SpaceFields on Space {
+  id
+  name
+  kind
+  description
+  capacity
+  usageRules
+  active
+  createdAt
+  updatedAt
+  rules {
+    openingHours {
+      weekday
+      opensAt
+      closesAt
+    }
+    slotMinutes
+    minAdvanceHours
+    maxAdvanceDays
+    unitLimit {
+      count
+      period
+    }
+    requiresApproval
+    cancelUntilHours
+  }
+}
+    `, {"fragmentName":"SpaceFields"}) as unknown as TypedDocumentString<SpaceFieldsFragment, unknown>;
 export const SupportRequestFieldsFragmentDoc = new TypedDocumentString(`
     fragment SupportRequestFields on SupportRequest {
   id
@@ -1322,6 +1448,7 @@ export const DashboardDocument = new TypedDocumentString(`
     activeUsers
     pendingEnrollments
     units
+    activeSpaces
     openSupportRequests
     failedNotifications
   }
@@ -1556,6 +1683,176 @@ export const SendTestPushDocument = new TypedDocumentString(`
   sendTestPush
 }
     `) as unknown as TypedDocumentString<SendTestPushMutation, SendTestPushMutationVariables>;
+export const SpacesDocument = new TypedDocumentString(`
+    query Spaces($includeInactive: Boolean!) {
+  spaces(includeInactive: $includeInactive) {
+    ...SpaceFields
+  }
+}
+    fragment SpaceFields on Space {
+  id
+  name
+  kind
+  description
+  capacity
+  usageRules
+  active
+  createdAt
+  updatedAt
+  rules {
+    openingHours {
+      weekday
+      opensAt
+      closesAt
+    }
+    slotMinutes
+    minAdvanceHours
+    maxAdvanceDays
+    unitLimit {
+      count
+      period
+    }
+    requiresApproval
+    cancelUntilHours
+  }
+}`) as unknown as TypedDocumentString<SpacesQuery, SpacesQueryVariables>;
+export const SpaceDocument = new TypedDocumentString(`
+    query Space($id: ID!) {
+  space(id: $id) {
+    ...SpaceFields
+  }
+}
+    fragment SpaceFields on Space {
+  id
+  name
+  kind
+  description
+  capacity
+  usageRules
+  active
+  createdAt
+  updatedAt
+  rules {
+    openingHours {
+      weekday
+      opensAt
+      closesAt
+    }
+    slotMinutes
+    minAdvanceHours
+    maxAdvanceDays
+    unitLimit {
+      count
+      period
+    }
+    requiresApproval
+    cancelUntilHours
+  }
+}`) as unknown as TypedDocumentString<SpaceQuery, SpaceQueryVariables>;
+export const CreateSpaceDocument = new TypedDocumentString(`
+    mutation CreateSpace($input: SpaceInput!) {
+  createSpace(input: $input) {
+    ...SpaceFields
+  }
+}
+    fragment SpaceFields on Space {
+  id
+  name
+  kind
+  description
+  capacity
+  usageRules
+  active
+  createdAt
+  updatedAt
+  rules {
+    openingHours {
+      weekday
+      opensAt
+      closesAt
+    }
+    slotMinutes
+    minAdvanceHours
+    maxAdvanceDays
+    unitLimit {
+      count
+      period
+    }
+    requiresApproval
+    cancelUntilHours
+  }
+}`) as unknown as TypedDocumentString<CreateSpaceMutation, CreateSpaceMutationVariables>;
+export const UpdateSpaceDocument = new TypedDocumentString(`
+    mutation UpdateSpace($id: ID!, $input: SpaceInput!) {
+  updateSpace(id: $id, input: $input) {
+    ...SpaceFields
+  }
+}
+    fragment SpaceFields on Space {
+  id
+  name
+  kind
+  description
+  capacity
+  usageRules
+  active
+  createdAt
+  updatedAt
+  rules {
+    openingHours {
+      weekday
+      opensAt
+      closesAt
+    }
+    slotMinutes
+    minAdvanceHours
+    maxAdvanceDays
+    unitLimit {
+      count
+      period
+    }
+    requiresApproval
+    cancelUntilHours
+  }
+}`) as unknown as TypedDocumentString<UpdateSpaceMutation, UpdateSpaceMutationVariables>;
+export const SetSpaceActiveDocument = new TypedDocumentString(`
+    mutation SetSpaceActive($id: ID!, $active: Boolean!) {
+  setSpaceActive(id: $id, active: $active) {
+    ...SpaceFields
+  }
+}
+    fragment SpaceFields on Space {
+  id
+  name
+  kind
+  description
+  capacity
+  usageRules
+  active
+  createdAt
+  updatedAt
+  rules {
+    openingHours {
+      weekday
+      opensAt
+      closesAt
+    }
+    slotMinutes
+    minAdvanceHours
+    maxAdvanceDays
+    unitLimit {
+      count
+      period
+    }
+    requiresApproval
+    cancelUntilHours
+  }
+}`) as unknown as TypedDocumentString<SetSpaceActiveMutation, SetSpaceActiveMutationVariables>;
+export const DeleteSpaceDocument = new TypedDocumentString(`
+    mutation DeleteSpace($id: ID!) {
+  deleteSpace(id: $id)
+}
+    `) as unknown as TypedDocumentString<DeleteSpaceMutation, DeleteSpaceMutationVariables>;
 export const SupportPageDocument = new TypedDocumentString(`
     query SupportPage($page: PageInput) {
   supportQuota {

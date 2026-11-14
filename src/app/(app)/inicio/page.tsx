@@ -133,22 +133,26 @@ export default async function HomePage() {
           Acesso rápido
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
-          <Card className="flex h-full flex-col gap-4 border-dashed bg-surface-muted p-5 shadow-none">
-            <span className="grid size-11 place-items-center rounded-full bg-brand text-brand-fg [&>svg]:size-5">
-              <CalendarClock aria-hidden />
-            </span>
-            <span>
-              <span className="flex items-center gap-2 font-bold text-fg">
-                Reservas
-                <span className="rounded-full bg-fg px-2 py-0.5 text-[10px] font-bold tracking-wide text-surface uppercase">
-                  Em breve
+          {condominium ? (
+            <Shortcut
+              href="/espacos"
+              icon={<CalendarClock aria-hidden />}
+              title="Espaços"
+              description="Quadras, salão de festas e outros espaços. Reservas em breve."
+            />
+          ) : (
+            <Card className="flex h-full flex-col gap-4 border-dashed bg-surface-muted p-5 shadow-none">
+              <span className="grid size-11 place-items-center rounded-full bg-brand text-brand-fg [&>svg]:size-5">
+                <CalendarClock aria-hidden />
+              </span>
+              <span>
+                <span className="block font-bold text-fg">Espaços</span>
+                <span className="mt-0.5 block text-[13px] text-muted">
+                  Disponíveis dentro de um condomínio.
                 </span>
               </span>
-              <span className="mt-0.5 block text-[13px] text-muted">
-                Quadras, salão de festas e outros espaços.
-              </span>
-            </span>
-          </Card>
+            </Card>
+          )}
           <Shortcut
             href="/notificacoes"
             icon={<Bell aria-hidden />}

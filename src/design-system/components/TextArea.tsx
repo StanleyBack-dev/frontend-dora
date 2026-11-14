@@ -8,11 +8,14 @@ import { cn } from "@/design-system/utils/cn";
 
 type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label: string;
+  /** Visually hide the label (still read by screen readers). */
+  hideLabel?: boolean;
   hint?: string;
 };
 
 export function TextArea({
   label,
+  hideLabel = false,
   hint,
   className,
   id,
@@ -25,7 +28,10 @@ export function TextArea({
 
   return (
     <div className={className}>
-      <label htmlFor={textareaId} className={labelClasses}>
+      <label
+        htmlFor={textareaId}
+        className={cn(labelClasses, hideLabel && "sr-only")}
+      >
         {label}
         {props.required && <RequiredMark />}
       </label>
