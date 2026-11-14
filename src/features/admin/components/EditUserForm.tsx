@@ -9,6 +9,7 @@ import { UserFormFields } from "@/features/admin/components/UserFormFields";
 import type { UserAccount, UserGroup, UserInput } from "@/shared/contracts/api";
 import type { Unit } from "@/shared/contracts/condominiums";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { formatPhone } from "@/shared/lib/masks";
 import { useToast } from "@/shared/toast/useToast";
 
 export function EditUserForm({
@@ -30,6 +31,8 @@ export function EditUserForm({
     username: user.username,
     group: user.group,
     unitId: user.unitId,
+    unitComplement: user.unitComplement ?? "",
+    phone: user.phone ? formatPhone(user.phone) : "",
   };
   const [form, setForm] = useState<UserInput>(initial);
   const { showError } = useToast();

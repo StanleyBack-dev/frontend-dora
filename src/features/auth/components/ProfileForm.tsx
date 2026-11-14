@@ -6,6 +6,7 @@ import { Copy, Save } from "lucide-react";
 import { Button, Field } from "@/design-system";
 import { authClient } from "@/features/auth/api/auth.client";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { formatPhone, maskPhone, phoneError } from "@/shared/lib/masks";
 import { useToast } from "@/shared/toast/useToast";
 
 // Read-only account data (login and group): changed only by the
@@ -46,27 +47,37 @@ function LockedField({ label, value }: { label: string; value: string }) {
 export function ProfileForm({
   initialName,
   initialEmail,
+  initialPhone,
   username,
   groupLabel,
 }: {
   initialName: string;
   initialEmail: string;
+  /** Stored digits (null: none). */
+  initialPhone: string | null;
   username: string;
   groupLabel: string;
 }) {
   const router = useRouter();
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
+  const startPhone = initialPhone ? formatPhone(initialPhone) : "";
+  const [phone, setPhone] = useState(startPhone);
+  const invalidPhone = phone ? phoneError(phone) : null;
   const { showError, showSuccess } = useToast();
   const [pending, setPending] = useState(false);
 
-  const changed = name.trim() !== initialName || email.trim() !== initialEmail;
+  const changed =
+    name.trim() !== initialName ||
+    email.trim() !== initialEmail ||
+    phone !== startPhone;
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (invalidPhone) return showError(invalidPhone);
     setPending(true);
     try {
-      await authClient.updateProfile(name, email);
+      await authClient.updateProfile({ name, email, phone });
       showSuccess("Dados atualizados.");
       router.refresh();
     } catch (cause) {
@@ -99,6 +110,16 @@ export function ProfileForm({
         required
         value={email}
         onChange={(event) => setEmail(event.target.value)}
+      />
+      <Field
+        label="Telefone (WhatsApp)"
+        type="tel"
+        inputMode="tel"
+        autoComplete="tel-national"
+        placeholder="(62) 99999-0000"
+        value={phone}
+        onChange={(event) => setPhone(maskPhone(event.target.value))}
+        error={invalidPhone ?? undefined}
       />
       <Button
         type="submit"

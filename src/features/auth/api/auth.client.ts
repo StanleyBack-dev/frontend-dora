@@ -21,10 +21,10 @@ export const authClient = {
       post({ currentPassword, newPassword }),
     ),
 
-  updateProfile: (name: string, email: string) =>
+  updateProfile: (input: { name: string; email: string; phone: string }) =>
     apiRequest<SessionUser>("/me", {
       method: "PATCH",
-      body: JSON.stringify({ name, email }),
+      body: JSON.stringify(input),
     }),
 
   setPhoto: (photo: string) =>

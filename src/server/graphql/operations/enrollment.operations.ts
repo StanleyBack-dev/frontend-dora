@@ -49,6 +49,10 @@ export const enrollmentRequestFieldsFragment = graphql(`
     phone
     unitId
     unitLabel
+    unitComplement
+    typedUnitLabel
+    typedUnitBlock
+    typedUnitNumber
     createdAt
     reviewedAt
     rejectionReason

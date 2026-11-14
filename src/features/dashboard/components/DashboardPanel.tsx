@@ -68,7 +68,7 @@ export function DashboardPanel({
       tone: "brand",
     },
     {
-      href: canManageUsers ? "/admin/usuarios" : null,
+      href: canManageUsers ? "/moradores" : null,
       label: "Moradores ativos",
       value: dashboard.activeUsers,
       hint: "Moradores e gestores com acesso",

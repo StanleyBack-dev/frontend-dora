@@ -27,12 +27,20 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   allowedDevOrigins,
   reactStrictMode: true,
-  // The condominiums console moved into Administração.
+  // Old addresses: the condominiums console and the members list now live
+  // in the main menu.
   async redirects() {
     return [
+      { source: "/plataforma", destination: "/condominios", permanent: true },
       {
-        source: "/plataforma",
-        destination: "/admin/condominios",
+        source: "/admin/condominios",
+        destination: "/condominios",
+        permanent: true,
+      },
+      { source: "/admin/usuarios", destination: "/moradores", permanent: true },
+      {
+        source: "/admin/usuarios/:id",
+        destination: "/moradores/:id",
         permanent: true,
       },
     ];

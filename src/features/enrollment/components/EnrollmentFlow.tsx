@@ -14,6 +14,7 @@ import {
   EMPTY_ENROLLMENT,
   enrollmentErrors,
   toEnrollmentData,
+  unitModeFor,
   type EnrollmentForm,
 } from "@/features/enrollment/model/enrollment-form";
 import type { EnrollmentForm as FormContext } from "@/shared/contracts/enrollment";
@@ -45,7 +46,8 @@ export function EnrollmentFlow() {
   const [pending, setPending] = useState(false);
 
   const units = context?.units ?? [];
-  const errors = enrollmentErrors(form, units.length > 0);
+  const unitMode = unitModeFor(units);
+  const errors = enrollmentErrors(form, unitMode);
   const invalid = Object.keys(errors).length > 0;
 
   async function verify(event: FormEvent) {
@@ -68,7 +70,7 @@ export function EnrollmentFlow() {
     setPending(true);
     try {
       await enrollmentClient.submit(
-        toEnrollmentData(form),
+        toEnrollmentData(form, unitMode),
         consent,
         photo?.base64 ?? null,
       );

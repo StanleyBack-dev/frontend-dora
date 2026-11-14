@@ -18,6 +18,9 @@ import { formatDateTime } from "@/shared/lib/format";
 import { formatPhone } from "@/shared/lib/masks";
 
 // Sign-ups sent through the public link; each row opens its review.
+const withComplement = (label: string, complement: string | null) =>
+  complement ? `${label} · ${complement}` : label;
+
 export function EnrollmentRequestsTable({
   requests,
   assignableGroups,
@@ -50,7 +53,16 @@ export function EnrollmentRequestsTable({
       label: "Unidade",
       className: "whitespace-nowrap",
       render: (request) =>
-        request.unitLabel ?? <span className="text-soft">—</span>,
+        request.unitLabel ? (
+          withComplement(request.unitLabel, request.unitComplement)
+        ) : request.typedUnitLabel ? (
+          <span title="Digitada no cadastro (ainda sem unidade vinculada)">
+            {withComplement(request.typedUnitLabel, request.unitComplement)}{" "}
+            <span className="text-soft">(informada)</span>
+          </span>
+        ) : (
+          <span className="text-soft">—</span>
+        ),
     },
     {
       key: "phone",

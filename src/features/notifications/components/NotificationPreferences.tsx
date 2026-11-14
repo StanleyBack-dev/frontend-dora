@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Spinner } from "@/design-system";
 import { notificationsClient } from "@/features/notifications/api/notifications.client";
 import { NOTIFICATION_TYPE_LABELS } from "@/features/notifications/model/notification-labels";
 import type { NotificationPreference } from "@/shared/contracts/notifications";
@@ -14,6 +15,8 @@ export function NotificationPreferences({
   initial: NotificationPreference[];
 }) {
   const [preferences, setPreferences] = useState(initial);
+  // Types being saved: spinner beside the box, which waits for the answer.
+  const [saving, setSaving] = useState<ReadonlySet<string>>(new Set());
   const { showError } = useToast();
 
   async function toggle(preference: NotificationPreference) {
@@ -26,7 +29,15 @@ export function NotificationPreferences({
             : item,
         ),
       );
+    const mark = (on: boolean) =>
+      setSaving((current) => {
+        const next = new Set(current);
+        if (on) next.add(preference.type);
+        else next.delete(preference.type);
+        return next;
+      });
     apply(emailEnabled);
+    mark(true);
     try {
       await notificationsClient.setPreference(preference.type, emailEnabled);
     } catch (cause) {
@@ -35,6 +46,7 @@ export function NotificationPreferences({
         cause instanceof ApiClientError ? cause.message : "Não foi possível.",
       );
     }
+    mark(false);
   }
 
   return (
@@ -54,11 +66,20 @@ export function NotificationPreferences({
                   {meta.description}
                 </span>
               </label>
+              {saving.has(preference.type) && (
+                <Spinner
+                  size="sm"
+                  className="mt-1 text-soft"
+                  label="Salvando"
+                />
+              )}
               <input
                 id={id}
                 type="checkbox"
                 className="mt-1 size-4 accent-[var(--accent)]"
                 checked={preference.emailEnabled}
+                disabled={saving.has(preference.type)}
+                aria-busy={saving.has(preference.type) || undefined}
                 onChange={() => void toggle(preference)}
               />
             </li>

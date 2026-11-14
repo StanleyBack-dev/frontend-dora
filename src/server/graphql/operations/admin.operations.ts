@@ -24,6 +24,9 @@ export const userAccountFieldsFragment = graphql(`
     active
     unitId
     unitLabel
+    unitComplement
+    phone
+    photoUrl
     sharedAccount
     mustChangePassword
     lockedUntil

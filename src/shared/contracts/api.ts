@@ -59,6 +59,8 @@ export type SessionUser = {
   permissions: Permission[];
   /** Short-lived link to the profile photo (null: none). */
   photoUrl: string | null;
+  /** Contact phone, digits only (null: none). */
+  phone: string | null;
   /** Already saw (or skipped) the guided tour. */
   onboardingCompleted: boolean;
 };
@@ -75,6 +77,12 @@ export type UserAccount = {
   unitId: string | null;
   /** "Bloco A · 101". */
   unitLabel: string | null;
+  /** Address detail inside the condominium ("casa dos fundos"). */
+  unitComplement: string | null;
+  /** Contact phone, digits only (DDD + number). */
+  phone: string | null;
+  /** Short-lived link to the profile photo (null: none). */
+  photoUrl: string | null;
   /**
    * Also used outside this condominium: login data only changes through the
    * person or the platform.
@@ -106,6 +114,10 @@ export type UserInput = {
   username?: string | null;
   group: UserGroup;
   unitId?: string | null;
+  /** On update: undefined keeps it, "" or null clears it. */
+  unitComplement?: string | null;
+  /** Any format (the API keeps the digits); "" or null clears it. */
+  phone?: string | null;
 };
 
 export type PermissionMatrix = {

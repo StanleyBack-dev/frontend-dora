@@ -3,6 +3,7 @@ import { Building2, CircleCheck, UserPlus, Users } from "lucide-react";
 import {
   Field,
   FilterActions,
+  PageHeader,
   FilterPanel,
   Select,
   StatCard,
@@ -23,8 +24,8 @@ export const metadata: Metadata = { title: "Condomínios" };
 
 const STATUSES = { ativos: "ACTIVE", suspensos: "SUSPENDED" } as const;
 
-// Administração → Condomínios: every condominium using Dora. Only the
-// platform administrator (CONDOMINIUMS_MANAGE, never granted to managers).
+// Condomínios: every condominium using Dora. Only the platform
+// administrator (CONDOMINIUMS_MANAGE, never granted to managers).
 export default async function CondominiumsAdminPage({
   searchParams,
 }: {
@@ -56,6 +57,10 @@ export default async function CondominiumsAdminPage({
 
   return (
     <>
+      <PageHeader
+        title="Condomínios"
+        description="Os clientes do Dora: situação, gestores, moradores e cadastros de cada condomínio."
+      />
       <section
         aria-label="Resumo da plataforma"
         className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4"
@@ -110,10 +115,7 @@ export default async function CondominiumsAdminPage({
               { value: "suspensos", label: "Suspensos" },
             ]}
           />
-          <FilterActions
-            clearHref="/admin/condominios"
-            hasActiveFilters={filtered}
-          />
+          <FilterActions clearHref="/condominios" hasActiveFilters={filtered} />
         </form>
       </FilterPanel>
 

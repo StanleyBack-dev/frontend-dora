@@ -12,6 +12,11 @@ export type EnrollmentForm = {
   phone: string;
   /** "" while none is chosen. */
   unitId: string;
+  /** "casa dos fundos" (optional). */
+  unitComplement: string;
+  /** Typed when the condominium has no units registered. */
+  unitBlock: string;
+  unitNumber: string;
 };
 
 export const EMPTY_ENROLLMENT: EnrollmentForm = {
@@ -19,13 +24,25 @@ export const EMPTY_ENROLLMENT: EnrollmentForm = {
   email: "",
   phone: "",
   unitId: "",
+  unitComplement: "",
+  unitBlock: "",
+  unitNumber: "",
 };
+
+/** How the form asks where the person lives. */
+export type UnitMode = "list" | "typed";
+
+export const unitModeFor = (units: readonly unknown[]): UnitMode =>
+  units.length > 0 ? "list" : "typed";
 
 export const fromRequest = (request: EnrollmentRequest): EnrollmentForm => ({
   fullName: request.fullName,
   email: request.email,
   phone: formatPhone(request.phone),
   unitId: request.unitId ?? "",
+  unitComplement: request.unitComplement ?? "",
+  unitBlock: request.typedUnitBlock ?? "",
+  unitNumber: request.typedUnitNumber ?? "",
 });
 
 export type EnrollmentErrors = Partial<Record<keyof EnrollmentForm, string>>;
@@ -33,11 +50,24 @@ export type EnrollmentErrors = Partial<Record<keyof EnrollmentForm, string>>;
 /** Same rules as the API, to show them while typing. */
 export function enrollmentErrors(
   form: EnrollmentForm,
-  /** The condominium has units: one must be chosen. */
-  requireUnit = false,
+  /** list: one unit must be chosen; typed: the number must be typed. */
+  mode: UnitMode,
 ): EnrollmentErrors {
   const errors: EnrollmentErrors = {};
-  if (requireUnit && !form.unitId) errors.unitId = "Escolha a sua unidade.";
+  if (mode === "list" && !form.unitId) errors.unitId = "Escolha a sua unidade.";
+  if (mode === "typed") {
+    if (!form.unitNumber.trim()) {
+      errors.unitNumber = "Informe o número da casa ou do apartamento.";
+    } else if (form.unitNumber.trim().length > 20) {
+      errors.unitNumber = "Use até 20 caracteres.";
+    }
+    if (form.unitBlock.trim().length > 30) {
+      errors.unitBlock = "Use até 30 caracteres.";
+    }
+  }
+  if (form.unitComplement.trim().length > 80) {
+    errors.unitComplement = "Use até 80 caracteres.";
+  }
   const name = form.fullName.trim();
   if (name.length < 5 || !name.includes(" ")) {
     errors.fullName = "Informe o nome completo (nome e sobrenome).";
@@ -53,11 +83,22 @@ export function enrollmentErrors(
   return errors;
 }
 
-export const toEnrollmentData = (form: EnrollmentForm): EnrollmentData => ({
+export const toEnrollmentData = (
+  form: EnrollmentForm,
+  mode: UnitMode,
+): EnrollmentData => ({
   fullName: form.fullName.trim(),
   email: form.email.trim(),
   phone: form.phone,
-  unitId: form.unitId || null,
+  unitId: mode === "list" ? form.unitId || null : null,
+  unitComplement: form.unitComplement.trim() || null,
+  // Typed values only when there is no list to choose from.
+  ...(mode === "typed"
+    ? {
+        unitBlock: form.unitBlock.trim() || null,
+        unitNumber: form.unitNumber.trim(),
+      }
+    : {}),
 });
 
 export const ENROLLMENT_STATUS: Record<

@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCheck } from "lucide-react";
-import { Button, cn } from "@/design-system";
+import { cn } from "@/design-system";
 import { notificationsClient } from "@/features/notifications/api/notifications.client";
+import { NOTIFICATIONS_READ_EVENT } from "@/features/notifications/model/notification-events";
 import { formatWhen } from "@/features/notifications/model/notification-labels";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import type { AppNotification } from "@/shared/contracts/notifications";
-import { ApiClientError } from "@/shared/lib/api-client";
-import { useToast } from "@/shared/toast/useToast";
 
-// Opening a notification marks it read and goes to what it is about.
+// Opening the notifications marks them all read. What was new keeps its
+// highlight while the page is open, so the person still sees what arrived;
+// opening one goes to what it is about.
 export function NotificationList({
   notifications,
   now,
@@ -20,72 +21,58 @@ export function NotificationList({
   now: string;
 }) {
   const router = useRouter();
-  const { showError } = useToast();
-  const [pending, setPending] = useState(false);
+  // The list as it was when the page opened (the parent remounts this per
+  // page/filter): refreshing after marking must not empty "Não lidas".
+  const [items] = useState(notifications);
   const reference = new Date(now);
-  const unread = notifications.some((item) => !item.readAt);
 
-  async function open(item: AppNotification) {
-    if (!item.readAt) {
-      await notificationsClient.markRead(item.id).catch(() => undefined);
-    }
-    if (item.link) router.push(item.link);
-    router.refresh();
-  }
+  useEffect(() => {
+    if (!items.some((item) => !item.readAt)) return;
+    let cancelled = false;
+    notificationsClient
+      .markAllRead()
+      .then(() => {
+        if (cancelled) return;
+        // Counters in the header and the menu.
+        window.dispatchEvent(new Event(NOTIFICATIONS_READ_EVENT));
+        router.refresh();
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [items, router]);
 
-  async function markAll() {
-    setPending(true);
-    try {
-      await notificationsClient.markAllRead();
-      router.refresh();
-    } catch (cause) {
-      showError(
-        cause instanceof ApiClientError ? cause.message : "Não foi possível.",
-      );
-    }
-    setPending(false);
+  function open(item: AppNotification) {
+    if (!item.link) return;
+    startNavigation();
+    router.push(item.link);
   }
 
   return (
-    <div className="space-y-3">
-      {unread && (
-        <div className="flex justify-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={<CheckCheck className="size-4" />}
-            loading={pending}
-            onClick={markAll}
-          >
-            Marcar todas como lidas
-          </Button>
-        </div>
-      )}
-      <ul className="divide-y divide-border rounded-lg border border-border">
-        {notifications.map((item) => (
+    <ul className="divide-y divide-border rounded-lg border border-border">
+      {items.map((item) => {
+        const fresh = !item.readAt;
+        return (
           <li key={item.id}>
             <button
               type="button"
-              onClick={() => void open(item)}
+              onClick={() => open(item)}
               className={cn(
                 "flex w-full gap-3 px-3 py-3 text-left text-sm transition-colors hover:bg-surface-muted",
-                !item.readAt && "bg-accent-soft/40",
+                fresh && "bg-accent-soft/40",
+                !item.link && "cursor-default",
               )}
             >
               <span
                 aria-hidden
                 className={cn(
                   "mt-1.5 size-2 shrink-0 rounded-full",
-                  item.readAt ? "bg-transparent" : "bg-accent",
+                  fresh ? "bg-accent" : "bg-transparent",
                 )}
               />
               <span className="min-w-0 flex-1">
-                <span
-                  className={cn(
-                    "block text-fg",
-                    !item.readAt && "font-semibold",
-                  )}
-                >
+                <span className={cn("block text-fg", fresh && "font-semibold")}>
                   {item.title}
                 </span>
                 {item.body && (
@@ -97,11 +84,11 @@ export function NotificationList({
               <span className="shrink-0 text-xs text-soft">
                 {formatWhen(item.createdAt, reference)}
               </span>
-              {!item.readAt && <span className="sr-only">(não lida)</span>}
+              {fresh && <span className="sr-only">(nova)</span>}
             </button>
           </li>
-        ))}
-      </ul>
-    </div>
+        );
+      })}
+    </ul>
   );
 }

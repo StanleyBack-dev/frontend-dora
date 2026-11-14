@@ -40,12 +40,13 @@ export default async function ProfilePage() {
         <Card>
           <CardHeader
             title="Dados pessoais"
-            description="O e-mail recebe avisos, comunicados e a recuperação de senha."
+            description="O e-mail recebe avisos, comunicados e a recuperação de senha. O telefone ajuda a administração a falar com você."
           />
           <CardBody>
             <ProfileForm
               initialName={user.name}
               initialEmail={user.email}
+              initialPhone={user.phone}
               username={user.username}
               groupLabel={GROUP_LABELS[user.group]}
             />

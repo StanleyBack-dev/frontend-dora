@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { connection } from "next/server";
 import { AppSplash } from "@/features/layout/components/AppSplash";
+import { NavigationProgress } from "@/features/layout/components/NavigationProgress";
 import { ToastProvider } from "@/shared/toast/ToastProvider";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/shared/lib/site";
 import "./globals.css";
@@ -57,6 +58,7 @@ export default async function RootLayout({
     <html lang="pt-BR" className={jakarta.variable}>
       <body>
         <AppSplash />
+        <NavigationProgress />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

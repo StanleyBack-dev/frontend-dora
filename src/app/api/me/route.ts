@@ -6,6 +6,8 @@ import { authService } from "@/server/services/auth.service";
 const schema = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.email().max(254),
+  // Absent: unchanged; "" removes it (the API validates the digits).
+  phone: z.string().trim().max(30).optional(),
 });
 
 export const PATCH = bffRoute(async (request) => {

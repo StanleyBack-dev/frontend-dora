@@ -6,12 +6,14 @@ import { usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
 import { cn } from "@/design-system";
 import { notificationsClient } from "@/features/notifications/api/notifications.client";
+import { NOTIFICATIONS_READ_EVENT } from "@/features/notifications/model/notification-events";
 
 const POLL_MS = 60_000;
 
 // Unread counter: starts with the server's value, then refreshes on every
 // navigation, every minute while the tab is visible, and when it regains
-// focus (the person coming back to the app).
+// focus (the person coming back to the app), and when the notifications
+// are opened (they get marked read).
 export function NotificationBell({
   initialCount,
   className,
@@ -34,7 +36,9 @@ export function NotificationBell({
     refresh();
     const timer = setInterval(refresh, POLL_MS);
     document.addEventListener("visibilitychange", refresh);
+    window.addEventListener(NOTIFICATIONS_READ_EVENT, refresh);
     return () => {
+      window.removeEventListener(NOTIFICATIONS_READ_EVENT, refresh);
       cancelled = true;
       clearInterval(timer);
       document.removeEventListener("visibilitychange", refresh);
