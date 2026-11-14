@@ -1,6 +1,6 @@
 import {
   Bell,
-  Building2,
+  CalendarDays,
   CircleHelp,
   CircleUserRound,
   House,
@@ -36,20 +36,20 @@ export const canSee = (item: NavItem, permissions: readonly Permission[]) =>
 // comes next, right after Início).
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/inicio", label: "Início", icon: House },
-  // Everyone in a condominium: its courts, party room… (bookings next).
-  { href: "/espacos", label: "Espaços", icon: MapPin },
+  // Everyone in a condominium books (Reservas shows each space's rules).
+  { href: "/reservas", label: "Reservas", icon: CalendarDays },
+  // The spaces themselves: only whoever manages them.
+  {
+    href: "/espacos",
+    label: "Espaços",
+    icon: MapPin,
+    permission: "SPACES_MANAGE",
+  },
   {
     href: "/comunicados",
     label: "Comunicados",
     icon: Megaphone,
     permission: "NOTIFICATIONS_BROADCAST",
-  },
-  // The platform console (every condominium): only the Dora administration.
-  {
-    href: "/plataforma",
-    label: "Condomínios",
-    icon: Building2,
-    permission: "CONDOMINIUMS_MANAGE",
   },
 ];
 

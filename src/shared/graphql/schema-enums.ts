@@ -1,3 +1,15 @@
+/** Situação da reserva. */
+export type BookingStatus =
+  | 'CANCELLED'
+  | 'CONFIRMED'
+  | 'PENDING'
+  | 'REJECTED';
+
+/** Próximas (ainda não terminaram) ou passadas. */
+export type BookingWhen =
+  | 'PAST'
+  | 'UPCOMING';
+
 /** Quem recebe o comunicado. */
 export type BroadcastAudience =
   | 'GRUPO'
@@ -21,6 +33,10 @@ export type LimitPeriod =
   | 'WEEK';
 
 export type NotificationType =
+  | 'BOOKING_CANCELLED'
+  | 'BOOKING_CONFIRMED'
+  | 'BOOKING_PENDING'
+  | 'BOOKING_REJECTED'
   | 'BROADCAST'
   | 'ENROLLMENT_SUBMITTED'
   | 'SUPPORT_ANSWERED'
@@ -31,6 +47,8 @@ export type NotificationType =
 /** Capacidade verificada pela API. */
 export type Permission =
   | 'AUDIT_READ'
+  | 'BOOKINGS_CREATE'
+  | 'BOOKINGS_MANAGE'
   | 'CONDOMINIUMS_MANAGE'
   | 'DASHBOARD_READ'
   | 'NOTIFICATIONS_BROADCAST'
@@ -39,6 +57,14 @@ export type Permission =
   | 'SUPPORT_MANAGE'
   | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
+
+/** Situação de um horário na grade do dia. */
+export type SlotState =
+  | 'BLOCKED'
+  | 'FREE'
+  | 'MINE'
+  | 'TAKEN'
+  | 'UNAVAILABLE';
 
 /** Tipo de espaço (quadra, salão de festas…). */
 export type SpaceKind =

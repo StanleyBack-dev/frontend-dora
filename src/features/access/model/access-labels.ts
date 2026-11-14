@@ -7,7 +7,7 @@ export const GROUP_LABELS: Record<UserGroup, string> = {
 };
 
 export const GROUP_DESCRIPTIONS: Record<UserGroup, string> = {
-  USER: "Usa o app do condomínio: recebe avisos e comunicados e pede ajuda ao suporte.",
+  USER: "Usa o app do condomínio: reserva espaços, recebe avisos e comunicados e pede ajuda ao suporte.",
   ADMIN:
     "Administra este condomínio (síndico, administração): moradores, cadastros, unidades, espaços, comunicados e painel.",
   ADMIN_MASTER:
@@ -19,7 +19,8 @@ export const GROUPS: UserGroup[] = ["USER", "ADMIN", "ADMIN_MASTER"];
 
 type PermissionInfo = { label: string; area: PermissionArea };
 
-export type PermissionArea = "Gestão" | "Comunicação" | "Administração";
+export type PermissionArea =
+  "Reservas" | "Gestão" | "Comunicação" | "Administração";
 
 // Exhaustive on purpose: a permission added to the API fails the typecheck
 // here until it gets a label.
@@ -37,6 +38,11 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
   SPACES_MANAGE: {
     label: "Gerenciar espaços e regras de reserva",
     area: "Gestão",
+  },
+  BOOKINGS_CREATE: { label: "Reservar espaços", area: "Reservas" },
+  BOOKINGS_MANAGE: {
+    label: "Aprovar, recusar e cancelar reservas; bloquear espaços",
+    area: "Reservas",
   },
   PERMISSIONS_MANAGE: {
     label: "Gerenciar permissões",
@@ -66,6 +72,7 @@ export const LOCKED_PERMISSIONS: ReadonlySet<Permission> = new Set<Permission>([
 ]);
 
 export const PERMISSION_AREAS: PermissionArea[] = [
+  "Reservas",
   "Gestão",
   "Comunicação",
   "Administração",

@@ -43,3 +43,13 @@ export const spaceInputSchema = z.object({
 });
 
 export const spaceActiveSchema = z.object({ active: z.boolean() });
+
+// Base64 of a photo the browser shrank (at most 1.2 MB of bytes). The API
+// checks the content again; this only refuses obviously wrong bodies.
+export const spacePhotoSchema = z.object({
+  photo: z
+    .string()
+    .min(1)
+    .max(1_700_000)
+    .regex(/^[A-Za-z0-9+/]+={0,2}$/),
+});

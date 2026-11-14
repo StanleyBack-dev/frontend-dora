@@ -20,6 +20,17 @@ export const spacesClient = {
       body: JSON.stringify({ active }),
     }),
 
+  addPhoto: (spaceId: string, photo: string) =>
+    apiRequest<Space>(`/spaces/${spaceId}/photos`, {
+      method: "POST",
+      body: JSON.stringify({ photo }),
+    }),
+
+  removePhoto: (spaceId: string, photoId: string) =>
+    apiRequest<Space>(`/spaces/${spaceId}/photos/${photoId}`, {
+      method: "DELETE",
+    }),
+
   remove: (id: string) =>
     apiRequest<{ ok: true }>(`/spaces/${id}`, { method: "DELETE" }),
 };

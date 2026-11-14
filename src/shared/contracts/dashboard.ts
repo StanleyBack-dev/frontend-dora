@@ -7,6 +7,10 @@ export type Dashboard = {
   units: number;
   /** Spaces residents can book. */
   activeSpaces: number;
+  /** Bookings waiting for a manager's approval. */
+  pendingBookings: number;
+  /** Active bookings starting today. */
+  bookingsToday: number;
   /** Support requests not answered yet (platform only, else null). */
   openSupportRequests: number | null;
   /** Notifications the API gave up sending (platform only, else null). */

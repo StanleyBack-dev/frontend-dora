@@ -9,6 +9,25 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     label: "Comunicados",
     description: "Avisos enviados pela administração do condomínio.",
   },
+  BOOKING_CONFIRMED: {
+    label: "Reserva confirmada",
+    description:
+      "Sua reserva foi confirmada (com o convite para a agenda do celular).",
+  },
+  BOOKING_PENDING: {
+    label: "Reserva aguardando aprovação",
+    description:
+      "Sua reserva foi enviada para aprovação; para gestores, uma reserva aguarda a sua decisão.",
+  },
+  BOOKING_REJECTED: {
+    label: "Reserva recusada",
+    description: "A administração recusou uma reserva sua, com o motivo.",
+  },
+  BOOKING_CANCELLED: {
+    label: "Reserva cancelada",
+    description:
+      "Uma reserva sua foi cancelada (por você ou pela administração).",
+  },
   SUPPORT_REQUESTED: {
     label: "Nova solicitação de suporte",
     description: "Para o administrador geral: alguém pediu ajuda pelo Suporte.",

@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ArrowLeft,
-  CalendarClock,
-  CalendarPlus,
-  ClipboardList,
-  Clock,
-  Users,
-} from "lucide-react";
-import { Badge, Button, Card, CardBody, CardHeader } from "@/design-system";
+import { ArrowLeft, CalendarClock, ClipboardList, Clock } from "lucide-react";
+import { Card, CardBody, CardHeader } from "@/design-system";
+import { AccessDenied } from "@/features/access/components/AccessDenied";
+import { SpaceHero } from "@/features/spaces/components/SpaceHero";
+import { SpacePhotoGallery } from "@/features/spaces/components/SpacePhotoGallery";
 import { SpaceManageActions } from "@/features/spaces/components/SpaceManageActions";
-import {
-  describeRules,
-  SPACE_KINDS,
-  WEEKDAYS,
-} from "@/features/spaces/model/space-labels";
-import { loadSpace } from "@/app/(app)/espacos/[id]/load-space";
+import { describeRules, WEEKDAYS } from "@/features/spaces/model/space-labels";
 import { getSessionUser } from "@/server/auth/current-user";
+import { loadSpace } from "@/server/loaders/load-space";
 import { can } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Espaço" };
@@ -28,11 +20,12 @@ export default async function SpacePage({
   params: Promise<{ id: string }>;
 }) {
   const user = await getSessionUser();
+  // Checked here too (the layout's check doesn't stop this page rendering).
+  if (!can(user, "SPACES_MANAGE")) return <AccessDenied />;
   const space = await loadSpace((await params).id);
   if (!space) notFound();
 
   const manager = can(user, "SPACES_MANAGE");
-  const { label, icon: Icon } = SPACE_KINDS[space.kind];
   const hours = new Map(
     space.rules.openingHours.map((day) => [day.weekday, day]),
   );
@@ -46,45 +39,9 @@ export default async function SpacePage({
         <ArrowLeft className="size-4" /> Espaços
       </Link>
 
-      <section className="relative overflow-hidden rounded-[1.75rem] bg-chrome px-6 py-7 text-chrome-fg sm:px-8">
-        <span
-          aria-hidden
-          className="absolute -top-20 -right-12 size-56 rounded-full bg-brand"
-        />
-        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex items-start gap-4">
-            <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-brand text-brand-fg">
-              <Icon aria-hidden className="size-7" />
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-bold tracking-wide text-chrome-muted uppercase">
-                {label}
-              </p>
-              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-                {space.name}
-              </h1>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {!space.active && <Badge tone="neutral">Inativo</Badge>}
-                {space.capacity && (
-                  <Badge tone="brand">
-                    <Users aria-hidden className="mr-1 size-3" />
-                    Até {space.capacity} pessoas
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-          {/* Booking arrives in the next stage. */}
-          <Button
-            variant="brand"
-            disabled
-            icon={<CalendarPlus className="size-4" />}
-            title="As reservas chegam em breve"
-          >
-            Reservar · em breve
-          </Button>
-        </div>
-      </section>
+      <SpaceHero space={space} />
+
+      <SpacePhotoGallery photos={space.photos} name={space.name} />
 
       {manager && (
         <Card>

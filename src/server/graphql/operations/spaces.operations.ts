@@ -9,6 +9,10 @@ export const spaceFieldsFragment = graphql(`
     capacity
     usageRules
     active
+    photos {
+      id
+      url
+    }
     createdAt
     updatedAt
     rules {
@@ -65,6 +69,22 @@ export const updateSpaceDocument = graphql(`
 export const setSpaceActiveDocument = graphql(`
   mutation SetSpaceActive($id: ID!, $active: Boolean!) {
     setSpaceActive(id: $id, active: $active) {
+      ...SpaceFields
+    }
+  }
+`);
+
+export const addSpacePhotoDocument = graphql(`
+  mutation AddSpacePhoto($spaceId: ID!, $photo: String!) {
+    addSpacePhoto(spaceId: $spaceId, photo: $photo) {
+      ...SpaceFields
+    }
+  }
+`);
+
+export const removeSpacePhotoDocument = graphql(`
+  mutation RemoveSpacePhoto($spaceId: ID!, $photoId: ID!) {
+    removeSpacePhoto(spaceId: $spaceId, photoId: $photoId) {
       ...SpaceFields
     }
   }

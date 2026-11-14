@@ -170,7 +170,7 @@ export function CondominiumSwitcher({ user, collapsed, onNavigate }: Props) {
           })}
           {user.platformAdmin && (
             <Link
-              href="/plataforma"
+              href="/admin/condominios"
               role="menuitem"
               onClick={() => {
                 setOpen(false);

@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Clock,
   Copy,
+  ImageIcon,
   MapPin,
   Save,
 } from "lucide-react";
@@ -19,6 +20,11 @@ import {
   cn,
 } from "@/design-system";
 import { spacesClient } from "@/features/spaces/api/spaces.client";
+import {
+  photosDraftOf,
+  SpacePhotosField,
+  type PhotosDraft,
+} from "@/features/spaces/components/SpacePhotosField";
 import {
   formatDuration,
   LIMIT_PERIODS,
@@ -124,6 +130,9 @@ export function SpaceForm({ space }: { space: Space | null }) {
   const { showError, showSuccess } = useToast();
   const [form, setForm] = useState<FormState>(() => toForm(space));
   const [pending, setPending] = useState(false);
+  const [photos, setPhotos] = useState<PhotosDraft>(() =>
+    photosDraftOf(space?.photos ?? []),
+  );
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((current) => ({ ...current, [key]: value }));
@@ -158,8 +167,38 @@ export function SpaceForm({ space }: { space: Space | null }) {
       const saved = space
         ? await spacesClient.update(space.id, input)
         : await spacesClient.create(input);
-      showSuccess(space ? "Espaço atualizado." : `${saved.name} cadastrado.`);
-      router.push(`/espacos/${saved.id}`);
+
+      // Photos go after the space exists: removals first, then the new ones
+      // one by one (each is checked by the API on its own).
+      const failures: string[] = [];
+      for (const photoId of photos.removed) {
+        await spacesClient
+          .removePhoto(saved.id, photoId)
+          .catch(() => failures.push("Uma foto não pôde ser removida."));
+      }
+      for (const photo of photos.added) {
+        await spacesClient
+          .addPhoto(saved.id, photo.base64)
+          .catch((cause) =>
+            failures.push(
+              cause instanceof ApiClientError
+                ? cause.message
+                : "Uma foto não pôde ser enviada.",
+            ),
+          );
+      }
+
+      if (failures.length > 0) {
+        showError(
+          "Espaço salvo, mas houve problema com as fotos.",
+          [...new Set(failures)].join(" "),
+        );
+        // Back to the form (edit) so the photos can be sent again.
+        router.push(`/espacos/${saved.id}/editar`);
+      } else {
+        showSuccess(space ? "Espaço atualizado." : `${saved.name} cadastrado.`);
+        router.push(`/espacos/${saved.id}`);
+      }
       router.refresh();
     } catch (cause) {
       showError(
@@ -221,6 +260,14 @@ export function SpaceForm({ space }: { space: Space | null }) {
           value={form.description}
           onChange={(event) => set("description", event.target.value)}
         />
+      </FormSection>
+
+      <FormSection
+        icon={<ImageIcon />}
+        title="Fotos"
+        description="Até 3 fotos: ajudam os moradores a reconhecer o espaço."
+      >
+        <SpacePhotosField value={photos} onChange={setPhotos} />
       </FormSection>
 
       <FormSection
