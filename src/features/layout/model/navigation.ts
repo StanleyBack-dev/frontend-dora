@@ -2,6 +2,7 @@ import {
   Bell,
   Building2,
   CalendarDays,
+  ChartColumn,
   CircleHelp,
   CircleUserRound,
   House,
@@ -38,6 +39,13 @@ export const canSee = (item: NavItem, permissions: readonly Permission[]) =>
 // comes next, right after Início).
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/inicio", label: "Início", icon: House },
+  // The platform's numbers: the platform administrator only.
+  {
+    href: "/painel",
+    label: "Painel",
+    icon: ChartColumn,
+    permission: "CONDOMINIUMS_MANAGE",
+  },
   // Everyone in a condominium books (Reservas shows each space's rules).
   { href: "/reservas", label: "Reservas", icon: CalendarDays },
   // The spaces themselves: only whoever manages them.

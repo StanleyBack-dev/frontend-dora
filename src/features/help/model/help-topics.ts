@@ -1,6 +1,7 @@
 import {
   Bell,
   Building2,
+  ChartColumn,
   CalendarDays,
   CircleHelp,
   CircleUserRound,
@@ -327,6 +328,39 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
         {
           text: "Unidade, complemento e papel valem só para este condomínio.",
+        },
+      ],
+    },
+  },
+  {
+    id: "painel",
+    href: "/painel",
+    title: "Painel",
+    icon: ChartColumn,
+    permission: "CONDOMINIUMS_MANAGE",
+    area: "main",
+    tour: "Os números do Dora: reservas, uso dos espaços, moradores e o que precisa de atenção, em todos os condomínios ou em um.",
+    sections: {
+      howto: [
+        {
+          text: "Escolha o período nos atalhos (7 dias, 30 dias, 90 dias, 12 meses) ou pelas datas, e filtre um condomínio se quiser. O período vai até 1 ano.",
+        },
+        {
+          text: "Passe o mouse (ou toque) numa coluna para ver o número exato; “Ver tabela” mostra os mesmos números em lista.",
+        },
+        {
+          text: "Em “Saúde da operação”, cada linha leva para onde resolver: cadastros parados, condomínios sem gestor ou sem unidades, suporte e avisos com problema.",
+        },
+      ],
+      rules: [
+        {
+          text: "As reservas contam pelo dia do horário reservado. Uso dos espaços considera só as reservas ativas (pendentes ou confirmadas).",
+        },
+        {
+          text: "“Saúde da operação” mostra a situação de agora, não do período. Os avisos com problema são de toda a plataforma.",
+        },
+        {
+          text: "Só a administração da plataforma vê o Painel.",
         },
       ],
     },
