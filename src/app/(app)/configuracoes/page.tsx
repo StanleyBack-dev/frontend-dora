@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { KeyRound, MailCheck, ScrollText, Smartphone } from "lucide-react";
+import {
+  Info,
+  KeyRound,
+  MailCheck,
+  ScrollText,
+  Smartphone,
+} from "lucide-react";
 import { Card, CardBody, CardHeader, PageHeader } from "@/design-system";
 import { SettingsLinkItem } from "@/features/settings/components/SettingsLinkItem";
 
@@ -31,6 +37,12 @@ const ITEMS = [
     title: "Termos e privacidade",
     description: "Quais dados o app guarda e por quanto tempo.",
   },
+  {
+    href: "/configuracoes/sobre",
+    icon: <Info className="size-5" />,
+    title: "Sobre o Dora",
+    description: "Versões do aplicativo e do servidor em uso.",
+  },
 ];
 
 export default function SettingsPage() {
@@ -38,7 +50,7 @@ export default function SettingsPage() {
     <>
       <PageHeader
         title="Configurações"
-        description="Senha, aplicativo, avisos e documentos do Dora."
+        description="Senha, aplicativo, avisos, documentos e versão do Dora."
       />
       <Card>
         <CardHeader title="Preferências" />

@@ -69,6 +69,10 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Responder solicitações de suporte",
     area: "Administração",
   },
+  SUPPORTERS_MANAGE: {
+    label: "Registrar os apoios ao Dora",
+    area: "Administração",
+  },
   CONDOMINIUMS_MANAGE: {
     label: "Gerenciar os condomínios da plataforma",
     area: "Administração",
@@ -81,6 +85,7 @@ export const LOCKED_PERMISSIONS: ReadonlySet<Permission> = new Set<Permission>([
   "PERMISSIONS_MANAGE",
   "AUDIT_READ",
   "SUPPORT_MANAGE",
+  "SUPPORTERS_MANAGE",
   "CONDOMINIUMS_MANAGE",
 ]);
 

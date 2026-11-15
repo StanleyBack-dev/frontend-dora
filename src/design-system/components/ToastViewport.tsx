@@ -20,9 +20,8 @@ const styles: Record<ToastVariant, { box: string; icon: ReactNode }> = {
   },
 };
 
-// The stack of toasts: bottom-right on desktop; full width at the top on a
-// phone (below the notch), so it never covers the tab bar or the invites
-// pinned above it. A manual popover so it sits in the top layer, above an open Drawer
+// The stack of toasts: bottom-right on desktop, full width at the bottom on a
+// phone (above the iPhone home bar). A manual popover so it sits in the top layer, above an open Drawer
 // or Modal (native <dialog>); re-shown on every change to stay on top.
 export function ToastViewport({
   toasts,
@@ -47,8 +46,8 @@ export function ToastViewport({
       aria-live="polite"
       className={cn(
         "pointer-events-none fixed m-0 flex-col gap-3 overflow-visible border-0 bg-transparent p-0",
-        "inset-x-3 top-[max(0.75rem,env(safe-area-inset-top))] bottom-auto w-auto",
-        "sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:w-full sm:max-w-sm",
+        "inset-x-4 top-auto bottom-[max(1rem,env(safe-area-inset-bottom))] w-auto",
+        "sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-full sm:max-w-sm",
         "[&:popover-open]:flex",
       )}
     >

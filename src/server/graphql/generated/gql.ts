@@ -27,6 +27,7 @@ type Documents = {
     "\n  query UserPermissions($id: ID!) {\n    userPermissions(id: $id) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": typeof types.UserPermissionsDocument,
     "\n  mutation SetUserPermissions($input: SetUserPermissionsInput!) {\n    setUserPermissions(input: $input) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": typeof types.SetUserPermissionsDocument,
     "\n  query RecordStamp($entity: String!, $id: ID!) {\n    recordStamp(entity: $entity, id: $id) {\n      createdAt\n      createdByName\n      updatedAt\n      updatedByName\n    }\n  }\n": typeof types.RecordStampDocument,
+    "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n    }\n  }\n": typeof types.AppInfoDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": typeof types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
@@ -117,6 +118,12 @@ type Documents = {
     "\n  mutation SendSupportRequest($input: SupportRequestInput!) {\n    sendSupportRequest(input: $input) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.SendSupportRequestDocument,
     "\n  mutation ReplySupportRequest($id: ID!, $reply: String!) {\n    replySupportRequest(id: $id, reply: $reply) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.ReplySupportRequestDocument,
     "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.FinalizeSupportRequestDocument,
+    "\n  query SupportRanking($year: Int) {\n    supportRanking(year: $year) {\n      year\n      supporters\n      totalCents\n      entries {\n        position\n        name\n        totalCents\n        contributions\n      }\n    }\n  }\n": typeof types.SupportRankingDocument,
+    "\n  query Supporters {\n    supporters {\n      id\n      name\n      showName\n      totalCents\n      contributions\n      lastReceivedOn\n      history {\n        id\n        amountCents\n        receivedOn\n        note\n      }\n    }\n  }\n": typeof types.SupportersDocument,
+    "\n  mutation RecordSupportContribution($input: RecordSupportContributionInput!) {\n    recordSupportContribution(input: $input) {\n      id\n    }\n  }\n": typeof types.RecordSupportContributionDocument,
+    "\n  mutation UpdateSupporter($id: ID!, $input: UpdateSupporterInput!) {\n    updateSupporter(id: $id, input: $input) {\n      id\n    }\n  }\n": typeof types.UpdateSupporterDocument,
+    "\n  mutation DeleteSupporter($id: ID!) {\n    deleteSupporter(id: $id)\n  }\n": typeof types.DeleteSupporterDocument,
+    "\n  mutation DeleteSupportContribution($id: ID!) {\n    deleteSupportContribution(id: $id)\n  }\n": typeof types.DeleteSupportContributionDocument,
     "\n  query SystemLogs($filter: SystemLogFilterInput, $page: PageInput) {\n    systemLogs(filter: $filter, page: $page) {\n      items {\n        id\n        level\n        category\n        source\n        message\n        details\n        userId\n        userName\n        ip\n        statusCode\n        durationMs\n        environment\n        createdAt\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SystemLogsDocument,
     "\n  query SystemLogSummary {\n    systemLogSummary {\n      level\n      last24h\n      last7d\n    }\n  }\n": typeof types.SystemLogSummaryDocument,
     "\n  mutation ReportClientError(\n    $message: String!\n    $url: String!\n    $digest: String\n  ) {\n    reportClientError(message: $message, url: $url, digest: $digest)\n  }\n": typeof types.ReportClientErrorDocument,
@@ -134,6 +141,7 @@ const documents: Documents = {
     "\n  query UserPermissions($id: ID!) {\n    userPermissions(id: $id) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": types.UserPermissionsDocument,
     "\n  mutation SetUserPermissions($input: SetUserPermissionsInput!) {\n    setUserPermissions(input: $input) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": types.SetUserPermissionsDocument,
     "\n  query RecordStamp($entity: String!, $id: ID!) {\n    recordStamp(entity: $entity, id: $id) {\n      createdAt\n      createdByName\n      updatedAt\n      updatedByName\n    }\n  }\n": types.RecordStampDocument,
+    "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n    }\n  }\n": types.AppInfoDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n": types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
@@ -224,6 +232,12 @@ const documents: Documents = {
     "\n  mutation SendSupportRequest($input: SupportRequestInput!) {\n    sendSupportRequest(input: $input) {\n      ...SupportRequestFields\n    }\n  }\n": types.SendSupportRequestDocument,
     "\n  mutation ReplySupportRequest($id: ID!, $reply: String!) {\n    replySupportRequest(id: $id, reply: $reply) {\n      ...SupportRequestFields\n    }\n  }\n": types.ReplySupportRequestDocument,
     "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n": types.FinalizeSupportRequestDocument,
+    "\n  query SupportRanking($year: Int) {\n    supportRanking(year: $year) {\n      year\n      supporters\n      totalCents\n      entries {\n        position\n        name\n        totalCents\n        contributions\n      }\n    }\n  }\n": types.SupportRankingDocument,
+    "\n  query Supporters {\n    supporters {\n      id\n      name\n      showName\n      totalCents\n      contributions\n      lastReceivedOn\n      history {\n        id\n        amountCents\n        receivedOn\n        note\n      }\n    }\n  }\n": types.SupportersDocument,
+    "\n  mutation RecordSupportContribution($input: RecordSupportContributionInput!) {\n    recordSupportContribution(input: $input) {\n      id\n    }\n  }\n": types.RecordSupportContributionDocument,
+    "\n  mutation UpdateSupporter($id: ID!, $input: UpdateSupporterInput!) {\n    updateSupporter(id: $id, input: $input) {\n      id\n    }\n  }\n": types.UpdateSupporterDocument,
+    "\n  mutation DeleteSupporter($id: ID!) {\n    deleteSupporter(id: $id)\n  }\n": types.DeleteSupporterDocument,
+    "\n  mutation DeleteSupportContribution($id: ID!) {\n    deleteSupportContribution(id: $id)\n  }\n": types.DeleteSupportContributionDocument,
     "\n  query SystemLogs($filter: SystemLogFilterInput, $page: PageInput) {\n    systemLogs(filter: $filter, page: $page) {\n      items {\n        id\n        level\n        category\n        source\n        message\n        details\n        userId\n        userName\n        ip\n        statusCode\n        durationMs\n        environment\n        createdAt\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SystemLogsDocument,
     "\n  query SystemLogSummary {\n    systemLogSummary {\n      level\n      last24h\n      last7d\n    }\n  }\n": types.SystemLogSummaryDocument,
     "\n  mutation ReportClientError(\n    $message: String!\n    $url: String!\n    $digest: String\n  ) {\n    reportClientError(message: $message, url: $url, digest: $digest)\n  }\n": types.ReportClientErrorDocument,
@@ -277,6 +291,10 @@ export function graphql(source: "\n  mutation SetUserPermissions($input: SetUser
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query RecordStamp($entity: String!, $id: ID!) {\n    recordStamp(entity: $entity, id: $id) {\n      createdAt\n      createdByName\n      updatedAt\n      updatedByName\n    }\n  }\n"): typeof import('./graphql').RecordStampDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n    }\n  }\n"): typeof import('./graphql').AppInfoDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -637,6 +655,30 @@ export function graphql(source: "\n  mutation ReplySupportRequest($id: ID!, $rep
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n"): typeof import('./graphql').FinalizeSupportRequestDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SupportRanking($year: Int) {\n    supportRanking(year: $year) {\n      year\n      supporters\n      totalCents\n      entries {\n        position\n        name\n        totalCents\n        contributions\n      }\n    }\n  }\n"): typeof import('./graphql').SupportRankingDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Supporters {\n    supporters {\n      id\n      name\n      showName\n      totalCents\n      contributions\n      lastReceivedOn\n      history {\n        id\n        amountCents\n        receivedOn\n        note\n      }\n    }\n  }\n"): typeof import('./graphql').SupportersDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RecordSupportContribution($input: RecordSupportContributionInput!) {\n    recordSupportContribution(input: $input) {\n      id\n    }\n  }\n"): typeof import('./graphql').RecordSupportContributionDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateSupporter($id: ID!, $input: UpdateSupporterInput!) {\n    updateSupporter(id: $id, input: $input) {\n      id\n    }\n  }\n"): typeof import('./graphql').UpdateSupporterDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteSupporter($id: ID!) {\n    deleteSupporter(id: $id)\n  }\n"): typeof import('./graphql').DeleteSupporterDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteSupportContribution($id: ID!) {\n    deleteSupportContribution(id: $id)\n  }\n"): typeof import('./graphql').DeleteSupportContributionDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

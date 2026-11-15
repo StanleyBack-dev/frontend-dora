@@ -1,4 +1,18 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import type { NextConfig } from "next";
+
+// Which build this is (shared/lib/app-version.ts): the version from
+// package.json (bumped by release-please) and the commit the deploy
+// workflow passes (APP_COMMIT_SHA); empty outside a deploy.
+const appVersion: string = JSON.parse(
+  readFileSync(join(process.cwd(), "package.json"), "utf8"),
+).version;
+const appCommit = (
+  process.env.APP_COMMIT_SHA ||
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  ""
+).trim();
 
 // Security headers for every page. The app only talks to its own origin
 // (the BFF), so connect-src can stay 'self'.
@@ -26,6 +40,16 @@ const allowedDevOrigins = (process.env.DEV_ALLOWED_ORIGINS ?? "")
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  env: {
+    NEXT_PUBLIC_APP_VERSION: appVersion,
+    NEXT_PUBLIC_APP_COMMIT: appCommit,
+  },
+  // Version skew: a page left open across a deploy reloads instead of
+  // asking the new deployment for files it no longer has. Vercel's own id
+  // (NEXT_DEPLOYMENT_ID, with Skew Protection) wins when present.
+  deploymentId: process.env.NEXT_DEPLOYMENT_ID
+    ? undefined
+    : appCommit || undefined,
   allowedDevOrigins,
   reactStrictMode: true,
   // Old addresses: the condominiums console and the members list now live

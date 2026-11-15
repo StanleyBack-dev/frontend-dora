@@ -34,7 +34,9 @@ import { authClient } from "@/features/auth/api/auth.client";
 import { CondominiumSwitcher } from "@/features/condominiums/components/CondominiumSwitcher";
 import { OnboardingTour } from "@/features/help/components/OnboardingTour";
 import { PageHelpButton } from "@/features/help/components/PageHelpButton";
+import { UpdateAvailableNotice } from "@/features/app-version/components/UpdateAvailableNotice";
 import { InstallAppInvite } from "@/features/install/components/InstallAppInvite";
+import { APP_BUILD, versionLabel } from "@/shared/lib/app-version";
 import { Wordmark } from "@/features/layout/components/Logo";
 import { LogoMark } from "@/features/layout/components/LogoMark";
 import { MenuSearch } from "@/features/layout/components/MenuSearch";
@@ -482,6 +484,22 @@ export function AppShell({
                   />
                 </button>
               </div>
+              {/* The running version: opens "Sobre o Dora". */}
+              <Link
+                href="/configuracoes/sobre"
+                onClick={closeMobile}
+                title="Sobre o Dora"
+                className="mt-2 block text-center text-[11px] font-medium text-chrome-subtle transition-colors hover:text-chrome-fg"
+              >
+                {collapsed ? (
+                  <span className="hidden lg:inline">
+                    {versionLabel(APP_BUILD)}
+                  </span>
+                ) : null}
+                <span className={cn(collapsed && "lg:hidden")}>
+                  Dora {versionLabel(APP_BUILD)}
+                </span>
+              </Link>
             </div>
           </aside>
 
@@ -522,6 +540,7 @@ export function AppShell({
             {/* Sign-in invites: pinned above the tab bar on phones. */}
             <InstallAppInvite />
             <PushNotificationsInvite hidden={tourOpen} />
+            <UpdateAvailableNotice />
           </div>
 
           <nav
