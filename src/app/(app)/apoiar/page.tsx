@@ -69,9 +69,12 @@ export default async function SupportProjectPage({
         title="Apoie o Dora"
         description="Um projeto independente, feito para facilitar a vida no condomínio."
       />
+      {/* Phones: one column with the Pix card right after "Por que apoiar?"
+      (the left column dissolves into the grid and `order` places each card).
+      Larger screens: the cards on the left, the Pix card on the right. */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="min-w-0 space-y-6">
-          <Card>
+        <div className="contents lg:block lg:min-w-0 lg:space-y-6">
+          <Card className="order-1">
             <CardBody className="space-y-4 text-[15px] text-fg">
               <p className="flex items-center gap-2 font-semibold">
                 <HeartHandshake aria-hidden className="size-5 text-brand" />
@@ -102,14 +105,18 @@ export default async function SupportProjectPage({
             </CardBody>
           </Card>
 
-          <SupportRankingCard ranking={ranking} periods={periods} />
+          <div className="order-3 min-w-0">
+            <SupportRankingCard ranking={ranking} periods={periods} />
+          </div>
 
           {supporters && (
-            <SupportersManager supporters={supporters} today={today} />
+            <div className="order-4 min-w-0">
+              <SupportersManager supporters={supporters} today={today} />
+            </div>
           )}
         </div>
 
-        <Card className="self-start">
+        <Card className="order-2 self-start lg:order-none">
           <CardBody className="space-y-4 text-center">
             <p className="text-sm font-semibold text-fg">Pix</p>
             <div
