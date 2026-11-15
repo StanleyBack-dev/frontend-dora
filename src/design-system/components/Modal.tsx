@@ -108,8 +108,10 @@ export function Modal({
       <div className="max-h-[calc(100dvh-11rem)] overflow-y-auto px-5 py-5 text-[13px] leading-relaxed text-muted">
         {children}
       </div>
+      {/* Phones: the buttons share the row while they fit and wrap to
+      full-width rows when they don't (never squeezed past their text). */}
       {footer && (
-        <div className="flex flex-wrap justify-end gap-2 border-t border-border bg-surface-muted px-5 py-3.5 max-sm:[&>*]:flex-1 max-sm:[&>*]:justify-center">
+        <div className="flex flex-wrap justify-end gap-2 border-t border-border bg-surface-muted px-5 py-3.5 max-sm:[&>*]:flex-[1_1_auto] max-sm:[&>*]:justify-center">
           {footer}
         </div>
       )}
