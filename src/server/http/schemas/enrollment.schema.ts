@@ -22,6 +22,8 @@ export const enrollmentDataSchema = z.object({
 
 export const submitEnrollmentSchema = z.object({
   data: enrollmentDataSchema,
+  /** Resident (default) or employee: employees send no unit nor address. */
+  applicant: z.enum(["RESIDENT", "EMPLOYEE"]).default("RESIDENT"),
   consent: z.boolean(),
   /** Base64 of the photo the browser shrank (the API checks the content). */
   photo: z

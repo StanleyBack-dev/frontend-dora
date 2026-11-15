@@ -28,6 +28,8 @@ export type UserListQuery = {
   limit?: number;
   search?: string;
   group?: UserGroup;
+  /** Any of these roles (e.g. the team: ADMIN and CONCIERGE). */
+  groups?: UserGroup[];
   unitId?: string;
   active?: boolean;
   page: number;
@@ -46,6 +48,7 @@ export const adminService = {
         filter: {
           search: query.search || undefined,
           group: query.group,
+          groups: query.groups,
           unitId: query.unitId,
           active: query.active,
         },

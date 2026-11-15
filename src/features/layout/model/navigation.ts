@@ -14,6 +14,7 @@ import {
   Megaphone,
   Settings,
   ShieldCheck,
+  UserCog,
   UsersRound,
 } from "lucide-react";
 import type { Permission } from "@/shared/contracts/api";
@@ -80,6 +81,13 @@ export const PRIMARY_NAV: NavItem[] = [
     href: "/moradores",
     label: "Moradores",
     icon: UsersRound,
+    permission: "USERS_MANAGE",
+  },
+  // Its team: managers (administração) and the gate (Portaria).
+  {
+    href: "/equipe",
+    label: "Equipe",
+    icon: UserCog,
     permission: "USERS_MANAGE",
   },
   // Every condominium using Dora: the platform administrator only.

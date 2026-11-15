@@ -44,6 +44,7 @@ export const enrollmentRequestFieldsFragment = graphql(`
   fragment EnrollmentRequestFields on EnrollmentRequest {
     id
     status
+    applicant
     fullName
     email
     phone

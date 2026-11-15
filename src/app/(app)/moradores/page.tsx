@@ -1,43 +1,16 @@
 import type { Metadata } from "next";
-import { Users } from "lucide-react";
-import {
-  Card,
-  EmptyState,
-  Field,
-  FilterActions,
-  FilterPanel,
-  PageHeader,
-  Pagination,
-  Select,
-} from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
-import { GROUP_LABELS } from "@/features/access/model/access-labels";
+import { MembersDirectory } from "@/features/admin/components/MembersDirectory";
 import { NoCondominium } from "@/features/condominiums/components/NoCondominium";
-import { CreateUserButton } from "@/features/admin/components/CreateUserButton";
-import { UsersTable } from "@/features/admin/components/UsersTable";
-import { authed, getSessionUser } from "@/server/auth/current-user";
-import { adminService } from "@/server/services/admin.service";
-import { condominiumsService } from "@/server/services/condominiums.service";
-import { assignableGroups, can } from "@/shared/lib/access";
-import {
-  buildHref,
-  firstParam,
-  oneOf,
-  DEFAULT_PAGE_SIZE,
-  PAGE_SIZES,
-  pageParam,
-  pageSizeParam,
-  pageSizeQuery,
-  type RawSearchParams,
-} from "@/shared/lib/search-params";
+import { getSessionUser } from "@/server/auth/current-user";
+import { loadMembers } from "@/server/loaders/load-members";
+import { can } from "@/shared/lib/access";
+import type { RawSearchParams } from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Moradores" };
 
-const STATUSES = ["ativos", "desativados"] as const;
-// Roles inside a condominium.
-const ROLES = ["USER", "ADMIN", "CONCIERGE"] as const;
-
-export default async function UsersPage({
+// The residents only: managers and the gate are in Equipe.
+export default async function ResidentsPage({
   searchParams,
 }: {
   searchParams: Promise<RawSearchParams>;
@@ -48,128 +21,23 @@ export default async function UsersPage({
   if (!can(user, "USERS_MANAGE")) return <AccessDenied />;
   if (!user.condominium) return <NoCondominium user={user} />;
 
-  const params = await searchParams;
-  const search = firstParam(params, "busca")?.slice(0, 100) ?? "";
-  const group = oneOf(firstParam(params, "grupo"), ROLES);
-  const status = oneOf(firstParam(params, "status"), STATUSES);
-  const units = await authed((token) => condominiumsService.units(token));
-  const unitId = oneOf(
-    firstParam(params, "unidade"),
-    units.map((unit) => unit.id),
-  );
-  const page = pageParam(params);
-  const pageSize = pageSizeParam(params);
-  const hrefWith = (overrides: Record<string, string | number | undefined>) =>
-    buildHref("/moradores", {
-      busca: search,
-      grupo: group,
-      unidade: unitId,
-      status,
-      "por-pagina": pageSizeQuery(pageSize),
-      ...overrides,
-    });
-
-  const users = await authed((token) =>
-    adminService.listUsers(token, {
-      search,
-      group,
-      unitId,
-      active: status === undefined ? undefined : status === "ativos",
-      page,
-      limit: pageSize,
-    }),
-  );
-  const filtered = Boolean(search || group || unitId || status);
+  const roles = ["USER"] as const;
+  const unitFilter = true;
+  const data = await loadMembers(await searchParams, { roles, unitFilter });
 
   return (
-    <>
-      <PageHeader
-        title="Moradores"
-        description={`Quem mora e quem administra o ${user.condominium.name}: unidade, contato, papel e acesso.`}
-        actions={
-          <CreateUserButton
-            assignableGroups={assignableGroups(user.group)}
-            units={units}
-          />
-        }
-      />
-      <FilterPanel hasActiveFilters={filtered}>
-        <form
-          role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
-        >
-          {pageSize !== DEFAULT_PAGE_SIZE && (
-            <input type="hidden" name="por-pagina" value={pageSize} />
-          )}
-          <Field
-            label="Buscar"
-            name="busca"
-            defaultValue={search}
-            placeholder="Nome, e-mail ou telefone"
-          />
-          <Select
-            label="Papel"
-            name="grupo"
-            defaultValue={group ?? ""}
-            placeholder="Todos"
-            options={ROLES.map((value) => ({
-              value,
-              label: GROUP_LABELS[value],
-            }))}
-          />
-          {units.length > 0 && (
-            <Select
-              label="Unidade"
-              name="unidade"
-              defaultValue={unitId ?? ""}
-              placeholder="Todas"
-              options={units.map((unit) => ({
-                value: unit.id,
-                label: unit.label,
-              }))}
-            />
-          )}
-          <Select
-            label="Situação"
-            name="status"
-            defaultValue={status ?? ""}
-            placeholder="Todas"
-            options={[
-              { value: "ativos", label: "Ativos" },
-              { value: "desativados", label: "Desativados" },
-            ]}
-          />
-          <FilterActions clearHref="/moradores" hasActiveFilters={filtered} />
-        </form>
-      </FilterPanel>
-
-      <Card>
-        {users.items.length === 0 ? (
-          <EmptyState
-            icon={<Users className="size-5" />}
-            title={
-              filtered ? "Ninguém encontrado" : "Ninguém no condomínio ainda"
-            }
-            description={
-              filtered
-                ? "Tente outros filtros."
-                : "Adicione os moradores e a administração, ou envie um link de cadastro."
-            }
-          />
-        ) : (
-          <UsersTable users={users.items} />
-        )}
-
-        <Pagination
-          page={users.page}
-          totalPages={users.totalPages}
-          total={users.total}
-          pageSize={pageSize}
-          hrefFor={(target) => hrefWith({ page: target })}
-          pageSizes={PAGE_SIZES}
-          pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
-        />
-      </Card>
-    </>
+    <MembersDirectory
+      user={user}
+      data={data}
+      config={{
+        basePath: "/moradores",
+        title: "Moradores",
+        description: `Quem mora no ${user.condominium.name}: unidade, contato e acesso. A administração e a portaria ficam em Equipe.`,
+        roles,
+        unitFilter,
+        emptyTitle: "Nenhum morador ainda",
+        emptyDescription: "Adicione os moradores ou envie um link de cadastro.",
+      }}
+    />
   );
 }
