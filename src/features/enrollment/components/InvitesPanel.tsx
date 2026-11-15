@@ -333,7 +333,9 @@ function ShareInviteModal({
         <p className="text-sm text-muted">
           Envie no grupo do condomínio ou para cada morador.
         </p>
-        <pre className="rounded-lg border border-border bg-surface-muted p-3 text-[13px] whitespace-pre-wrap text-fg">
+        {/* Breaks anywhere: the link has no spaces and would run past the
+        modal on phones. */}
+        <pre className="max-w-full rounded-lg border border-border bg-surface-muted p-3 font-sans text-[13px] whitespace-pre-wrap text-fg [overflow-wrap:anywhere]">
           {text}
         </pre>
       </div>
