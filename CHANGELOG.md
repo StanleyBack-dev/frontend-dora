@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.2.1...v0.3.0) (2026-11-15)
+
+
+### Features
+
+* last update dates instead of commits in "Sobre o Dora" ([e9c0544](https://github.com/StanleyBack-dev/frontend-dora/commit/e9c0544006f8bf54296f510f9ca2fbd430ab4dc2))
+
+
+### Bug Fixes
+
+* show the Pix card right after "Por que apoiar?" on phones ([ea1d844](https://github.com/StanleyBack-dev/frontend-dora/commit/ea1d844ca12d603b9a3a74a2dcda6caf7685fb12))
+
 ## [0.2.1](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.2.0...v0.2.1) (2026-11-15)
 
 
