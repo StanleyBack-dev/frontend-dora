@@ -13,9 +13,9 @@ import {
 
 const noopSubscribe = () => () => {};
 
-// One-time invitation to install the app: on phones a card stuck to the
-// bottom that still takes its room in the page (nothing stays hidden under
-// it); on larger screens a small card floating in the corner. Once the user
+// One-time invitation to install the app: on phones a compact card pinned
+// just above the tab bar (never over the middle of the page); on larger
+// screens a small card floating in the corner. Once the user
 // installs or closes it, it never comes back on this browser; the option
 // stays available in Configurações.
 export function InstallAppInvite() {
@@ -49,7 +49,7 @@ export function InstallAppInvite() {
   return (
     <aside
       aria-label="Instalar o aplicativo"
-      className="sticky bottom-24 z-40 mx-4 mb-24 rounded-2xl border border-border bg-surface p-4 shadow-pop sm:fixed sm:right-6 sm:bottom-24 sm:mx-0 sm:mb-0 sm:w-80 lg:bottom-6"
+      className="fixed inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 rounded-2xl border border-border bg-surface p-3 shadow-pop sm:inset-x-auto sm:right-6 sm:bottom-24 sm:w-80 sm:p-4 lg:bottom-6"
     >
       <div className="flex items-start gap-3">
         <span className="grid size-9 shrink-0 place-items-center rounded-md bg-accent-soft text-accent">

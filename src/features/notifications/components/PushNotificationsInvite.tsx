@@ -71,7 +71,7 @@ export function PushNotificationsInvite({ hidden }: { hidden: boolean }) {
   return (
     <aside
       aria-label="Ativar notificações"
-      className="sticky bottom-24 z-40 mx-4 mb-24 rounded-2xl border border-border bg-surface p-4 shadow-pop sm:fixed sm:right-6 sm:bottom-24 sm:mx-0 sm:mb-0 sm:w-80 lg:bottom-6"
+      className="fixed inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 rounded-2xl border border-border bg-surface p-3 shadow-pop sm:inset-x-auto sm:right-6 sm:bottom-24 sm:w-80 sm:p-4 lg:bottom-6"
     >
       <div className="flex items-start gap-3">
         <span className="grid size-9 shrink-0 place-items-center rounded-md bg-accent-soft text-accent">
