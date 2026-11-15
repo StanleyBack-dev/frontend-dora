@@ -7,7 +7,7 @@ import { formatSlot } from "@/features/bookings/model/booking-labels";
 import { inviteQrSvg } from "@/features/bookings/model/invite-qr";
 import { bookingsService } from "@/server/services/bookings.service";
 import { formatLongDay } from "@/shared/lib/datetime";
-import { siteUrl } from "@/shared/lib/site";
+import { requestOrigin } from "@/server/http/request-origin";
 
 const SHARE_TITLE = "Convite · Dora";
 const SHARE_DESCRIPTION = "Mostre este convite na portaria do condomínio.";
@@ -60,7 +60,9 @@ export default async function GuestInvitePage({
   }
 
   const valid = invite.status === "VALID";
-  const qrSvg = await inviteQrSvg(`${siteUrl()}/convite/${invite.code}`);
+  const qrSvg = await inviteQrSvg(
+    `${await requestOrigin()}/convite/${invite.code}`,
+  );
   return (
     <AuthLayout>
       <div className="space-y-5">

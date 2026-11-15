@@ -46,7 +46,12 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: npx vercel deploy --prod --token "$VERCEL_TOKEN" --yes
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+        # The commit goes into the build: "Sobre o Dora" shows it, and the
+        # app compares it with /api/version to offer the new version.
+        run: |
+          npx vercel deploy --prod --token "$VERCEL_TOKEN" --yes \
+            --build-env APP_COMMIT_SHA="$COMMIT_SHA" --env APP_COMMIT_SHA="$COMMIT_SHA"
 
       # Tells the ADMIN_MASTER (app and e-mail) through the API; skipped
       # when API_URL/CRON_SECRET are not set in this repository.

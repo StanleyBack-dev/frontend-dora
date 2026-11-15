@@ -16,6 +16,15 @@ export default async function EnrollmentOpengraphImage() {
       headline="Cadastro de morador"
       note="Use o código do convite para enviar os seus dados ao condomínio."
       logoSrc={await brandLogoSrc()}
+      ticket={{
+        label: "Convite de cadastro",
+        title: "Seu condomínio no Dora",
+        lines: [
+          "Envie os seus dados",
+          "A administração aprova",
+          "Pronto: é só reservar",
+        ],
+      }}
     />,
     size,
   );

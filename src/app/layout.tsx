@@ -4,7 +4,8 @@ import { connection } from "next/server";
 import { AppSplash } from "@/features/layout/components/AppSplash";
 import { NavigationProgress } from "@/features/layout/components/NavigationProgress";
 import { ToastProvider } from "@/shared/toast/ToastProvider";
-import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/shared/lib/site";
+import { requestOrigin } from "@/server/http/request-origin";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/shared/lib/site";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -13,8 +14,7 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl()),
+const baseMetadata: Metadata = {
   title: { default: SITE_NAME, template: `%s · ${SITE_NAME}` },
   description: SITE_DESCRIPTION,
   // Private app: no page is offered to search engines.
@@ -40,6 +40,11 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
 };
+
+// Absolute addresses (og:image) on the domain the page was opened on.
+export async function generateMetadata(): Promise<Metadata> {
+  return { ...baseMetadata, metadataBase: new URL(await requestOrigin()) };
+}
 
 export const viewport: Viewport = {
   // The chrome color (globals.css): the installed app's status bar.

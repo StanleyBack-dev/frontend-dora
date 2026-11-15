@@ -243,6 +243,7 @@ export type Permission =
   | 'NOTIFICATIONS_BROADCAST'
   | 'PERMISSIONS_MANAGE'
   | 'SPACES_MANAGE'
+  | 'SUPPORTERS_MANAGE'
   | 'SUPPORT_MANAGE'
   | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
@@ -263,6 +264,19 @@ export type PushSubscriptionInput = {
   endpoint: string;
   /** Chave pública do aparelho (base64url). */
   p256dh: string;
+};
+
+export type RecordSupportContributionInput = {
+  /** Valor em centavos. */
+  amountCents: number;
+  /** Nome do apoiador. Um nome que já está na lista soma a esse apoiador. */
+  name: string;
+  /** Observação interna (não aparece no ranking). */
+  note?: string | null | undefined;
+  /** Dia em que o apoio chegou (YYYY-MM-DD). */
+  receivedOn: string;
+  /** Falso: o ranking mostra "Apoiador anônimo" no lugar do nome. */
+  showName: boolean;
 };
 
 export type ResetPasswordInput = {
@@ -375,6 +389,12 @@ export type UpdateMyProfileInput = {
   name: string;
   /** Telefone de contato (ausente: mantém; vazio: remove). */
   phone?: string | null | undefined;
+};
+
+export type UpdateSupporterInput = {
+  name: string;
+  /** Falso: aparece como "Apoiador anônimo". */
+  showName: boolean;
 };
 
 export type UpdateUnitInput = {
@@ -506,6 +526,11 @@ export type RecordStampQueryVariables = Exact<{
 
 
 export type RecordStampQuery = { recordStamp: { createdAt: string, createdByName: string | null, updatedAt: string, updatedByName: string | null } | null };
+
+export type AppInfoQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AppInfoQuery = { appInfo: { version: string, commit: string | null } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -1081,6 +1106,47 @@ export type FinalizeSupportRequestMutationVariables = Exact<{
 
 export type FinalizeSupportRequestMutation = { finalizeSupportRequest: { id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
 
+export type SupportRankingQueryVariables = Exact<{
+  year?: number | null | undefined;
+}>;
+
+
+export type SupportRankingQuery = { supportRanking: { year: number | null, supporters: number, totalCents: number, entries: Array<{ position: number, name: string | null, totalCents: number, contributions: number }> } };
+
+export type SupportersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SupportersQuery = { supporters: Array<{ id: string, name: string, showName: boolean, totalCents: number, contributions: number, lastReceivedOn: string | null, history: Array<{ id: string, amountCents: number, receivedOn: string, note: string | null }> }> };
+
+export type RecordSupportContributionMutationVariables = Exact<{
+  input: RecordSupportContributionInput;
+}>;
+
+
+export type RecordSupportContributionMutation = { recordSupportContribution: { id: string } };
+
+export type UpdateSupporterMutationVariables = Exact<{
+  id: string | number;
+  input: UpdateSupporterInput;
+}>;
+
+
+export type UpdateSupporterMutation = { updateSupporter: { id: string } };
+
+export type DeleteSupporterMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteSupporterMutation = { deleteSupporter: boolean };
+
+export type DeleteSupportContributionMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteSupportContributionMutation = { deleteSupportContribution: boolean };
+
 export type SystemLogsQueryVariables = Exact<{
   filter?: SystemLogFilterInput | null | undefined;
   page?: PageInput | null | undefined;
@@ -1584,6 +1650,14 @@ export const RecordStampDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RecordStampQuery, RecordStampQueryVariables>;
+export const AppInfoDocument = new TypedDocumentString(`
+    query AppInfo {
+  appInfo {
+    version
+    commit
+  }
+}
+    `) as unknown as TypedDocumentString<AppInfoQuery, AppInfoQueryVariables>;
 export const LoginDocument = new TypedDocumentString(`
     mutation Login($input: LoginInput!) {
   login(input: $input) {
@@ -3120,6 +3194,63 @@ export const FinalizeSupportRequestDocument = new TypedDocumentString(`
   finalizedByName
   createdAt
 }`) as unknown as TypedDocumentString<FinalizeSupportRequestMutation, FinalizeSupportRequestMutationVariables>;
+export const SupportRankingDocument = new TypedDocumentString(`
+    query SupportRanking($year: Int) {
+  supportRanking(year: $year) {
+    year
+    supporters
+    totalCents
+    entries {
+      position
+      name
+      totalCents
+      contributions
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<SupportRankingQuery, SupportRankingQueryVariables>;
+export const SupportersDocument = new TypedDocumentString(`
+    query Supporters {
+  supporters {
+    id
+    name
+    showName
+    totalCents
+    contributions
+    lastReceivedOn
+    history {
+      id
+      amountCents
+      receivedOn
+      note
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<SupportersQuery, SupportersQueryVariables>;
+export const RecordSupportContributionDocument = new TypedDocumentString(`
+    mutation RecordSupportContribution($input: RecordSupportContributionInput!) {
+  recordSupportContribution(input: $input) {
+    id
+  }
+}
+    `) as unknown as TypedDocumentString<RecordSupportContributionMutation, RecordSupportContributionMutationVariables>;
+export const UpdateSupporterDocument = new TypedDocumentString(`
+    mutation UpdateSupporter($id: ID!, $input: UpdateSupporterInput!) {
+  updateSupporter(id: $id, input: $input) {
+    id
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateSupporterMutation, UpdateSupporterMutationVariables>;
+export const DeleteSupporterDocument = new TypedDocumentString(`
+    mutation DeleteSupporter($id: ID!) {
+  deleteSupporter(id: $id)
+}
+    `) as unknown as TypedDocumentString<DeleteSupporterMutation, DeleteSupporterMutationVariables>;
+export const DeleteSupportContributionDocument = new TypedDocumentString(`
+    mutation DeleteSupportContribution($id: ID!) {
+  deleteSupportContribution(id: $id)
+}
+    `) as unknown as TypedDocumentString<DeleteSupportContributionMutation, DeleteSupportContributionMutationVariables>;
 export const SystemLogsDocument = new TypedDocumentString(`
     query SystemLogs($filter: SystemLogFilterInput, $page: PageInput) {
   systemLogs(filter: $filter, page: $page) {
