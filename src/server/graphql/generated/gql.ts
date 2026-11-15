@@ -27,7 +27,7 @@ type Documents = {
     "\n  query UserPermissions($id: ID!) {\n    userPermissions(id: $id) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": typeof types.UserPermissionsDocument,
     "\n  mutation SetUserPermissions($input: SetUserPermissionsInput!) {\n    setUserPermissions(input: $input) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": typeof types.SetUserPermissionsDocument,
     "\n  query RecordStamp($entity: String!, $id: ID!) {\n    recordStamp(entity: $entity, id: $id) {\n      createdAt\n      createdByName\n      updatedAt\n      updatedByName\n    }\n  }\n": typeof types.RecordStampDocument,
-    "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n    }\n  }\n": typeof types.AppInfoDocument,
+    "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n      deployedAt\n    }\n  }\n": typeof types.AppInfoDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": typeof types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
@@ -141,7 +141,7 @@ const documents: Documents = {
     "\n  query UserPermissions($id: ID!) {\n    userPermissions(id: $id) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": types.UserPermissionsDocument,
     "\n  mutation SetUserPermissions($input: SetUserPermissionsInput!) {\n    setUserPermissions(input: $input) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": types.SetUserPermissionsDocument,
     "\n  query RecordStamp($entity: String!, $id: ID!) {\n    recordStamp(entity: $entity, id: $id) {\n      createdAt\n      createdByName\n      updatedAt\n      updatedByName\n    }\n  }\n": types.RecordStampDocument,
-    "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n    }\n  }\n": types.AppInfoDocument,
+    "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n      deployedAt\n    }\n  }\n": types.AppInfoDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n": types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
@@ -294,7 +294,7 @@ export function graphql(source: "\n  query RecordStamp($entity: String!, $id: ID
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n    }\n  }\n"): typeof import('./graphql').AppInfoDocument;
+export function graphql(source: "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n      deployedAt\n    }\n  }\n"): typeof import('./graphql').AppInfoDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

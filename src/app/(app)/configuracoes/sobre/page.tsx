@@ -7,8 +7,16 @@ import {
   versionLabel,
   type BuildInfo,
 } from "@/shared/lib/app-version";
+import { formatDateTime } from "@/shared/lib/datetime";
 
 export const metadata: Metadata = { title: "Sobre o Dora" };
+
+/** "Atualizado em 15/11/2026 às 02:45" (São Paulo time). */
+function updatedLabel(build: BuildInfo | null): string {
+  if (!build) return "Não foi possível consultar agora";
+  if (!build.updatedAt) return "Data de atualização indisponível";
+  return `Atualizado em ${formatDateTime(build.updatedAt).replace(", ", " às ")}`;
+}
 
 function BuildRow({
   icon,
@@ -26,13 +34,7 @@ function BuildRow({
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-fg">{title}</p>
-        <p className="text-xs text-muted">
-          {build?.commit
-            ? `Commit ${build.commit.slice(0, 7)}`
-            : build
-              ? "Ambiente de desenvolvimento"
-              : "Não foi possível consultar agora"}
-        </p>
+        <p className="text-xs text-muted">{updatedLabel(build)}</p>
       </div>
       <span className="shrink-0 font-mono text-sm font-semibold text-fg">
         {build ? versionLabel(build) : "—"}
@@ -41,8 +43,8 @@ function BuildRow({
   );
 }
 
-// Which versions are running: the web app (this build) and the API. Handy
-// when reporting a problem to the support.
+// Which versions are running, the web app (this build) and the API, and
+// when each one was last updated. Handy when reporting a problem.
 export default async function AboutPage() {
   const api = await appInfoService.api();
 

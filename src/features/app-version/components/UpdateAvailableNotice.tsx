@@ -15,7 +15,11 @@ async function deployedBuild(): Promise<BuildInfo | null> {
     if (!response.ok) return null;
     const build = (await response.json()) as Partial<BuildInfo>;
     return typeof build.version === "string"
-      ? { version: build.version, commit: build.commit ?? null }
+      ? {
+          version: build.version,
+          commit: build.commit ?? null,
+          updatedAt: build.updatedAt ?? null,
+        }
       : null;
   } catch {
     return null;

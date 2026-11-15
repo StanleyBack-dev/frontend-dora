@@ -530,7 +530,7 @@ export type RecordStampQuery = { recordStamp: { createdAt: string, createdByName
 export type AppInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AppInfoQuery = { appInfo: { version: string, commit: string | null } };
+export type AppInfoQuery = { appInfo: { version: string, commit: string | null, deployedAt: string | null } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -1655,6 +1655,7 @@ export const AppInfoDocument = new TypedDocumentString(`
   appInfo {
     version
     commit
+    deployedAt
   }
 }
     `) as unknown as TypedDocumentString<AppInfoQuery, AppInfoQueryVariables>;

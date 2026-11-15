@@ -43,6 +43,8 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: appVersion,
     NEXT_PUBLIC_APP_COMMIT: appCommit,
+    // When this build was made (the deploy builds on Vercel): "Sobre o Dora".
+    NEXT_PUBLIC_APP_BUILT_AT: new Date().toISOString(),
   },
   allowedDevOrigins,
   reactStrictMode: true,
