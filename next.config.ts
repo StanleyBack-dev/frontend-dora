@@ -44,12 +44,6 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_APP_VERSION: appVersion,
     NEXT_PUBLIC_APP_COMMIT: appCommit,
   },
-  // Version skew: a page left open across a deploy reloads instead of
-  // asking the new deployment for files it no longer has. Vercel's own id
-  // (NEXT_DEPLOYMENT_ID, with Skew Protection) wins when present.
-  deploymentId: process.env.NEXT_DEPLOYMENT_ID
-    ? undefined
-    : appCommit || undefined,
   allowedDevOrigins,
   reactStrictMode: true,
   // Old addresses: the condominiums console and the members list now live
