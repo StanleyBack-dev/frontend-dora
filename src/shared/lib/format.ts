@@ -50,3 +50,7 @@ export function formatRelative(
     return rtf.format(Math.round(diffMs / 3_600_000), "hour");
   return rtf.format(Math.round(diffMs / 86_400_000), "day");
 }
+
+/** Cents → "R$ 150,00". */
+export const formatCents = (cents: number): string =>
+  formatCurrency(cents / 100);

@@ -12,6 +12,9 @@ import { authService } from "@/server/services/auth.service";
 const PUBLIC_PAGES = new Set(["/entrar", "/recuperar-senha"]);
 // Open to everyone, signed in or not.
 const OPEN_PAGES = new Set(["/termos", "/cadastro"]);
+// Open by prefix: a guest's invite (/convite/<code>) is for people without
+// an account.
+const OPEN_PREFIXES = ["/convite/"];
 
 // Keeps the session usable before anything renders. The access cookie
 // expires just before its token; when it is gone but the refresh cookie is
@@ -35,7 +38,12 @@ export async function proxy(request: NextRequest) {
   const hasAccess = request.cookies.has(names.access);
   const refreshToken = request.cookies.get(names.refresh)?.value;
 
-  if (OPEN_PAGES.has(pathname)) return next();
+  if (
+    OPEN_PAGES.has(pathname) ||
+    OPEN_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  ) {
+    return next();
+  }
   if (PUBLIC_PAGES.has(pathname)) {
     return hasAccess
       ? NextResponse.redirect(new URL("/inicio", request.url))

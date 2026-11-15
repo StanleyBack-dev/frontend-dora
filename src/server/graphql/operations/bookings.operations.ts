@@ -6,6 +6,7 @@ export const bookingFieldsFragment = graphql(`
     spaceId
     spaceName
     spaceKind
+    guestsAllowed
     userId
     userName
     unitLabel
@@ -18,6 +19,9 @@ export const bookingFieldsFragment = graphql(`
     decidedAt
     cancelledAt
     cancelledByManager
+    feeCents
+    feeBilledAt
+    seriesId
     createdAt
   }
 `);
@@ -64,6 +68,7 @@ export const spaceAvailabilityDocument = graphql(`
         bookingId
         bookingStatus
         label
+        waitlisted
       }
     }
   }
@@ -126,5 +131,165 @@ export const createSpaceBlockDocument = graphql(`
 export const deleteSpaceBlockDocument = graphql(`
   mutation DeleteSpaceBlock($id: ID!) {
     deleteSpaceBlock(id: $id)
+  }
+`);
+
+// --- weekly series ---
+
+export const createBookingSeriesDocument = graphql(`
+  mutation CreateBookingSeries($input: CreateBookingSeriesInput!) {
+    createBookingSeries(input: $input) {
+      seriesId
+      created {
+        ...BookingFields
+      }
+      skipped {
+        startsAt
+        reason
+      }
+    }
+  }
+`);
+
+export const cancelBookingSeriesDocument = graphql(`
+  mutation CancelBookingSeries($seriesId: ID!) {
+    cancelBookingSeries(seriesId: $seriesId) {
+      cancelled
+      kept
+    }
+  }
+`);
+
+// --- waiting list ---
+
+export const joinWaitlistDocument = graphql(`
+  mutation JoinWaitlist($input: WaitlistSlotInput!) {
+    joinWaitlist(input: $input)
+  }
+`);
+
+export const leaveWaitlistDocument = graphql(`
+  mutation LeaveWaitlist($input: WaitlistSlotInput!) {
+    leaveWaitlist(input: $input)
+  }
+`);
+
+// --- guests ---
+
+export const bookingGuestFieldsFragment = graphql(`
+  fragment BookingGuestFields on BookingGuest {
+    id
+    bookingId
+    name
+    documentType
+    document
+    phone
+    code
+    checkedInAt
+    createdAt
+  }
+`);
+
+export const bookingGuestsDocument = graphql(`
+  query BookingGuests($bookingId: ID!) {
+    bookingGuests(bookingId: $bookingId) {
+      ...BookingGuestFields
+    }
+  }
+`);
+
+export const addBookingGuestsDocument = graphql(`
+  mutation AddBookingGuests($input: AddBookingGuestsInput!) {
+    addBookingGuests(input: $input) {
+      ...BookingGuestFields
+    }
+  }
+`);
+
+export const removeBookingGuestDocument = graphql(`
+  mutation RemoveBookingGuest($id: ID!) {
+    removeBookingGuest(id: $id)
+  }
+`);
+
+export const guestInviteDocument = graphql(`
+  query GuestInvite($code: String!) {
+    guestInvite(code: $code) {
+      code
+      guestName
+      hostFirstName
+      spaceName
+      condominiumName
+      startsAt
+      endsAt
+      status
+      checkedIn
+    }
+  }
+`);
+
+// --- the gate (Portaria) ---
+
+export const gateGuestFieldsFragment = graphql(`
+  fragment GateGuestFields on GateGuest {
+    id
+    bookingId
+    name
+    documentType
+    document
+    phone
+    code
+    checkedInAt
+    spaceName
+    startsAt
+    endsAt
+    hostName
+    unitLabel
+    checkInWindow
+  }
+`);
+
+export const gateGuestsDocument = graphql(`
+  query GateGuests($date: String) {
+    gateGuests(date: $date) {
+      ...GateGuestFields
+    }
+  }
+`);
+
+export const checkInGuestDocument = graphql(`
+  mutation CheckInGuest($input: CheckInGuestInput!) {
+    checkInGuest(input: $input) {
+      ...GateGuestFields
+    }
+  }
+`);
+
+export const undoGuestCheckInDocument = graphql(`
+  mutation UndoGuestCheckIn($guestId: ID!) {
+    undoGuestCheckIn(guestId: $guestId) {
+      ...GateGuestFields
+    }
+  }
+`);
+
+// --- usage fees ---
+
+export const bookingFeesDocument = graphql(`
+  query BookingFees($month: String) {
+    bookingFees(month: $month) {
+      month
+      totalCents
+      billedCents
+      items {
+        ...BookingFields
+      }
+    }
+  }
+`);
+
+export const setBookingFeesBilledDocument = graphql(`
+  mutation SetBookingFeesBilled($input: SetBookingFeesBilledInput!) {
+    setBookingFeesBilled(input: $input)
   }
 `);

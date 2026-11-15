@@ -3,6 +3,7 @@ import type { Permission, UserGroup } from "@/shared/contracts/api";
 export const GROUP_LABELS: Record<UserGroup, string> = {
   USER: "Morador",
   ADMIN: "Gestor",
+  CONCIERGE: "Portaria",
   ADMIN_MASTER: "Administrador geral",
 };
 
@@ -10,12 +11,19 @@ export const GROUP_DESCRIPTIONS: Record<UserGroup, string> = {
   USER: "Usa o app do condomínio: reserva espaços, recebe avisos e comunicados e pede ajuda ao suporte.",
   ADMIN:
     "Administra este condomínio (síndico, administração): moradores, cadastros, unidades, espaços, comunicados e painel.",
+  CONCIERGE:
+    "Trabalha na portaria: vê os convidados das reservas do dia e libera a entrada. Não reserva espaços.",
   ADMIN_MASTER:
     "Administra a plataforma Dora: todos os condomínios, suporte e histórico dos registros.",
 };
 
 /** Groups in rank order (lowest first). */
-export const GROUPS: UserGroup[] = ["USER", "ADMIN", "ADMIN_MASTER"];
+export const GROUPS: UserGroup[] = [
+  "USER",
+  "CONCIERGE",
+  "ADMIN",
+  "ADMIN_MASTER",
+];
 
 type PermissionInfo = { label: string; area: PermissionArea };
 
@@ -41,7 +49,12 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
   },
   BOOKINGS_CREATE: { label: "Reservar espaços", area: "Reservas" },
   BOOKINGS_MANAGE: {
-    label: "Aprovar, recusar e cancelar reservas; bloquear espaços",
+    label:
+      "Aprovar, recusar e cancelar reservas; bloquear espaços; taxas de uso",
+    area: "Reservas",
+  },
+  GUESTS_CHECKIN: {
+    label: "Liberar a entrada de convidados (portaria)",
     area: "Reservas",
   },
   PERMISSIONS_MANAGE: {

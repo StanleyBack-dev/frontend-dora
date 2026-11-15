@@ -28,6 +28,11 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Uma reserva sua foi cancelada (por você ou pela administração).",
   },
+  BOOKING_SLOT_FREED: {
+    label: "Horário liberado",
+    description:
+      "Um horário que você esperava na lista de espera foi liberado.",
+  },
   SUPPORT_REQUESTED: {
     label: "Nova solicitação de suporte",
     description: "Para o administrador geral: alguém pediu ajuda pelo Suporte.",

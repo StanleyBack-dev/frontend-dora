@@ -20,11 +20,29 @@ export type CondominiumStatus =
   | 'ACTIVE'
   | 'SUSPENDED';
 
+/** Documento de identidade: CPF ou RG. */
+export type DocumentType =
+  | 'CPF'
+  | 'RG';
+
 /** Situação do cadastro enviado pelo link público. */
 export type EnrollmentStatus =
   | 'APROVADA'
   | 'PENDENTE'
   | 'RECUSADA';
+
+/** Se a portaria já pode liberar a entrada do convidado. */
+export type GuestCheckInWindow =
+  | 'CANCELLED'
+  | 'FINISHED'
+  | 'OPEN'
+  | 'TOO_EARLY';
+
+/** Situação do convite: válido, cancelado ou encerrado. */
+export type GuestInviteStatus =
+  | 'CANCELLED'
+  | 'ENDED'
+  | 'VALID';
 
 /** Período do limite de reservas por unidade. */
 export type LimitPeriod =
@@ -43,6 +61,7 @@ export type NotificationType =
   | 'BOOKING_CONFIRMED'
   | 'BOOKING_PENDING'
   | 'BOOKING_REJECTED'
+  | 'BOOKING_SLOT_FREED'
   | 'BROADCAST'
   | 'ENROLLMENT_SUBMITTED'
   | 'SUPPORT_ANSWERED'
@@ -57,6 +76,7 @@ export type Permission =
   | 'BOOKINGS_MANAGE'
   | 'CONDOMINIUMS_MANAGE'
   | 'DASHBOARD_READ'
+  | 'GUESTS_CHECKIN'
   | 'NOTIFICATIONS_BROADCAST'
   | 'PERMISSIONS_MANAGE'
   | 'SPACES_MANAGE'
@@ -96,11 +116,13 @@ export type SupportStatus =
   | 'FINALIZADO'
   | 'RESPONDIDO';
 
-/** Perfil de acesso: Morador, Gestor ou Administrador geral. */
+/** Perfil de acesso: Morador, Gestor, Portaria ou Administrador geral. */
 export type UserGroup =
   /** Gestor */
   | 'ADMIN'
   /** Administrador geral */
   | 'ADMIN_MASTER'
+  /** Portaria */
+  | 'CONCIERGE'
   /** Morador */
   | 'USER';

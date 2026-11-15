@@ -1,12 +1,12 @@
 import { SegmentedNav } from "@/design-system";
 
-/** "Minhas reservas" and, for managers, "Gestão". */
+/** "Minhas reservas" and, for managers, "Gestão" and "Taxas". */
 export function BookingsTabs({
   current,
   manager,
   pending,
 }: {
-  current: "mine" | "manage";
+  current: "mine" | "manage" | "fees";
   manager: boolean;
   /** Bookings waiting for approval (badge on Gestão). */
   pending?: number;
@@ -27,6 +27,11 @@ export function BookingsTabs({
           href: "/reservas/gestao",
           active: current === "manage",
           count: pending || undefined,
+        },
+        {
+          label: "Taxas",
+          href: "/reservas/taxas",
+          active: current === "fees",
         },
       ]}
     />

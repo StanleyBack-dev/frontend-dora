@@ -10,6 +10,7 @@ import {
   ImageIcon,
   MapPin,
   Save,
+  Wallet,
 } from "lucide-react";
 import {
   Button,
@@ -41,6 +42,7 @@ import type {
   SpaceKind,
 } from "@/shared/contracts/spaces";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { centsOf, maskMoney, moneyField } from "@/shared/lib/masks";
 import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useToast } from "@/shared/toast/useToast";
 
@@ -61,6 +63,14 @@ type FormState = {
   limitPeriod: LimitPeriod;
   requiresApproval: boolean;
   cancelUntilHours: string;
+  paid: boolean;
+  /** Masked money ("150,00"). */
+  fee: string;
+  guestsAllowed: boolean;
+  /** "" = no limit besides the capacity. */
+  maxGuests: string;
+  guestDocumentRequired: boolean;
+  recurringAllowed: boolean;
 };
 
 const CLOSED: DayForm = { open: false, opensAt: "08:00", closesAt: "22:00" };
@@ -91,6 +101,12 @@ function toForm(space: Space | null): FormState {
     limitPeriod: rules?.unitLimit?.period ?? "WEEK",
     requiresApproval: rules?.requiresApproval ?? false,
     cancelUntilHours: String(rules?.cancelUntilHours ?? 0),
+    paid: rules?.feeCents != null,
+    fee: moneyField(rules?.feeCents ?? null),
+    guestsAllowed: rules?.guests.allowed ?? false,
+    maxGuests: rules?.guests.max ? String(rules.guests.max) : "",
+    guestDocumentRequired: rules?.guests.documentRequired ?? false,
+    recurringAllowed: rules?.recurringAllowed ?? false,
   };
 }
 
@@ -120,6 +136,14 @@ function toInput(form: FormState): SpaceInput {
         : null,
       requiresApproval: form.requiresApproval,
       cancelUntilHours: int(form.cancelUntilHours) || 0,
+      // Paid but without a value: the API answers with the valid range.
+      feeCents: form.paid ? (centsOf(form.fee) ?? 0) : null,
+      guests: {
+        allowed: form.guestsAllowed,
+        max: form.maxGuests.trim() ? int(form.maxGuests) || 0 : null,
+        documentRequired: form.guestDocumentRequired,
+      },
+      recurringAllowed: form.recurringAllowed,
     },
   };
 }
@@ -451,6 +475,122 @@ export function SpaceForm({ space }: { space: Space | null }) {
             <span className="text-muted">
               A reserva só vale depois que um gestor aprovar. Bom para salão de
               festas e churrasqueira.
+            </span>
+          </span>
+        </label>
+      </FormSection>
+
+      <FormSection
+        icon={<Wallet />}
+        title="Taxa, convidados e recorrência"
+        description="O que o morador paga pelo uso, quem pode levar e se pode reservar toda semana."
+      >
+        <div
+          className={cn(
+            "rounded-xl border border-border p-3",
+            form.paid && "bg-surface-muted",
+          )}
+        >
+          <label className="flex cursor-pointer items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              className="mt-0.5 size-4 shrink-0 accent-[var(--brand)]"
+              checked={form.paid}
+              onChange={(event) => set("paid", event.target.checked)}
+            />
+            <span>
+              <span className="block font-medium text-fg">
+                Cobrar taxa de uso
+              </span>
+              <span className="text-muted">
+                O valor fica gravado em cada reserva e aparece em Reservas →
+                Taxas, para lançar na cobrança do condomínio.
+              </span>
+            </span>
+          </label>
+          {form.paid && (
+            <div className="mt-3 sm:max-w-60">
+              <Field
+                label="Valor por reserva (R$)"
+                required
+                inputMode="numeric"
+                placeholder="0,00"
+                value={form.fee}
+                onChange={(event) => set("fee", maskMoney(event.target.value))}
+              />
+            </div>
+          )}
+        </div>
+
+        <div
+          className={cn(
+            "rounded-xl border border-border p-3",
+            form.guestsAllowed && "bg-surface-muted",
+          )}
+        >
+          <label className="flex cursor-pointer items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              className="mt-0.5 size-4 shrink-0 accent-[var(--brand)]"
+              checked={form.guestsAllowed}
+              onChange={(event) => set("guestsAllowed", event.target.checked)}
+            />
+            <span>
+              <span className="block font-medium text-fg">
+                Aceitar lista de convidados
+              </span>
+              <span className="text-muted">
+                Quem reserva cadastra os convidados e envia o convite com QR
+                code; a portaria confere e libera a entrada.
+              </span>
+            </span>
+          </label>
+          {form.guestsAllowed && (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:items-end">
+              <Field
+                label="Máximo de convidados"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={500}
+                placeholder={
+                  form.capacity.trim()
+                    ? `Até ${Math.max(0, int(form.capacity) - 1)} (capacidade)`
+                    : "Sem limite"
+                }
+                value={form.maxGuests}
+                onChange={(event) => set("maxGuests", event.target.value)}
+              />
+              <label className="flex cursor-pointer items-center gap-2 pb-2.5 text-sm font-medium text-fg">
+                <input
+                  type="checkbox"
+                  className="size-4 accent-[var(--brand)]"
+                  checked={form.guestDocumentRequired}
+                  onChange={(event) =>
+                    set("guestDocumentRequired", event.target.checked)
+                  }
+                />
+                Exigir documento de cada convidado
+              </label>
+            </div>
+          )}
+        </div>
+
+        <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-border p-3 text-sm">
+          <input
+            type="checkbox"
+            className="mt-0.5 size-4 shrink-0 accent-[var(--brand)]"
+            checked={form.recurringAllowed}
+            onChange={(event) => set("recurringAllowed", event.target.checked)}
+          />
+          <span>
+            <span className="block font-medium text-fg">
+              Permitir reserva recorrente
+            </span>
+            <span className="text-muted">
+              O morador pode reservar o mesmo horário toda semana (de 2 a 26
+              semanas), dentro da antecedência e do limite por unidade. Gestores
+              sempre podem.
             </span>
           </span>
         </label>

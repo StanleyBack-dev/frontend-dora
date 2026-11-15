@@ -30,10 +30,10 @@ export const ADMIN_AREA_PERMISSIONS: Permission[] = [
 
 /**
  * Roles `actor` may give to a member of the condominium (mirrors the API
- * rule: the platform assigns resident or manager, a manager only resident).
+ * rule: the platform assigns any role, a manager resident or gate staff).
  */
 export function assignableGroups(actor: UserGroup): UserGroup[] {
-  if (actor === "ADMIN_MASTER") return ["USER", "ADMIN"];
-  if (actor === "ADMIN") return ["USER"];
+  if (actor === "ADMIN_MASTER") return ["USER", "CONCIERGE", "ADMIN"];
+  if (actor === "ADMIN") return ["USER", "CONCIERGE"];
   return [];
 }

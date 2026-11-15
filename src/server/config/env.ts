@@ -1,6 +1,13 @@
 import "server-only";
 import { z } from "zod";
 
+/** An optional text where an empty value (`NAME=` in .env) means unset. */
+const optional = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim() === "" ? undefined : value,
+  z.string().trim().max(120).optional(),
+);
+
 // Validated once per server instance. Nothing here is NEXT_PUBLIC_: secrets
 // never reach the browser bundle (enforced by "server-only").
 const schema = z.object({
@@ -20,6 +27,13 @@ const schema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
+  /**
+   * "Apoie o Dora" (PIX): the page and its menu item exist only when key,
+   * name and city are all set. Empty values mean "off".
+   */
+  PIX_KEY: optional,
+  PIX_RECEIVER_NAME: optional,
+  PIX_RECEIVER_CITY: optional,
 });
 
 export type ServerEnv = z.infer<typeof schema>;

@@ -63,3 +63,24 @@ export function maskCnpj(value: string): string {
     .replace(/\.(\d{3})(\d)/, ".$1/$2")
     .replace(/(\d{4})(\d)/, "$1-$2");
 }
+
+// --- money ------------------------------------------------------------------
+
+/** Typed money, filled from the right: "15000" → "150,00" (at most R$ 100 mil). */
+export function maskMoney(value: string): string {
+  const digits = value.replace(/\D/g, "").replace(/^0+/, "").slice(0, 8);
+  if (!digits) return "";
+  const cents = digits.padStart(3, "0");
+  const reais = cents.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${reais},${cents.slice(-2)}`;
+}
+
+/** "1.500,00" → 150000 cents (null when empty). */
+export function centsOf(masked: string): number | null {
+  const digits = masked.replace(/\D/g, "");
+  return digits ? Number(digits) : null;
+}
+
+/** 150000 cents → "1.500,00" for a masked field. */
+export const moneyField = (cents: number | null): string =>
+  cents === null ? "" : maskMoney(String(cents));

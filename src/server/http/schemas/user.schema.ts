@@ -3,7 +3,11 @@ import { z } from "zod";
 import type { Permission, UserGroup } from "@/shared/contracts/api";
 
 // Roles a member can have (the platform role is never assigned here).
-const GROUPS = ["USER", "ADMIN"] as const satisfies readonly UserGroup[];
+const GROUPS = [
+  "USER",
+  "ADMIN",
+  "CONCIERGE",
+] as const satisfies readonly UserGroup[];
 
 export const userIdSchema = z.uuid();
 

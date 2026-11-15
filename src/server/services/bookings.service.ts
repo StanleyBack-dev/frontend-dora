@@ -1,7 +1,20 @@
 import "server-only";
 import { backendGraphql } from "@/server/graphql/client";
 import {
+  addBookingGuestsDocument,
   approveBookingDocument,
+  bookingFeesDocument,
+  bookingGuestsDocument,
+  cancelBookingSeriesDocument,
+  checkInGuestDocument,
+  createBookingSeriesDocument,
+  gateGuestsDocument,
+  guestInviteDocument,
+  joinWaitlistDocument,
+  leaveWaitlistDocument,
+  removeBookingGuestDocument,
+  setBookingFeesBilledDocument,
+  undoGuestCheckInDocument,
   bookingsDocument,
   cancelBookingDocument,
   createBookingDocument,
@@ -15,6 +28,13 @@ import {
 import type { Paginated } from "@/shared/contracts/api";
 import type {
   Booking,
+  BookingFees,
+  BookingGuest,
+  BookingSeriesResult,
+  GateGuest,
+  GuestInput,
+  GuestInvite,
+  SeriesCancellation,
   BookingStatus,
   BookingWhen,
   SpaceAvailability,
@@ -136,5 +156,141 @@ export const bookingsService = {
       token,
       variables: { id },
     });
+  },
+
+  // === weekly series ===
+
+  async createSeries(
+    token: string,
+    input: {
+      spaceId: string;
+      startsAt: string;
+      weeks: number;
+      notes: string | null;
+    },
+  ): Promise<BookingSeriesResult> {
+    const { createBookingSeries } = await backendGraphql(
+      createBookingSeriesDocument,
+      { token, variables: { input } },
+    );
+    return createBookingSeries;
+  },
+
+  async cancelSeries(
+    token: string,
+    seriesId: string,
+  ): Promise<SeriesCancellation> {
+    const { cancelBookingSeries } = await backendGraphql(
+      cancelBookingSeriesDocument,
+      { token, variables: { seriesId } },
+    );
+    return cancelBookingSeries;
+  },
+
+  // === waiting list ===
+
+  async joinWaitlist(
+    token: string,
+    input: { spaceId: string; startsAt: string },
+  ): Promise<void> {
+    await backendGraphql(joinWaitlistDocument, { token, variables: { input } });
+  },
+
+  async leaveWaitlist(
+    token: string,
+    input: { spaceId: string; startsAt: string },
+  ): Promise<void> {
+    await backendGraphql(leaveWaitlistDocument, {
+      token,
+      variables: { input },
+    });
+  },
+
+  // === guests ===
+
+  async guests(token: string, bookingId: string): Promise<BookingGuest[]> {
+    const { bookingGuests } = await backendGraphql(bookingGuestsDocument, {
+      token,
+      variables: { bookingId },
+    });
+    return bookingGuests;
+  },
+
+  async addGuests(
+    token: string,
+    bookingId: string,
+    guests: GuestInput[],
+  ): Promise<BookingGuest[]> {
+    const { addBookingGuests } = await backendGraphql(
+      addBookingGuestsDocument,
+      { token, variables: { input: { bookingId, guests } } },
+    );
+    return addBookingGuests;
+  },
+
+  async removeGuest(token: string, id: string): Promise<void> {
+    await backendGraphql(removeBookingGuestDocument, {
+      token,
+      variables: { id },
+    });
+  },
+
+  /** Public: the invite page (null: no such code). */
+  async invite(code: string): Promise<GuestInvite | null> {
+    const { guestInvite } = await backendGraphql(guestInviteDocument, {
+      variables: { code },
+    });
+    return guestInvite ?? null;
+  },
+
+  // === the gate (Portaria) ===
+
+  async gateGuests(token: string, date?: string): Promise<GateGuest[]> {
+    const { gateGuests } = await backendGraphql(gateGuestsDocument, {
+      token,
+      variables: { date: date ?? null },
+    });
+    return gateGuests;
+  },
+
+  async checkIn(
+    token: string,
+    target: { guestId?: string | null; code?: string | null },
+  ): Promise<GateGuest> {
+    const { checkInGuest } = await backendGraphql(checkInGuestDocument, {
+      token,
+      variables: { input: target },
+    });
+    return checkInGuest;
+  },
+
+  async undoCheckIn(token: string, guestId: string): Promise<GateGuest> {
+    const { undoGuestCheckIn } = await backendGraphql(
+      undoGuestCheckInDocument,
+      { token, variables: { guestId } },
+    );
+    return undoGuestCheckIn;
+  },
+
+  // === usage fees ===
+
+  async fees(token: string, month?: string): Promise<BookingFees> {
+    const { bookingFees } = await backendGraphql(bookingFeesDocument, {
+      token,
+      variables: { month: month ?? null },
+    });
+    return bookingFees;
+  },
+
+  async setFeesBilled(
+    token: string,
+    bookingIds: string[],
+    billed: boolean,
+  ): Promise<number> {
+    const { setBookingFeesBilled } = await backendGraphql(
+      setBookingFeesBilledDocument,
+      { token, variables: { input: { bookingIds, billed } } },
+    );
+    return setBookingFeesBilled;
   },
 };
