@@ -12,6 +12,7 @@ import {
   Megaphone,
   Settings,
   ShieldCheck,
+  UserCog,
   UsersRound,
   type LucideIcon,
 } from "lucide-react";
@@ -327,22 +328,22 @@ export const HELP_TOPICS: HelpTopic[] = [
     icon: UsersRound,
     permission: "USERS_MANAGE",
     area: "main",
-    tour: "Quem mora e quem administra o condomínio: unidade, complemento, telefone, papel e acesso de cada pessoa.",
+    tour: "Quem mora no condomínio: unidade, complemento, telefone e acesso de cada morador.",
     sections: {
       purpose: [
         {
-          text: "A lista de todas as pessoas do condomínio aberto, com a foto, a unidade e o complemento (ex.: casa dos fundos), o telefone, o e-mail, o papel e o último acesso.",
+          text: "A lista dos moradores do condomínio aberto, com a foto, a unidade e o complemento (ex.: casa dos fundos), o telefone, o e-mail e o último acesso. A administração e a portaria ficam em Equipe.",
         },
       ],
       howto: [
         {
-          text: "Use “Adicionar” para incluir alguém: nome, e-mail, papel (Morador ou Gestor), unidade, complemento e telefone. Conta nova recebe a senha temporária por e-mail.",
+          text: "Use “Adicionar” para incluir um morador: nome, e-mail, unidade, complemento e telefone. Conta nova recebe a senha temporária por e-mail.",
         },
         {
           text: "Toque no lápis para abrir a pessoa: corrija os dados, redefina a senha, desative o acesso ou abra exceções de permissão.",
         },
         {
-          text: "Filtre por nome, e-mail ou telefone, por papel, unidade ou situação.",
+          text: "Filtre por nome, e-mail ou telefone, por unidade ou situação.",
         },
       ],
       rules: [
@@ -350,7 +351,34 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "O login é sempre o e-mail. Quem já usa o Dora em outro condomínio entra com a mesma conta; os dados de acesso dela (nome, e-mail, telefone e senha) só a própria pessoa altera.",
         },
         {
-          text: "Unidade, complemento e papel valem só para este condomínio.",
+          text: "Unidade, complemento e papel valem só para este condomínio. Mudar o papel de alguém para Administrador ou Portaria leva a pessoa para Equipe.",
+        },
+      ],
+    },
+  },
+  {
+    id: "equipe",
+    href: "/equipe",
+    title: "Equipe",
+    icon: UserCog,
+    permission: "USERS_MANAGE",
+    area: "main",
+    tour: "A administração e a portaria do condomínio: contato, papel e acesso de cada pessoa.",
+    sections: {
+      purpose: [
+        {
+          text: "Quem trabalha no condomínio com acesso ao Dora: os administradores (síndico, administração) e a portaria. Moradores ficam em Moradores.",
+        },
+      ],
+      howto: [
+        {
+          text: "Use “Adicionar” para incluir alguém da equipe: nome, e-mail, papel (Administrador ou Portaria) e telefone. Conta nova recebe a senha temporária por e-mail.",
+        },
+        {
+          text: "Funcionários também podem se cadastrar pelo link de cadastro, marcando “Funcionário”: na aprovação, escolha Portaria ou Administrador.",
+        },
+        {
+          text: "Toque no lápis para abrir a pessoa: corrija os dados, troque o papel, redefina a senha ou desative o acesso.",
         },
       ],
     },

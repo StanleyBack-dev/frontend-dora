@@ -20,6 +20,8 @@ import { formatPhone } from "@/shared/lib/masks";
 
 export const metadata: Metadata = { title: "Morador" };
 
+// Also the page of a team member (/equipe/[id] renders this one).
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function UserDetailPage({
@@ -53,14 +55,19 @@ export default async function UserDetailPage({
   const isSelf = user.id === viewer.id;
   // A shared account's login data is not this condominium's to change.
   const accountLocked = user.sharedAccount && !viewer.platformAdmin;
+  // Back to the list the person is in: residents or the team.
+  const list =
+    user.group === "USER"
+      ? { href: "/moradores", label: "Moradores" }
+      : { href: "/equipe", label: "Equipe" };
 
   return (
     <div className="space-y-6">
       <Link
-        href="/moradores"
+        href={list.href}
         className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
       >
-        <ArrowLeft className="size-4" /> Moradores
+        <ArrowLeft className="size-4" /> {list.label}
       </Link>
 
       <Card>

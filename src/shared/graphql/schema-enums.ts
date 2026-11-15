@@ -25,6 +25,11 @@ export type DocumentType =
   | 'CPF'
   | 'RG';
 
+/** Quem se cadastra: morador ou funcionário do condomínio. */
+export type EnrollmentApplicant =
+  | 'EMPLOYEE'
+  | 'RESIDENT';
+
 /** Situação do cadastro enviado pelo link público. */
 export type EnrollmentStatus =
   | 'APROVADA'

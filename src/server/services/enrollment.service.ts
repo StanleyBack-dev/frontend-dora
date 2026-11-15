@@ -15,6 +15,7 @@ import {
 import type { Paginated, UserGroup } from "@/shared/contracts/api";
 import type {
   EnrollmentApproval,
+  EnrollmentApplicant,
   EnrollmentData,
   EnrollmentForm,
   EnrollmentInvite,
@@ -62,11 +63,12 @@ export const enrollmentService = {
   async submit(
     formToken: string,
     data: EnrollmentData,
+    applicant: EnrollmentApplicant,
     consent: boolean,
     photo: string | null,
   ): Promise<void> {
     await backendGraphql(submitEnrollmentDocument, {
-      variables: { input: { formToken, data, consent, photo } },
+      variables: { input: { formToken, data, applicant, consent, photo } },
     });
   },
 

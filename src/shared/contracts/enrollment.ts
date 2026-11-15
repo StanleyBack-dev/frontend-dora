@@ -1,7 +1,10 @@
 import type { TemporaryAccess } from "@/shared/contracts/api";
-import type { EnrollmentStatus } from "@/shared/graphql/schema-enums";
+import type {
+  EnrollmentApplicant,
+  EnrollmentStatus,
+} from "@/shared/graphql/schema-enums";
 
-export type { EnrollmentStatus };
+export type { EnrollmentApplicant, EnrollmentStatus };
 
 /** Code shared with a group of residents (one code, many answers). */
 export type EnrollmentInvite = {
@@ -43,6 +46,8 @@ export type EnrollmentRequest = EnrollmentData & {
   typedUnitBlock: string | null;
   typedUnitNumber: string | null;
   status: EnrollmentStatus;
+  /** Resident or employee (employees have no unit nor address). */
+  applicant: EnrollmentApplicant;
   createdAt: string;
   reviewedAt: string | null;
   rejectionReason: string | null;

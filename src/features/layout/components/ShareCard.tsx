@@ -28,7 +28,7 @@ export function ShareCard({
   logoSrc,
   ticket,
 }: {
-  /** Big line under the name (e.g. "Cadastro de morador"). */
+  /** Big line under the name (e.g. "Cadastro no condomínio"). */
   headline: string;
   /** Small line at the bottom. */
   note: string;

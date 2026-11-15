@@ -39,7 +39,7 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     area: "Comunicação",
   },
   USERS_MANAGE: {
-    label: "Gerenciar moradores e cadastros",
+    label: "Gerenciar moradores, equipe e cadastros",
     area: "Administração",
   },
   UNITS_MANAGE: { label: "Gerenciar unidades", area: "Administração" },

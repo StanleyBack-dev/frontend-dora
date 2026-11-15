@@ -30,7 +30,7 @@ const message = (cause: unknown, fallback: string) =>
 // answer waits for the condominium's administration to approve it.
 const Heading = () => (
   <h1 className="text-center text-[28px] font-extrabold tracking-tight text-fg">
-    Cadastro de morador
+    Cadastro no condomínio
   </h1>
 );
 
@@ -46,7 +46,7 @@ export function EnrollmentFlow() {
   const [pending, setPending] = useState(false);
 
   const units = context?.units ?? [];
-  const unitMode = unitModeFor(units);
+  const unitMode = unitModeFor(units, form.applicant);
   const errors = enrollmentErrors(form, unitMode);
   const invalid = Object.keys(errors).length > 0;
 
@@ -71,6 +71,7 @@ export function EnrollmentFlow() {
     try {
       await enrollmentClient.submit(
         toEnrollmentData(form, unitMode),
+        form.applicant,
         consent,
         photo?.base64 ?? null,
       );

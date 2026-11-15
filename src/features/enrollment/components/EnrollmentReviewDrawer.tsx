@@ -66,7 +66,12 @@ export function EnrollmentReviewDrawer({
   const status = ENROLLMENT_STATUS[request.status];
   const reviewable = request.status === "PENDENTE" && !access;
 
-  const unitMode = unitModeFor(units);
+  const unitMode = unitModeFor(units, request.applicant);
+  // Employees join the team (Portaria or Administrador), never Moradores.
+  const groups =
+    request.applicant === "EMPLOYEE"
+      ? assignableGroups.filter((value) => value !== "USER")
+      : assignableGroups;
   const errors = enrollmentErrors(form, unitMode);
 
   const finish = () => {
@@ -181,7 +186,7 @@ export function EnrollmentReviewDrawer({
                     onChange={(event) =>
                       setGroup(event.target.value as UserGroup)
                     }
-                    options={assignableGroups.map((value) => ({
+                    options={groups.map((value) => ({
                       value,
                       label: GROUP_LABELS[value],
                     }))}
