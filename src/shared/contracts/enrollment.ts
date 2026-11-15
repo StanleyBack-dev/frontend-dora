@@ -1,5 +1,6 @@
 import type { TemporaryAccess } from "@/shared/contracts/api";
 import type {
+  AddressFormat,
   EnrollmentApplicant,
   EnrollmentStatus,
 } from "@/shared/graphql/schema-enums";
@@ -29,11 +30,15 @@ export type EnrollmentData = {
   /** Typed when the condominium has no units registered yet. */
   unitBlock?: string | null;
   unitNumber?: string | null;
+  /** Houses: the street (the quadra goes in unitBlock, the lote in unitNumber). */
+  unitStreet?: string | null;
 };
 
 /** What the public form shows once the code is accepted. */
 export type EnrollmentForm = {
   condominiumName: string;
+  /** Houses: street, quadra and lote are typed (no unit list). */
+  addressFormat: AddressFormat;
   units: { id: string; label: string }[];
 };
 
@@ -45,6 +50,8 @@ export type EnrollmentRequest = EnrollmentData & {
   typedUnitLabel: string | null;
   typedUnitBlock: string | null;
   typedUnitNumber: string | null;
+  /** Houses: the street typed on the form. */
+  typedUnitStreet: string | null;
   status: EnrollmentStatus;
   /** Resident or employee (employees have no unit nor address). */
   applicant: EnrollmentApplicant;

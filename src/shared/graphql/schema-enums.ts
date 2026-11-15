@@ -1,3 +1,8 @@
+/** Como as moradias são identificadas: apartamentos (bloco e número) ou casas (rua, quadra e lote). */
+export type AddressFormat =
+  | 'APARTMENT'
+  | 'HOUSE';
+
 /** Situação da reserva. */
 export type BookingStatus =
   | 'CANCELLED'

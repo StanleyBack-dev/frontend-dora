@@ -10,6 +10,7 @@ export const condominiumFieldsFragment = graphql(`
     city
     state
     status
+    addressFormat
     activeMembers
     managers
     units
@@ -56,6 +57,7 @@ export const setCondominiumStatusDocument = graphql(`
 export const unitFieldsFragment = graphql(`
   fragment UnitFields on Unit {
     id
+    street
     block
     number
     label

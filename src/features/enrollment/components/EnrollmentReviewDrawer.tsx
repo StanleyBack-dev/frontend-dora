@@ -66,7 +66,12 @@ export function EnrollmentReviewDrawer({
   const status = ENROLLMENT_STATUS[request.status];
   const reviewable = request.status === "PENDENTE" && !access;
 
-  const unitMode = unitModeFor(units, request.applicant);
+  // A house was typed (street, quadra and lote): reviewed as a house.
+  const unitMode = unitModeFor(
+    units,
+    request.applicant,
+    request.typedUnitStreet ? "HOUSE" : "APARTMENT",
+  );
   // Employees join the team (Portaria or Administrador), never Moradores.
   const groups =
     request.applicant === "EMPLOYEE"
@@ -207,6 +212,7 @@ export function EnrollmentReviewDrawer({
                 errors={errors}
                 showErrors={submitted}
                 units={units}
+                house={unitMode === "house"}
                 typedUnitLabel={request.typedUnitLabel}
                 reviewing
               />

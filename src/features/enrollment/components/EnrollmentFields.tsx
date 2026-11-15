@@ -34,6 +34,7 @@ export function EnrollmentFields({
   errors,
   showErrors,
   units = [],
+  house = false,
   autoFocus = false,
   typedUnitLabel = null,
   reviewing = false,
@@ -45,6 +46,8 @@ export function EnrollmentFields({
   showErrors: boolean;
   /** The condominium's units (empty: it has none, no unit is asked). */
   units?: { id: string; label: string }[];
+  /** Houses: street, quadra and lote typed (never a list). */
+  house?: boolean;
   autoFocus?: boolean;
   /** What the person typed when there were no units (review only). */
   typedUnitLabel?: string | null;
@@ -158,12 +161,47 @@ export function EnrollmentFields({
           icon={<House />}
           title="Endereço no condomínio"
           description={
-            units.length > 0
-              ? "A sua unidade e, se precisar, um complemento."
-              : "O condomínio ainda não tem unidades cadastradas: digite o bloco (ou torre) e o número."
+            house
+              ? "A rua, a quadra e o lote da sua casa e, se precisar, um complemento."
+              : units.length > 0
+                ? "A sua unidade e, se precisar, um complemento."
+                : "O condomínio ainda não tem unidades cadastradas: digite o bloco (ou torre) e o número."
           }
         >
-          {units.length > 0 ? (
+          {house ? (
+            <>
+              <Field
+                label="Rua"
+                required
+                placeholder="Ex.: Rua das Flores"
+                maxLength={80}
+                autoComplete="address-line1"
+                value={form.unitStreet}
+                onChange={(e) => set("unitStreet", e.target.value)}
+                error={error("unitStreet")}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <Field
+                  label="Quadra"
+                  required
+                  placeholder="Ex.: 3"
+                  maxLength={30}
+                  value={form.unitBlock}
+                  onChange={(e) => set("unitBlock", e.target.value)}
+                  error={error("unitBlock")}
+                />
+                <Field
+                  label="Lote"
+                  required
+                  placeholder="Ex.: 12"
+                  maxLength={20}
+                  value={form.unitNumber}
+                  onChange={(e) => set("unitNumber", e.target.value)}
+                  error={error("unitNumber")}
+                />
+              </div>
+            </>
+          ) : units.length > 0 ? (
             <div>
               <Combobox
                 label="Unidade"
@@ -223,10 +261,11 @@ export function EnrollmentFields({
             />
             <p className="mt-1.5 text-xs text-soft">Opcional.</p>
           </div>
-          {reviewing && units.length === 0 && (
+          {reviewing && (house || units.length === 0) && (
             <p className="text-xs text-soft">
-              Ao aprovar, a unidade digitada é vinculada à pessoa (e cadastrada
-              em Unidades, se ainda não existir).
+              {house
+                ? "Ao aprovar, a casa é vinculada à pessoa (e cadastrada em Unidades, se ainda não existir)."
+                : "Ao aprovar, a unidade digitada é vinculada à pessoa (e cadastrada em Unidades, se ainda não existir)."}
             </p>
           )}
         </FormSection>

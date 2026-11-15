@@ -46,7 +46,7 @@ export function EnrollmentFlow() {
   const [pending, setPending] = useState(false);
 
   const units = context?.units ?? [];
-  const unitMode = unitModeFor(units, form.applicant);
+  const unitMode = unitModeFor(units, form.applicant, context?.addressFormat);
   const errors = enrollmentErrors(form, unitMode);
   const invalid = Object.keys(errors).length > 0;
 
@@ -170,6 +170,7 @@ export function EnrollmentFlow() {
         errors={errors}
         showErrors={submitted}
         units={units}
+        house={unitMode === "house"}
       />
       <label className="flex cursor-pointer items-start gap-2 text-sm text-muted">
         <input

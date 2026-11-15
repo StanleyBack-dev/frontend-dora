@@ -2,12 +2,13 @@
 // code. Dates are ISO strings. Enums come from the GraphQL schema
 // (codegen: shared/graphql/schema-enums.ts).
 import type {
+  AddressFormat,
   CondominiumStatus,
   Permission,
   UserGroup,
 } from "@/shared/graphql/schema-enums";
 
-export type { CondominiumStatus, Permission, UserGroup };
+export type { AddressFormat, CondominiumStatus, Permission, UserGroup };
 
 /** Error shape returned by every BFF route. */
 export type ApiError = {
@@ -31,6 +32,8 @@ export type CurrentCondominium = {
   city: string;
   state: string;
   status: CondominiumStatus;
+  /** Apartments or houses: how homes are identified (forms and labels). */
+  addressFormat: AddressFormat;
 };
 
 /** A condominium the person can open (active member). */

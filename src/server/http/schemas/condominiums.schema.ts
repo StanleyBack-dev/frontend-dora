@@ -9,6 +9,7 @@ export const condominiumInputSchema = z.object({
   document: z.string().trim().max(30).nullish(),
   city: z.string().trim().min(2).max(80),
   state: z.string().trim().length(2),
+  addressFormat: z.enum(["APARTMENT", "HOUSE"]).optional(),
 });
 
 export const condominiumStatusSchema = z.object({
@@ -22,11 +23,13 @@ export const switchCondominiumSchema = z.object({
 export const unitIdSchema = z.uuid();
 
 export const createUnitsSchema = z.object({
+  street: z.string().trim().max(80).nullish(),
   block: z.string().trim().max(30).nullish(),
   numbers: z.string().trim().min(1).max(4000),
 });
 
 export const updateUnitSchema = z.object({
+  street: z.string().trim().max(80).nullish(),
   block: z.string().trim().max(30).nullish(),
   number: z.string().trim().min(1).max(20),
 });

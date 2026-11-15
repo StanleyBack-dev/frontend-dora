@@ -29,15 +29,19 @@ const plural = (count: number, one: string, many: string) =>
 export function UnitsManager({
   units,
   editable,
+  house = false,
 }: {
   units: Unit[];
   /** UNITS_MANAGE: anyone else only sees the list. */
   editable: boolean;
+  /** Houses: street, quadra (block) and lotes (numbers). */
+  house?: boolean;
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
   const [editing, setEditing] = useState<Editing | null>(null);
   const [removing, setRemoving] = useState<Unit | null>(null);
+  const [street, setStreet] = useState("");
   const [block, setBlock] = useState("");
   const [numbers, setNumbers] = useState("");
   const [pending, setPending] = useState(false);
@@ -48,12 +52,14 @@ export function UnitsManager({
   );
 
   function openCreate() {
+    setStreet("");
     setBlock("");
     setNumbers("");
     setEditing({ mode: "create" });
   }
 
   function openEdit(unit: Unit) {
+    setStreet(unit.street);
     setBlock(unit.block);
     setNumbers(unit.number);
     setEditing({ mode: "edit", unit });
@@ -68,6 +74,7 @@ export function UnitsManager({
     try {
       if (editing.mode === "create") {
         const created = await condominiumsClient.createUnits({
+          street: house ? street : null,
           block: block || null,
           numbers,
         });
@@ -76,6 +83,7 @@ export function UnitsManager({
         );
       } else {
         await condominiumsClient.updateUnit(editing.unit.id, {
+          street: house ? street : null,
           block: block || null,
           number: numbers,
         });
@@ -112,14 +120,24 @@ export function UnitsManager({
         <span className="font-semibold text-fg">{unit.label}</span>
       ),
     },
+    ...(house
+      ? [
+          {
+            key: "street",
+            label: "Rua",
+            render: (unit: Unit) =>
+              unit.street || <span className="text-soft">—</span>,
+          },
+        ]
+      : []),
     {
       key: "block",
-      label: "Bloco",
+      label: house ? "Quadra" : "Bloco",
       render: (unit) => unit.block || <span className="text-soft">—</span>,
     },
     {
       key: "number",
-      label: "Número",
+      label: house ? "Lote" : "Número",
       render: (unit) => unit.number,
     },
     {
@@ -177,12 +195,12 @@ export function UnitsManager({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted">
           {units.length > 0
-            ? `${plural(units.length, "unidade", "unidades")}${blocks > 1 ? ` em ${blocks} blocos` : ""}`
+            ? `${plural(units.length, house ? "casa" : "unidade", house ? "casas" : "unidades")}${blocks > 1 ? ` em ${blocks} ${house ? "quadras" : "blocos"}` : ""}`
             : "Nenhuma unidade cadastrada"}
         </p>
         {editable && (
           <Button onClick={openCreate} icon={<Plus className="size-4" />}>
-            Adicionar unidades
+            {house ? "Adicionar casas" : "Adicionar unidades"}
           </Button>
         )}
       </div>
@@ -191,8 +209,16 @@ export function UnitsManager({
         {units.length === 0 ? (
           <EmptyState
             icon={<Building className="size-5" />}
-            title="Cadastre as unidades do condomínio"
-            description="Moradores ficam vinculados a uma unidade, e o link de cadastro pede que cada pessoa escolha a sua."
+            title={
+              house
+                ? "Nenhuma casa cadastrada ainda"
+                : "Cadastre as unidades do condomínio"
+            }
+            description={
+              house
+                ? "No link de cadastro, cada morador digita a rua, a quadra e o lote; ao aprovar, a casa entra aqui sozinha. Você também pode cadastrar antes."
+                : "Moradores ficam vinculados a uma unidade, e o link de cadastro pede que cada pessoa escolha a sua."
+            }
           />
         ) : (
           <DataTable rows={units} columns={columns} getId={(unit) => unit.id} />
@@ -202,7 +228,15 @@ export function UnitsManager({
       <Drawer
         open={editing !== null}
         onClose={() => setEditing(null)}
-        title={creating ? "Adicionar unidades" : "Editar unidade"}
+        title={
+          creating
+            ? house
+              ? "Adicionar casas"
+              : "Adicionar unidades"
+            : house
+              ? "Editar casa"
+              : "Editar unidade"
+        }
         busy={pending}
         footer={
           <>
@@ -213,44 +247,72 @@ export function UnitsManager({
             >
               Cancelar
             </Button>
-            <Button onClick={save} loading={pending} disabled={!numbers.trim()}>
-              {creating ? "Criar unidades" : "Salvar"}
+            <Button
+              onClick={save}
+              loading={pending}
+              disabled={
+                !numbers.trim() || (house && (!street.trim() || !block.trim()))
+              }
+            >
+              {creating ? (house ? "Criar casas" : "Criar unidades") : "Salvar"}
             </Button>
           </>
         }
       >
         <div className="space-y-4">
-          <div>
+          {house && (
             <Field
-              label="Bloco ou torre"
+              label="Rua"
+              required
+              value={street}
+              maxLength={80}
+              placeholder="Ex.: Rua das Flores"
+              onChange={(event) => setStreet(event.target.value)}
+            />
+          )}
+          {house ? (
+            <Field
+              label="Quadra"
+              required
               value={block}
               maxLength={30}
-              placeholder="Ex.: Bloco A, Torre 1"
+              placeholder="Ex.: 3"
               onChange={(event) => setBlock(event.target.value)}
             />
-            <p className="mt-1.5 text-xs text-soft">
-              Deixe em branco se o condomínio não tem blocos (casas, prédio
-              único).
-            </p>
-          </div>
+          ) : (
+            <div>
+              <Field
+                label="Bloco ou torre"
+                value={block}
+                maxLength={30}
+                placeholder="Ex.: Bloco A, Torre 1"
+                onChange={(event) => setBlock(event.target.value)}
+              />
+              <p className="mt-1.5 text-xs text-soft">
+                Deixe em branco se o condomínio não tem blocos (casas, prédio
+                único).
+              </p>
+            </div>
+          )}
           {creating ? (
             <div>
               <TextArea
-                label="Números"
+                label={house ? "Lotes" : "Números"}
                 required
                 rows={4}
                 value={numbers}
-                placeholder="101-104, 201-204"
+                placeholder={house ? "1-20, 25" : "101-104, 201-204"}
                 onChange={(event) => setNumbers(event.target.value)}
               />
               <p className="mt-1.5 text-xs text-soft">
-                Separe por vírgula ou por linha. Faixas como 101-110 criam todas
-                as unidades do intervalo (até 500 por vez).
+                {house
+                  ? "Separe por vírgula ou por linha. Faixas como 1-20 criam todos os lotes do intervalo nesta rua e quadra (até 500 por vez)."
+                  : "Separe por vírgula ou por linha. Faixas como 101-110 criam todas as unidades do intervalo (até 500 por vez)."}
               </p>
             </div>
           ) : (
             <Field
-              label="Número"
+              label={house ? "Lote" : "Número"}
               required
               value={numbers}
               maxLength={20}
