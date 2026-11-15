@@ -39,6 +39,44 @@ export function crc16(text: string): string {
   return crc.toString(16).toUpperCase().padStart(4, "0");
 }
 
+/** Valid CPF check digits (11 digits). */
+function isCpf(digits: string): boolean {
+  if (!/^\d{11}$/.test(digits) || /^(\d)\1{10}$/.test(digits)) return false;
+  const check = (length: number) => {
+    let sum = 0;
+    for (let i = 0; i < length; i += 1) {
+      sum += Number(digits[i]) * (length + 1 - i);
+    }
+    const rest = (sum * 10) % 11;
+    return rest === 10 ? 0 : rest;
+  };
+  return check(9) === Number(digits[9]) && check(10) === Number(digits[10]);
+}
+
+/**
+ * The key as the BR Code expects it, whatever way it was typed:
+ * - e-mail and random key (UUID): lower case;
+ * - CPF (valid check digits) and CNPJ (14 digits): digits only;
+ * - phone: "+55" + DDD + number ("62 98460-7820" → "+5562984607820").
+ * A phone that happens to be a valid CPF is read as CPF: type it with "+55"
+ * to be explicit.
+ */
+export function normalizePixKey(raw: string): string {
+  const key = raw.trim();
+  if (key.includes("@")) return key.toLowerCase();
+  if (/^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(key)) {
+    return key.toLowerCase();
+  }
+  const digits = key.replace(/\D/g, "");
+  if (key.startsWith("+")) return `+${digits}`;
+  if (digits.length === 14) return digits;
+  if (isCpf(digits)) return digits;
+  // DDD + number, with or without the country code.
+  if (/^55\d{10,11}$/.test(digits)) return `+${digits}`;
+  if (/^\d{10,11}$/.test(digits)) return `+55${digits}`;
+  return key;
+}
+
 /** The PIX "copia e cola" text (also what the QR code carries). */
 export function pixPayload(receiver: PixReceiver): string {
   const description = receiver.description
@@ -46,7 +84,7 @@ export function pixPayload(receiver: PixReceiver): string {
     : "";
   const account =
     field("00", "br.gov.bcb.pix") +
-    field("01", receiver.key.trim()) +
+    field("01", normalizePixKey(receiver.key)) +
     (description ? field("02", description) : "");
   const body =
     field("00", "01") +
