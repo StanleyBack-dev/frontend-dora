@@ -4,10 +4,12 @@ import { useEffect, useState, type FormEvent } from "react";
 import {
   CircleCheck,
   Copy,
+  ListPlus,
   MessageCircle,
   Trash2,
   UserPlus,
   Users,
+  X,
 } from "lucide-react";
 import {
   Alert,
@@ -48,10 +50,35 @@ const EMPTY = {
 
 const DOCUMENT_TYPES: DocumentType[] = ["CPF", "RG"];
 
-// The guest list of a booking: add people, send each one the invite (QR code
-// for the gate) by WhatsApp, or all of them in one message, and take someone
-// off the list. Changes are possible while the booking is on and hasn't
-// ended.
+/** Most guests sent in one go (the API's limit per request). */
+const MAX_PER_SEND = 100;
+
+const NAME_FIELD_ID = "guest-name";
+
+/** A guest typed but not sent yet (the pre-list). */
+type DraftGuest = GuestInput & { key: number };
+
+/** Same person: same name (any case or spacing) or same document. */
+function samePerson(
+  a: Pick<GuestInput, "name" | "document">,
+  b: Pick<GuestInput, "name" | "document">,
+): boolean {
+  const name = (value: string) =>
+    value.trim().replace(/\s+/g, " ").toLocaleLowerCase("pt-BR");
+  const digits = (value: string | null | undefined) =>
+    (value ?? "").replace(/[^0-9xX]/g, "").toUpperCase();
+  return (
+    name(a.name) === name(b.name) ||
+    (digits(a.document) !== "" && digits(a.document) === digits(b.document))
+  );
+}
+
+// The guest list of a booking. People are typed into a pre-list first
+// (nothing is sent while typing) and added all at once; then each one gets
+// the invite (QR code for the gate) by WhatsApp, or all of them in one
+// message, and anyone can be taken off the list. Changes are possible while
+// the booking is on and hasn't ended. The pre-list survives closing the
+// drawer, until it is added.
 export function GuestsDrawer({
   open,
   onClose,
@@ -66,6 +93,8 @@ export function GuestsDrawer({
   const { showError, showSuccess } = useToast();
   const [list, setList] = useState<BookingGuest[] | null>(null);
   const [form, setForm] = useState(EMPTY);
+  const [draft, setDraft] = useState<DraftGuest[]>([]);
+  const [nextKey, setNextKey] = useState(1);
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
   const event = { spaceName: booking.spaceName, period: booking.period };
@@ -135,26 +164,53 @@ export function GuestsDrawer({
     }
   }
 
-  async function addOne(submit: FormEvent) {
+  // Puts the typed guest in the pre-list (nothing is sent yet) and gets the
+  // form ready for the next one.
+  function include(submit: FormEvent) {
     submit.preventDefault();
     if (invalidDocument) {
       setTriedDocument(true);
       return showError(invalidDocument);
     }
     if (invalidPhone) return showError(invalidPhone);
-    const ok = await send([
-      {
-        name: form.name,
-        documentType:
-          form.documentType && form.document ? form.documentType : null,
-        document: form.documentType ? form.document || null : null,
-        phone: form.phone || null,
-      },
-    ]);
-    if (ok) {
-      setForm({ ...EMPTY, documentType: form.documentType });
-      setTriedDocument(false);
+    const guest: GuestInput = {
+      name: form.name.trim().replace(/\s+/g, " "),
+      documentType:
+        form.documentType && form.document ? form.documentType : null,
+      document: form.documentType ? form.document || null : null,
+      phone: form.phone || null,
+    };
+    if (draft.some((item) => samePerson(item, guest))) {
+      return showError(`${guest.name} já está na lista para adicionar.`);
     }
+    if ((list ?? []).some((item) => samePerson(item, guest))) {
+      return showError(`${guest.name} já é convidado desta reserva.`);
+    }
+    if (draft.length >= MAX_PER_SEND) {
+      return showError(
+        `Adicione estes ${MAX_PER_SEND} primeiro e depois continue a lista.`,
+      );
+    }
+    setDraft((current) => [...current, { ...guest, key: nextKey }]);
+    setNextKey((key) => key + 1);
+    // The document type stays: guests usually come with the same one.
+    setForm({ ...EMPTY, documentType: form.documentType });
+    setTriedDocument(false);
+    document.getElementById(NAME_FIELD_ID)?.focus();
+  }
+
+  // Sends the whole pre-list in one request; on failure it stays to fix.
+  async function addAll() {
+    if (draft.length === 0) return;
+    const ok = await send(
+      draft.map(({ name, documentType, document, phone }) => ({
+        name,
+        documentType,
+        document,
+        phone,
+      })),
+    );
+    if (ok) setDraft([]);
   }
 
   async function remove(guest: BookingGuest) {
@@ -194,6 +250,29 @@ export function GuestsDrawer({
       title="Convidados"
       subtitle={`${booking.spaceName} · ${booking.period}`}
       width="lg"
+      busy={adding}
+      footer={
+        editable && draft.length > 0 ? (
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => setDraft([])}
+              disabled={adding}
+            >
+              Limpar lista
+            </Button>
+            <Button
+              onClick={addAll}
+              loading={adding}
+              icon={<UserPlus className="size-4" />}
+            >
+              {draft.length === 1
+                ? "Adicionar 1 convidado"
+                : `Adicionar ${draft.length} convidados`}
+            </Button>
+          </>
+        ) : undefined
+      }
     >
       {list === null ? (
         <div className="flex justify-center py-8">
@@ -207,8 +286,9 @@ export function GuestsDrawer({
                 <UserPlus aria-hidden className="size-4 text-soft" />
                 Adicionar convidado
               </p>
-              <form onSubmit={addOne} noValidate className="space-y-3">
+              <form onSubmit={include} noValidate className="space-y-3">
                 <Field
+                  id={NAME_FIELD_ID}
                   label="Nome completo"
                   required
                   value={form.name}
@@ -278,20 +358,77 @@ export function GuestsDrawer({
                     error={invalidPhone ?? undefined}
                   />
                 </div>
-                <div className="flex justify-end">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs text-soft">
+                    Inclua todos e depois adicione de uma vez.
+                  </p>
                   <Button
                     type="submit"
                     size="sm"
-                    loading={adding}
+                    variant="secondary"
                     disabled={
-                      form.name.trim().length < 2 || Boolean(showDocumentError)
+                      adding ||
+                      form.name.trim().length < 2 ||
+                      Boolean(showDocumentError)
                     }
-                    icon={<UserPlus className="size-4" />}
+                    icon={<ListPlus className="size-4" />}
                   >
-                    Adicionar
+                    Incluir na lista
                   </Button>
                 </div>
               </form>
+
+              {draft.length > 0 && (
+                <div className="space-y-2 border-t border-border pt-3">
+                  <p className="text-sm font-semibold text-fg">
+                    Para adicionar ({draft.length})
+                  </p>
+                  <ul className="divide-y divide-border rounded-lg border border-dashed border-border-strong bg-surface-muted">
+                    {draft.map((guest) => (
+                      <li
+                        key={guest.key}
+                        className="flex items-center gap-3 px-3 py-2"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-fg">
+                            {guest.name}
+                          </p>
+                          {(guest.document || guest.phone) && (
+                            <p className="truncate text-xs text-muted">
+                              {[
+                                guest.documentType && guest.document
+                                  ? `${DOCUMENT_LABELS[guest.documentType]} ${guest.document}`
+                                  : null,
+                                guest.phone,
+                              ]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setDraft((current) =>
+                              current.filter((item) => item.key !== guest.key),
+                            )
+                          }
+                          disabled={adding}
+                          aria-label={`Tirar ${guest.name} da lista para adicionar`}
+                          title="Tirar da lista"
+                          className="grid size-8 shrink-0 place-items-center rounded-md text-soft transition-colors hover:bg-danger-soft hover:text-danger disabled:opacity-50"
+                        >
+                          <X aria-hidden className="size-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="text-xs text-soft">
+                    Ainda não foram adicionados: toque em “Adicionar” no fim do
+                    painel.
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <Alert tone="info">

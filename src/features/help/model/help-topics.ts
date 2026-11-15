@@ -150,7 +150,7 @@ export const HELP_TOPICS: HelpTopic[] = [
           only: ["BOOKINGS_CREATE"],
         },
         {
-          text: "Em espaços com lista de convidados, use “Convidados” na reserva: cada convidado recebe o próprio convite com QR code; envie um por um pelo WhatsApp ou todos numa mensagem só.",
+          text: "Em espaços com lista de convidados, use “Convidados” na reserva: inclua todos na lista com “Incluir na lista” e adicione de uma vez. Cada convidado recebe o próprio convite com QR code; envie um por um pelo WhatsApp ou todos numa mensagem só.",
           only: ["BOOKINGS_CREATE"],
         },
         {
