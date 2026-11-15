@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.4.0...v0.5.0) (2026-11-15)
+
+
+### Features
+
+* house addresses (street, quadra and lote) per condominium ([f654901](https://github.com/StanleyBack-dev/frontend-dora/commit/f65490161a863d39f95082ba069f98f4f6e4c719))
+* house addresses (street, quadra and lote) per condominium ([28e018e](https://github.com/StanleyBack-dev/frontend-dora/commit/28e018ea2e2553eb8e0bc078379e9c7a490f389d))
+
 ## [0.4.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.3.1...v0.4.0) (2026-11-15)
 
 
