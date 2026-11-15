@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.3.0...v0.3.1) (2026-11-15)
+
+
+### Bug Fixes
+
+* invite message and modal buttons cut off on phones ([4e288d6](https://github.com/StanleyBack-dev/frontend-dora/commit/4e288d6d519eb60a62af787299f175b1665dd595))
+* invite message and modal buttons cut off on phones ([511a30d](https://github.com/StanleyBack-dev/frontend-dora/commit/511a30d8148cbc586b0f033709d7c86193030d1c))
+
 ## [0.3.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.2.1...v0.3.0) (2026-11-15)
 
 
