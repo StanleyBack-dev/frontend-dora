@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.3.1...v0.4.0) (2026-11-15)
+
+
+### Features
+
+* employee sign-ups, residents-only Moradores and a new Equipe page ([aa89d99](https://github.com/StanleyBack-dev/frontend-dora/commit/aa89d99a9cf902f97e0ac698cc10c638e38cee79))
+* employee sign-ups, residents-only Moradores and a new Equipe page ([013a9ff](https://github.com/StanleyBack-dev/frontend-dora/commit/013a9ff4d17604517da3485b14e296d5f713b43a))
+* guests pre-list, added all at once ([9d93580](https://github.com/StanleyBack-dev/frontend-dora/commit/9d93580cf03b98260802c936d5619b7b822cd450))
+* guests pre-list, added all at once ([d08b247](https://github.com/StanleyBack-dev/frontend-dora/commit/d08b2478fe9e0fef60c43be67ec3241d1661d201))
+
 ## [0.3.1](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.3.0...v0.3.1) (2026-11-15)
 
 
