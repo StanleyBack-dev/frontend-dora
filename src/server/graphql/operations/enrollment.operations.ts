@@ -12,6 +12,7 @@ export const enrollmentFormDocument = graphql(`
   query EnrollmentForm($formToken: String!) {
     enrollmentForm(formToken: $formToken) {
       condominiumName
+      addressFormat
       units {
         id
         label
@@ -54,6 +55,7 @@ export const enrollmentRequestFieldsFragment = graphql(`
     typedUnitLabel
     typedUnitBlock
     typedUnitNumber
+    typedUnitStreet
     createdAt
     reviewedAt
     rejectionReason

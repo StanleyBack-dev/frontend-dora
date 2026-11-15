@@ -12,5 +12,11 @@ export default async function UnitsPage() {
   if (!can(user, "UNITS_MANAGE")) return <AccessDenied />;
 
   const units = await authed((token) => condominiumsService.units(token));
-  return <UnitsManager units={units} editable />;
+  return (
+    <UnitsManager
+      units={units}
+      editable
+      house={user.condominium?.addressFormat === "HOUSE"}
+    />
+  );
 }

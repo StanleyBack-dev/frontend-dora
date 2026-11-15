@@ -9,6 +9,11 @@ export type AddBookingGuestsInput = {
   guests: Array<GuestInput>;
 };
 
+/** Como as moradias são identificadas: apartamentos (bloco e número) ou casas (rua, quadra e lote). */
+export type AddressFormat =
+  | 'APARTMENT'
+  | 'HOUSE';
+
 export type BookingFilterInput = {
   spaceId?: string | number | null | undefined;
   status?: BookingStatus | null | undefined;
@@ -58,6 +63,8 @@ export type CondominiumFilterInput = {
 };
 
 export type CondominiumInput = {
+  /** Apartamentos (bloco e número, padrão) ou casas (rua, quadra e lote). */
+  addressFormat?: AddressFormat | null | undefined;
   city: string;
   /** CNPJ (opcional). */
   document?: string | null | undefined;
@@ -109,6 +116,8 @@ export type CreateUnitsInput = {
   block?: string | null | undefined;
   /** Números e faixas: "101-104, 201". */
   numbers: string;
+  /** Rua (só em condomínios de casas). */
+  street?: string | null | undefined;
 };
 
 export type CreateUserInput = {
@@ -140,7 +149,7 @@ export type EnrollmentDataInput = {
   email: string;
   fullName: string;
   phone: string;
-  /** Bloco ou torre digitado (quando o condomínio ainda não tem unidades). */
+  /** Bloco ou torre digitado (quando o condomínio ainda não tem unidades); em casas, a quadra. */
   unitBlock?: string | null | undefined;
   /** Complemento do endereço no condomínio ("casa dos fundos"). */
   unitComplement?: string | null | undefined;
@@ -148,6 +157,8 @@ export type EnrollmentDataInput = {
   unitId?: string | number | null | undefined;
   /** Número da casa ou apartamento digitado (quando o condomínio ainda não tem unidades). Na aprovação, ausente mantém o informado. */
   unitNumber?: string | null | undefined;
+  /** Rua digitada (condomínio de casas; com a quadra em unitBlock e o lote em unitNumber). */
+  unitStreet?: string | null | undefined;
 };
 
 export type EnrollmentRequestFilterInput = {
@@ -407,6 +418,8 @@ export type UpdateSupporterInput = {
 export type UpdateUnitInput = {
   block?: string | null | undefined;
   number: string;
+  /** Rua (só em condomínios de casas). */
+  street?: string | null | undefined;
 };
 
 export type UpdateUserInput = {
@@ -546,7 +559,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
+export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
 
 export type RefreshSessionMutationVariables = Exact<{
   refreshToken: string;
@@ -563,7 +576,7 @@ export type LogoutMutation = { logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type CompleteOnboardingMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -582,7 +595,7 @@ export type UpdateMyProfileMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type SetMyPhotoMutationVariables = Exact<{
   photo: string;
@@ -810,21 +823,21 @@ export type SendBroadcastMutationVariables = Exact<{
 
 export type SendBroadcastMutation = { sendBroadcast: { id: string, title: string, body: string, audience: BroadcastAudience, targetGroup: UserGroup | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string } };
 
-export type CondominiumFieldsFragment = { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string };
+export type CondominiumFieldsFragment = { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string };
 
 export type CondominiumsQueryVariables = Exact<{
   filter?: CondominiumFilterInput | null | undefined;
 }>;
 
 
-export type CondominiumsQuery = { condominiums: Array<{ id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string }> };
+export type CondominiumsQuery = { condominiums: Array<{ id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string }> };
 
 export type CreateCondominiumMutationVariables = Exact<{
   input: CondominiumInput;
 }>;
 
 
-export type CreateCondominiumMutation = { createCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+export type CreateCondominiumMutation = { createCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
 
 export type UpdateCondominiumMutationVariables = Exact<{
   id: string | number;
@@ -832,7 +845,7 @@ export type UpdateCondominiumMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCondominiumMutation = { updateCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+export type UpdateCondominiumMutation = { updateCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
 
 export type SetCondominiumStatusMutationVariables = Exact<{
   id: string | number;
@@ -840,21 +853,21 @@ export type SetCondominiumStatusMutationVariables = Exact<{
 }>;
 
 
-export type SetCondominiumStatusMutation = { setCondominiumStatus: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+export type SetCondominiumStatusMutation = { setCondominiumStatus: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
 
-export type UnitFieldsFragment = { id: string, block: string, number: string, label: string, residents: number };
+export type UnitFieldsFragment = { id: string, street: string, block: string, number: string, label: string, residents: number };
 
 export type UnitsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UnitsQuery = { units: Array<{ id: string, block: string, number: string, label: string, residents: number }> };
+export type UnitsQuery = { units: Array<{ id: string, street: string, block: string, number: string, label: string, residents: number }> };
 
 export type CreateUnitsMutationVariables = Exact<{
   input: CreateUnitsInput;
 }>;
 
 
-export type CreateUnitsMutation = { createUnits: Array<{ id: string, block: string, number: string, label: string, residents: number }> };
+export type CreateUnitsMutation = { createUnits: Array<{ id: string, street: string, block: string, number: string, label: string, residents: number }> };
 
 export type UpdateUnitMutationVariables = Exact<{
   id: string | number;
@@ -862,7 +875,7 @@ export type UpdateUnitMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUnitMutation = { updateUnit: { id: string, block: string, number: string, label: string, residents: number } };
+export type UpdateUnitMutation = { updateUnit: { id: string, street: string, block: string, number: string, label: string, residents: number } };
 
 export type DeleteUnitMutationVariables = Exact<{
   id: string | number;
@@ -888,7 +901,7 @@ export type EnrollmentFormQueryVariables = Exact<{
 }>;
 
 
-export type EnrollmentFormQuery = { enrollmentForm: { condominiumName: string, units: Array<{ id: string, label: string }> } };
+export type EnrollmentFormQuery = { enrollmentForm: { condominiumName: string, addressFormat: AddressFormat, units: Array<{ id: string, label: string }> } };
 
 export type SubmitEnrollmentMutationVariables = Exact<{
   input: SubmitEnrollmentInput;
@@ -899,7 +912,7 @@ export type SubmitEnrollmentMutation = { submitEnrollment: boolean };
 
 export type EnrollmentInviteFieldsFragment = { id: string, code: string, label: string, expiresAt: string, revokedAt: string | null, createdAt: string, requestCount: number };
 
-export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
+export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
 
 export type EnrollmentInvitesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -926,7 +939,7 @@ export type EnrollmentRequestsQueryVariables = Exact<{
 }>;
 
 
-export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
+export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
 
 export type ApproveEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -935,7 +948,7 @@ export type ApproveEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
+export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
 
 export type RejectEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -943,7 +956,7 @@ export type RejectEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
+export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -1295,6 +1308,7 @@ export const CondominiumFieldsFragmentDoc = new TypedDocumentString(`
   city
   state
   status
+  addressFormat
   activeMembers
   managers
   units
@@ -1306,6 +1320,7 @@ export const CondominiumFieldsFragmentDoc = new TypedDocumentString(`
 export const UnitFieldsFragmentDoc = new TypedDocumentString(`
     fragment UnitFields on Unit {
   id
+  street
   block
   number
   label
@@ -1337,6 +1352,7 @@ export const EnrollmentRequestFieldsFragmentDoc = new TypedDocumentString(`
   typedUnitLabel
   typedUnitBlock
   typedUnitNumber
+  typedUnitStreet
   createdAt
   reviewedAt
   rejectionReason
@@ -1694,6 +1710,7 @@ export const LoginDocument = new TypedDocumentString(`
         city
         state
         status
+        addressFormat
       }
       condominiums {
         id
@@ -1741,6 +1758,7 @@ export const MeDocument = new TypedDocumentString(`
       city
       state
       status
+      addressFormat
     }
     condominiums {
       id
@@ -1782,6 +1800,7 @@ export const UpdateMyProfileDocument = new TypedDocumentString(`
       city
       state
       status
+      addressFormat
     }
     condominiums {
       id
@@ -2313,6 +2332,7 @@ export const CondominiumsDocument = new TypedDocumentString(`
   city
   state
   status
+  addressFormat
   activeMembers
   managers
   units
@@ -2333,6 +2353,7 @@ export const CreateCondominiumDocument = new TypedDocumentString(`
   city
   state
   status
+  addressFormat
   activeMembers
   managers
   units
@@ -2353,6 +2374,7 @@ export const UpdateCondominiumDocument = new TypedDocumentString(`
   city
   state
   status
+  addressFormat
   activeMembers
   managers
   units
@@ -2373,6 +2395,7 @@ export const SetCondominiumStatusDocument = new TypedDocumentString(`
   city
   state
   status
+  addressFormat
   activeMembers
   managers
   units
@@ -2388,6 +2411,7 @@ export const UnitsDocument = new TypedDocumentString(`
 }
     fragment UnitFields on Unit {
   id
+  street
   block
   number
   label
@@ -2401,6 +2425,7 @@ export const CreateUnitsDocument = new TypedDocumentString(`
 }
     fragment UnitFields on Unit {
   id
+  street
   block
   number
   label
@@ -2414,6 +2439,7 @@ export const UpdateUnitDocument = new TypedDocumentString(`
 }
     fragment UnitFields on Unit {
   id
+  street
   block
   number
   label
@@ -2447,6 +2473,7 @@ export const EnrollmentFormDocument = new TypedDocumentString(`
     query EnrollmentForm($formToken: String!) {
   enrollmentForm(formToken: $formToken) {
     condominiumName
+    addressFormat
     units {
       id
       label
@@ -2530,6 +2557,7 @@ export const EnrollmentRequestsDocument = new TypedDocumentString(`
   typedUnitLabel
   typedUnitBlock
   typedUnitNumber
+  typedUnitStreet
   createdAt
   reviewedAt
   rejectionReason
@@ -2585,6 +2613,7 @@ fragment EnrollmentRequestFields on EnrollmentRequest {
   typedUnitLabel
   typedUnitBlock
   typedUnitNumber
+  typedUnitStreet
   createdAt
   reviewedAt
   rejectionReason
@@ -2610,6 +2639,7 @@ export const RejectEnrollmentRequestDocument = new TypedDocumentString(`
   typedUnitLabel
   typedUnitBlock
   typedUnitNumber
+  typedUnitStreet
   createdAt
   reviewedAt
   rejectionReason

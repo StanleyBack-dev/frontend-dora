@@ -18,6 +18,8 @@ export const enrollmentDataSchema = z.object({
   // Only when the condominium has no units (absent: keeps what was typed).
   unitBlock: z.string().trim().max(30).nullish(),
   unitNumber: z.string().trim().max(20).nullish(),
+  // Houses: the street (with the quadra and the lote above).
+  unitStreet: z.string().trim().max(80).nullish(),
 });
 
 export const submitEnrollmentSchema = z.object({

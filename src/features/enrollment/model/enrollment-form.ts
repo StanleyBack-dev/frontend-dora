@@ -1,4 +1,5 @@
 import type { Tone } from "@/design-system";
+import type { AddressFormat } from "@/shared/contracts/condominiums";
 import type {
   EnrollmentApplicant,
   EnrollmentData,
@@ -17,9 +18,12 @@ export type EnrollmentForm = {
   unitId: string;
   /** "casa dos fundos" (optional). */
   unitComplement: string;
-  /** Typed when the condominium has no units registered. */
+  /** Typed when the condominium has no units registered; houses: quadra. */
   unitBlock: string;
+  /** Houses: the lote. */
   unitNumber: string;
+  /** Houses: the street. */
+  unitStreet: string;
 };
 
 export const EMPTY_ENROLLMENT: EnrollmentForm = {
@@ -31,19 +35,28 @@ export const EMPTY_ENROLLMENT: EnrollmentForm = {
   unitComplement: "",
   unitBlock: "",
   unitNumber: "",
+  unitStreet: "",
 };
 
 /**
  * How the form asks where the person lives: from the list, typed (no units
- * registered) or not at all (employees don't live there).
+ * registered), as a house (street, quadra and lote, always typed) or not at
+ * all (employees don't live there).
  */
-export type UnitMode = "list" | "typed" | "none";
+export type UnitMode = "list" | "typed" | "house" | "none";
 
 export const unitModeFor = (
   units: readonly unknown[],
   applicant: EnrollmentApplicant = "RESIDENT",
+  addressFormat: AddressFormat = "APARTMENT",
 ): UnitMode =>
-  applicant === "EMPLOYEE" ? "none" : units.length > 0 ? "list" : "typed";
+  applicant === "EMPLOYEE"
+    ? "none"
+    : addressFormat === "HOUSE"
+      ? "house"
+      : units.length > 0
+        ? "list"
+        : "typed";
 
 export const APPLICANT_LABELS: Record<EnrollmentApplicant, string> = {
   RESIDENT: "Morador",
@@ -59,6 +72,7 @@ export const fromRequest = (request: EnrollmentRequest): EnrollmentForm => ({
   unitComplement: request.unitComplement ?? "",
   unitBlock: request.typedUnitBlock ?? "",
   unitNumber: request.typedUnitNumber ?? "",
+  unitStreet: request.typedUnitStreet ?? "",
 });
 
 export type EnrollmentErrors = Partial<Record<keyof EnrollmentForm, string>>;
@@ -71,6 +85,21 @@ export function enrollmentErrors(
 ): EnrollmentErrors {
   const errors: EnrollmentErrors = {};
   if (mode === "list" && !form.unitId) errors.unitId = "Escolha a sua unidade.";
+  if (mode === "house") {
+    const street = form.unitStreet.trim();
+    if (!street) errors.unitStreet = "Informe a rua.";
+    else if (street.length < 2 || street.length > 80) {
+      errors.unitStreet = "A rua tem de 2 a 80 caracteres.";
+    }
+    if (!form.unitBlock.trim()) errors.unitBlock = "Informe a quadra.";
+    else if (form.unitBlock.trim().length > 30) {
+      errors.unitBlock = "Use até 30 caracteres.";
+    }
+    if (!form.unitNumber.trim()) errors.unitNumber = "Informe o lote.";
+    else if (form.unitNumber.trim().length > 20) {
+      errors.unitNumber = "Use até 20 caracteres.";
+    }
+  }
   if (mode === "typed") {
     if (!form.unitNumber.trim()) {
       errors.unitNumber = "Informe o número da casa ou do apartamento.";
@@ -112,6 +141,13 @@ export const toEnrollmentData = (
   ...(mode === "typed"
     ? {
         unitBlock: form.unitBlock.trim() || null,
+        unitNumber: form.unitNumber.trim(),
+      }
+    : {}),
+  ...(mode === "house"
+    ? {
+        unitStreet: form.unitStreet.trim(),
+        unitBlock: form.unitBlock.trim(),
         unitNumber: form.unitNumber.trim(),
       }
     : {}),

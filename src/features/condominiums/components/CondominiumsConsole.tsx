@@ -56,7 +56,18 @@ const STATES = [
   "TO",
 ];
 
-const EMPTY: CondominiumInput = { name: "", document: "", city: "", state: "" };
+const EMPTY: CondominiumInput = {
+  name: "",
+  document: "",
+  city: "",
+  state: "",
+  addressFormat: "APARTMENT",
+};
+
+const ADDRESS_FORMATS = [
+  { value: "APARTMENT", label: "Apartamentos (bloco e número)" },
+  { value: "HOUSE", label: "Casas (rua, quadra e lote)" },
+];
 
 type Editing = { mode: "create" } | { mode: "edit"; condominium: Condominium };
 
@@ -99,6 +110,7 @@ export function CondominiumsConsole({
       document: condominium.document ? maskCnpj(condominium.document) : "",
       city: condominium.city,
       state: condominium.state,
+      addressFormat: condominium.addressFormat,
     });
     setEditing({ mode: "edit", condominium });
   }
@@ -354,6 +366,24 @@ export function CondominiumsConsole({
               onChange={(event) => set("state", event.target.value)}
               options={STATES.map((state) => ({ value: state, label: state }))}
             />
+          </div>
+          <div>
+            <Select
+              label="Endereço das moradias"
+              required
+              value={form.addressFormat ?? "APARTMENT"}
+              onChange={(event) =>
+                set(
+                  "addressFormat",
+                  event.target.value as CondominiumInput["addressFormat"],
+                )
+              }
+              options={ADDRESS_FORMATS}
+            />
+            <p className="mt-1.5 text-xs text-soft">
+              Casas: no cadastro, o morador digita rua, quadra e lote (sem lista
+              de unidades).
+            </p>
           </div>
           {creating && (
             <p className="text-xs text-soft">
