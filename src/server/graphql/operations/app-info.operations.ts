@@ -5,6 +5,7 @@ export const appInfoDocument = graphql(`
     appInfo {
       version
       commit
+      deployedAt
     }
   }
 `);
