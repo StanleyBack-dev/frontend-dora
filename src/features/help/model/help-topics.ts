@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CircleHelp,
   CircleUserRound,
+  DoorOpen,
   House,
   LifeBuoy,
   MapPin,
@@ -116,6 +117,9 @@ export const HELP_TOPICS: HelpTopic[] = [
       rules: [
         {
           text: "As regras de reserva (antecedência, limite por unidade, prazo para cancelar e aprovação) valem para as próximas reservas.",
+        },
+        {
+          text: "Em “Taxa, convidados e recorrência”, defina se o espaço é pago (e o valor por reserva), se aceita lista de convidados (com limite e documento) e se moradores podem reservar toda semana. A taxa fica gravada em cada reserva: mudar o valor não altera as já feitas.",
           only: ["SPACES_MANAGE"],
         },
       ],
@@ -134,7 +138,19 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Toque em “Nova reserva”, escolha o espaço, o dia e um horário livre e confirme. Espaços com aprovação guardam o horário até a administração decidir.",
         },
         {
-          text: "Na grade, horários em cinza já estão reservados, bloqueados ou fora do prazo.",
+          text: "Na grade, horários em vermelho já têm reserva, os seus ficam em laranja e os cinza estão bloqueados ou fora do prazo.",
+        },
+        {
+          text: "Toque num horário reservado para entrar na lista de espera: se ele for liberado, todos da lista são avisados e quem reservar primeiro fica com ele.",
+          only: ["BOOKINGS_CREATE"],
+        },
+        {
+          text: "Ao confirmar, marque “Repetir toda semana” para reservar o mesmo horário por 2 a 26 semanas (quando o espaço permite). Datas ocupadas são puladas e informadas.",
+          only: ["BOOKINGS_CREATE"],
+        },
+        {
+          text: "Em espaços com lista de convidados, use “Convidados” na reserva: cada convidado recebe o próprio convite com QR code; envie um por um pelo WhatsApp ou todos numa mensagem só.",
+          only: ["BOOKINGS_CREATE"],
         },
         {
           text: "Na tela de reserva do espaço, use “Bloquear período” para fechá-lo numa manutenção ou evento; se houver reservas no período, você confirma o cancelamento e os moradores são avisados.",
@@ -144,7 +160,11 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Em “Próximas”, veja as reservas marcadas e cancele se precisar.",
         },
         {
-          text: "Em “Gestão”, veja todas as reservas do condomínio, aprove ou recuse as pendentes (com motivo) e cancele quando necessário.",
+          text: "Em “Gestão”, veja todas as reservas do condomínio, aprove ou recuse as pendentes (com motivo), veja os convidados e cancele quando necessário.",
+          only: ["BOOKINGS_MANAGE"],
+        },
+        {
+          text: "Em “Taxas”, veja as taxas de uso do mês por unidade, marque as que já foram lançadas na cobrança do condomínio e exporte a planilha.",
           only: ["BOOKINGS_MANAGE"],
         },
       ],
@@ -154,6 +174,9 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
         {
           text: "O limite de reservas é por unidade: vale para todos os moradores da mesma unidade.",
+        },
+        {
+          text: "Espaços pagos têm uma taxa por reserva, mostrada antes de confirmar. Reservas canceladas ou recusadas não são cobradas.",
         },
       ],
       notices: [
@@ -328,6 +351,36 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
         {
           text: "Unidade, complemento e papel valem só para este condomínio.",
+        },
+      ],
+    },
+  },
+  {
+    id: "portaria",
+    href: "/portaria",
+    title: "Portaria",
+    icon: DoorOpen,
+    permission: "GUESTS_CHECKIN",
+    area: "main",
+    tour: "Os convidados das reservas de hoje: confira o código do convite e libere a entrada.",
+    sections: {
+      howto: [
+        {
+          text: "Leia o QR do convite (ou digite o código de 8 letras e números) e toque em “Liberar entrada”: a entrada daquele convidado é registrada na hora. Confira o documento, se houver.",
+        },
+        {
+          text: "Sem o convite em mãos, use a lista do dia: busque pelo nome, documento, unidade ou código e toque em “Liberar entrada”. Ela se atualiza sozinha a cada minuto.",
+        },
+        {
+          text: "Liberou a pessoa errada? Toque na seta ao lado de “Entrou às…” para desfazer.",
+        },
+      ],
+      rules: [
+        {
+          text: "A entrada é liberada a partir de 3 horas antes da reserva, até o fim dela. Convites de reservas canceladas não valem.",
+        },
+        {
+          text: "A Portaria vê só os convidados do condomínio e não faz reservas.",
         },
       ],
     },

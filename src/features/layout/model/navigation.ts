@@ -5,6 +5,8 @@ import {
   ChartColumn,
   CircleHelp,
   CircleUserRound,
+  DoorOpen,
+  HeartHandshake,
   House,
   MapPin,
   LifeBuoy,
@@ -46,8 +48,20 @@ export const PRIMARY_NAV: NavItem[] = [
     icon: ChartColumn,
     permission: "CONDOMINIUMS_MANAGE",
   },
-  // Everyone in a condominium books (Reservas shows each space's rules).
-  { href: "/reservas", label: "Reservas", icon: CalendarDays },
+  // Whoever books or manages bookings (not the gate staff).
+  {
+    href: "/reservas",
+    label: "Reservas",
+    icon: CalendarDays,
+    anyPermission: ["BOOKINGS_CREATE", "BOOKINGS_MANAGE"],
+  },
+  // The day's guests at the gate: the gate staff and the managers.
+  {
+    href: "/portaria",
+    label: "Portaria",
+    icon: DoorOpen,
+    permission: "GUESTS_CHECKIN",
+  },
   // The spaces themselves: only whoever manages them.
   {
     href: "/espacos",
@@ -87,6 +101,13 @@ export const ACCOUNT_NAV: NavItem[] = [
   // Everyone: how to use each menu, by their permissions.
   { href: "/ajuda", label: "Ajuda", icon: CircleHelp },
 ];
+
+/** Contributions to the project (PIX): only when it is configured. */
+export const SUPPORT_PROJECT_NAV: NavItem = {
+  href: "/apoiar",
+  label: "Apoie o Dora",
+  icon: HeartHandshake,
+};
 
 /** Admin area: shown when the user has any of its permissions. */
 export const ADMIN_NAV: NavItem = {

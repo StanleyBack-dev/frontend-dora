@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarX2, Check, X } from "lucide-react";
+import { CalendarX2, Check, Repeat, Users, Wallet, X } from "lucide-react";
 import {
   Badge,
   Button,
@@ -12,12 +12,14 @@ import {
   type DataTableColumn,
 } from "@/design-system";
 import { bookingsClient } from "@/features/bookings/api/bookings.client";
+import { GuestsDrawer } from "@/features/bookings/components/GuestsDrawer";
 import {
   BOOKING_STATUS,
   formatBookingPeriod,
 } from "@/features/bookings/model/booking-labels";
 import type { Booking } from "@/shared/contracts/bookings";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { formatCents } from "@/shared/lib/format";
 import { useToast } from "@/shared/toast/useToast";
 
 type Action = { kind: "approve" | "reject" | "cancel"; booking: Booking };
@@ -29,7 +31,8 @@ const TITLES: Record<Action["kind"], string> = {
 };
 
 // Every booking of the condominium for managers: approve or reject the
-// pending ones, cancel any active one (the booker is told, with the reason).
+// pending ones, cancel any active one (the booker is told, with the reason)
+// and see or change its guest list.
 export function BookingsManageTable({
   bookings,
   now,
@@ -42,6 +45,7 @@ export function BookingsManageTable({
   const [action, setAction] = useState<Action | null>(null);
   const [reason, setReason] = useState("");
   const [pending, setPending] = useState(false);
+  const [guestsOf, setGuestsOf] = useState<Booking | null>(null);
 
   function open(kind: Action["kind"], booking: Booking) {
     setReason("");
@@ -89,7 +93,27 @@ export function BookingsManageTable({
       key: "space",
       label: "Espaço",
       mobile: "subtitle",
-      render: (booking) => booking.spaceName,
+      render: (booking) => (
+        <span className="flex flex-col">
+          <span>{booking.spaceName}</span>
+          {(booking.feeCents !== null || booking.seriesId) && (
+            <span className="flex flex-wrap gap-x-2 text-xs text-soft">
+              {booking.feeCents !== null && (
+                <span className="inline-flex items-center gap-1">
+                  <Wallet aria-hidden className="size-3" />
+                  {formatCents(booking.feeCents)}
+                </span>
+              )}
+              {booking.seriesId && (
+                <span className="inline-flex items-center gap-1">
+                  <Repeat aria-hidden className="size-3" />
+                  semanal
+                </span>
+              )}
+            </span>
+          )}
+        </span>
+      ),
     },
     {
       key: "who",
@@ -126,39 +150,53 @@ export function BookingsManageTable({
         const active =
           booking.status === "PENDING" || booking.status === "CONFIRMED";
         const running = new Date(booking.endsAt).getTime() > now;
-        if (!active || !running) return null;
+        if (!active) return null;
         return (
           <div className="flex flex-wrap justify-end gap-2">
-            {booking.status === "PENDING" &&
-              new Date(booking.startsAt).getTime() > now && (
-                <>
-                  <Button
-                    size="sm"
-                    variant="brand"
-                    icon={<Check className="size-4" />}
-                    onClick={() => open("approve", booking)}
-                  >
-                    Aprovar
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    icon={<X className="size-4" />}
-                    onClick={() => open("reject", booking)}
-                  >
-                    Recusar
-                  </Button>
-                </>
-              )}
-            {booking.status === "CONFIRMED" && (
+            {booking.guestsAllowed && (
               <Button
                 size="sm"
                 variant="ghost"
-                icon={<CalendarX2 className="size-4" />}
-                onClick={() => open("cancel", booking)}
+                icon={<Users className="size-4" />}
+                onClick={() => setGuestsOf(booking)}
               >
-                Cancelar
+                Convidados
               </Button>
+            )}
+            {running && (
+              <>
+                {booking.status === "PENDING" &&
+                  new Date(booking.startsAt).getTime() > now && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="brand"
+                        icon={<Check className="size-4" />}
+                        onClick={() => open("approve", booking)}
+                      >
+                        Aprovar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        icon={<X className="size-4" />}
+                        onClick={() => open("reject", booking)}
+                      >
+                        Recusar
+                      </Button>
+                    </>
+                  )}
+                {booking.status === "CONFIRMED" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    icon={<CalendarX2 className="size-4" />}
+                    onClick={() => open("cancel", booking)}
+                  >
+                    Cancelar
+                  </Button>
+                )}
+              </>
             )}
           </div>
         );
@@ -171,6 +209,18 @@ export function BookingsManageTable({
   return (
     <>
       <DataTable rows={bookings} columns={columns} getId={(item) => item.id} />
+      {guestsOf && (
+        <GuestsDrawer
+          open
+          onClose={() => setGuestsOf(null)}
+          booking={{
+            id: guestsOf.id,
+            spaceName: guestsOf.spaceName,
+            period: formatBookingPeriod(guestsOf),
+          }}
+          editable={new Date(guestsOf.endsAt).getTime() > now}
+        />
+      )}
       <Modal
         open={action !== null}
         onClose={() => setAction(null)}

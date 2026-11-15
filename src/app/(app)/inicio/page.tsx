@@ -8,6 +8,7 @@ import {
   ChartColumn,
   CalendarClock,
   CircleUserRound,
+  DoorOpen,
   LifeBuoy,
   Megaphone,
 } from "lucide-react";
@@ -144,12 +145,19 @@ export default async function HomePage() {
           Acesso rápido
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
-          {condominium ? (
+          {condominium && can(user, "BOOKINGS_CREATE") ? (
             <Shortcut
               href="/reservas/nova"
               icon={<CalendarClock aria-hidden />}
               title="Reservar"
               description="Quadras, salão de festas e outros espaços do condomínio."
+            />
+          ) : condominium && can(user, "GUESTS_CHECKIN") ? (
+            <Shortcut
+              href="/portaria"
+              icon={<DoorOpen aria-hidden />}
+              title="Portaria"
+              description="Os convidados das reservas de hoje e a liberação da entrada."
             />
           ) : (
             <Card className="flex h-full flex-col gap-4 border-dashed bg-surface-muted p-5 shadow-none">

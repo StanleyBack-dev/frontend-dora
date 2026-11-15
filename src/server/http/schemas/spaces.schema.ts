@@ -39,6 +39,13 @@ export const spaceInputSchema = z.object({
       .nullable(),
     requiresApproval: z.boolean(),
     cancelUntilHours: int,
+    feeCents: int.nullable(),
+    guests: z.object({
+      allowed: z.boolean(),
+      max: int.nullable(),
+      documentRequired: z.boolean(),
+    }),
+    recurringAllowed: z.boolean(),
   }),
 });
 

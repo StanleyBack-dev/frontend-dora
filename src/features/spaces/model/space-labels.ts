@@ -1,3 +1,4 @@
+import { formatCents } from "@/shared/lib/format";
 import {
   Dumbbell,
   Flame,
@@ -132,6 +133,22 @@ export function describeRules(rules: SpaceRules): string[] {
   );
   if (rules.requiresApproval) {
     lines.push("Cada reserva passa pela aprovação da administração");
+  }
+  lines.push(
+    rules.feeCents !== null
+      ? `Taxa de uso de ${formatCents(rules.feeCents)} por reserva, lançada na cobrança do condomínio`
+      : "Sem taxa de uso",
+  );
+  if (rules.guests.allowed) {
+    const limit = rules.guests.max
+      ? `até ${plural(rules.guests.max, "convidado", "convidados")}`
+      : "convidados";
+    lines.push(
+      `Aceita lista de ${limit}, liberados pela portaria${rules.guests.documentRequired ? " (com documento)" : ""}`,
+    );
+  }
+  if (rules.recurringAllowed) {
+    lines.push("Pode reservar o mesmo horário toda semana");
   }
   return lines;
 }

@@ -3,7 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CalendarCheck, Lock, ShieldCheck } from "lucide-react";
+import {
+  BellRing,
+  CalendarCheck,
+  Lock,
+  Repeat,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
 import {
   Alert,
   Button,
@@ -11,6 +18,7 @@ import {
   CardBody,
   CardHeader,
   Modal,
+  Select,
   Spinner,
   TextArea,
   cn,
@@ -27,6 +35,7 @@ import type {
 } from "@/shared/contracts/bookings";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { dateParts, formatLongDay } from "@/shared/lib/datetime";
+import { formatCents } from "@/shared/lib/format";
 import { useToast } from "@/shared/toast/useToast";
 
 type Props = {
@@ -35,11 +44,19 @@ type Props = {
     name: string;
     usageRules: string | null;
     requiresApproval: boolean;
+    /** Usage fee per booking, in cents (null: free). */
+    feeCents: number | null;
+    guestsAllowed: boolean;
   };
   initial: SpaceAvailability;
   /** BOOKINGS_CREATE: may book (otherwise the grid is read-only). */
   canBook: boolean;
+  /** May book weekly (the space allows it, or a manager). */
+  canRepeat: boolean;
 };
+
+/** 2 … 26 weeks for a weekly booking. */
+const WEEK_OPTIONS = Array.from({ length: 25 }, (_, i) => i + 2);
 
 // The person's own bookings in the app's orange, someone else's in dark red.
 // Free ones stay neutral (the hover only outlines them).
@@ -68,7 +85,7 @@ const SLOT_HINT: Record<AvailabilitySlot["state"], string> = {
 
 // The booking calendar of a space: pick a day, then a free slot. Taken and
 // blocked slots stay visible so people understand the day at a glance.
-export function BookingCalendar({ space, initial, canBook }: Props) {
+export function BookingCalendar({ space, initial, canBook, canRepeat }: Props) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
   const [availability, setAvailability] = useState(initial);
@@ -77,6 +94,10 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
   const [notes, setNotes] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [pending, setPending] = useState(false);
+  const [repeat, setRepeat] = useState(false);
+  const [weeks, setWeeks] = useState(4);
+  // A taken slot: offer the waiting list.
+  const [waitSlot, setWaitSlot] = useState<AvailabilitySlot | null>(null);
 
   const dates = datesBetween(availability.firstDate, availability.lastDate);
   const strip = useRef<HTMLDivElement>(null);
@@ -109,13 +130,69 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
   function choose(slot: AvailabilitySlot) {
     setChosen(slot);
     setNotes("");
+    setRepeat(false);
     setAccepted(!space.usageRules);
+  }
+
+  async function toggleWaitlist() {
+    if (!waitSlot) return;
+    setPending(true);
+    try {
+      if (waitSlot.waitlisted) {
+        await bookingsClient.leaveWaitlist(space.id, waitSlot.startsAt);
+        showSuccess("Você saiu da lista de espera.");
+      } else {
+        await bookingsClient.joinWaitlist(space.id, waitSlot.startsAt);
+        showSuccess(
+          "Você está na lista de espera.",
+          "Se o horário for liberado, você recebe um aviso. Quem reservar primeiro fica com ele.",
+        );
+      }
+      setWaitSlot(null);
+      await load(availability.date);
+    } catch (cause) {
+      showError(
+        cause instanceof ApiClientError
+          ? cause.message
+          : "Não foi possível atualizar a lista de espera.",
+      );
+    }
+    setPending(false);
+  }
+
+  async function bookSeries(slot: AvailabilitySlot) {
+    const result = await bookingsClient.createSeries({
+      spaceId: space.id,
+      startsAt: slot.startsAt,
+      weeks,
+      notes: notes.trim() || null,
+    });
+    const created = result.created.length;
+    const pendingApproval = result.created[0]?.status === "PENDING";
+    showSuccess(
+      pendingApproval
+        ? `${created} reservas semanais enviadas para aprovação.`
+        : `${created} reservas semanais confirmadas!`,
+      result.skipped.length > 0
+        ? `${result.skipped.length} data${result.skipped.length === 1 ? " não pôde" : "s não puderam"} ser reservada${result.skipped.length === 1 ? "" : "s"}: ${result.skipped
+            .map((item) => `${formatLongDay(item.startsAt)} (${item.reason})`)
+            .join("; ")}`
+        : "Todas as datas foram reservadas.",
+    );
   }
 
   async function book() {
     if (!chosen) return;
     setPending(true);
     try {
+      if (repeat) {
+        await bookSeries(chosen);
+        setChosen(null);
+        await load(availability.date);
+        router.refresh();
+        setPending(false);
+        return;
+      }
       const booking = await bookingsClient.create({
         spaceId: space.id,
         startsAt: chosen.startsAt,
@@ -127,7 +204,9 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
           : "Reserva confirmada!",
         booking.status === "PENDING"
           ? "Você recebe um aviso quando a administração decidir."
-          : "O convite para a agenda do celular chega no seu e-mail.",
+          : space.guestsAllowed
+            ? "Adicione os convidados em Reservas: cada um recebe um convite com QR code."
+            : "O convite para a agenda do celular chega no seu e-mail.",
       );
       setChosen(null);
       await load(availability.date);
@@ -231,13 +310,19 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
                 )}
               >
                 {availability.slots.map((slot) => {
-                  const clickable = slot.state === "FREE" && canBook;
+                  const clickable =
+                    canBook &&
+                    (slot.state === "FREE" || slot.state === "TAKEN");
                   return (
                     <button
                       key={slot.startsAt}
                       type="button"
                       disabled={!clickable}
-                      onClick={() => choose(slot)}
+                      onClick={() =>
+                        slot.state === "TAKEN"
+                          ? setWaitSlot(slot)
+                          : choose(slot)
+                      }
                       title={slot.label ?? undefined}
                       className={cn(
                         "flex min-w-0 flex-col items-start rounded-xl border px-3 py-2.5 text-left transition-colors disabled:cursor-default",
@@ -251,10 +336,15 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
                         {slot.state === "BLOCKED" && (
                           <Lock aria-hidden className="size-3" />
                         )}
+                        {slot.waitlisted && (
+                          <BellRing aria-hidden className="size-3" />
+                        )}
                         {slot.state === "MINE" &&
                         slot.bookingStatus === "PENDING"
                           ? "Sua · aguardando"
-                          : SLOT_HINT[slot.state]}
+                          : slot.waitlisted
+                            ? "Reservado · na fila"
+                            : SLOT_HINT[slot.state]}
                       </span>
                       {slot.label && slot.state !== "FREE" && (
                         <span className="mt-0.5 line-clamp-1 text-[11px] opacity-80">
@@ -310,7 +400,11 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
               loading={pending}
               disabled={!accepted}
             >
-              {space.requiresApproval ? "Enviar para aprovação" : "Reservar"}
+              {space.requiresApproval
+                ? "Enviar para aprovação"
+                : repeat
+                  ? `Reservar ${weeks} semanas`
+                  : "Reservar"}
             </Button>
           </>
         }
@@ -328,6 +422,55 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
                 {formatSlot(chosen.startsAt, chosen.endsAt)}
               </p>
             </div>
+            {space.feeCents !== null && (
+              <p className="flex items-start gap-2 rounded-xl border border-border p-3 text-sm text-fg">
+                <Wallet
+                  aria-hidden
+                  className="mt-0.5 size-4 shrink-0 text-soft"
+                />
+                <span>
+                  Taxa de uso de <strong>{formatCents(space.feeCents)}</strong>
+                  {repeat ? " por semana" : ""}, lançada na cobrança do
+                  condomínio.
+                </span>
+              </p>
+            )}
+            {canRepeat && (
+              <div
+                className={cn(
+                  "rounded-xl border border-border p-3",
+                  repeat && "bg-surface-muted",
+                )}
+              >
+                <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-fg">
+                  <input
+                    type="checkbox"
+                    className="size-4 accent-[var(--brand)]"
+                    checked={repeat}
+                    onChange={(event) => setRepeat(event.target.checked)}
+                  />
+                  <Repeat aria-hidden className="size-4 text-soft" />
+                  Repetir toda semana neste horário
+                </label>
+                {repeat && (
+                  <div className="mt-3 sm:max-w-48">
+                    <Select
+                      label="Por quantas semanas"
+                      value={String(weeks)}
+                      onChange={(event) => setWeeks(Number(event.target.value))}
+                      options={WEEK_OPTIONS.map((value) => ({
+                        value: String(value),
+                        label: `${value} semanas`,
+                      }))}
+                    />
+                    <p className="mt-1.5 text-xs text-soft">
+                      Datas já ocupadas ou fora das regras são puladas e
+                      informadas no fim.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
             {space.requiresApproval && (
               <Alert tone="info">
                 <ShieldCheck aria-hidden className="mr-1 inline size-4" />
@@ -360,6 +503,48 @@ export function BookingCalendar({ space, initial, canBook }: Props) {
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
             />
+          </div>
+        )}
+      </Modal>
+
+      <Modal
+        open={waitSlot !== null}
+        onClose={() => setWaitSlot(null)}
+        title={waitSlot?.waitlisted ? "Lista de espera" : "Horário reservado"}
+        busy={pending}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => setWaitSlot(null)}
+              disabled={pending}
+            >
+              Voltar
+            </Button>
+            <Button
+              variant={waitSlot?.waitlisted ? "secondary" : "brand"}
+              onClick={toggleWaitlist}
+              loading={pending}
+              icon={<BellRing className="size-4" />}
+            >
+              {waitSlot?.waitlisted
+                ? "Sair da lista de espera"
+                : "Entrar na lista de espera"}
+            </Button>
+          </>
+        }
+      >
+        {waitSlot && (
+          <div className="space-y-3 text-sm text-muted">
+            <p className="font-semibold text-fg capitalize">
+              {formatLongDay(waitSlot.startsAt)} ·{" "}
+              {formatSlot(waitSlot.startsAt, waitSlot.endsAt)}
+            </p>
+            <p>
+              {waitSlot.waitlisted
+                ? "Você já está na lista de espera deste horário. Se ele for liberado, você recebe um aviso no app e no e-mail."
+                : "Este horário já tem reserva. Entre na lista de espera: se a reserva for cancelada ou recusada, todos da lista recebem um aviso, e quem reservar primeiro fica com o horário."}
+            </p>
           </div>
         )}
       </Modal>

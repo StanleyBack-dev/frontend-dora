@@ -13,6 +13,15 @@ export type OpeningHours = {
 
 export type UnitLimit = { count: number; period: LimitPeriod };
 
+/** Who may come with the person who booked. */
+export type GuestRules = {
+  allowed: boolean;
+  /** Most guests per booking (null: no limit besides the capacity). */
+  max: number | null;
+  /** The gate needs each guest's document. */
+  documentRequired: boolean;
+};
+
 /** Booking rules of a space (enforced when residents book). */
 export type SpaceRules = {
   openingHours: OpeningHours[];
@@ -22,6 +31,11 @@ export type SpaceRules = {
   unitLimit: UnitLimit | null;
   requiresApproval: boolean;
   cancelUntilHours: number;
+  /** Usage fee per booking, in cents (null: free). */
+  feeCents: number | null;
+  guests: GuestRules;
+  /** Residents may book the same slot every week. */
+  recurringAllowed: boolean;
 };
 
 /** A photo of a space: a short-lived signed link. */

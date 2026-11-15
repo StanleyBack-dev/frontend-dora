@@ -45,6 +45,7 @@ import {
 import {
   ACCOUNT_NAV,
   ADMIN_NAV,
+  SUPPORT_PROJECT_NAV,
   canSee,
   isActive,
   PRIMARY_NAV,
@@ -186,6 +187,7 @@ function TabLink({
 export function AppShell({
   user,
   showAdmin,
+  showSupportProject = false,
   unreadNotifications,
   children,
 }: {
@@ -201,6 +203,8 @@ export function AppShell({
     | "condominiums"
   >;
   showAdmin: boolean;
+  /** "Apoie o Dora" in the Conta menu (only when PIX is configured). */
+  showSupportProject?: boolean;
   /** Server-side count; the bell keeps it fresh afterwards. */
   unreadNotifications: number;
   children: ReactNode;
@@ -238,7 +242,11 @@ export function AppShell({
   );
 
   const primary = PRIMARY_NAV.filter((item) => canSee(item, user.permissions));
-  const account = showAdmin ? [...ACCOUNT_NAV, ADMIN_NAV] : ACCOUNT_NAV;
+  const account = [
+    ...ACCOUNT_NAV,
+    ...(showSupportProject ? [SUPPORT_PROJECT_NAV] : []),
+    ...(showAdmin ? [ADMIN_NAV] : []),
+  ];
   const accountActive = account.some((item) => isActive(pathname, item));
 
   // Pin the page behind the open mobile drawer: on iOS only `position:

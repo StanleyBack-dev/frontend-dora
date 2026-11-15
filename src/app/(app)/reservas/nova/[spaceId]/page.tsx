@@ -71,9 +71,14 @@ export default async function BookSpacePage({
             name: space.name,
             usageRules: space.usageRules,
             requiresApproval: space.rules.requiresApproval,
+            feeCents: space.rules.feeCents,
+            guestsAllowed: space.rules.guests.allowed,
           }}
           initial={availability}
           canBook={can(user, "BOOKINGS_CREATE")}
+          canRepeat={
+            space.rules.recurringAllowed || can(user, "BOOKINGS_MANAGE")
+          }
         />
 
         <div className="min-w-0 space-y-6 self-start">

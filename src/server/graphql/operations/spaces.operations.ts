@@ -30,6 +30,13 @@ export const spaceFieldsFragment = graphql(`
       }
       requiresApproval
       cancelUntilHours
+      feeCents
+      guests {
+        allowed
+        max
+        documentRequired
+      }
+      recurringAllowed
     }
   }
 `);

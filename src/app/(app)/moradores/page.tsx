@@ -35,7 +35,7 @@ export const metadata: Metadata = { title: "Moradores" };
 
 const STATUSES = ["ativos", "desativados"] as const;
 // Roles inside a condominium.
-const ROLES = ["USER", "ADMIN"] as const;
+const ROLES = ["USER", "ADMIN", "CONCIERGE"] as const;
 
 export default async function UsersPage({
   searchParams,

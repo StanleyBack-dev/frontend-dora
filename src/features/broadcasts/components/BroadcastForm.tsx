@@ -16,12 +16,13 @@ import { ApiClientError } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
 /** Roles inside the condominium that can receive an announcement. */
-const ROLES: UserGroup[] = ["USER", "ADMIN"];
+const ROLES: UserGroup[] = ["USER", "ADMIN", "CONCIERGE"];
 
 /** "Moradores", "Gestores"…: how a group reads as recipients. */
 const GROUP_AUDIENCE: Record<UserGroup, string> = {
   USER: "os moradores",
   ADMIN: "os gestores",
+  CONCIERGE: "a portaria",
   ADMIN_MASTER: "os administradores gerais",
 };
 

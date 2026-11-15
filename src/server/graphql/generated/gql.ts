@@ -40,10 +40,10 @@ type Documents = {
     "\n  mutation VerifyPasswordRecoveryCode($input: VerifyRecoveryCodeInput!) {\n    verifyPasswordRecoveryCode(input: $input)\n  }\n": typeof types.VerifyPasswordRecoveryCodeDocument,
     "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n": typeof types.ResetPasswordWithRecoveryDocument,
     "\n  mutation SwitchCondominium($condominiumId: ID) {\n    switchCondominium(condominiumId: $condominiumId)\n  }\n": typeof types.SwitchCondominiumDocument,
-    "\n  fragment BookingFields on Booking {\n    id\n    spaceId\n    spaceName\n    spaceKind\n    userId\n    userName\n    unitLabel\n    startsAt\n    endsAt\n    status\n    notes\n    cancelUntil\n    reason\n    decidedAt\n    cancelledAt\n    cancelledByManager\n    createdAt\n  }\n": typeof types.BookingFieldsFragmentDoc,
+    "\n  fragment BookingFields on Booking {\n    id\n    spaceId\n    spaceName\n    spaceKind\n    guestsAllowed\n    userId\n    userName\n    unitLabel\n    startsAt\n    endsAt\n    status\n    notes\n    cancelUntil\n    reason\n    decidedAt\n    cancelledAt\n    cancelledByManager\n    feeCents\n    feeBilledAt\n    seriesId\n    createdAt\n  }\n": typeof types.BookingFieldsFragmentDoc,
     "\n  query MyBookings($when: BookingWhen!, $page: PageInput) {\n    myBookings(when: $when, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": typeof types.MyBookingsDocument,
     "\n  query Bookings($filter: BookingFilterInput, $page: PageInput) {\n    bookings(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": typeof types.BookingsDocument,
-    "\n  query SpaceAvailability($spaceId: ID!, $date: String!) {\n    spaceAvailability(spaceId: $spaceId, date: $date) {\n      spaceId\n      date\n      firstDate\n      lastDate\n      slots {\n        startsAt\n        endsAt\n        state\n        bookingId\n        bookingStatus\n        label\n      }\n    }\n  }\n": typeof types.SpaceAvailabilityDocument,
+    "\n  query SpaceAvailability($spaceId: ID!, $date: String!) {\n    spaceAvailability(spaceId: $spaceId, date: $date) {\n      spaceId\n      date\n      firstDate\n      lastDate\n      slots {\n        startsAt\n        endsAt\n        state\n        bookingId\n        bookingStatus\n        label\n        waitlisted\n      }\n    }\n  }\n": typeof types.SpaceAvailabilityDocument,
     "\n  mutation CreateBooking($input: CreateBookingInput!) {\n    createBooking(input: $input) {\n      ...BookingFields\n    }\n  }\n": typeof types.CreateBookingDocument,
     "\n  mutation CancelBooking($id: ID!, $reason: String) {\n    cancelBooking(id: $id, reason: $reason) {\n      ...BookingFields\n    }\n  }\n": typeof types.CancelBookingDocument,
     "\n  mutation ApproveBooking($id: ID!) {\n    approveBooking(id: $id) {\n      ...BookingFields\n    }\n  }\n": typeof types.ApproveBookingDocument,
@@ -51,6 +51,21 @@ type Documents = {
     "\n  query SpaceBlocks($spaceId: ID!) {\n    spaceBlocks(spaceId: $spaceId) {\n      id\n      spaceId\n      startsAt\n      endsAt\n      reason\n      createdByName\n      createdAt\n    }\n  }\n": typeof types.SpaceBlocksDocument,
     "\n  mutation CreateSpaceBlock($input: CreateSpaceBlockInput!) {\n    createSpaceBlock(input: $input) {\n      id\n    }\n  }\n": typeof types.CreateSpaceBlockDocument,
     "\n  mutation DeleteSpaceBlock($id: ID!) {\n    deleteSpaceBlock(id: $id)\n  }\n": typeof types.DeleteSpaceBlockDocument,
+    "\n  mutation CreateBookingSeries($input: CreateBookingSeriesInput!) {\n    createBookingSeries(input: $input) {\n      seriesId\n      created {\n        ...BookingFields\n      }\n      skipped {\n        startsAt\n        reason\n      }\n    }\n  }\n": typeof types.CreateBookingSeriesDocument,
+    "\n  mutation CancelBookingSeries($seriesId: ID!) {\n    cancelBookingSeries(seriesId: $seriesId) {\n      cancelled\n      kept\n    }\n  }\n": typeof types.CancelBookingSeriesDocument,
+    "\n  mutation JoinWaitlist($input: WaitlistSlotInput!) {\n    joinWaitlist(input: $input)\n  }\n": typeof types.JoinWaitlistDocument,
+    "\n  mutation LeaveWaitlist($input: WaitlistSlotInput!) {\n    leaveWaitlist(input: $input)\n  }\n": typeof types.LeaveWaitlistDocument,
+    "\n  fragment BookingGuestFields on BookingGuest {\n    id\n    bookingId\n    name\n    documentType\n    document\n    phone\n    code\n    checkedInAt\n    createdAt\n  }\n": typeof types.BookingGuestFieldsFragmentDoc,
+    "\n  query BookingGuests($bookingId: ID!) {\n    bookingGuests(bookingId: $bookingId) {\n      ...BookingGuestFields\n    }\n  }\n": typeof types.BookingGuestsDocument,
+    "\n  mutation AddBookingGuests($input: AddBookingGuestsInput!) {\n    addBookingGuests(input: $input) {\n      ...BookingGuestFields\n    }\n  }\n": typeof types.AddBookingGuestsDocument,
+    "\n  mutation RemoveBookingGuest($id: ID!) {\n    removeBookingGuest(id: $id)\n  }\n": typeof types.RemoveBookingGuestDocument,
+    "\n  query GuestInvite($code: String!) {\n    guestInvite(code: $code) {\n      code\n      guestName\n      hostFirstName\n      spaceName\n      condominiumName\n      startsAt\n      endsAt\n      status\n      checkedIn\n    }\n  }\n": typeof types.GuestInviteDocument,
+    "\n  fragment GateGuestFields on GateGuest {\n    id\n    bookingId\n    name\n    documentType\n    document\n    phone\n    code\n    checkedInAt\n    spaceName\n    startsAt\n    endsAt\n    hostName\n    unitLabel\n    checkInWindow\n  }\n": typeof types.GateGuestFieldsFragmentDoc,
+    "\n  query GateGuests($date: String) {\n    gateGuests(date: $date) {\n      ...GateGuestFields\n    }\n  }\n": typeof types.GateGuestsDocument,
+    "\n  mutation CheckInGuest($input: CheckInGuestInput!) {\n    checkInGuest(input: $input) {\n      ...GateGuestFields\n    }\n  }\n": typeof types.CheckInGuestDocument,
+    "\n  mutation UndoGuestCheckIn($guestId: ID!) {\n    undoGuestCheckIn(guestId: $guestId) {\n      ...GateGuestFields\n    }\n  }\n": typeof types.UndoGuestCheckInDocument,
+    "\n  query BookingFees($month: String) {\n    bookingFees(month: $month) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": typeof types.BookingFeesDocument,
+    "\n  mutation SetBookingFeesBilled($input: SetBookingFeesBilledInput!) {\n    setBookingFeesBilled(input: $input)\n  }\n": typeof types.SetBookingFeesBilledDocument,
     "\n  fragment BroadcastFields on Broadcast {\n    id\n    title\n    body\n    audience\n    targetGroup\n    sendEmail\n    recipients\n    authorName\n    createdAt\n  }\n": typeof types.BroadcastFieldsFragmentDoc,
     "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": typeof types.BroadcastsDocument,
     "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": typeof types.SendBroadcastDocument,
@@ -87,7 +102,7 @@ type Documents = {
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": typeof types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": typeof types.SendTestPushDocument,
     "\n  query PlatformMetrics($filter: PlatformMetricsFilterInput) {\n    platformMetrics(filter: $filter) {\n      from\n      to\n      days\n      condominiumId\n      bookings {\n        total\n        confirmed\n        pending\n        cancelled\n        rejected\n        stalePending\n        granularity\n        series {\n          bucket\n          total\n          cancelled\n        }\n        byCondominium {\n          condominiumId\n          name\n          total\n          cancelled\n        }\n      }\n      spaces {\n        activeSpaces\n        unusedCount\n        mostUsed {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        unused {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        byWeekday {\n          weekday\n          bookings\n        }\n        byHour {\n          hour\n          bookings\n        }\n      }\n      engagement {\n        members\n        active7d\n        active30d\n        newMembers\n        enrollments\n        inactiveCount\n        inactiveCondominiums {\n          condominiumId\n          name\n          lastActivityAt\n        }\n      }\n      health {\n        staleEnrollments\n        failedNotifications\n        delayedNotifications\n        withoutManager\n        withoutUnits\n        openSupport\n      }\n    }\n  }\n": typeof types.PlatformMetricsDocument,
-    "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n    }\n  }\n": typeof types.SpaceFieldsFragmentDoc,
+    "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n      feeCents\n      guests {\n        allowed\n        max\n        documentRequired\n      }\n      recurringAllowed\n    }\n  }\n": typeof types.SpaceFieldsFragmentDoc,
     "\n  query Spaces($includeInactive: Boolean!) {\n    spaces(includeInactive: $includeInactive) {\n      ...SpaceFields\n    }\n  }\n": typeof types.SpacesDocument,
     "\n  query Space($id: ID!) {\n    space(id: $id) {\n      ...SpaceFields\n    }\n  }\n": typeof types.SpaceDocument,
     "\n  mutation CreateSpace($input: SpaceInput!) {\n    createSpace(input: $input) {\n      ...SpaceFields\n    }\n  }\n": typeof types.CreateSpaceDocument,
@@ -132,10 +147,10 @@ const documents: Documents = {
     "\n  mutation VerifyPasswordRecoveryCode($input: VerifyRecoveryCodeInput!) {\n    verifyPasswordRecoveryCode(input: $input)\n  }\n": types.VerifyPasswordRecoveryCodeDocument,
     "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n": types.ResetPasswordWithRecoveryDocument,
     "\n  mutation SwitchCondominium($condominiumId: ID) {\n    switchCondominium(condominiumId: $condominiumId)\n  }\n": types.SwitchCondominiumDocument,
-    "\n  fragment BookingFields on Booking {\n    id\n    spaceId\n    spaceName\n    spaceKind\n    userId\n    userName\n    unitLabel\n    startsAt\n    endsAt\n    status\n    notes\n    cancelUntil\n    reason\n    decidedAt\n    cancelledAt\n    cancelledByManager\n    createdAt\n  }\n": types.BookingFieldsFragmentDoc,
+    "\n  fragment BookingFields on Booking {\n    id\n    spaceId\n    spaceName\n    spaceKind\n    guestsAllowed\n    userId\n    userName\n    unitLabel\n    startsAt\n    endsAt\n    status\n    notes\n    cancelUntil\n    reason\n    decidedAt\n    cancelledAt\n    cancelledByManager\n    feeCents\n    feeBilledAt\n    seriesId\n    createdAt\n  }\n": types.BookingFieldsFragmentDoc,
     "\n  query MyBookings($when: BookingWhen!, $page: PageInput) {\n    myBookings(when: $when, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": types.MyBookingsDocument,
     "\n  query Bookings($filter: BookingFilterInput, $page: PageInput) {\n    bookings(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": types.BookingsDocument,
-    "\n  query SpaceAvailability($spaceId: ID!, $date: String!) {\n    spaceAvailability(spaceId: $spaceId, date: $date) {\n      spaceId\n      date\n      firstDate\n      lastDate\n      slots {\n        startsAt\n        endsAt\n        state\n        bookingId\n        bookingStatus\n        label\n      }\n    }\n  }\n": types.SpaceAvailabilityDocument,
+    "\n  query SpaceAvailability($spaceId: ID!, $date: String!) {\n    spaceAvailability(spaceId: $spaceId, date: $date) {\n      spaceId\n      date\n      firstDate\n      lastDate\n      slots {\n        startsAt\n        endsAt\n        state\n        bookingId\n        bookingStatus\n        label\n        waitlisted\n      }\n    }\n  }\n": types.SpaceAvailabilityDocument,
     "\n  mutation CreateBooking($input: CreateBookingInput!) {\n    createBooking(input: $input) {\n      ...BookingFields\n    }\n  }\n": types.CreateBookingDocument,
     "\n  mutation CancelBooking($id: ID!, $reason: String) {\n    cancelBooking(id: $id, reason: $reason) {\n      ...BookingFields\n    }\n  }\n": types.CancelBookingDocument,
     "\n  mutation ApproveBooking($id: ID!) {\n    approveBooking(id: $id) {\n      ...BookingFields\n    }\n  }\n": types.ApproveBookingDocument,
@@ -143,6 +158,21 @@ const documents: Documents = {
     "\n  query SpaceBlocks($spaceId: ID!) {\n    spaceBlocks(spaceId: $spaceId) {\n      id\n      spaceId\n      startsAt\n      endsAt\n      reason\n      createdByName\n      createdAt\n    }\n  }\n": types.SpaceBlocksDocument,
     "\n  mutation CreateSpaceBlock($input: CreateSpaceBlockInput!) {\n    createSpaceBlock(input: $input) {\n      id\n    }\n  }\n": types.CreateSpaceBlockDocument,
     "\n  mutation DeleteSpaceBlock($id: ID!) {\n    deleteSpaceBlock(id: $id)\n  }\n": types.DeleteSpaceBlockDocument,
+    "\n  mutation CreateBookingSeries($input: CreateBookingSeriesInput!) {\n    createBookingSeries(input: $input) {\n      seriesId\n      created {\n        ...BookingFields\n      }\n      skipped {\n        startsAt\n        reason\n      }\n    }\n  }\n": types.CreateBookingSeriesDocument,
+    "\n  mutation CancelBookingSeries($seriesId: ID!) {\n    cancelBookingSeries(seriesId: $seriesId) {\n      cancelled\n      kept\n    }\n  }\n": types.CancelBookingSeriesDocument,
+    "\n  mutation JoinWaitlist($input: WaitlistSlotInput!) {\n    joinWaitlist(input: $input)\n  }\n": types.JoinWaitlistDocument,
+    "\n  mutation LeaveWaitlist($input: WaitlistSlotInput!) {\n    leaveWaitlist(input: $input)\n  }\n": types.LeaveWaitlistDocument,
+    "\n  fragment BookingGuestFields on BookingGuest {\n    id\n    bookingId\n    name\n    documentType\n    document\n    phone\n    code\n    checkedInAt\n    createdAt\n  }\n": types.BookingGuestFieldsFragmentDoc,
+    "\n  query BookingGuests($bookingId: ID!) {\n    bookingGuests(bookingId: $bookingId) {\n      ...BookingGuestFields\n    }\n  }\n": types.BookingGuestsDocument,
+    "\n  mutation AddBookingGuests($input: AddBookingGuestsInput!) {\n    addBookingGuests(input: $input) {\n      ...BookingGuestFields\n    }\n  }\n": types.AddBookingGuestsDocument,
+    "\n  mutation RemoveBookingGuest($id: ID!) {\n    removeBookingGuest(id: $id)\n  }\n": types.RemoveBookingGuestDocument,
+    "\n  query GuestInvite($code: String!) {\n    guestInvite(code: $code) {\n      code\n      guestName\n      hostFirstName\n      spaceName\n      condominiumName\n      startsAt\n      endsAt\n      status\n      checkedIn\n    }\n  }\n": types.GuestInviteDocument,
+    "\n  fragment GateGuestFields on GateGuest {\n    id\n    bookingId\n    name\n    documentType\n    document\n    phone\n    code\n    checkedInAt\n    spaceName\n    startsAt\n    endsAt\n    hostName\n    unitLabel\n    checkInWindow\n  }\n": types.GateGuestFieldsFragmentDoc,
+    "\n  query GateGuests($date: String) {\n    gateGuests(date: $date) {\n      ...GateGuestFields\n    }\n  }\n": types.GateGuestsDocument,
+    "\n  mutation CheckInGuest($input: CheckInGuestInput!) {\n    checkInGuest(input: $input) {\n      ...GateGuestFields\n    }\n  }\n": types.CheckInGuestDocument,
+    "\n  mutation UndoGuestCheckIn($guestId: ID!) {\n    undoGuestCheckIn(guestId: $guestId) {\n      ...GateGuestFields\n    }\n  }\n": types.UndoGuestCheckInDocument,
+    "\n  query BookingFees($month: String) {\n    bookingFees(month: $month) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": types.BookingFeesDocument,
+    "\n  mutation SetBookingFeesBilled($input: SetBookingFeesBilledInput!) {\n    setBookingFeesBilled(input: $input)\n  }\n": types.SetBookingFeesBilledDocument,
     "\n  fragment BroadcastFields on Broadcast {\n    id\n    title\n    body\n    audience\n    targetGroup\n    sendEmail\n    recipients\n    authorName\n    createdAt\n  }\n": types.BroadcastFieldsFragmentDoc,
     "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": types.BroadcastsDocument,
     "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": types.SendBroadcastDocument,
@@ -179,7 +209,7 @@ const documents: Documents = {
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": types.SendTestPushDocument,
     "\n  query PlatformMetrics($filter: PlatformMetricsFilterInput) {\n    platformMetrics(filter: $filter) {\n      from\n      to\n      days\n      condominiumId\n      bookings {\n        total\n        confirmed\n        pending\n        cancelled\n        rejected\n        stalePending\n        granularity\n        series {\n          bucket\n          total\n          cancelled\n        }\n        byCondominium {\n          condominiumId\n          name\n          total\n          cancelled\n        }\n      }\n      spaces {\n        activeSpaces\n        unusedCount\n        mostUsed {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        unused {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        byWeekday {\n          weekday\n          bookings\n        }\n        byHour {\n          hour\n          bookings\n        }\n      }\n      engagement {\n        members\n        active7d\n        active30d\n        newMembers\n        enrollments\n        inactiveCount\n        inactiveCondominiums {\n          condominiumId\n          name\n          lastActivityAt\n        }\n      }\n      health {\n        staleEnrollments\n        failedNotifications\n        delayedNotifications\n        withoutManager\n        withoutUnits\n        openSupport\n      }\n    }\n  }\n": types.PlatformMetricsDocument,
-    "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n    }\n  }\n": types.SpaceFieldsFragmentDoc,
+    "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n      feeCents\n      guests {\n        allowed\n        max\n        documentRequired\n      }\n      recurringAllowed\n    }\n  }\n": types.SpaceFieldsFragmentDoc,
     "\n  query Spaces($includeInactive: Boolean!) {\n    spaces(includeInactive: $includeInactive) {\n      ...SpaceFields\n    }\n  }\n": types.SpacesDocument,
     "\n  query Space($id: ID!) {\n    space(id: $id) {\n      ...SpaceFields\n    }\n  }\n": types.SpaceDocument,
     "\n  mutation CreateSpace($input: SpaceInput!) {\n    createSpace(input: $input) {\n      ...SpaceFields\n    }\n  }\n": types.CreateSpaceDocument,
@@ -302,7 +332,7 @@ export function graphql(source: "\n  mutation SwitchCondominium($condominiumId: 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment BookingFields on Booking {\n    id\n    spaceId\n    spaceName\n    spaceKind\n    userId\n    userName\n    unitLabel\n    startsAt\n    endsAt\n    status\n    notes\n    cancelUntil\n    reason\n    decidedAt\n    cancelledAt\n    cancelledByManager\n    createdAt\n  }\n"): typeof import('./graphql').BookingFieldsFragmentDoc;
+export function graphql(source: "\n  fragment BookingFields on Booking {\n    id\n    spaceId\n    spaceName\n    spaceKind\n    guestsAllowed\n    userId\n    userName\n    unitLabel\n    startsAt\n    endsAt\n    status\n    notes\n    cancelUntil\n    reason\n    decidedAt\n    cancelledAt\n    cancelledByManager\n    feeCents\n    feeBilledAt\n    seriesId\n    createdAt\n  }\n"): typeof import('./graphql').BookingFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -314,7 +344,7 @@ export function graphql(source: "\n  query Bookings($filter: BookingFilterInput,
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query SpaceAvailability($spaceId: ID!, $date: String!) {\n    spaceAvailability(spaceId: $spaceId, date: $date) {\n      spaceId\n      date\n      firstDate\n      lastDate\n      slots {\n        startsAt\n        endsAt\n        state\n        bookingId\n        bookingStatus\n        label\n      }\n    }\n  }\n"): typeof import('./graphql').SpaceAvailabilityDocument;
+export function graphql(source: "\n  query SpaceAvailability($spaceId: ID!, $date: String!) {\n    spaceAvailability(spaceId: $spaceId, date: $date) {\n      spaceId\n      date\n      firstDate\n      lastDate\n      slots {\n        startsAt\n        endsAt\n        state\n        bookingId\n        bookingStatus\n        label\n        waitlisted\n      }\n    }\n  }\n"): typeof import('./graphql').SpaceAvailabilityDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -343,6 +373,66 @@ export function graphql(source: "\n  mutation CreateSpaceBlock($input: CreateSpa
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation DeleteSpaceBlock($id: ID!) {\n    deleteSpaceBlock(id: $id)\n  }\n"): typeof import('./graphql').DeleteSpaceBlockDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateBookingSeries($input: CreateBookingSeriesInput!) {\n    createBookingSeries(input: $input) {\n      seriesId\n      created {\n        ...BookingFields\n      }\n      skipped {\n        startsAt\n        reason\n      }\n    }\n  }\n"): typeof import('./graphql').CreateBookingSeriesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CancelBookingSeries($seriesId: ID!) {\n    cancelBookingSeries(seriesId: $seriesId) {\n      cancelled\n      kept\n    }\n  }\n"): typeof import('./graphql').CancelBookingSeriesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation JoinWaitlist($input: WaitlistSlotInput!) {\n    joinWaitlist(input: $input)\n  }\n"): typeof import('./graphql').JoinWaitlistDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation LeaveWaitlist($input: WaitlistSlotInput!) {\n    leaveWaitlist(input: $input)\n  }\n"): typeof import('./graphql').LeaveWaitlistDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment BookingGuestFields on BookingGuest {\n    id\n    bookingId\n    name\n    documentType\n    document\n    phone\n    code\n    checkedInAt\n    createdAt\n  }\n"): typeof import('./graphql').BookingGuestFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query BookingGuests($bookingId: ID!) {\n    bookingGuests(bookingId: $bookingId) {\n      ...BookingGuestFields\n    }\n  }\n"): typeof import('./graphql').BookingGuestsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AddBookingGuests($input: AddBookingGuestsInput!) {\n    addBookingGuests(input: $input) {\n      ...BookingGuestFields\n    }\n  }\n"): typeof import('./graphql').AddBookingGuestsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveBookingGuest($id: ID!) {\n    removeBookingGuest(id: $id)\n  }\n"): typeof import('./graphql').RemoveBookingGuestDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GuestInvite($code: String!) {\n    guestInvite(code: $code) {\n      code\n      guestName\n      hostFirstName\n      spaceName\n      condominiumName\n      startsAt\n      endsAt\n      status\n      checkedIn\n    }\n  }\n"): typeof import('./graphql').GuestInviteDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment GateGuestFields on GateGuest {\n    id\n    bookingId\n    name\n    documentType\n    document\n    phone\n    code\n    checkedInAt\n    spaceName\n    startsAt\n    endsAt\n    hostName\n    unitLabel\n    checkInWindow\n  }\n"): typeof import('./graphql').GateGuestFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GateGuests($date: String) {\n    gateGuests(date: $date) {\n      ...GateGuestFields\n    }\n  }\n"): typeof import('./graphql').GateGuestsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CheckInGuest($input: CheckInGuestInput!) {\n    checkInGuest(input: $input) {\n      ...GateGuestFields\n    }\n  }\n"): typeof import('./graphql').CheckInGuestDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UndoGuestCheckIn($guestId: ID!) {\n    undoGuestCheckIn(guestId: $guestId) {\n      ...GateGuestFields\n    }\n  }\n"): typeof import('./graphql').UndoGuestCheckInDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query BookingFees($month: String) {\n    bookingFees(month: $month) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n"): typeof import('./graphql').BookingFeesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetBookingFeesBilled($input: SetBookingFeesBilledInput!) {\n    setBookingFeesBilled(input: $input)\n  }\n"): typeof import('./graphql').SetBookingFeesBilledDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -490,7 +580,7 @@ export function graphql(source: "\n  query PlatformMetrics($filter: PlatformMetr
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n    }\n  }\n"): typeof import('./graphql').SpaceFieldsFragmentDoc;
+export function graphql(source: "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n      feeCents\n      guests {\n        allowed\n        max\n        documentRequired\n      }\n      recurringAllowed\n    }\n  }\n"): typeof import('./graphql').SpaceFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
