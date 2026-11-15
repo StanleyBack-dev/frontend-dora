@@ -53,7 +53,9 @@ export function EnrollmentRequestsTable({
       label: "Unidade",
       className: "whitespace-nowrap",
       render: (request) =>
-        request.unitLabel ? (
+        request.applicant === "EMPLOYEE" ? (
+          <Badge tone="info">Funcionário</Badge>
+        ) : request.unitLabel ? (
           withComplement(request.unitLabel, request.unitComplement)
         ) : request.typedUnitLabel ? (
           <span title="Digitada no cadastro (ainda sem unidade vinculada)">

@@ -6,14 +6,14 @@ import {
 import { brandLogoSrc } from "@/features/layout/model/brand-logo";
 
 // Cover of the sign-up invite links, the ones sent most over WhatsApp.
-export const alt = "Cadastro de morador · Dora";
+export const alt = "Cadastro no condomínio · Dora";
 export const size = SHARE_CARD_SIZE;
 export const contentType = "image/png";
 
 export default async function EnrollmentOpengraphImage() {
   return new ImageResponse(
     <ShareCard
-      headline="Cadastro de morador"
+      headline="Cadastro no condomínio"
       note="Use o código do convite para enviar os seus dados ao condomínio."
       logoSrc={await brandLogoSrc()}
       ticket={{

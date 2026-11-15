@@ -130,6 +130,11 @@ export type DocumentType =
   | 'CPF'
   | 'RG';
 
+/** Quem se cadastra: morador ou funcionário do condomínio. */
+export type EnrollmentApplicant =
+  | 'EMPLOYEE'
+  | 'RESIDENT';
+
 /** Dados do cadastro (formulário ou correção). */
 export type EnrollmentDataInput = {
   email: string;
@@ -342,6 +347,8 @@ export type SpaceRulesInput = {
 };
 
 export type SubmitEnrollmentInput = {
+  /** Morador (padrão) ou funcionário. Funcionário não informa unidade nem endereço. */
+  applicant?: EnrollmentApplicant | null | undefined;
   /** Aceite do uso dos dados (LGPD). */
   consent: boolean;
   data: EnrollmentDataInput;
@@ -418,6 +425,8 @@ export type UpdateUserInput = {
 export type UserFilterInput = {
   active?: boolean | null | undefined;
   group?: UserGroup | null | undefined;
+  /** Qualquer um destes papéis (ex.: a equipe, ADMIN e CONCIERGE). */
+  groups?: Array<UserGroup> | null | undefined;
   search?: string | null | undefined;
   unitId?: string | number | null | undefined;
 };
@@ -890,7 +899,7 @@ export type SubmitEnrollmentMutation = { submitEnrollment: boolean };
 
 export type EnrollmentInviteFieldsFragment = { id: string, code: string, label: string, expiresAt: string, revokedAt: string | null, createdAt: string, requestCount: number };
 
-export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
+export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
 
 export type EnrollmentInvitesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -917,7 +926,7 @@ export type EnrollmentRequestsQueryVariables = Exact<{
 }>;
 
 
-export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
+export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
 
 export type ApproveEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -926,7 +935,7 @@ export type ApproveEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
+export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
 
 export type RejectEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -934,7 +943,7 @@ export type RejectEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
+export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -1318,6 +1327,7 @@ export const EnrollmentRequestFieldsFragmentDoc = new TypedDocumentString(`
     fragment EnrollmentRequestFields on EnrollmentRequest {
   id
   status
+  applicant
   fullName
   email
   phone
@@ -2510,6 +2520,7 @@ export const EnrollmentRequestsDocument = new TypedDocumentString(`
     fragment EnrollmentRequestFields on EnrollmentRequest {
   id
   status
+  applicant
   fullName
   email
   phone
@@ -2564,6 +2575,7 @@ export const ApproveEnrollmentRequestDocument = new TypedDocumentString(`
 fragment EnrollmentRequestFields on EnrollmentRequest {
   id
   status
+  applicant
   fullName
   email
   phone
@@ -2588,6 +2600,7 @@ export const RejectEnrollmentRequestDocument = new TypedDocumentString(`
     fragment EnrollmentRequestFields on EnrollmentRequest {
   id
   status
+  applicant
   fullName
   email
   phone

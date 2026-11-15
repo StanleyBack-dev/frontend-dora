@@ -1,5 +1,6 @@
 import type { Tone } from "@/design-system";
 import type {
+  EnrollmentApplicant,
   EnrollmentData,
   EnrollmentRequest,
   EnrollmentStatus,
@@ -7,6 +8,8 @@ import type {
 import { formatPhone, phoneError } from "@/shared/lib/masks";
 
 export type EnrollmentForm = {
+  /** Lives in the condominium or works there (no address then). */
+  applicant: EnrollmentApplicant;
   fullName: string;
   email: string;
   phone: string;
@@ -20,6 +23,7 @@ export type EnrollmentForm = {
 };
 
 export const EMPTY_ENROLLMENT: EnrollmentForm = {
+  applicant: "RESIDENT",
   fullName: "",
   email: "",
   phone: "",
@@ -29,13 +33,25 @@ export const EMPTY_ENROLLMENT: EnrollmentForm = {
   unitNumber: "",
 };
 
-/** How the form asks where the person lives. */
-export type UnitMode = "list" | "typed";
+/**
+ * How the form asks where the person lives: from the list, typed (no units
+ * registered) or not at all (employees don't live there).
+ */
+export type UnitMode = "list" | "typed" | "none";
 
-export const unitModeFor = (units: readonly unknown[]): UnitMode =>
-  units.length > 0 ? "list" : "typed";
+export const unitModeFor = (
+  units: readonly unknown[],
+  applicant: EnrollmentApplicant = "RESIDENT",
+): UnitMode =>
+  applicant === "EMPLOYEE" ? "none" : units.length > 0 ? "list" : "typed";
+
+export const APPLICANT_LABELS: Record<EnrollmentApplicant, string> = {
+  RESIDENT: "Morador",
+  EMPLOYEE: "Funcionário",
+};
 
 export const fromRequest = (request: EnrollmentRequest): EnrollmentForm => ({
+  applicant: request.applicant,
   fullName: request.fullName,
   email: request.email,
   phone: formatPhone(request.phone),
@@ -65,7 +81,7 @@ export function enrollmentErrors(
       errors.unitBlock = "Use até 30 caracteres.";
     }
   }
-  if (form.unitComplement.trim().length > 80) {
+  if (mode !== "none" && form.unitComplement.trim().length > 80) {
     errors.unitComplement = "Use até 80 caracteres.";
   }
   const name = form.fullName.trim();
@@ -91,7 +107,7 @@ export const toEnrollmentData = (
   email: form.email.trim(),
   phone: form.phone,
   unitId: mode === "list" ? form.unitId || null : null,
-  unitComplement: form.unitComplement.trim() || null,
+  unitComplement: mode === "none" ? null : form.unitComplement.trim() || null,
   // Typed values only when there is no list to choose from.
   ...(mode === "typed"
     ? {

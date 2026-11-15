@@ -19,7 +19,14 @@ import { formatPhone } from "@/shared/lib/masks";
 // Residents of the condominium (table with the audit column): photo, where
 // they live, contact and access. The pencil (first column; on phones next to
 // the name) opens the person's page.
-export function UsersTable({ users }: { users: UserAccount[] }) {
+export function UsersTable({
+  users,
+  basePath = "/moradores",
+}: {
+  users: UserAccount[];
+  /** The list it is in (Moradores or Equipe): the edit link opens there. */
+  basePath?: string;
+}) {
   const audit = auditColumn((user: UserAccount) => ({
     entity: "user" as const,
     id: user.id,
@@ -34,7 +41,7 @@ export function UsersTable({ users }: { users: UserAccount[] }) {
       mobile: "control",
       render: (user) => (
         <Link
-          href={`/moradores/${user.id}`}
+          href={`${basePath}/${user.id}`}
           aria-label={`Editar ${user.name}`}
           title="Editar usuário"
           className="grid size-8 place-items-center rounded-md text-accent transition-colors hover:bg-accent-soft"

@@ -35,14 +35,17 @@ export function CreateUserButton({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<UserInput>(EMPTY);
+  // The first role offered is the default (Moradores: resident; Equipe:
+  // the first team role).
+  const empty: UserInput = { ...EMPTY, group: assignableGroups[0] ?? "USER" };
+  const [form, setForm] = useState<UserInput>(empty);
   const [created, setCreated] = useState<TemporaryAccess | null>(null);
   const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   function close() {
     setOpen(false);
-    setForm(EMPTY);
+    setForm(empty);
     setCreated(null);
   }
 

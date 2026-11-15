@@ -71,7 +71,7 @@ export function DashboardPanel({
       href: canManageUsers ? "/moradores" : null,
       label: "Moradores ativos",
       value: dashboard.activeUsers,
-      hint: "Moradores e gestores com acesso",
+      hint: "Com acesso ao app (sem a equipe)",
       icon: <Users className="size-5" />,
       tone: "neutral",
     },

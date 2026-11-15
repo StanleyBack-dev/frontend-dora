@@ -12,13 +12,13 @@ import {
 
 // Public sign-up, step 2: the form. It waits for a manager's approval.
 export const POST = bffRoute(async (request) => {
-  const { data, consent, photo } = await readBody(
+  const { data, applicant, consent, photo } = await readBody(
     request,
     submitEnrollmentSchema,
   );
   const token = await readEnrollmentToken();
   if (!token) throw enrollmentFormExpired();
-  await enrollmentService.submit(token, data, consent, photo);
+  await enrollmentService.submit(token, data, applicant, consent, photo);
   await clearEnrollmentToken();
   return NextResponse.json({ ok: true });
 });

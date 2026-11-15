@@ -2,6 +2,7 @@ import type { EnrollmentForm as EnrollmentFormContext } from "@/shared/contracts
 import type { UserGroup } from "@/shared/contracts/api";
 import type {
   EnrollmentApproval,
+  EnrollmentApplicant,
   EnrollmentData,
   EnrollmentInvite,
   EnrollmentRequest,
@@ -18,10 +19,15 @@ export const enrollmentClient = {
       body: JSON.stringify({ code }),
     }),
 
-  submit: (data: EnrollmentData, consent: boolean, photo: string | null) =>
+  submit: (
+    data: EnrollmentData,
+    applicant: EnrollmentApplicant,
+    consent: boolean,
+    photo: string | null,
+  ) =>
     apiRequest<{ ok: true }>("/public/cadastro", {
       method: "POST",
-      body: JSON.stringify({ data, consent, photo }),
+      body: JSON.stringify({ data, applicant, consent, photo }),
     }),
 
   // === manager ===
