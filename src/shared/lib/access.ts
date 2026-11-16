@@ -37,3 +37,20 @@ export function assignableGroups(actor: UserGroup): UserGroup[] {
   if (actor === "ADMIN") return ["USER", "CONCIERGE"];
   return [];
 }
+
+/**
+ * A resident of the condominium they are working in (the Morador group,
+ * with a membership there). Dependents are theirs only: managers, the gate
+ * and the platform administrator (who opens any condominium without being
+ * a member) have none.
+ */
+export function isResidentHere(
+  user: Pick<SessionUser, "group" | "condominium" | "condominiums">,
+): boolean {
+  const current = user.condominium;
+  return (
+    user.group === "USER" &&
+    current !== null &&
+    user.condominiums.some((condominium) => condominium.id === current.id)
+  );
+}

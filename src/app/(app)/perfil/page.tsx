@@ -11,6 +11,7 @@ import { UsersRound } from "lucide-react";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { MyPhotoField } from "@/features/auth/components/MyPhotoField";
 import { ProfileForm } from "@/features/auth/components/ProfileForm";
+import { isResidentHere } from "@/shared/lib/access";
 import { getSessionUser } from "@/server/auth/current-user";
 
 export const metadata: Metadata = { title: "Meu perfil" };
@@ -60,7 +61,7 @@ export default async function ProfilePage() {
             />
           </CardBody>
         </Card>
-        {user.condominium && (
+        {isResidentHere(user) && (
           <Card className="lg:col-span-2">
             <CardHeader
               title="Dependentes"
