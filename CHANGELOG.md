@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.5.0...v0.6.0) (2026-11-16)
+
+
+### Features
+
+* events module (stage 1) and the form pattern across the app ([7b7614a](https://github.com/StanleyBack-dev/frontend-dora/commit/7b7614a2e07335897286608fe2e3e3bef355ddfa))
+* events module (stage 1) and the form pattern across the app ([191aa99](https://github.com/StanleyBack-dev/frontend-dora/commit/191aa99edc338734c6b3cda52a33e3228887864a))
+
 ## [0.5.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.4.0...v0.5.0) (2026-11-15)
 
 
