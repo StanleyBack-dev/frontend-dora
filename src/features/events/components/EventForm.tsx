@@ -27,10 +27,18 @@ import {
   type ChoiceOption,
 } from "@/design-system";
 import { eventsClient } from "@/features/events/api/events.client";
+import { EventTicketingFields } from "@/features/events/components/EventTicketingFields";
+import {
+  ticketingFrom,
+  ticketingInput,
+  ticketingMissing,
+  type TicketingForm,
+} from "@/features/events/model/ticketing-form";
 import type {
   CondominiumEvent,
   EventAddress,
   EventInput,
+  PixReceiver,
 } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { BRAZILIAN_STATES } from "@/shared/lib/brazilian-states";
@@ -68,6 +76,8 @@ type FormState = {
   audience: Audience;
   externalGuestLimit: string;
   entry: Entry;
+  /** Paid entry: types, limit per unit and PIX. */
+  ticketing: TicketingForm;
 };
 
 const WHERE_OPTIONS: ChoiceOption<Where>[] = [
@@ -104,13 +114,13 @@ const ENTRY_OPTIONS: ChoiceOption<Entry>[] = [
   {
     value: "FREE",
     title: "Gratuito",
-    hint: "Inscrição com ingresso gratuito e QR code na entrada.",
+    hint: "Inscrição com os nomes e idades de quem vai.",
     icon: <Ticket />,
   },
   {
     value: "PAID",
     title: "Ingresso pago",
-    hint: "Pago por Pix ao condomínio, com o comprovante conferido pela administração.",
+    hint: "Tipos e preços; pago por PIX, com o comprovante conferido.",
     icon: <Wallet />,
   },
 ];
@@ -140,6 +150,7 @@ const fromEvent = (event: CondominiumEvent | null): FormState => {
         ? String(event.externalGuestLimit)
         : "",
     entry: event?.ticketed ? "PAID" : "FREE",
+    ticketing: ticketingFrom(event),
   };
 };
 
@@ -172,6 +183,7 @@ function missing(form: FormState): string[] {
       out.push("Convidados de fora até a lotação total.");
     }
   }
+  if (form.entry === "PAID") out.push(...ticketingMissing(form.ticketing));
   return out;
 }
 
@@ -180,10 +192,13 @@ function missing(form: FormState): string[] {
 export function EventForm({
   event,
   spaces,
+  condominiumPix,
 }: {
   event: CondominiumEvent | null;
   /** The condominium's spaces; their capacity fills the event's. */
   spaces: { id: string; name: string; capacity: number | null }[];
+  /** The condominium's PIX (null: none; undefined: not visible). */
+  condominiumPix: PixReceiver | null | undefined;
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
@@ -245,6 +260,15 @@ export function EventForm({
       externalGuestLimit:
         form.audience === "GUESTS" ? numberOf(form.externalGuestLimit) : 0,
       ticketed: form.entry === "PAID",
+      ...(form.entry === "PAID"
+        ? ticketingInput(form.ticketing)
+        : {
+            fullPriceCents: null,
+            ticketTypes: [],
+            unitTicketLimit: null,
+            pixSource: null,
+            customPix: null,
+          }),
     };
     setPending(true);
     setError(null);
@@ -501,7 +525,7 @@ export function EventForm({
       <CollapsibleSection
         icon={<Ticket />}
         title="Entrada"
-        description="Todos entram com ingresso e QR code; escolha se ele é pago."
+        description="Inscrição grátis ou ingressos pagos por PIX."
       >
         <ChoiceCards
           name="entry"
@@ -511,10 +535,11 @@ export function EventForm({
           onChange={(value) => set("entry", value)}
         />
         {form.entry === "PAID" && (
-          <p className="text-xs text-soft">
-            Os tipos de ingresso e os valores (inteira, meia, faixas de idade)
-            são definidos na etapa de ingressos.
-          </p>
+          <EventTicketingFields
+            value={form.ticketing}
+            onChange={(ticketing) => set("ticketing", ticketing)}
+            condominiumPix={condominiumPix}
+          />
         )}
       </CollapsibleSection>
 

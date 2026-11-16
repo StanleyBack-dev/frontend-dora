@@ -17,6 +17,7 @@ export const loginDocument = graphql(`
         permissions
         photoUrl
         phone
+        birthDate
         onboardingCompleted
         platformAdmin
         condominium {
@@ -69,6 +70,7 @@ export const meDocument = graphql(`
       permissions
       photoUrl
       phone
+      birthDate
       onboardingCompleted
       platformAdmin
       condominium {
@@ -115,6 +117,7 @@ export const updateMyProfileDocument = graphql(`
       permissions
       photoUrl
       phone
+      birthDate
       onboardingCompleted
       platformAdmin
       condominium {

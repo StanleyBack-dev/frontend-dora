@@ -40,6 +40,7 @@ export function CreateUserButton({
     unitComplement: "",
     employee: null,
     phone: "",
+    birthDate: "",
   };
   const [form, setForm] = useState<UserInput>(empty);
   const [created, setCreated] = useState<TemporaryAccess | null>(null);

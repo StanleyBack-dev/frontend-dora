@@ -7,6 +7,7 @@ import { Button, Field } from "@/design-system";
 import { authClient } from "@/features/auth/api/auth.client";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { formatPhone, maskPhone, phoneError } from "@/shared/lib/masks";
+import { birthDateError, todayIso } from "@/shared/lib/birth-date";
 import { useToast } from "@/shared/toast/useToast";
 
 // Read-only account data (login and group): changed only by the
@@ -48,6 +49,7 @@ export function ProfileForm({
   initialName,
   initialEmail,
   initialPhone,
+  initialBirthDate,
   username,
   groupLabel,
 }: {
@@ -55,6 +57,8 @@ export function ProfileForm({
   initialEmail: string;
   /** Stored digits (null: none). */
   initialPhone: string | null;
+  /** YYYY-MM-DD (null: none). */
+  initialBirthDate: string | null;
   username: string;
   groupLabel: string;
 }) {
@@ -64,20 +68,25 @@ export function ProfileForm({
   const startPhone = initialPhone ? formatPhone(initialPhone) : "";
   const [phone, setPhone] = useState(startPhone);
   const invalidPhone = phone ? phoneError(phone) : null;
+  const startBirth = initialBirthDate ?? "";
+  const [birthDate, setBirthDate] = useState(startBirth);
+  const invalidBirth = birthDateError(birthDate, false);
   const { showError, showSuccess } = useToast();
   const [pending, setPending] = useState(false);
 
   const changed =
     name.trim() !== initialName ||
     email.trim() !== initialEmail ||
-    phone !== startPhone;
+    phone !== startPhone ||
+    birthDate !== startBirth;
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (invalidPhone) return showError(invalidPhone);
+    if (invalidBirth) return showError(invalidBirth);
     setPending(true);
     try {
-      await authClient.updateProfile({ name, email, phone });
+      await authClient.updateProfile({ name, email, phone, birthDate });
       showSuccess("Dados atualizados.");
       router.refresh();
     } catch (cause) {
@@ -121,6 +130,20 @@ export function ProfileForm({
         onChange={(event) => setPhone(maskPhone(event.target.value))}
         error={invalidPhone ?? undefined}
       />
+      <div>
+        <Field
+          label="Data de nascimento"
+          type="date"
+          autoComplete="bday"
+          max={todayIso()}
+          value={birthDate}
+          onChange={(event) => setBirthDate(event.target.value)}
+          error={invalidBirth ?? undefined}
+        />
+        <p className="mt-1.5 text-xs text-soft">
+          Usada para conferir a idade nos ingressos dos eventos.
+        </p>
+      </div>
       <Button
         type="submit"
         loading={pending}

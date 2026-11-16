@@ -21,7 +21,12 @@ export const authClient = {
       post({ currentPassword, newPassword }),
     ),
 
-  updateProfile: (input: { name: string; email: string; phone: string }) =>
+  updateProfile: (input: {
+    name: string;
+    email: string;
+    phone: string;
+    birthDate: string;
+  }) =>
     apiRequest<SessionUser>("/me", {
       method: "PATCH",
       body: JSON.stringify(input),

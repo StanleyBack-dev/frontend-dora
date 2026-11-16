@@ -27,6 +27,7 @@ import type {
 } from "@/shared/contracts/api";
 import type { Unit } from "@/shared/contracts/condominiums";
 import { maskPhone, phoneError } from "@/shared/lib/masks";
+import { birthDateError, todayIso } from "@/shared/lib/birth-date";
 
 const KIND_OPTIONS: ChoiceOption<MemberKind>[] = [
   {
@@ -162,6 +163,15 @@ export function UserFormFields({
           value={phone}
           onChange={(event) => set("phone", maskPhone(event.target.value))}
           error={(phone && phoneError(phone)) || undefined}
+        />
+        <Field
+          label="Data de nascimento"
+          type="date"
+          disabled={accountLocked}
+          max={todayIso()}
+          value={value.birthDate ?? ""}
+          onChange={(event) => set("birthDate", event.target.value)}
+          error={birthDateError(value.birthDate ?? "", false) ?? undefined}
         />
       </CollapsibleSection>
 

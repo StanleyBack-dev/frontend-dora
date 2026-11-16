@@ -8,6 +8,12 @@ const schema = z.object({
   email: z.email().max(254),
   // Absent: unchanged; "" removes it (the API validates the digits).
   phone: z.string().trim().max(30).optional(),
+  // Absent: unchanged; "" removes it (the API checks the date).
+  birthDate: z
+    .string()
+    .trim()
+    .regex(/^(\d{4}-\d{2}-\d{2})?$/)
+    .optional(),
 });
 
 export const PATCH = bffRoute(async (request) => {

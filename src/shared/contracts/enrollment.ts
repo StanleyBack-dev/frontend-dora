@@ -23,6 +23,8 @@ export type EnrollmentData = {
   fullName: string;
   email: string;
   phone: string;
+  /** YYYY-MM-DD (required on the public form; null on older requests). */
+  birthDate?: string | null;
   /** Unit picked on the form (required when the condominium has units). */
   unitId?: string | null;
   /** Address detail inside the condominium ("casa dos fundos"). */

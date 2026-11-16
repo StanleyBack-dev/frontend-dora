@@ -227,6 +227,12 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Troque a foto de perfil: ela ajuda a administração a identificar você.",
         },
         { text: "Mantenha o e-mail atualizado para receber os avisos." },
+        {
+          text: "Informe a data de nascimento: ela confere a sua idade nos ingressos dos eventos, sem documento.",
+        },
+        {
+          text: "Em “Meus dependentes”, cadastre quem mora com você e não usa o app (filhos, cônjuge…), com um documento da data de nascimento. Depois que a administração aprovar, eles entram nos pedidos de ingressos com a idade certa.",
+        },
       ],
     },
   },
@@ -343,8 +349,18 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Quando a administração publica um evento, você recebe um aviso no app e por e-mail, com o convite para a agenda do celular.",
         },
         {
-          text: "Use “Novo evento” para criar: título, quando, onde (um espaço ou outro local), lotação, convidados de fora e se a entrada é paga. Ele fica como rascunho até você publicar.",
+          text: "Na página do evento, use “Garantir ingressos” (ou “Inscrever-se”, se for grátis): escolha quem vai (você, seus dependentes aprovados ou outra pessoa) e o ingresso de cada um. A idade de quem tem a data de nascimento no app é usada sozinha; um desconto sem idade comprovada, ou de estudante, PcD e professor, pede o documento da pessoa.",
+        },
+        {
+          text: "Evento pago: o pedido mostra o PIX com o valor e o código do pedido (QR code ou copia e cola). Pague e toque em “Enviar comprovante” (print ou PDF). A administração confere e você é avisado.",
+        },
+        {
+          text: "Use “Novo evento” para criar: título, quando, onde (um espaço ou outro local), lotação, convidados de fora e a entrada. Paga: o valor da inteira e os públicos aceitos (adulto, criança, idoso, estudante…), cada um pagando inteira, meia, grátis ou outro valor, com a faixa de idade; o limite por unidade e qual PIX recebe (o do condomínio ou outro). Ele fica como rascunho até você publicar.",
           only: ["EVENTS_MANAGE"],
+        },
+        {
+          text: "Em “Pedidos”, na página do evento, confira o comprovante no extrato pelo código do pedido e os documentos de quem tem desconto, e aprove ou recuse com o motivo. O PIX do condomínio fica em Administração → Pagamentos.",
+          only: ["PAYMENTS_MANAGE"],
         },
         {
           text: "Na página do evento, publique o rascunho (todos são avisados), edite enquanto ele não terminar ou cancele com o motivo (quem já foi avisado recebe o cancelamento).",
@@ -354,6 +370,9 @@ export const HELP_TOPICS: HelpTopic[] = [
       rules: [
         {
           text: "Rascunhos só aparecem para a administração. Um evento cancelado ou que já terminou não muda mais.",
+        },
+        {
+          text: "Um pedido pago segura as vagas por 48 horas (nunca depois do início do evento); sem o comprovante nesse prazo, as vagas voltam. Os pedidos fecham quando o evento começa.",
         },
       ],
     },

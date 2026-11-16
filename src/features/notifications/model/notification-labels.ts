@@ -37,6 +37,35 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     label: "Evento cancelado",
     description: "Um evento publicado foi cancelado, com o motivo.",
   },
+  EVENT_ORDER_RECEIPT: {
+    label: "Pedido de ingressos para conferir",
+    description:
+      "Um morador enviou o comprovante do PIX e/ou os documentos de um pedido de ingressos.",
+  },
+  DEPENDENT_SUBMITTED: {
+    label: "Dependente para aprovar",
+    description:
+      "Um morador cadastrou um dependente, com o documento da data de nascimento.",
+  },
+  DEPENDENT_APPROVED: {
+    label: "Dependente aprovado",
+    description:
+      "Seu dependente foi aprovado e já pode entrar nos pedidos de ingressos.",
+  },
+  DEPENDENT_REJECTED: {
+    label: "Dependente recusado",
+    description: "Seu dependente não foi aprovado, com o motivo.",
+  },
+  EVENT_ORDER_CONFIRMED: {
+    label: "Ingressos confirmados",
+    description:
+      "Seu pedido de ingressos (ou inscrição grátis) para um evento foi confirmado.",
+  },
+  EVENT_ORDER_REJECTED: {
+    label: "Pedido de ingressos recusado",
+    description:
+      "O comprovante ou os documentos do seu pedido de ingressos não foram aceitos, com o motivo.",
+  },
   BOOKING_SLOT_FREED: {
     label: "Horário liberado",
     description:

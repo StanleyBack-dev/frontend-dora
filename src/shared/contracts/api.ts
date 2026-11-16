@@ -91,6 +91,8 @@ export type SessionUser = {
   photoUrl: string | null;
   /** Contact phone, digits only (null: none). */
   phone: string | null;
+  /** YYYY-MM-DD (null: not informed); prices event tickets by age. */
+  birthDate: string | null;
   /** Already saw (or skipped) the guided tour. */
   onboardingCompleted: boolean;
 };
@@ -115,6 +117,8 @@ export type UserAccount = {
   employee: EmployeeProfile | null;
   /** Contact phone, digits only (DDD + number). */
   phone: string | null;
+  /** YYYY-MM-DD (null: not informed). */
+  birthDate: string | null;
   /** Short-lived link to the profile photo (null: none). */
   photoUrl: string | null;
   /**
@@ -158,6 +162,8 @@ export type UserInput = {
   employee?: EmployeeProfileInput | null;
   /** Any format (the API keeps the digits); "" or null clears it. */
   phone?: string | null;
+  /** YYYY-MM-DD; "" or null clears it. */
+  birthDate?: string | null;
 };
 
 export type PermissionMatrix = {

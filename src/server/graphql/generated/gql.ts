@@ -16,7 +16,7 @@ import * as types from './graphql';
  */
 type Documents = {
     "\n  query Users($filter: UserFilterInput, $page: PageInput) {\n    users(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...UserAccountFields\n      }\n    }\n  }\n": typeof types.UsersDocument,
-    "\n  fragment UserAccountFields on UserAccount {\n    id\n    name\n    email\n    username\n    group\n    active\n    kind\n    unitId\n    unitLabel\n    unitComplement\n    employee {\n      jobTitle\n      hiredOn\n      workShift\n      contractor\n    }\n    phone\n    photoUrl\n    sharedAccount\n    mustChangePassword\n    lockedUntil\n    locked\n    lastLoginAt\n    deactivatedAt\n    createdAt\n  }\n": typeof types.UserAccountFieldsFragmentDoc,
+    "\n  fragment UserAccountFields on UserAccount {\n    id\n    name\n    email\n    username\n    group\n    active\n    kind\n    unitId\n    unitLabel\n    unitComplement\n    employee {\n      jobTitle\n      hiredOn\n      workShift\n      contractor\n    }\n    phone\n    birthDate\n    photoUrl\n    sharedAccount\n    mustChangePassword\n    lockedUntil\n    locked\n    lastLoginAt\n    deactivatedAt\n    createdAt\n  }\n": typeof types.UserAccountFieldsFragmentDoc,
     "\n  query User($id: ID!) {\n    user(id: $id) {\n      ...UserAccountFields\n    }\n  }\n": typeof types.UserDocument,
     "\n  mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      temporaryPassword\n      emailSent\n      existingAccount\n      user {\n        ...UserAccountFields\n      }\n    }\n  }\n": typeof types.CreateUserDocument,
     "\n  mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n      ...UserAccountFields\n    }\n  }\n": typeof types.UpdateUserDocument,
@@ -28,13 +28,13 @@ type Documents = {
     "\n  mutation SetUserPermissions($input: SetUserPermissionsInput!) {\n    setUserPermissions(input: $input) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": typeof types.SetUserPermissionsDocument,
     "\n  query RecordStamp($entity: String!, $id: ID!) {\n    recordStamp(entity: $entity, id: $id) {\n      createdAt\n      createdByName\n      updatedAt\n      updatedByName\n    }\n  }\n": typeof types.RecordStampDocument,
     "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n      deployedAt\n    }\n  }\n": typeof types.AppInfoDocument,
-    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n          addressFormat\n          modules\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n": typeof types.LoginDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        birthDate\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n          addressFormat\n          modules\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": typeof types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
-    "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n": typeof types.MeDocument,
+    "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      birthDate\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n": typeof types.MeDocument,
     "\n  mutation CompleteOnboarding {\n    completeOnboarding\n  }\n": typeof types.CompleteOnboardingDocument,
     "\n  mutation ChangeMyPassword($input: ChangePasswordInput!) {\n    changeMyPassword(input: $input)\n  }\n": typeof types.ChangeMyPasswordDocument,
-    "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n": typeof types.UpdateMyProfileDocument,
+    "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      birthDate\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n": typeof types.UpdateMyProfileDocument,
     "\n  mutation SetMyPhoto($photo: String!) {\n    setMyPhoto(photo: $photo)\n  }\n": typeof types.SetMyPhotoDocument,
     "\n  mutation RemoveMyPhoto {\n    removeMyPhoto\n  }\n": typeof types.RemoveMyPhotoDocument,
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": typeof types.RequestPasswordRecoveryDocument,
@@ -82,24 +82,40 @@ type Documents = {
     "\n  mutation UpdateUnit($id: ID!, $input: UpdateUnitInput!) {\n    updateUnit(id: $id, input: $input) {\n      ...UnitFields\n    }\n  }\n": typeof types.UpdateUnitDocument,
     "\n  mutation DeleteUnit($id: ID!) {\n    deleteUnit(id: $id)\n  }\n": typeof types.DeleteUnitDocument,
     "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      pendingBookings\n      bookingsToday\n      openSupportRequests\n      failedNotifications\n    }\n  }\n": typeof types.DashboardDocument,
+    "\n  fragment DependentFields on Dependent {\n    id\n    name\n    birthDate\n    relationship\n    status\n    holderName\n    unitLabel\n    rejectReason\n    reviewedAt\n    createdAt\n    documentUrl\n    documentContentType\n  }\n": typeof types.DependentFieldsFragmentDoc,
+    "\n  query MyDependents {\n    myDependents {\n      ...DependentFields\n    }\n  }\n": typeof types.MyDependentsDocument,
+    "\n  mutation AddDependent($input: DependentInput!) {\n    addDependent(input: $input) {\n      ...DependentFields\n    }\n  }\n": typeof types.AddDependentDocument,
+    "\n  mutation RemoveDependent($id: ID!) {\n    removeDependent(id: $id)\n  }\n": typeof types.RemoveDependentDocument,
+    "\n  query Dependents($status: DependentStatus) {\n    dependents(status: $status) {\n      ...DependentFields\n    }\n  }\n": typeof types.DependentsDocument,
+    "\n  mutation ApproveDependent($id: ID!) {\n    approveDependent(id: $id) {\n      ...DependentFields\n    }\n  }\n": typeof types.ApproveDependentDocument,
+    "\n  mutation RejectDependent($id: ID!, $reason: String!) {\n    rejectDependent(id: $id, reason: $reason) {\n      ...DependentFields\n    }\n  }\n": typeof types.RejectDependentDocument,
     "\n  mutation VerifyEnrollmentCode($code: String!) {\n    verifyEnrollmentCode(code: $code)\n  }\n": typeof types.VerifyEnrollmentCodeDocument,
     "\n  query EnrollmentForm($formToken: String!) {\n    enrollmentForm(formToken: $formToken) {\n      condominiumName\n      addressFormat\n      units {\n        id\n        label\n      }\n    }\n  }\n": typeof types.EnrollmentFormDocument,
     "\n  mutation SubmitEnrollment($input: SubmitEnrollmentInput!) {\n    submitEnrollment(input: $input)\n  }\n": typeof types.SubmitEnrollmentDocument,
     "\n  fragment EnrollmentInviteFields on EnrollmentInvite {\n    id\n    code\n    label\n    expiresAt\n    revokedAt\n    createdAt\n    requestCount\n  }\n": typeof types.EnrollmentInviteFieldsFragmentDoc,
-    "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    applicant\n    fullName\n    email\n    phone\n    unitId\n    unitLabel\n    unitComplement\n    typedUnitLabel\n    typedUnitBlock\n    typedUnitNumber\n    typedUnitStreet\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n": typeof types.EnrollmentRequestFieldsFragmentDoc,
+    "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    applicant\n    fullName\n    email\n    phone\n    birthDate\n    unitId\n    unitLabel\n    unitComplement\n    typedUnitLabel\n    typedUnitBlock\n    typedUnitNumber\n    typedUnitStreet\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n": typeof types.EnrollmentRequestFieldsFragmentDoc,
     "\n  query EnrollmentInvites {\n    enrollmentInvites {\n      ...EnrollmentInviteFields\n    }\n  }\n": typeof types.EnrollmentInvitesDocument,
     "\n  mutation CreateEnrollmentInvite($input: CreateEnrollmentInviteInput!) {\n    createEnrollmentInvite(input: $input) {\n      ...EnrollmentInviteFields\n    }\n  }\n": typeof types.CreateEnrollmentInviteDocument,
     "\n  mutation RevokeEnrollmentInvite($id: ID!) {\n    revokeEnrollmentInvite(id: $id) {\n      ...EnrollmentInviteFields\n    }\n  }\n": typeof types.RevokeEnrollmentInviteDocument,
     "\n  query EnrollmentRequests(\n    $filter: EnrollmentRequestFilterInput\n    $page: PageInput\n  ) {\n    enrollmentRequests(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...EnrollmentRequestFields\n      }\n    }\n    pendingEnrollmentCount\n  }\n": typeof types.EnrollmentRequestsDocument,
     "\n  mutation ApproveEnrollmentRequest(\n    $id: ID!\n    $data: EnrollmentDataInput!\n    $group: UserGroup!\n  ) {\n    approveEnrollmentRequest(id: $id, data: $data, group: $group) {\n      request {\n        ...EnrollmentRequestFields\n      }\n      access {\n        temporaryPassword\n        emailSent\n        existingAccount\n        user {\n          ...UserAccountFields\n        }\n      }\n    }\n  }\n": typeof types.ApproveEnrollmentRequestDocument,
     "\n  mutation RejectEnrollmentRequest($id: ID!, $reason: String!) {\n    rejectEnrollmentRequest(id: $id, reason: $reason) {\n      ...EnrollmentRequestFields\n    }\n  }\n": typeof types.RejectEnrollmentRequestDocument,
-    "\n  fragment EventFields on Event {\n    id\n    title\n    description\n    spaceId\n    spaceName\n    location\n    address {\n      zip\n      street\n      number\n      complement\n      district\n      city\n      state\n    }\n    startsAt\n    endsAt\n    capacity\n    externalGuestLimit\n    ticketed\n    status\n    cancelReason\n    publishedAt\n    cancelledAt\n    createdAt\n  }\n": typeof types.EventFieldsFragmentDoc,
+    "\n  fragment EventFields on Event {\n    id\n    title\n    description\n    spaceId\n    spaceName\n    location\n    address {\n      zip\n      street\n      number\n      complement\n      district\n      city\n      state\n    }\n    startsAt\n    endsAt\n    capacity\n    externalGuestLimit\n    ticketed\n    fullPriceCents\n    ticketTypes {\n      id\n      kind\n      name\n      priceMode\n      customPriceCents\n      priceCents\n      minAge\n      maxAge\n    }\n    unitTicketLimit\n    pixSource\n    customPix {\n      keyType\n      key\n      name\n      city\n    }\n    placesLeft\n    outsidePlacesLeft\n    status\n    cancelReason\n    publishedAt\n    cancelledAt\n    createdAt\n  }\n": typeof types.EventFieldsFragmentDoc,
     "\n  query Events($when: EventWhen) {\n    events(when: $when) {\n      ...EventFields\n    }\n  }\n": typeof types.EventsDocument,
     "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n    }\n  }\n": typeof types.EventDocument,
     "\n  mutation CreateEvent($input: EventInput!) {\n    createEvent(input: $input) {\n      ...EventFields\n    }\n  }\n": typeof types.CreateEventDocument,
     "\n  mutation UpdateEvent($id: ID!, $input: EventInput!) {\n    updateEvent(id: $id, input: $input) {\n      ...EventFields\n    }\n  }\n": typeof types.UpdateEventDocument,
     "\n  mutation PublishEvent($id: ID!) {\n    publishEvent(id: $id) {\n      ...EventFields\n    }\n  }\n": typeof types.PublishEventDocument,
     "\n  mutation CancelEvent($id: ID!, $reason: String!) {\n    cancelEvent(id: $id, reason: $reason) {\n      ...EventFields\n    }\n  }\n": typeof types.CancelEventDocument,
+    "\n  fragment EventOrderFields on EventOrder {\n    id\n    eventId\n    eventTitle\n    code\n    status\n    totalCents\n    buyerName\n    unitLabel\n    attendees {\n      id\n      source\n      dependentId\n      name\n      age\n      outside\n      ticketName\n      priceCents\n      needsProof\n      proofUrl\n      proofContentType\n    }\n    pix {\n      keyType\n      key\n      name\n      city\n    }\n    pixCode\n    expiresAt\n    receiptSentAt\n    receiptContentType\n    receiptUrl\n    reviewedAt\n    rejectReason\n    cancelledAt\n    createdAt\n  }\n": typeof types.EventOrderFieldsFragmentDoc,
+    "\n  query MyEventOrders($eventId: ID!) {\n    myEventOrders(eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.MyEventOrdersDocument,
+    "\n  query EventOrders($eventId: ID!, $status: EventOrderStatus) {\n    eventOrders(eventId: $eventId, status: $status) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.EventOrdersDocument,
+    "\n  mutation CreateEventOrder($eventId: ID!, $attendees: [AttendeeInput!]!) {\n    createEventOrder(eventId: $eventId, attendees: $attendees) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.CreateEventOrderDocument,
+    "\n  mutation SubmitEventOrderReceipt($id: ID!, $file: String!) {\n    submitEventOrderReceipt(id: $id, file: $file) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.SubmitEventOrderReceiptDocument,
+    "\n  mutation CancelEventOrder($id: ID!) {\n    cancelEventOrder(id: $id) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.CancelEventOrderDocument,
+    "\n  mutation ApproveEventOrder($id: ID!) {\n    approveEventOrder(id: $id) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.ApproveEventOrderDocument,
+    "\n  mutation RejectEventOrder($id: ID!, $reason: String!) {\n    rejectEventOrder(id: $id, reason: $reason) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.RejectEventOrderDocument,
+    "\n  mutation SubmitEventAttendeeProof(\n    $orderId: ID!\n    $attendeeId: ID!\n    $file: String!\n  ) {\n    submitEventAttendeeProof(\n      orderId: $orderId\n      attendeeId: $attendeeId\n      file: $file\n    ) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.SubmitEventAttendeeProofDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": typeof types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": typeof types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": typeof types.MarkNotificationReadDocument,
@@ -110,6 +126,9 @@ type Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": typeof types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": typeof types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": typeof types.SendTestPushDocument,
+    "\n  query CondominiumPix {\n    condominiumPix {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": typeof types.CondominiumPixDocument,
+    "\n  mutation SetCondominiumPix($input: PixReceiverInput!) {\n    setCondominiumPix(input: $input) {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": typeof types.SetCondominiumPixDocument,
+    "\n  mutation RemoveCondominiumPix {\n    removeCondominiumPix\n  }\n": typeof types.RemoveCondominiumPixDocument,
     "\n  query PlatformMetrics($filter: PlatformMetricsFilterInput) {\n    platformMetrics(filter: $filter) {\n      from\n      to\n      days\n      condominiumId\n      bookings {\n        total\n        confirmed\n        pending\n        cancelled\n        rejected\n        stalePending\n        granularity\n        series {\n          bucket\n          total\n          cancelled\n        }\n        byCondominium {\n          condominiumId\n          name\n          total\n          cancelled\n        }\n      }\n      spaces {\n        activeSpaces\n        unusedCount\n        mostUsed {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        unused {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        byWeekday {\n          weekday\n          bookings\n        }\n        byHour {\n          hour\n          bookings\n        }\n      }\n      engagement {\n        members\n        active7d\n        active30d\n        newMembers\n        enrollments\n        inactiveCount\n        inactiveCondominiums {\n          condominiumId\n          name\n          lastActivityAt\n        }\n      }\n      health {\n        staleEnrollments\n        failedNotifications\n        delayedNotifications\n        withoutManager\n        withoutUnits\n        openSupport\n      }\n    }\n  }\n": typeof types.PlatformMetricsDocument,
     "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n      feeCents\n      guests {\n        allowed\n        max\n        documentRequired\n      }\n      recurringAllowed\n    }\n  }\n": typeof types.SpaceFieldsFragmentDoc,
     "\n  query Spaces($includeInactive: Boolean!) {\n    spaces(includeInactive: $includeInactive) {\n      ...SpaceFields\n    }\n  }\n": typeof types.SpacesDocument,
@@ -138,7 +157,7 @@ type Documents = {
 };
 const documents: Documents = {
     "\n  query Users($filter: UserFilterInput, $page: PageInput) {\n    users(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...UserAccountFields\n      }\n    }\n  }\n": types.UsersDocument,
-    "\n  fragment UserAccountFields on UserAccount {\n    id\n    name\n    email\n    username\n    group\n    active\n    kind\n    unitId\n    unitLabel\n    unitComplement\n    employee {\n      jobTitle\n      hiredOn\n      workShift\n      contractor\n    }\n    phone\n    photoUrl\n    sharedAccount\n    mustChangePassword\n    lockedUntil\n    locked\n    lastLoginAt\n    deactivatedAt\n    createdAt\n  }\n": types.UserAccountFieldsFragmentDoc,
+    "\n  fragment UserAccountFields on UserAccount {\n    id\n    name\n    email\n    username\n    group\n    active\n    kind\n    unitId\n    unitLabel\n    unitComplement\n    employee {\n      jobTitle\n      hiredOn\n      workShift\n      contractor\n    }\n    phone\n    birthDate\n    photoUrl\n    sharedAccount\n    mustChangePassword\n    lockedUntil\n    locked\n    lastLoginAt\n    deactivatedAt\n    createdAt\n  }\n": types.UserAccountFieldsFragmentDoc,
     "\n  query User($id: ID!) {\n    user(id: $id) {\n      ...UserAccountFields\n    }\n  }\n": types.UserDocument,
     "\n  mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      temporaryPassword\n      emailSent\n      existingAccount\n      user {\n        ...UserAccountFields\n      }\n    }\n  }\n": types.CreateUserDocument,
     "\n  mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n      ...UserAccountFields\n    }\n  }\n": types.UpdateUserDocument,
@@ -150,13 +169,13 @@ const documents: Documents = {
     "\n  mutation SetUserPermissions($input: SetUserPermissionsInput!) {\n    setUserPermissions(input: $input) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": types.SetUserPermissionsDocument,
     "\n  query RecordStamp($entity: String!, $id: ID!) {\n    recordStamp(entity: $entity, id: $id) {\n      createdAt\n      createdByName\n      updatedAt\n      updatedByName\n    }\n  }\n": types.RecordStampDocument,
     "\n  query AppInfo {\n    appInfo {\n      version\n      commit\n      deployedAt\n    }\n  }\n": types.AppInfoDocument,
-    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n          addressFormat\n          modules\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n": types.LoginDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        birthDate\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n          addressFormat\n          modules\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n": types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
-    "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n": types.MeDocument,
+    "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      birthDate\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n": types.MeDocument,
     "\n  mutation CompleteOnboarding {\n    completeOnboarding\n  }\n": types.CompleteOnboardingDocument,
     "\n  mutation ChangeMyPassword($input: ChangePasswordInput!) {\n    changeMyPassword(input: $input)\n  }\n": types.ChangeMyPasswordDocument,
-    "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n": types.UpdateMyProfileDocument,
+    "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      birthDate\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n": types.UpdateMyProfileDocument,
     "\n  mutation SetMyPhoto($photo: String!) {\n    setMyPhoto(photo: $photo)\n  }\n": types.SetMyPhotoDocument,
     "\n  mutation RemoveMyPhoto {\n    removeMyPhoto\n  }\n": types.RemoveMyPhotoDocument,
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": types.RequestPasswordRecoveryDocument,
@@ -204,24 +223,40 @@ const documents: Documents = {
     "\n  mutation UpdateUnit($id: ID!, $input: UpdateUnitInput!) {\n    updateUnit(id: $id, input: $input) {\n      ...UnitFields\n    }\n  }\n": types.UpdateUnitDocument,
     "\n  mutation DeleteUnit($id: ID!) {\n    deleteUnit(id: $id)\n  }\n": types.DeleteUnitDocument,
     "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      pendingBookings\n      bookingsToday\n      openSupportRequests\n      failedNotifications\n    }\n  }\n": types.DashboardDocument,
+    "\n  fragment DependentFields on Dependent {\n    id\n    name\n    birthDate\n    relationship\n    status\n    holderName\n    unitLabel\n    rejectReason\n    reviewedAt\n    createdAt\n    documentUrl\n    documentContentType\n  }\n": types.DependentFieldsFragmentDoc,
+    "\n  query MyDependents {\n    myDependents {\n      ...DependentFields\n    }\n  }\n": types.MyDependentsDocument,
+    "\n  mutation AddDependent($input: DependentInput!) {\n    addDependent(input: $input) {\n      ...DependentFields\n    }\n  }\n": types.AddDependentDocument,
+    "\n  mutation RemoveDependent($id: ID!) {\n    removeDependent(id: $id)\n  }\n": types.RemoveDependentDocument,
+    "\n  query Dependents($status: DependentStatus) {\n    dependents(status: $status) {\n      ...DependentFields\n    }\n  }\n": types.DependentsDocument,
+    "\n  mutation ApproveDependent($id: ID!) {\n    approveDependent(id: $id) {\n      ...DependentFields\n    }\n  }\n": types.ApproveDependentDocument,
+    "\n  mutation RejectDependent($id: ID!, $reason: String!) {\n    rejectDependent(id: $id, reason: $reason) {\n      ...DependentFields\n    }\n  }\n": types.RejectDependentDocument,
     "\n  mutation VerifyEnrollmentCode($code: String!) {\n    verifyEnrollmentCode(code: $code)\n  }\n": types.VerifyEnrollmentCodeDocument,
     "\n  query EnrollmentForm($formToken: String!) {\n    enrollmentForm(formToken: $formToken) {\n      condominiumName\n      addressFormat\n      units {\n        id\n        label\n      }\n    }\n  }\n": types.EnrollmentFormDocument,
     "\n  mutation SubmitEnrollment($input: SubmitEnrollmentInput!) {\n    submitEnrollment(input: $input)\n  }\n": types.SubmitEnrollmentDocument,
     "\n  fragment EnrollmentInviteFields on EnrollmentInvite {\n    id\n    code\n    label\n    expiresAt\n    revokedAt\n    createdAt\n    requestCount\n  }\n": types.EnrollmentInviteFieldsFragmentDoc,
-    "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    applicant\n    fullName\n    email\n    phone\n    unitId\n    unitLabel\n    unitComplement\n    typedUnitLabel\n    typedUnitBlock\n    typedUnitNumber\n    typedUnitStreet\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n": types.EnrollmentRequestFieldsFragmentDoc,
+    "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    applicant\n    fullName\n    email\n    phone\n    birthDate\n    unitId\n    unitLabel\n    unitComplement\n    typedUnitLabel\n    typedUnitBlock\n    typedUnitNumber\n    typedUnitStreet\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n": types.EnrollmentRequestFieldsFragmentDoc,
     "\n  query EnrollmentInvites {\n    enrollmentInvites {\n      ...EnrollmentInviteFields\n    }\n  }\n": types.EnrollmentInvitesDocument,
     "\n  mutation CreateEnrollmentInvite($input: CreateEnrollmentInviteInput!) {\n    createEnrollmentInvite(input: $input) {\n      ...EnrollmentInviteFields\n    }\n  }\n": types.CreateEnrollmentInviteDocument,
     "\n  mutation RevokeEnrollmentInvite($id: ID!) {\n    revokeEnrollmentInvite(id: $id) {\n      ...EnrollmentInviteFields\n    }\n  }\n": types.RevokeEnrollmentInviteDocument,
     "\n  query EnrollmentRequests(\n    $filter: EnrollmentRequestFilterInput\n    $page: PageInput\n  ) {\n    enrollmentRequests(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...EnrollmentRequestFields\n      }\n    }\n    pendingEnrollmentCount\n  }\n": types.EnrollmentRequestsDocument,
     "\n  mutation ApproveEnrollmentRequest(\n    $id: ID!\n    $data: EnrollmentDataInput!\n    $group: UserGroup!\n  ) {\n    approveEnrollmentRequest(id: $id, data: $data, group: $group) {\n      request {\n        ...EnrollmentRequestFields\n      }\n      access {\n        temporaryPassword\n        emailSent\n        existingAccount\n        user {\n          ...UserAccountFields\n        }\n      }\n    }\n  }\n": types.ApproveEnrollmentRequestDocument,
     "\n  mutation RejectEnrollmentRequest($id: ID!, $reason: String!) {\n    rejectEnrollmentRequest(id: $id, reason: $reason) {\n      ...EnrollmentRequestFields\n    }\n  }\n": types.RejectEnrollmentRequestDocument,
-    "\n  fragment EventFields on Event {\n    id\n    title\n    description\n    spaceId\n    spaceName\n    location\n    address {\n      zip\n      street\n      number\n      complement\n      district\n      city\n      state\n    }\n    startsAt\n    endsAt\n    capacity\n    externalGuestLimit\n    ticketed\n    status\n    cancelReason\n    publishedAt\n    cancelledAt\n    createdAt\n  }\n": types.EventFieldsFragmentDoc,
+    "\n  fragment EventFields on Event {\n    id\n    title\n    description\n    spaceId\n    spaceName\n    location\n    address {\n      zip\n      street\n      number\n      complement\n      district\n      city\n      state\n    }\n    startsAt\n    endsAt\n    capacity\n    externalGuestLimit\n    ticketed\n    fullPriceCents\n    ticketTypes {\n      id\n      kind\n      name\n      priceMode\n      customPriceCents\n      priceCents\n      minAge\n      maxAge\n    }\n    unitTicketLimit\n    pixSource\n    customPix {\n      keyType\n      key\n      name\n      city\n    }\n    placesLeft\n    outsidePlacesLeft\n    status\n    cancelReason\n    publishedAt\n    cancelledAt\n    createdAt\n  }\n": types.EventFieldsFragmentDoc,
     "\n  query Events($when: EventWhen) {\n    events(when: $when) {\n      ...EventFields\n    }\n  }\n": types.EventsDocument,
     "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n    }\n  }\n": types.EventDocument,
     "\n  mutation CreateEvent($input: EventInput!) {\n    createEvent(input: $input) {\n      ...EventFields\n    }\n  }\n": types.CreateEventDocument,
     "\n  mutation UpdateEvent($id: ID!, $input: EventInput!) {\n    updateEvent(id: $id, input: $input) {\n      ...EventFields\n    }\n  }\n": types.UpdateEventDocument,
     "\n  mutation PublishEvent($id: ID!) {\n    publishEvent(id: $id) {\n      ...EventFields\n    }\n  }\n": types.PublishEventDocument,
     "\n  mutation CancelEvent($id: ID!, $reason: String!) {\n    cancelEvent(id: $id, reason: $reason) {\n      ...EventFields\n    }\n  }\n": types.CancelEventDocument,
+    "\n  fragment EventOrderFields on EventOrder {\n    id\n    eventId\n    eventTitle\n    code\n    status\n    totalCents\n    buyerName\n    unitLabel\n    attendees {\n      id\n      source\n      dependentId\n      name\n      age\n      outside\n      ticketName\n      priceCents\n      needsProof\n      proofUrl\n      proofContentType\n    }\n    pix {\n      keyType\n      key\n      name\n      city\n    }\n    pixCode\n    expiresAt\n    receiptSentAt\n    receiptContentType\n    receiptUrl\n    reviewedAt\n    rejectReason\n    cancelledAt\n    createdAt\n  }\n": types.EventOrderFieldsFragmentDoc,
+    "\n  query MyEventOrders($eventId: ID!) {\n    myEventOrders(eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n": types.MyEventOrdersDocument,
+    "\n  query EventOrders($eventId: ID!, $status: EventOrderStatus) {\n    eventOrders(eventId: $eventId, status: $status) {\n      ...EventOrderFields\n    }\n  }\n": types.EventOrdersDocument,
+    "\n  mutation CreateEventOrder($eventId: ID!, $attendees: [AttendeeInput!]!) {\n    createEventOrder(eventId: $eventId, attendees: $attendees) {\n      ...EventOrderFields\n    }\n  }\n": types.CreateEventOrderDocument,
+    "\n  mutation SubmitEventOrderReceipt($id: ID!, $file: String!) {\n    submitEventOrderReceipt(id: $id, file: $file) {\n      ...EventOrderFields\n    }\n  }\n": types.SubmitEventOrderReceiptDocument,
+    "\n  mutation CancelEventOrder($id: ID!) {\n    cancelEventOrder(id: $id) {\n      ...EventOrderFields\n    }\n  }\n": types.CancelEventOrderDocument,
+    "\n  mutation ApproveEventOrder($id: ID!) {\n    approveEventOrder(id: $id) {\n      ...EventOrderFields\n    }\n  }\n": types.ApproveEventOrderDocument,
+    "\n  mutation RejectEventOrder($id: ID!, $reason: String!) {\n    rejectEventOrder(id: $id, reason: $reason) {\n      ...EventOrderFields\n    }\n  }\n": types.RejectEventOrderDocument,
+    "\n  mutation SubmitEventAttendeeProof(\n    $orderId: ID!\n    $attendeeId: ID!\n    $file: String!\n  ) {\n    submitEventAttendeeProof(\n      orderId: $orderId\n      attendeeId: $attendeeId\n      file: $file\n    ) {\n      ...EventOrderFields\n    }\n  }\n": types.SubmitEventAttendeeProofDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": types.MarkNotificationReadDocument,
@@ -232,6 +267,9 @@ const documents: Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": types.SendTestPushDocument,
+    "\n  query CondominiumPix {\n    condominiumPix {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": types.CondominiumPixDocument,
+    "\n  mutation SetCondominiumPix($input: PixReceiverInput!) {\n    setCondominiumPix(input: $input) {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": types.SetCondominiumPixDocument,
+    "\n  mutation RemoveCondominiumPix {\n    removeCondominiumPix\n  }\n": types.RemoveCondominiumPixDocument,
     "\n  query PlatformMetrics($filter: PlatformMetricsFilterInput) {\n    platformMetrics(filter: $filter) {\n      from\n      to\n      days\n      condominiumId\n      bookings {\n        total\n        confirmed\n        pending\n        cancelled\n        rejected\n        stalePending\n        granularity\n        series {\n          bucket\n          total\n          cancelled\n        }\n        byCondominium {\n          condominiumId\n          name\n          total\n          cancelled\n        }\n      }\n      spaces {\n        activeSpaces\n        unusedCount\n        mostUsed {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        unused {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        byWeekday {\n          weekday\n          bookings\n        }\n        byHour {\n          hour\n          bookings\n        }\n      }\n      engagement {\n        members\n        active7d\n        active30d\n        newMembers\n        enrollments\n        inactiveCount\n        inactiveCondominiums {\n          condominiumId\n          name\n          lastActivityAt\n        }\n      }\n      health {\n        staleEnrollments\n        failedNotifications\n        delayedNotifications\n        withoutManager\n        withoutUnits\n        openSupport\n      }\n    }\n  }\n": types.PlatformMetricsDocument,
     "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n      feeCents\n      guests {\n        allowed\n        max\n        documentRequired\n      }\n      recurringAllowed\n    }\n  }\n": types.SpaceFieldsFragmentDoc,
     "\n  query Spaces($includeInactive: Boolean!) {\n    spaces(includeInactive: $includeInactive) {\n      ...SpaceFields\n    }\n  }\n": types.SpacesDocument,
@@ -266,7 +304,7 @@ export function graphql(source: "\n  query Users($filter: UserFilterInput, $page
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment UserAccountFields on UserAccount {\n    id\n    name\n    email\n    username\n    group\n    active\n    kind\n    unitId\n    unitLabel\n    unitComplement\n    employee {\n      jobTitle\n      hiredOn\n      workShift\n      contractor\n    }\n    phone\n    photoUrl\n    sharedAccount\n    mustChangePassword\n    lockedUntil\n    locked\n    lastLoginAt\n    deactivatedAt\n    createdAt\n  }\n"): typeof import('./graphql').UserAccountFieldsFragmentDoc;
+export function graphql(source: "\n  fragment UserAccountFields on UserAccount {\n    id\n    name\n    email\n    username\n    group\n    active\n    kind\n    unitId\n    unitLabel\n    unitComplement\n    employee {\n      jobTitle\n      hiredOn\n      workShift\n      contractor\n    }\n    phone\n    birthDate\n    photoUrl\n    sharedAccount\n    mustChangePassword\n    lockedUntil\n    locked\n    lastLoginAt\n    deactivatedAt\n    createdAt\n  }\n"): typeof import('./graphql').UserAccountFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -314,7 +352,7 @@ export function graphql(source: "\n  query AppInfo {\n    appInfo {\n      versi
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n          addressFormat\n          modules\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').LoginDocument;
+export function graphql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        phone\n        birthDate\n        onboardingCompleted\n        platformAdmin\n        condominium {\n          id\n          name\n          city\n          state\n          status\n          addressFormat\n          modules\n        }\n        condominiums {\n          id\n          name\n          city\n          state\n          role\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').LoginDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -326,7 +364,7 @@ export function graphql(source: "\n  mutation Logout {\n    logout\n  }\n"): typ
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n"): typeof import('./graphql').MeDocument;
+export function graphql(source: "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      birthDate\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n"): typeof import('./graphql').MeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -338,7 +376,7 @@ export function graphql(source: "\n  mutation ChangeMyPassword($input: ChangePas
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n"): typeof import('./graphql').UpdateMyProfileDocument;
+export function graphql(source: "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      phone\n      birthDate\n      onboardingCompleted\n      platformAdmin\n      condominium {\n        id\n        name\n        city\n        state\n        status\n        addressFormat\n        modules\n      }\n      condominiums {\n        id\n        name\n        city\n        state\n        role\n      }\n    }\n  }\n"): typeof import('./graphql').UpdateMyProfileDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -530,6 +568,34 @@ export function graphql(source: "\n  query Dashboard {\n    dashboard {\n      a
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  fragment DependentFields on Dependent {\n    id\n    name\n    birthDate\n    relationship\n    status\n    holderName\n    unitLabel\n    rejectReason\n    reviewedAt\n    createdAt\n    documentUrl\n    documentContentType\n  }\n"): typeof import('./graphql').DependentFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MyDependents {\n    myDependents {\n      ...DependentFields\n    }\n  }\n"): typeof import('./graphql').MyDependentsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AddDependent($input: DependentInput!) {\n    addDependent(input: $input) {\n      ...DependentFields\n    }\n  }\n"): typeof import('./graphql').AddDependentDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveDependent($id: ID!) {\n    removeDependent(id: $id)\n  }\n"): typeof import('./graphql').RemoveDependentDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Dependents($status: DependentStatus) {\n    dependents(status: $status) {\n      ...DependentFields\n    }\n  }\n"): typeof import('./graphql').DependentsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ApproveDependent($id: ID!) {\n    approveDependent(id: $id) {\n      ...DependentFields\n    }\n  }\n"): typeof import('./graphql').ApproveDependentDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RejectDependent($id: ID!, $reason: String!) {\n    rejectDependent(id: $id, reason: $reason) {\n      ...DependentFields\n    }\n  }\n"): typeof import('./graphql').RejectDependentDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation VerifyEnrollmentCode($code: String!) {\n    verifyEnrollmentCode(code: $code)\n  }\n"): typeof import('./graphql').VerifyEnrollmentCodeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -546,7 +612,7 @@ export function graphql(source: "\n  fragment EnrollmentInviteFields on Enrollme
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    applicant\n    fullName\n    email\n    phone\n    unitId\n    unitLabel\n    unitComplement\n    typedUnitLabel\n    typedUnitBlock\n    typedUnitNumber\n    typedUnitStreet\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n"): typeof import('./graphql').EnrollmentRequestFieldsFragmentDoc;
+export function graphql(source: "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    applicant\n    fullName\n    email\n    phone\n    birthDate\n    unitId\n    unitLabel\n    unitComplement\n    typedUnitLabel\n    typedUnitBlock\n    typedUnitNumber\n    typedUnitStreet\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n"): typeof import('./graphql').EnrollmentRequestFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -574,7 +640,7 @@ export function graphql(source: "\n  mutation RejectEnrollmentRequest($id: ID!, 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment EventFields on Event {\n    id\n    title\n    description\n    spaceId\n    spaceName\n    location\n    address {\n      zip\n      street\n      number\n      complement\n      district\n      city\n      state\n    }\n    startsAt\n    endsAt\n    capacity\n    externalGuestLimit\n    ticketed\n    status\n    cancelReason\n    publishedAt\n    cancelledAt\n    createdAt\n  }\n"): typeof import('./graphql').EventFieldsFragmentDoc;
+export function graphql(source: "\n  fragment EventFields on Event {\n    id\n    title\n    description\n    spaceId\n    spaceName\n    location\n    address {\n      zip\n      street\n      number\n      complement\n      district\n      city\n      state\n    }\n    startsAt\n    endsAt\n    capacity\n    externalGuestLimit\n    ticketed\n    fullPriceCents\n    ticketTypes {\n      id\n      kind\n      name\n      priceMode\n      customPriceCents\n      priceCents\n      minAge\n      maxAge\n    }\n    unitTicketLimit\n    pixSource\n    customPix {\n      keyType\n      key\n      name\n      city\n    }\n    placesLeft\n    outsidePlacesLeft\n    status\n    cancelReason\n    publishedAt\n    cancelledAt\n    createdAt\n  }\n"): typeof import('./graphql').EventFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -599,6 +665,42 @@ export function graphql(source: "\n  mutation PublishEvent($id: ID!) {\n    publ
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation CancelEvent($id: ID!, $reason: String!) {\n    cancelEvent(id: $id, reason: $reason) {\n      ...EventFields\n    }\n  }\n"): typeof import('./graphql').CancelEventDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment EventOrderFields on EventOrder {\n    id\n    eventId\n    eventTitle\n    code\n    status\n    totalCents\n    buyerName\n    unitLabel\n    attendees {\n      id\n      source\n      dependentId\n      name\n      age\n      outside\n      ticketName\n      priceCents\n      needsProof\n      proofUrl\n      proofContentType\n    }\n    pix {\n      keyType\n      key\n      name\n      city\n    }\n    pixCode\n    expiresAt\n    receiptSentAt\n    receiptContentType\n    receiptUrl\n    reviewedAt\n    rejectReason\n    cancelledAt\n    createdAt\n  }\n"): typeof import('./graphql').EventOrderFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MyEventOrders($eventId: ID!) {\n    myEventOrders(eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').MyEventOrdersDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query EventOrders($eventId: ID!, $status: EventOrderStatus) {\n    eventOrders(eventId: $eventId, status: $status) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').EventOrdersDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateEventOrder($eventId: ID!, $attendees: [AttendeeInput!]!) {\n    createEventOrder(eventId: $eventId, attendees: $attendees) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').CreateEventOrderDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SubmitEventOrderReceipt($id: ID!, $file: String!) {\n    submitEventOrderReceipt(id: $id, file: $file) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').SubmitEventOrderReceiptDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CancelEventOrder($id: ID!) {\n    cancelEventOrder(id: $id) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').CancelEventOrderDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ApproveEventOrder($id: ID!) {\n    approveEventOrder(id: $id) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').ApproveEventOrderDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RejectEventOrder($id: ID!, $reason: String!) {\n    rejectEventOrder(id: $id, reason: $reason) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').RejectEventOrderDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SubmitEventAttendeeProof(\n    $orderId: ID!\n    $attendeeId: ID!\n    $file: String!\n  ) {\n    submitEventAttendeeProof(\n      orderId: $orderId\n      attendeeId: $attendeeId\n      file: $file\n    ) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').SubmitEventAttendeeProofDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -639,6 +741,18 @@ export function graphql(source: "\n  mutation UnsubscribePush($endpoint: String!
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation SendTestPush {\n    sendTestPush\n  }\n"): typeof import('./graphql').SendTestPushDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CondominiumPix {\n    condominiumPix {\n      keyType\n      key\n      name\n      city\n    }\n  }\n"): typeof import('./graphql').CondominiumPixDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetCondominiumPix($input: PixReceiverInput!) {\n    setCondominiumPix(input: $input) {\n      keyType\n      key\n      name\n      city\n    }\n  }\n"): typeof import('./graphql').SetCondominiumPixDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveCondominiumPix {\n    removeCondominiumPix\n  }\n"): typeof import('./graphql').RemoveCondominiumPixDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

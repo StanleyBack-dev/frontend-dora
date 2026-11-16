@@ -61,6 +61,10 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Criar, publicar e cancelar eventos",
     area: "Gestão",
   },
+  PAYMENTS_MANAGE: {
+    label: "PIX do condomínio e conferência de comprovantes",
+    area: "Gestão",
+  },
   PERMISSIONS_MANAGE: {
     label: "Gerenciar permissões",
     area: "Administração",

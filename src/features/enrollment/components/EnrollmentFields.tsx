@@ -30,6 +30,7 @@ const APPLICANT_OPTIONS: ChoiceOption<EnrollmentApplicant>[] = [
   },
 ];
 import { maskPhone } from "@/shared/lib/masks";
+import { todayIso } from "@/shared/lib/birth-date";
 
 // The sign-up data: the public form and the manager's review share it.
 export function EnrollmentFields({
@@ -130,6 +131,16 @@ export function EnrollmentFields({
             value={form.phone}
             onChange={(e) => set("phone", maskPhone(e.target.value))}
             error={error("phone")}
+          />
+          <Field
+            label="Data de nascimento"
+            required={!reviewing}
+            type="date"
+            autoComplete="bday"
+            max={todayIso()}
+            value={form.birthDate}
+            onChange={(e) => set("birthDate", e.target.value)}
+            error={error("birthDate")}
           />
         </div>
       </CollapsibleSection>

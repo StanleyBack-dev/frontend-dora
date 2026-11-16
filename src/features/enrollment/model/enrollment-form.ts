@@ -7,6 +7,7 @@ import type {
   EnrollmentStatus,
 } from "@/shared/contracts/enrollment";
 import { formatPhone, phoneError } from "@/shared/lib/masks";
+import { birthDateError } from "@/shared/lib/birth-date";
 
 export type EnrollmentForm = {
   /** Lives in the condominium or works there (no address then). */
@@ -14,6 +15,8 @@ export type EnrollmentForm = {
   fullName: string;
   email: string;
   phone: string;
+  /** YYYY-MM-DD ("" while not informed). */
+  birthDate: string;
   /** "" while none is chosen. */
   unitId: string;
   /** "casa dos fundos" (optional). */
@@ -31,6 +34,7 @@ export const EMPTY_ENROLLMENT: EnrollmentForm = {
   fullName: "",
   email: "",
   phone: "",
+  birthDate: "",
   unitId: "",
   unitComplement: "",
   unitBlock: "",
@@ -68,6 +72,7 @@ export const fromRequest = (request: EnrollmentRequest): EnrollmentForm => ({
   fullName: request.fullName,
   email: request.email,
   phone: formatPhone(request.phone),
+  birthDate: request.birthDate ?? "",
   unitId: request.unitId ?? "",
   unitComplement: request.unitComplement ?? "",
   unitBlock: request.typedUnitBlock ?? "",
@@ -82,6 +87,8 @@ export function enrollmentErrors(
   form: EnrollmentForm,
   /** list: one unit must be chosen; typed: the number must be typed. */
   mode: UnitMode,
+  /** The public form asks it; a manager may approve an older request without. */
+  birthDateRequired = true,
 ): EnrollmentErrors {
   const errors: EnrollmentErrors = {};
   if (mode === "list" && !form.unitId) errors.unitId = "Escolha a sua unidade.";
@@ -120,6 +127,8 @@ export function enrollmentErrors(
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) {
     errors.email = "Informe um e-mail válido.";
   }
+  const birth = birthDateError(form.birthDate, birthDateRequired);
+  if (birth) errors.birthDate = birth;
   if (!form.phone) errors.phone = "Informe o telefone com DDD.";
   else {
     const phone = phoneError(form.phone);
@@ -135,6 +144,7 @@ export const toEnrollmentData = (
   fullName: form.fullName.trim(),
   email: form.email.trim(),
   phone: form.phone,
+  birthDate: form.birthDate || null,
   unitId: mode === "list" ? form.unitId || null : null,
   unitComplement: mode === "none" ? null : form.unitComplement.trim() || null,
   // Typed values only when there is no list to choose from.

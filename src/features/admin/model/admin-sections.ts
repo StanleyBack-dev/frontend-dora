@@ -2,7 +2,9 @@ import {
   Building,
   ClipboardList,
   Link2,
+  UsersRound,
   ScrollText,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import type { Permission } from "@/shared/contracts/api";
@@ -12,7 +14,7 @@ export type AdminSection = {
   label: string;
   description: string;
   icon: LucideIcon;
-  group: "Acessos" | "Sistema";
+  group: "Acessos" | "Financeiro" | "Sistema";
   permission: Permission;
   /** Belongs to one condominium (needs one open). */
   tenant: boolean;
@@ -40,12 +42,30 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     tenant: true,
   },
   {
+    href: "/admin/dependentes",
+    label: "Dependentes",
+    description: "Documentos para aprovar",
+    icon: UsersRound,
+    group: "Acessos",
+    permission: "USERS_MANAGE",
+    tenant: true,
+  },
+  {
     href: "/admin/unidades",
     label: "Unidades",
     description: "Blocos, apartamentos e casas",
     icon: Building,
     group: "Acessos",
     permission: "UNITS_MANAGE",
+    tenant: true,
+  },
+  {
+    href: "/admin/pagamentos",
+    label: "Pagamentos",
+    description: "PIX do condomínio",
+    icon: Wallet,
+    group: "Financeiro",
+    permission: "PAYMENTS_MANAGE",
     tenant: true,
   },
   {
