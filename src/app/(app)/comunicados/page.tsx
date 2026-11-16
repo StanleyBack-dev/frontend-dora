@@ -25,12 +25,7 @@ export default async function BroadcastsPage() {
         description="Avisos para todo o condomínio ou para um grupo de acesso. Chegam no app, nos aparelhos com notificação e, se quiser, por e-mail."
       />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <Card>
-          <CardHeader title="Novo comunicado" />
-          <CardBody>
-            <BroadcastForm />
-          </CardBody>
-        </Card>
+        <BroadcastForm />
         <Card>
           <CardHeader title="Enviados" description="Os 50 mais recentes." />
           <CardBody>

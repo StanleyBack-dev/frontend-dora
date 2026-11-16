@@ -11,6 +11,7 @@ export const condominiumFieldsFragment = graphql(`
     state
     status
     addressFormat
+    modules
     activeMembers
     managers
     units
@@ -47,6 +48,18 @@ export const updateCondominiumDocument = graphql(`
 export const setCondominiumStatusDocument = graphql(`
   mutation SetCondominiumStatus($id: ID!, $status: CondominiumStatus!) {
     setCondominiumStatus(id: $id, status: $status) {
+      ...CondominiumFields
+    }
+  }
+`);
+
+export const setCondominiumModuleDocument = graphql(`
+  mutation SetCondominiumModule(
+    $id: ID!
+    $module: AppModule!
+    $enabled: Boolean!
+  ) {
+    setCondominiumModule(id: $id, module: $module, enabled: $enabled) {
       ...CondominiumFields
     }
   }

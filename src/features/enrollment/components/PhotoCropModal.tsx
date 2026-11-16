@@ -170,7 +170,7 @@ export function PhotoCropModal({
       title="Ajustar foto"
       footer={
         <>
-          <Button type="button" variant="secondary" onClick={onCancel}>
+          <Button type="button" variant="cancel" onClick={onCancel}>
             Cancelar
           </Button>
           <Button

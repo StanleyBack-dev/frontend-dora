@@ -189,7 +189,7 @@ export function BookingsManageTable({
                 {booking.status === "CONFIRMED" && (
                   <Button
                     size="sm"
-                    variant="ghost"
+                    variant="cancel"
                     icon={<CalendarX2 className="size-4" />}
                     onClick={() => open("cancel", booking)}
                   >

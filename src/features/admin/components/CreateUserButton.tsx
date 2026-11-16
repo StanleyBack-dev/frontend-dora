@@ -69,6 +69,7 @@ export function CreateUserButton({
   return (
     <>
       <Button
+        variant="brand"
         onClick={() => setOpen(true)}
         icon={<UserPlus className="size-4" />}
       >
@@ -90,7 +91,7 @@ export function CreateUserButton({
             <Button onClick={close}>Concluir</Button>
           ) : (
             <>
-              <Button variant="secondary" onClick={close} disabled={pending}>
+              <Button variant="cancel" onClick={close} disabled={pending}>
                 Cancelar
               </Button>
               <Button onClick={submit} loading={pending} disabled={!complete}>

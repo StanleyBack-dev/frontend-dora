@@ -97,7 +97,7 @@ export function SpaceManageActions({ space }: { space: Space }) {
         footer={
           <>
             <Button
-              variant="secondary"
+              variant="cancel"
               onClick={() => setConfirming(null)}
               disabled={pending}
             >

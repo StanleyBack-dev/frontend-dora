@@ -40,7 +40,10 @@ export function HelpBrowser() {
   const box = useRef<HTMLDivElement>(null);
 
   const topics = useMemo(
-    () => (viewer ? visibleTopics(viewer.permissions, viewer.showAdmin) : []),
+    () =>
+      viewer
+        ? visibleTopics(viewer.permissions, viewer.showAdmin, viewer.modules)
+        : [],
     [viewer],
   );
   // Everything a topic says, to search by any word of it.

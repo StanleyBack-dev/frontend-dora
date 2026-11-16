@@ -14,11 +14,14 @@ import {
 } from "lucide-react";
 import {
   Button,
+  ChoiceCards,
+  CollapsibleSection,
   Field,
-  FormSection,
+  FormActions,
+  FormIssues,
   Select,
   TextArea,
-  cn,
+  type ChoiceOption,
 } from "@/design-system";
 import { spacesClient } from "@/features/spaces/api/spaces.client";
 import {
@@ -47,6 +50,59 @@ import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useToast } from "@/shared/toast/useToast";
 
 type DayForm = { open: boolean; opensAt: string; closesAt: string };
+
+type YesNo = "no" | "yes";
+const yesNo = (value: boolean): YesNo => (value ? "yes" : "no");
+const choice = (
+  no: Omit<ChoiceOption<YesNo>, "value">,
+  yes: Omit<ChoiceOption<YesNo>, "value">,
+): ChoiceOption<YesNo>[] => [
+  { value: "no", ...no },
+  { value: "yes", ...yes },
+];
+
+const LIMIT_CHOICE = choice(
+  { title: "Sem limite", hint: "Cada unidade reserva quantas vezes quiser." },
+  {
+    title: "Limitar por unidade",
+    hint: "Um número máximo de reservas por período.",
+  },
+);
+const APPROVAL_CHOICE = choice(
+  {
+    title: "Confirmação automática",
+    hint: "A reserva vale assim que é feita.",
+  },
+  {
+    title: "Exigir aprovação",
+    hint: "Só vale depois que um gestor aprovar. Bom para salão e churrasqueira.",
+  },
+);
+const FEE_CHOICE = choice(
+  { title: "Uso gratuito", hint: "Sem taxa por reserva." },
+  {
+    title: "Cobrar taxa de uso",
+    hint: "Gravada em cada reserva; aparece em Reservas → Taxas.",
+  },
+);
+const GUESTS_CHOICE = choice(
+  { title: "Sem lista de convidados", hint: "Só quem reserva." },
+  {
+    title: "Aceitar convidados",
+    hint: "Convite com QR code; a portaria confere e libera a entrada.",
+  },
+);
+const DOCUMENT_CHOICE = choice(
+  { title: "Documento opcional", hint: "Nome basta para cada convidado." },
+  { title: "Exigir documento", hint: "CPF ou RG de cada convidado." },
+);
+const RECURRING_CHOICE = choice(
+  { title: "Só reservas avulsas", hint: "Uma data por vez." },
+  {
+    title: "Permitir reserva semanal",
+    hint: "O mesmo horário toda semana (2 a 26 semanas). Gestores sempre podem.",
+  },
+);
 
 type FormState = {
   name: string;
@@ -155,6 +211,9 @@ export function SpaceForm({ space }: { space: Space | null }) {
   const { showError, showSuccess } = useToast();
   const [form, setForm] = useState<FormState>(() => toForm(space));
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // The missing fields show only after a submit attempt.
+  const [tried, setTried] = useState(false);
   const [photos, setPhotos] = useState<PhotosDraft>(() =>
     photosDraftOf(space?.photos ?? []),
   );
@@ -186,7 +245,13 @@ export function SpaceForm({ space }: { space: Space | null }) {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    setTried(true);
+    if (!form.name.trim()) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     setPending(true);
+    setError(null);
     try {
       const input = toInput(form);
       const saved = space
@@ -228,11 +293,12 @@ export function SpaceForm({ space }: { space: Space | null }) {
       }
       router.refresh();
     } catch (cause) {
-      showError(
+      const message =
         cause instanceof ApiClientError
           ? cause.message
-          : "Não foi possível salvar o espaço.",
-      );
+          : "Não foi possível salvar o espaço.";
+      setError(message);
+      showError(message);
       setPending(false);
     }
   }
@@ -242,8 +308,13 @@ export function SpaceForm({ space }: { space: Space | null }) {
     : [...SLOT_OPTIONS, form.slotMinutes].sort((a, b) => a - b);
 
   return (
-    <form onSubmit={submit} className="space-y-5" noValidate>
-      <FormSection
+    <form onSubmit={submit} className="space-y-4" noValidate>
+      <FormIssues
+        missing={tried && !form.name.trim() ? ["O nome do espaço."] : []}
+        error={error}
+      />
+
+      <CollapsibleSection
         icon={<MapPin />}
         title="Dados do espaço"
         description="Como o espaço aparece para os moradores."
@@ -287,17 +358,17 @@ export function SpaceForm({ space }: { space: Space | null }) {
           value={form.description}
           onChange={(event) => set("description", event.target.value)}
         />
-      </FormSection>
+      </CollapsibleSection>
 
-      <FormSection
+      <CollapsibleSection
         icon={<ImageIcon />}
         title="Fotos"
         description="Até 3 fotos: ajudam os moradores a reconhecer o espaço."
       >
         <SpacePhotosField value={photos} onChange={setPhotos} />
-      </FormSection>
+      </CollapsibleSection>
 
-      <FormSection
+      <CollapsibleSection
         icon={<Clock />}
         title="Horário de funcionamento"
         description="Os dias desmarcados ficam fechados para reserva."
@@ -371,9 +442,9 @@ export function SpaceForm({ space }: { space: Space | null }) {
         <p className="text-xs text-soft">
           Para funcionar até meia-noite, use 23:59 no horário de fechamento.
         </p>
-      </FormSection>
+      </CollapsibleSection>
 
-      <FormSection
+      <CollapsibleSection
         icon={<CalendarClock />}
         title="Regras de reserva"
         description="Valem para as próximas reservas; as já feitas não mudam."
@@ -418,23 +489,16 @@ export function SpaceForm({ space }: { space: Space | null }) {
           />
         </div>
 
-        <div
-          className={cn(
-            "rounded-xl border border-border p-3",
-            form.limitOn && "bg-surface-muted",
-          )}
-        >
-          <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-fg">
-            <input
-              type="checkbox"
-              className="size-4 accent-[var(--brand)]"
-              checked={form.limitOn}
-              onChange={(event) => set("limitOn", event.target.checked)}
-            />
-            Limitar reservas por unidade
-          </label>
+        <ChoiceCards
+          name="limit"
+          legend="Reservas por unidade"
+          options={LIMIT_CHOICE}
+          value={yesNo(form.limitOn)}
+          onChange={(value) => set("limitOn", value === "yes")}
+        />
+        <div>
           {form.limitOn && (
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               <Field
                 label="Quantidade"
                 type="number"
@@ -461,55 +525,30 @@ export function SpaceForm({ space }: { space: Space | null }) {
           )}
         </div>
 
-        <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-border p-3 text-sm">
-          <input
-            type="checkbox"
-            className="mt-0.5 size-4 shrink-0 accent-[var(--brand)]"
-            checked={form.requiresApproval}
-            onChange={(event) => set("requiresApproval", event.target.checked)}
-          />
-          <span>
-            <span className="block font-medium text-fg">
-              Exigir aprovação da administração
-            </span>
-            <span className="text-muted">
-              A reserva só vale depois que um gestor aprovar. Bom para salão de
-              festas e churrasqueira.
-            </span>
-          </span>
-        </label>
-      </FormSection>
+        <ChoiceCards
+          name="approval"
+          legend="Confirmação"
+          options={APPROVAL_CHOICE}
+          value={yesNo(form.requiresApproval)}
+          onChange={(value) => set("requiresApproval", value === "yes")}
+        />
+      </CollapsibleSection>
 
-      <FormSection
+      <CollapsibleSection
         icon={<Wallet />}
         title="Taxa, convidados e recorrência"
         description="O que o morador paga pelo uso, quem pode levar e se pode reservar toda semana."
       >
-        <div
-          className={cn(
-            "rounded-xl border border-border p-3",
-            form.paid && "bg-surface-muted",
-          )}
-        >
-          <label className="flex cursor-pointer items-start gap-2 text-sm">
-            <input
-              type="checkbox"
-              className="mt-0.5 size-4 shrink-0 accent-[var(--brand)]"
-              checked={form.paid}
-              onChange={(event) => set("paid", event.target.checked)}
-            />
-            <span>
-              <span className="block font-medium text-fg">
-                Cobrar taxa de uso
-              </span>
-              <span className="text-muted">
-                O valor fica gravado em cada reserva e aparece em Reservas →
-                Taxas, para lançar na cobrança do condomínio.
-              </span>
-            </span>
-          </label>
+        <ChoiceCards
+          name="fee"
+          legend="Taxa de uso"
+          options={FEE_CHOICE}
+          value={yesNo(form.paid)}
+          onChange={(value) => set("paid", value === "yes")}
+        />
+        <div>
           {form.paid && (
-            <div className="mt-3 sm:max-w-60">
+            <div className="sm:max-w-60">
               <Field
                 label="Valor por reserva (R$)"
                 required
@@ -522,31 +561,16 @@ export function SpaceForm({ space }: { space: Space | null }) {
           )}
         </div>
 
-        <div
-          className={cn(
-            "rounded-xl border border-border p-3",
-            form.guestsAllowed && "bg-surface-muted",
-          )}
-        >
-          <label className="flex cursor-pointer items-start gap-2 text-sm">
-            <input
-              type="checkbox"
-              className="mt-0.5 size-4 shrink-0 accent-[var(--brand)]"
-              checked={form.guestsAllowed}
-              onChange={(event) => set("guestsAllowed", event.target.checked)}
-            />
-            <span>
-              <span className="block font-medium text-fg">
-                Aceitar lista de convidados
-              </span>
-              <span className="text-muted">
-                Quem reserva cadastra os convidados e envia o convite com QR
-                code; a portaria confere e libera a entrada.
-              </span>
-            </span>
-          </label>
+        <ChoiceCards
+          name="guests"
+          legend="Convidados"
+          options={GUESTS_CHOICE}
+          value={yesNo(form.guestsAllowed)}
+          onChange={(value) => set("guestsAllowed", value === "yes")}
+        />
+        <div>
           {form.guestsAllowed && (
-            <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:items-end">
+            <div className="space-y-4">
               <Field
                 label="Máximo de convidados"
                 type="number"
@@ -561,42 +585,29 @@ export function SpaceForm({ space }: { space: Space | null }) {
                 value={form.maxGuests}
                 onChange={(event) => set("maxGuests", event.target.value)}
               />
-              <label className="flex cursor-pointer items-center gap-2 pb-2.5 text-sm font-medium text-fg">
-                <input
-                  type="checkbox"
-                  className="size-4 accent-[var(--brand)]"
-                  checked={form.guestDocumentRequired}
-                  onChange={(event) =>
-                    set("guestDocumentRequired", event.target.checked)
-                  }
-                />
-                Exigir documento de cada convidado
-              </label>
+              <ChoiceCards
+                name="guestDocument"
+                legend="Documento dos convidados"
+                options={DOCUMENT_CHOICE}
+                value={yesNo(form.guestDocumentRequired)}
+                onChange={(value) =>
+                  set("guestDocumentRequired", value === "yes")
+                }
+              />
             </div>
           )}
         </div>
 
-        <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-border p-3 text-sm">
-          <input
-            type="checkbox"
-            className="mt-0.5 size-4 shrink-0 accent-[var(--brand)]"
-            checked={form.recurringAllowed}
-            onChange={(event) => set("recurringAllowed", event.target.checked)}
-          />
-          <span>
-            <span className="block font-medium text-fg">
-              Permitir reserva recorrente
-            </span>
-            <span className="text-muted">
-              O morador pode reservar o mesmo horário toda semana (de 2 a 26
-              semanas), dentro da antecedência e do limite por unidade. Gestores
-              sempre podem.
-            </span>
-          </span>
-        </label>
-      </FormSection>
+        <ChoiceCards
+          name="recurring"
+          legend="Reserva semanal"
+          options={RECURRING_CHOICE}
+          value={yesNo(form.recurringAllowed)}
+          onChange={(value) => set("recurringAllowed", value === "yes")}
+        />
+      </CollapsibleSection>
 
-      <FormSection
+      <CollapsibleSection
         icon={<ClipboardList />}
         title="Regras de uso"
         description="Aparecem para o morador antes de reservar."
@@ -610,12 +621,12 @@ export function SpaceForm({ space }: { space: Space | null }) {
           value={form.usageRules}
           onChange={(event) => set("usageRules", event.target.value)}
         />
-      </FormSection>
+      </CollapsibleSection>
 
-      <div className="flex flex-wrap justify-end gap-2">
+      <FormActions>
         <Button
           type="button"
-          variant="secondary"
+          variant="cancel"
           onClick={() => router.back()}
           disabled={pending}
         >
@@ -624,12 +635,11 @@ export function SpaceForm({ space }: { space: Space | null }) {
         <Button
           type="submit"
           loading={pending}
-          disabled={!form.name.trim()}
           icon={<Save className="size-4" />}
         >
           {space ? "Salvar alterações" : "Cadastrar espaço"}
         </Button>
-      </div>
+      </FormActions>
     </form>
   );
 }

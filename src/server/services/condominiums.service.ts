@@ -6,12 +6,14 @@ import {
   createCondominiumDocument,
   createUnitsDocument,
   deleteUnitDocument,
+  setCondominiumModuleDocument,
   setCondominiumStatusDocument,
   unitsDocument,
   updateCondominiumDocument,
   updateUnitDocument,
 } from "@/server/graphql/operations/condominiums.operations";
 import type {
+  AppModule,
   Condominium,
   CondominiumInput,
   CondominiumStatus,
@@ -76,6 +78,20 @@ export const condominiumsService = {
       { token, variables: { id, status } },
     );
     return setCondominiumStatus;
+  },
+
+  /** Turns an optional module on or off (platform administrator). */
+  async setModule(
+    token: string,
+    id: string,
+    module: AppModule,
+    enabled: boolean,
+  ): Promise<Condominium> {
+    const { setCondominiumModule } = await backendGraphql(
+      setCondominiumModuleDocument,
+      { token, variables: { id, module, enabled } },
+    );
+    return setCondominiumModule;
   },
 
   // === units of the session's condominium ===

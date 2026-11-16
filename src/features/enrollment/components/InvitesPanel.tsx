@@ -230,7 +230,7 @@ function CreateInviteModal({
       busy={pending}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose} disabled={pending}>
+          <Button variant="cancel" onClick={onClose} disabled={pending}>
             Cancelar
           </Button>
           <Button onClick={submit} loading={pending} disabled={!valid}>

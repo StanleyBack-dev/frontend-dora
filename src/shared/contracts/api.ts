@@ -3,12 +3,19 @@
 // (codegen: shared/graphql/schema-enums.ts).
 import type {
   AddressFormat,
+  AppModule,
   CondominiumStatus,
   Permission,
   UserGroup,
 } from "@/shared/graphql/schema-enums";
 
-export type { AddressFormat, CondominiumStatus, Permission, UserGroup };
+export type {
+  AddressFormat,
+  AppModule,
+  CondominiumStatus,
+  Permission,
+  UserGroup,
+};
 
 /** Error shape returned by every BFF route. */
 export type ApiError = {
@@ -34,6 +41,8 @@ export type CurrentCondominium = {
   status: CondominiumStatus;
   /** Apartments or houses: how homes are identified (forms and labels). */
   addressFormat: AddressFormat;
+  /** Optional modules contracted apart that are on (menu, pages). */
+  modules: AppModule[];
 };
 
 /** A condominium the person can open (active member). */

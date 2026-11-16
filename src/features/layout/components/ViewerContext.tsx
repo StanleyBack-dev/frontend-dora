@@ -1,13 +1,15 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { Permission } from "@/shared/contracts/api";
+import type { AppModule, Permission } from "@/shared/contracts/api";
 
 /** What client components need to know about who is using the app. */
 export type Viewer = {
   permissions: readonly Permission[];
   /** Sees the admin area (any of its permissions). */
   showAdmin: boolean;
+  /** Optional modules of the condominium that are on (help, menu). */
+  modules: readonly AppModule[];
   /** Opens the guided tour again (Ajuda → "Rever a apresentação"). */
   restartTour: () => void;
 };
