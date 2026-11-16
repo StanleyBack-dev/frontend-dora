@@ -2,14 +2,24 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FileCheck, FileText, FileUp, Send, XCircle } from "lucide-react";
+import {
+  CircleCheck,
+  FileCheck,
+  FileText,
+  FileUp,
+  Send,
+  XCircle,
+} from "lucide-react";
 import QRCode from "qrcode";
 import { Alert, Badge, Button, Card, CardBody, Modal } from "@/design-system";
 import {
   DocumentField,
   type PickedDocument,
 } from "@/features/documents/components/DocumentField";
+import { whatsappLink } from "@/features/bookings/model/guest-invite";
 import { eventsClient } from "@/features/events/api/events.client";
+import { TicketButton } from "@/features/events/components/TicketButton";
+import { allTicketsMessage } from "@/features/events/model/ticket-pass";
 import {
   ORDER_STATUS,
   peopleCount,
@@ -17,14 +27,15 @@ import {
 import { CopyPixButton } from "@/features/support-project/components/CopyPixButton";
 import type { EventOrder } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { formatTime } from "@/shared/lib/datetime";
 import { formatCents, formatDateTime } from "@/shared/lib/format";
 import { formatPixKey, PIX_KEY_TYPE_LABELS } from "@/shared/lib/pix-key";
 import { useToast } from "@/shared/toast/useToast";
 
 // The person's orders for this event. Unpaid: the PIX (QR code and copia e
 // cola with the amount and the order code), the deadline, the receipt
-// upload and giving up. Then: under review, confirmed (with the people) or
-// refused (with the reason).
+// upload and giving up. Then: under review, confirmed (each person with
+// their ticket: QR, code and link to share) or refused (with the reason).
 export function MyEventOrders({ orders }: { orders: EventOrder[] }) {
   if (orders.length === 0) return null;
   return (
@@ -78,6 +89,20 @@ function OrderCard({ order }: { order: EventOrder }) {
                     : " · grátis"}
                 </span>
               )}
+              {person.ticketCode && (
+                <span className="flex w-full flex-wrap items-center gap-2 pt-1">
+                  <TicketButton
+                    person={{ ...person, ticketCode: person.ticketCode }}
+                    eventTitle={order.eventTitle}
+                  />
+                  {person.checkedInAt && (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
+                      <CircleCheck aria-hidden className="size-3.5" />
+                      Entrou às {formatTime(person.checkedInAt)}
+                    </span>
+                  )}
+                </span>
+              )}
               {person.needsProof &&
                 (order.status === "PENDING_PAYMENT" || person.proofUrl) && (
                   <AttendeeProof
@@ -115,14 +140,7 @@ function OrderCard({ order }: { order: EventOrder }) {
             )}
           </Alert>
         )}
-        {order.status === "CONFIRMED" && (
-          <Alert tone="success">
-            {order.totalCents > 0
-              ? "Pagamento conferido: suas vagas estão garantidas."
-              : "Inscrição confirmada: suas vagas estão garantidas."}{" "}
-            Os ingressos com QR code para a entrada chegam em breve no app.
-          </Alert>
-        )}
+        {order.status === "CONFIRMED" && <ConfirmedTickets order={order} />}
         {order.status === "REJECTED" && (
           <Alert tone="danger">
             Pedido recusado
@@ -137,6 +155,44 @@ function OrderCard({ order }: { order: EventOrder }) {
         )}
       </CardBody>
     </Card>
+  );
+}
+
+/** A confirmed order: where the tickets are, and all of them in one message. */
+function ConfirmedTickets({ order }: { order: EventOrder }) {
+  const people = order.attendees.flatMap((person) =>
+    person.ticketCode
+      ? [{ name: person.name, ticketCode: person.ticketCode }]
+      : [],
+  );
+  return (
+    <Alert tone="success">
+      {order.totalCents > 0
+        ? "Pagamento conferido: suas vagas estão garantidas."
+        : "Inscrição confirmada: suas vagas estão garantidas."}{" "}
+      Cada pessoa tem o próprio ingresso (botão Ingresso): mostre o QR na
+      portaria ou envie o link a quem vai com você.
+      {people.length > 1 && (
+        <>
+          {" "}
+          {/* The links use this site's address: made on the click, not on
+              the server render. */}
+          <button
+            type="button"
+            onClick={() =>
+              window.open(
+                whatsappLink(allTicketsMessage(people, order.eventTitle)),
+                "_blank",
+                "noopener,noreferrer",
+              )
+            }
+            className="font-semibold underline"
+          >
+            Enviar todos pelo WhatsApp
+          </button>
+        </>
+      )}
+    </Alert>
   );
 }
 

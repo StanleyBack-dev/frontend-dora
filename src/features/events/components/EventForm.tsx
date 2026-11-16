@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Building2,
   CalendarClock,
+  Hourglass,
   House,
   MapPin,
   MapPinned,
@@ -37,12 +38,14 @@ import {
 import type {
   CondominiumEvent,
   EventAddress,
+  EventSalesClose,
   EventInput,
   PixReceiver,
 } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { BRAZILIAN_STATES } from "@/shared/lib/brazilian-states";
 import { fromLocalInput, toLocalInput } from "@/shared/lib/datetime";
+import { formatDateTime } from "@/shared/lib/format";
 import { maskCep } from "@/shared/lib/masks";
 import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useToast } from "@/shared/toast/useToast";
@@ -78,6 +81,10 @@ type FormState = {
   entry: Entry;
   /** Paid entry: types, limit per unit and PIX. */
   ticketing: TicketingForm;
+  /** Orders until: some hours before the start, or the end. */
+  salesClose: EventSalesClose;
+  /** BEFORE_START: hours before the start ("0": at the start). */
+  salesCloseHours: string;
 };
 
 const WHERE_OPTIONS: ChoiceOption<Where>[] = [
@@ -125,6 +132,24 @@ const ENTRY_OPTIONS: ChoiceOption<Entry>[] = [
   },
 ];
 
+const SALES_CLOSE_OPTIONS: ChoiceOption<EventSalesClose>[] = [
+  {
+    value: "BEFORE_START",
+    title: "Antes do início",
+    hint: "Fecha algumas horas antes (0: no horário de início). Dá tempo de conferir os comprovantes.",
+    icon: <Hourglass />,
+  },
+  {
+    value: "AT_END",
+    title: "Até o fim do evento",
+    hint: "Aceita pedidos também durante o evento, até o horário final.",
+    icon: <CalendarClock />,
+  },
+];
+
+/** Most hours before the start (30 days). */
+const SALES_CLOSE_HOURS_MAX = 720;
+
 const fromEvent = (event: CondominiumEvent | null): FormState => {
   const address = event?.address ?? null;
   return {
@@ -151,8 +176,21 @@ const fromEvent = (event: CondominiumEvent | null): FormState => {
         : "",
     entry: event?.ticketed ? "PAID" : "FREE",
     ticketing: ticketingFrom(event),
+    salesClose: event?.salesClose ?? "BEFORE_START",
+    salesCloseHours: String(event?.salesCloseHours ?? 0),
   };
 };
+
+/** When orders stop, from the start typed and the hours (a hint). */
+function salesCloseHint(form: FormState): string {
+  const startsAt = fromLocalInput(form.startsAt);
+  const hours = numberOf(form.salesCloseHours);
+  if (!startsAt || !(hours >= 0)) {
+    return "0: até o horário de início. Ex.: 24 fecha um dia antes.";
+  }
+  const closes = new Date(new Date(startsAt).getTime() - hours * 3_600_000);
+  return `Os pedidos fecham em ${formatDateTime(closes.toISOString())}.`;
+}
 
 /** A whole number from a field ("" or not a number: NaN). */
 const numberOf = (value: string) =>
@@ -184,6 +222,14 @@ function missing(form: FormState): string[] {
     }
   }
   if (form.entry === "PAID") out.push(...ticketingMissing(form.ticketing));
+  if (form.salesClose === "BEFORE_START") {
+    const hours = numberOf(form.salesCloseHours);
+    if (!(hours >= 0 && hours <= SALES_CLOSE_HOURS_MAX)) {
+      out.push(
+        `Quantas horas antes do início fecham os pedidos (0 a ${SALES_CLOSE_HOURS_MAX}).`,
+      );
+    }
+  }
   return out;
 }
 
@@ -269,6 +315,9 @@ export function EventForm({
             pixSource: null,
             customPix: null,
           }),
+      salesClose: form.salesClose,
+      salesCloseHours:
+        form.salesClose === "BEFORE_START" ? numberOf(form.salesCloseHours) : 0,
     };
     setPending(true);
     setError(null);
@@ -525,7 +574,7 @@ export function EventForm({
       <CollapsibleSection
         icon={<Ticket />}
         title="Entrada"
-        description="Inscrição grátis ou ingressos pagos por PIX."
+        description="Inscrição grátis ou ingressos pagos por PIX, e até quando os pedidos são aceitos."
       >
         <ChoiceCards
           name="entry"
@@ -540,6 +589,29 @@ export function EventForm({
             onChange={(ticketing) => set("ticketing", ticketing)}
             condominiumPix={condominiumPix}
           />
+        )}
+        <ChoiceCards
+          name="salesClose"
+          legend={form.entry === "PAID" ? "Vendas até" : "Inscrições até"}
+          options={SALES_CLOSE_OPTIONS}
+          value={form.salesClose}
+          onChange={(value) => set("salesClose", value)}
+        />
+        {form.salesClose === "BEFORE_START" && (
+          <div className="sm:max-w-xs">
+            <Field
+              label="Horas antes do início"
+              required
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={SALES_CLOSE_HOURS_MAX}
+              placeholder="0"
+              value={form.salesCloseHours}
+              onChange={(change) => set("salesCloseHours", change.target.value)}
+            />
+            <p className="mt-1.5 text-xs text-soft">{salesCloseHint(form)}</p>
+          </div>
         )}
       </CollapsibleSection>
 

@@ -3,14 +3,18 @@ import { Card, CardBody } from "@/design-system";
 import { priceLabel } from "@/features/events/model/ticket-kinds";
 import { ageRange } from "@/features/events/model/ticketing-form";
 import type { CondominiumEvent } from "@/shared/contracts/events";
+import { formatDateTime } from "@/shared/lib/format";
 
 // How to get in: the ticket types with prices and ages (paid event) or the
 // free registration, and the places still free.
 export function EventTicketsCard({
   event,
+  onSale = false,
   action,
 }: {
   event: CondominiumEvent;
+  /** Takes orders now (published, before its sales close). */
+  onSale?: boolean;
   /** The order button, when the event takes orders. */
   action?: React.ReactNode;
 }) {
@@ -63,6 +67,13 @@ export function EventTicketsCard({
             Meia, grátis e outros descontos podem pedir documento: a idade de
             quem não tem a data de nascimento no app, ou a condição (estudante,
             PcD, professor).
+          </p>
+        )}
+        {onSale && (
+          <p className="text-xs text-soft">
+            {event.ticketed ? "Vendas" : "Inscrições"} até{" "}
+            {formatDateTime(event.salesClosesAt)}
+            {event.salesClose === "AT_END" ? " (fim do evento)" : ""}.
           </p>
         )}
         {event.unitTicketLimit && (

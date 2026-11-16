@@ -51,8 +51,19 @@ type Group = {
 
 // The gate's console: the day's guests by booking, the invite code typed
 // (or read from the QR) at the gate, and the entry tapped from the list. The
-// list refreshes every minute so new guests show up on their own.
-export function GateConsole({ initial }: { initial: GateGuest[] }) {
+// list refreshes every minute so new guests show up on their own. Another
+// list on the page (event tickets) can take the codes that are its own.
+export function GateConsole({
+  initial,
+  takeCode,
+}: {
+  initial: GateGuest[];
+  /**
+   * A typed or scanned code another list handles (an event ticket): its
+   * check-in (true: done), or null when the code is an invite.
+   */
+  takeCode?: (code: string) => Promise<boolean> | null;
+}) {
   const { showError, showSuccess } = useToast();
   const [guests, setGuests] = useState(initial);
   const [search, setSearch] = useState("");
@@ -80,6 +91,13 @@ export function GateConsole({ initial }: { initial: GateGuest[] }) {
     );
 
   async function checkIn(target: { guestId?: string; code?: string }) {
+    const taken = target.code ? takeCode?.(target.code) : null;
+    if (taken) {
+      setBusy("code");
+      if (await taken) setCode("");
+      setBusy(null);
+      return;
+    }
     setBusy(target.guestId ?? "code");
     try {
       const guest = await bookingsClient.checkIn(target);
@@ -158,12 +176,16 @@ export function GateConsole({ initial }: { initial: GateGuest[] }) {
           >
             <div className="min-w-0 flex-1">
               <Field
-                label="Código do convite"
+                label={
+                  takeCode
+                    ? "Código do convite ou ingresso"
+                    : "Código do convite"
+                }
                 autoCapitalize="characters"
                 autoComplete="off"
                 spellCheck={false}
                 placeholder="Ex.: ABCD EFGH"
-                maxLength={12}
+                maxLength={14}
                 value={code}
                 onChange={(event) => setCode(event.target.value.toUpperCase())}
               />

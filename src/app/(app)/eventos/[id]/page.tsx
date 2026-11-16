@@ -36,6 +36,7 @@ import { loadMyEventOrders } from "@/server/loaders/load-event-orders";
 import { loadApprovedDependents } from "@/server/loaders/load-dependents";
 import { requestTime } from "@/server/request-time";
 import { can } from "@/shared/lib/access";
+import { formatDateTime } from "@/shared/lib/format";
 
 export const metadata: Metadata = { title: "Evento" };
 
@@ -56,7 +57,9 @@ export default async function EventPage({
   const now = (await requestTime()).getTime();
   const open = isEventOpen(event, now);
   const published = event.status === "PUBLISHED";
-  const onSale = published && new Date(event.startsAt).getTime() > now;
+  // Orders until the event's sales close (some hours before the start, or
+  // its end), as the API checks.
+  const onSale = published && new Date(event.salesClosesAt).getTime() > now;
   const [myOrders, dependents] = published
     ? await Promise.all([
         loadMyEventOrders(event.id),
@@ -125,6 +128,7 @@ export default async function EventPage({
           {event.status !== "CANCELLED" && (
             <EventTicketsCard
               event={event}
+              onSale={onSale}
               action={
                 onSale ? (
                   <EventOrderButton
@@ -145,7 +149,8 @@ export default async function EventPage({
                   />
                 ) : published ? (
                   <p className="text-xs text-soft">
-                    O evento já começou: não aceita mais pedidos.
+                    {event.ticketed ? "As vendas" : "As inscrições"} fecharam em{" "}
+                    {formatDateTime(event.salesClosesAt)}.
                   </p>
                 ) : (
                   <p className="text-xs text-soft">

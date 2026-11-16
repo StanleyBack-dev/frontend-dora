@@ -5,6 +5,7 @@ import type {
   EventInput,
   EventOrder,
   PixReceiver,
+  GateEventTicket,
 } from "@/shared/contracts/events";
 
 export const eventsClient = {
@@ -71,4 +72,21 @@ export const eventsClient = {
       `/event-orders/${orderId}/attendees/${attendeeId}/proof`,
       { method: "POST", body: JSON.stringify({ file }) },
     ),
+
+  // --- the gate (Portaria) ---
+  gateTickets: (date?: string) =>
+    apiRequest<GateEventTicket[]>(
+      date ? `/gate/tickets?date=${encodeURIComponent(date)}` : "/gate/tickets",
+    ),
+
+  checkInTicket: (target: { attendeeId?: string; code?: string }) =>
+    apiRequest<GateEventTicket>("/gate/tickets/check-in", {
+      method: "POST",
+      body: JSON.stringify(target),
+    }),
+
+  undoTicketCheckIn: (attendeeId: string) =>
+    apiRequest<GateEventTicket>(`/gate/tickets/${attendeeId}/undo`, {
+      method: "POST",
+    }),
 };
