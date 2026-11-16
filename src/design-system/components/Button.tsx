@@ -3,13 +3,13 @@ import { Spinner } from "@/design-system/components/Spinner";
 import { cn } from "@/design-system/utils/cn";
 
 export type ButtonVariant =
-  "primary" | "brand" | "secondary" | "ghost" | "danger";
+  "primary" | "brand" | "secondary" | "ghost" | "danger" | "cancel";
 export type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 const variants: Record<ButtonVariant, string> = {
-  // Solid black: the main action.
+  // Light green with dark text: create, save, confirm, accept.
   primary:
-    "border border-accent bg-accent text-accent-fg shadow-sm hover:bg-accent-hover",
+    "border border-positive bg-positive text-positive-fg shadow-sm hover:border-positive-hover hover:bg-positive-hover",
   // Dora orange with black text: the highlight action of a screen.
   brand:
     "border border-brand bg-brand text-brand-fg shadow-sm hover:bg-brand-hover",
@@ -18,7 +18,10 @@ const variants: Record<ButtonVariant, string> = {
     "border border-border-strong bg-surface text-fg hover:border-brand hover:bg-surface-muted",
   ghost:
     "border border-transparent text-muted hover:bg-surface-muted hover:text-fg",
+  // Solid red: a destructive action (delete, cancel a booking).
   danger: "border border-danger bg-danger text-white hover:opacity-90",
+  // Red outline: back out of a form or dialog without doing anything.
+  cancel: "border border-danger bg-surface text-danger hover:bg-danger-soft",
 };
 
 const sizes: Record<ButtonSize, string> = {

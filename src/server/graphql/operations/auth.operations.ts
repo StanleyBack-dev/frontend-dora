@@ -26,6 +26,7 @@ export const loginDocument = graphql(`
           state
           status
           addressFormat
+          modules
         }
         condominiums {
           id
@@ -77,6 +78,7 @@ export const meDocument = graphql(`
         state
         status
         addressFormat
+        modules
       }
       condominiums {
         id
@@ -122,6 +124,7 @@ export const updateMyProfileDocument = graphql(`
         state
         status
         addressFormat
+        modules
       }
       condominiums {
         id

@@ -57,6 +57,10 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Liberar a entrada de convidados (portaria)",
     area: "Reservas",
   },
+  EVENTS_MANAGE: {
+    label: "Criar, publicar e cancelar eventos",
+    area: "Gestão",
+  },
   PERMISSIONS_MANAGE: {
     label: "Gerenciar permissões",
     area: "Administração",

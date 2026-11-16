@@ -1,9 +1,10 @@
 import type {
   AddressFormat,
+  AppModule,
   CondominiumStatus,
 } from "@/shared/graphql/schema-enums";
 
-export type { AddressFormat, CondominiumStatus };
+export type { AddressFormat, AppModule, CondominiumStatus };
 
 /** A condominium as the platform console shows it. */
 export type Condominium = {
@@ -16,6 +17,8 @@ export type Condominium = {
   status: CondominiumStatus;
   /** Apartments (block and number) or houses (street, quadra and lote). */
   addressFormat: AddressFormat;
+  /** Optional modules contracted apart that are on. */
+  modules: AppModule[];
   activeMembers: number;
   managers: number;
   units: number;

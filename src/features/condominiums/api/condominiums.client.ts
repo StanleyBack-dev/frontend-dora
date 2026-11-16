@@ -1,5 +1,6 @@
 import { apiRequest } from "@/shared/lib/api-client";
 import type {
+  AppModule,
   Condominium,
   CondominiumInput,
   CondominiumStatus,
@@ -26,6 +27,12 @@ export const condominiumsClient = {
     apiRequest<Condominium>(`/platform/condominiums/${id}`, {
       method: "PATCH",
       body: JSON.stringify(input),
+    }),
+
+  setModule: (id: string, module: AppModule, enabled: boolean) =>
+    apiRequest<Condominium>(`/platform/condominiums/${id}/modules`, {
+      method: "POST",
+      body: JSON.stringify({ module, enabled }),
     }),
 
   setStatus: (id: string, status: CondominiumStatus) =>

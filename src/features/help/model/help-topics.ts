@@ -9,6 +9,7 @@ import {
   House,
   LifeBuoy,
   MapPin,
+  PartyPopper,
   Megaphone,
   Settings,
   ShieldCheck,
@@ -16,7 +17,7 @@ import {
   UsersRound,
   type LucideIcon,
 } from "lucide-react";
-import type { Permission } from "@/shared/contracts/api";
+import type { Permission, AppModule } from "@/shared/contracts/api";
 
 // The app's manual, in one place: the help page (Ajuda), the help button in
 // each page's header and the guided tour (onboarding) all read from here.
@@ -52,6 +53,8 @@ export type HelpTopic = {
   anyPermission?: Permission[];
   /** Only for who sees the admin area. */
   admin?: boolean;
+  /** An optional module (contracted apart): only while it is on. */
+  module?: AppModule;
   /** Where the topic lives in the menu (tour and help page). */
   area: "main" | "account";
   /** One or two lines for the guided tour. */
@@ -322,6 +325,40 @@ export const HELP_TOPICS: HelpTopic[] = [
     },
   },
   {
+    id: "eventos",
+    href: "/eventos",
+    title: "Eventos",
+    icon: PartyPopper,
+    module: "EVENTS",
+    area: "main",
+    tour: "Os eventos do condomínio: datas, local e como garantir o seu ingresso.",
+    sections: {
+      purpose: [
+        {
+          text: "As festas e encontros do condomínio, dos próximos aos que já passaram, com data, local, lotação e se a entrada é gratuita ou com ingresso pago.",
+        },
+      ],
+      howto: [
+        {
+          text: "Quando a administração publica um evento, você recebe um aviso no app e por e-mail, com o convite para a agenda do celular.",
+        },
+        {
+          text: "Use “Novo evento” para criar: título, quando, onde (um espaço ou outro local), lotação, convidados de fora e se a entrada é paga. Ele fica como rascunho até você publicar.",
+          only: ["EVENTS_MANAGE"],
+        },
+        {
+          text: "Na página do evento, publique o rascunho (todos são avisados), edite enquanto ele não terminar ou cancele com o motivo (quem já foi avisado recebe o cancelamento).",
+          only: ["EVENTS_MANAGE"],
+        },
+      ],
+      rules: [
+        {
+          text: "Rascunhos só aparecem para a administração. Um evento cancelado ou que já terminou não muda mais.",
+        },
+      ],
+    },
+  },
+  {
     id: "moradores",
     href: "/moradores",
     title: "Moradores",
@@ -523,10 +560,12 @@ export const HELP_TOPICS: HelpTopic[] = [
 export function visibleTopics(
   permissions: readonly Permission[],
   showAdmin: boolean,
+  modules: readonly AppModule[] = [],
 ): HelpTopic[] {
   return HELP_TOPICS.filter(
     (topic) =>
       (!topic.admin || showAdmin) &&
+      (!topic.module || modules.includes(topic.module)) &&
       (!topic.permission || permissions.includes(topic.permission)) &&
       (!topic.anyPermission ||
         topic.anyPermission.some((item) => permissions.includes(item))),

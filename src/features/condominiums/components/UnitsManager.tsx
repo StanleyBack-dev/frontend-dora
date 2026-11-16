@@ -241,7 +241,7 @@ export function UnitsManager({
         footer={
           <>
             <Button
-              variant="secondary"
+              variant="cancel"
               onClick={() => setEditing(null)}
               disabled={pending}
             >
@@ -331,7 +331,7 @@ export function UnitsManager({
         footer={
           <>
             <Button
-              variant="secondary"
+              variant="cancel"
               onClick={() => setRemoving(null)}
               disabled={pending}
             >

@@ -55,6 +55,14 @@ export function usernameError(value: string): string | null {
 }
 
 /** CNPJ while typing: 00.000.000/0000-00. */
+/** "74000100" → "74000-100" while typing. */
+export function maskCep(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  return digits.length > 5
+    ? `${digits.slice(0, 5)}-${digits.slice(5)}`
+    : digits;
+}
+
 export function maskCnpj(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 14);
   return digits

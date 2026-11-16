@@ -28,6 +28,15 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Uma reserva sua foi cancelada (por você ou pela administração).",
   },
+  EVENT_PUBLISHED: {
+    label: "Novo evento",
+    description:
+      "Um evento do condomínio foi publicado (com o convite para a agenda do celular).",
+  },
+  EVENT_CANCELLED: {
+    label: "Evento cancelado",
+    description: "Um evento publicado foi cancelado, com o motivo.",
+  },
   BOOKING_SLOT_FREED: {
     label: "Horário liberado",
     description:

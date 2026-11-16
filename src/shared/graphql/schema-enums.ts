@@ -3,6 +3,10 @@ export type AddressFormat =
   | 'APARTMENT'
   | 'HOUSE';
 
+/** Módulos contratados à parte pelo condomínio. */
+export type AppModule =
+  | 'EVENTS';
+
 /** Situação da reserva. */
 export type BookingStatus =
   | 'CANCELLED'
@@ -40,6 +44,17 @@ export type EnrollmentStatus =
   | 'APROVADA'
   | 'PENDENTE'
   | 'RECUSADA';
+
+/** Rascunho (só gestores), publicado ou cancelado. */
+export type EventStatus =
+  | 'CANCELLED'
+  | 'DRAFT'
+  | 'PUBLISHED';
+
+/** Próximos (ainda não terminaram) ou passados. */
+export type EventWhen =
+  | 'PAST'
+  | 'UPCOMING';
 
 /** Se a portaria já pode liberar a entrada do convidado. */
 export type GuestCheckInWindow =
@@ -79,6 +94,8 @@ export type NotificationType =
   | 'BOOKING_SLOT_FREED'
   | 'BROADCAST'
   | 'ENROLLMENT_SUBMITTED'
+  | 'EVENT_CANCELLED'
+  | 'EVENT_PUBLISHED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
   | 'SUPPORT_REQUESTED'
@@ -91,6 +108,7 @@ export type Permission =
   | 'BOOKINGS_MANAGE'
   | 'CONDOMINIUMS_MANAGE'
   | 'DASHBOARD_READ'
+  | 'EVENTS_MANAGE'
   | 'GUESTS_CHECKIN'
   | 'NOTIFICATIONS_BROADCAST'
   | 'PERMISSIONS_MANAGE'

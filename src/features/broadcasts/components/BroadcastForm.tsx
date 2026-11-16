@@ -2,21 +2,71 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Megaphone, Send } from "lucide-react";
-import { Alert, Button, Field, Modal, Select, TextArea } from "@/design-system";
+import {
+  BellRing,
+  Building2,
+  Mail,
+  Megaphone,
+  Send,
+  ShieldCheck,
+  UserRound,
+  Users,
+  UsersRound,
+} from "lucide-react";
+import {
+  Alert,
+  Button,
+  ChoiceCards,
+  CollapsibleSection,
+  Field,
+  Modal,
+  TextArea,
+  type ChoiceOption,
+} from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { broadcastsClient } from "@/features/broadcasts/api/broadcasts.client";
-import {
-  AUDIENCES,
-  AUDIENCE_LABELS,
-} from "@/features/broadcasts/model/broadcast-labels";
+import { AUDIENCE_LABELS } from "@/features/broadcasts/model/broadcast-labels";
 import type { UserGroup } from "@/shared/contracts/api";
 import type { BroadcastAudience } from "@/shared/contracts/broadcasts";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
+const AUDIENCE_OPTIONS: ChoiceOption<BroadcastAudience>[] = [
+  {
+    value: "TODOS",
+    title: AUDIENCE_LABELS.TODOS,
+    hint: "Moradores, gestores e portaria.",
+    icon: <Building2 />,
+  },
+  {
+    value: "GRUPO",
+    title: AUDIENCE_LABELS.GRUPO,
+    hint: "Só moradores, só gestores ou só a portaria.",
+    icon: <UsersRound />,
+  },
+];
+
 /** Roles inside the condominium that can receive an announcement. */
-const ROLES: UserGroup[] = ["USER", "ADMIN", "CONCIERGE"];
+const GROUP_OPTIONS: ChoiceOption<UserGroup>[] = [
+  { value: "USER", title: GROUP_LABELS.USER, icon: <UserRound /> },
+  { value: "ADMIN", title: GROUP_LABELS.ADMIN, icon: <ShieldCheck /> },
+  { value: "CONCIERGE", title: GROUP_LABELS.CONCIERGE, icon: <Users /> },
+];
+
+const EMAIL_OPTIONS: ChoiceOption<"no" | "yes">[] = [
+  {
+    value: "no",
+    title: "Só no app",
+    hint: "Aviso no app e nos aparelhos com notificação.",
+    icon: <BellRing />,
+  },
+  {
+    value: "yes",
+    title: "App e e-mail",
+    hint: "Também no e-mail de cada pessoa.",
+    icon: <Mail />,
+  },
+];
 
 /** "Moradores", "Gestores"…: how a group reads as recipients. */
 const GROUP_AUDIENCE: Record<UserGroup, string> = {
@@ -79,69 +129,76 @@ export function BroadcastForm() {
   return (
     <div className="space-y-4">
       {sent && <Alert tone="success">{sent}</Alert>}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Select
-          label="Para"
-          required
+      <CollapsibleSection
+        icon={<Users />}
+        title="Para quem"
+        description="Todo o condomínio ou só um grupo de acesso."
+      >
+        <ChoiceCards
+          name="audience"
+          options={AUDIENCE_OPTIONS}
           value={audience}
-          options={AUDIENCES.map((value) => ({
-            value,
-            label: AUDIENCE_LABELS[value],
-          }))}
-          onChange={(e) => setAudience(e.target.value as BroadcastAudience)}
+          onChange={setAudience}
         />
         {audience === "GRUPO" && (
-          <Select
-            label="Papel"
-            required
-            placeholder="Escolha"
+          <ChoiceCards
+            name="targetGroup"
+            legend="Grupo"
+            options={GROUP_OPTIONS}
             value={targetGroup}
-            options={ROLES.map((value) => ({
-              value,
-              label: GROUP_LABELS[value],
-            }))}
-            onChange={(e) => setTargetGroup(e.target.value as UserGroup | "")}
+            onChange={setTargetGroup}
           />
         )}
-      </div>
-      <Field
-        label="Título"
-        required
-        maxLength={120}
-        value={title}
-        onChange={(e) => {
-          setSent(null);
-          setTitle(e.target.value);
-        }}
-      />
-      <TextArea
-        label="Mensagem"
-        required
-        rows={5}
-        maxLength={2000}
-        value={body}
-        onChange={(e) => {
-          setSent(null);
-          setBody(e.target.value);
-        }}
-      />
-      <label className="flex items-center gap-2 text-sm text-fg">
-        <input
-          type="checkbox"
-          className="size-4 accent-[var(--brand)]"
-          checked={sendEmail}
-          onChange={(e) => setSendEmail(e.target.checked)}
-        />
-        Também enviar por e-mail
-      </label>
-      <Button
-        variant="brand"
-        icon={<Send className="size-4" />}
-        disabled={!valid}
-        onClick={() => setConfirmOpen(true)}
+      </CollapsibleSection>
+      <CollapsibleSection
+        icon={<Megaphone />}
+        title="Mensagem"
+        description="O título aparece na notificação; a mensagem, ao abrir."
       >
-        Enviar comunicado
-      </Button>
+        <Field
+          label="Título"
+          required
+          maxLength={120}
+          value={title}
+          onChange={(e) => {
+            setSent(null);
+            setTitle(e.target.value);
+          }}
+        />
+        <TextArea
+          label="Mensagem"
+          required
+          rows={5}
+          maxLength={2000}
+          value={body}
+          onChange={(e) => {
+            setSent(null);
+            setBody(e.target.value);
+          }}
+        />
+      </CollapsibleSection>
+      <CollapsibleSection
+        icon={<Mail />}
+        title="Como enviar"
+        description="Sempre no app e nos aparelhos com notificação ativada."
+      >
+        <ChoiceCards
+          name="sendEmail"
+          options={EMAIL_OPTIONS}
+          value={sendEmail ? "yes" : "no"}
+          onChange={(value) => setSendEmail(value === "yes")}
+        />
+      </CollapsibleSection>
+      <div className="flex justify-end">
+        <Button
+          variant="brand"
+          icon={<Send className="size-4" />}
+          disabled={!valid}
+          onClick={() => setConfirmOpen(true)}
+        >
+          Enviar comunicado
+        </Button>
+      </div>
 
       <Modal
         open={confirmOpen}

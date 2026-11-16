@@ -14,11 +14,12 @@ import {
 import {
   Alert,
   Button,
+  ChoiceCards,
   Drawer,
   EmptyState,
   Field,
-  Select,
   Spinner,
+  type ChoiceOption,
 } from "@/design-system";
 import { bookingsClient } from "@/features/bookings/api/bookings.client";
 import {
@@ -48,7 +49,12 @@ const EMPTY = {
   phone: "",
 };
 
-const DOCUMENT_TYPES: DocumentType[] = ["CPF", "RG"];
+/** The document asked of a guest: none, CPF or RG (cards in the form). */
+const DOCUMENT_OPTIONS: ChoiceOption<DocumentType | "NONE">[] = [
+  { value: "NONE", title: "Sem documento", hint: "Só o nome." },
+  { value: "CPF", title: DOCUMENT_LABELS.CPF, hint: "11 números." },
+  { value: "RG", title: DOCUMENT_LABELS.RG, hint: "Números e um X no fim." },
+];
 
 /** Most guests sent in one go (the API's limit per request). */
 const MAX_PER_SEND = 100;
@@ -294,26 +300,23 @@ export function GuestsDrawer({
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
+                <ChoiceCards
+                  name="documentType"
+                  legend="Documento"
+                  options={DOCUMENT_OPTIONS}
+                  value={form.documentType || "NONE"}
+                  onChange={(value) => {
+                    const type = value === "NONE" ? "" : value;
+                    setTriedDocument(false);
+                    // Switching type keeps the digits, in the new mask.
+                    setForm({
+                      ...form,
+                      documentType: type,
+                      document: type ? maskDocument(type, form.document) : "",
+                    });
+                  }}
+                />
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Select
-                    label="Documento"
-                    placeholder="Sem documento"
-                    value={form.documentType}
-                    onChange={(e) => {
-                      const type = e.target.value as DocumentType | "";
-                      setTriedDocument(false);
-                      // Switching type keeps the digits, in the new mask.
-                      setForm({
-                        ...form,
-                        documentType: type,
-                        document: type ? maskDocument(type, form.document) : "",
-                      });
-                    }}
-                    options={DOCUMENT_TYPES.map((type) => ({
-                      value: type,
-                      label: DOCUMENT_LABELS[type],
-                    }))}
-                  />
                   {form.documentType && (
                     <Field
                       label={

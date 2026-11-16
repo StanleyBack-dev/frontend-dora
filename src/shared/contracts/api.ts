@@ -3,6 +3,7 @@
 // (codegen: shared/graphql/schema-enums.ts).
 import type {
   AddressFormat,
+  AppModule,
   CondominiumStatus,
   MemberKind,
   Permission,
@@ -11,6 +12,7 @@ import type {
 
 export type {
   AddressFormat,
+  AppModule,
   CondominiumStatus,
   MemberKind,
   Permission,
@@ -57,6 +59,8 @@ export type CurrentCondominium = {
   status: CondominiumStatus;
   /** Apartments or houses: how homes are identified (forms and labels). */
   addressFormat: AddressFormat;
+  /** Optional modules contracted apart that are on (menu, pages). */
+  modules: AppModule[];
 };
 
 /** A condominium the person can open (active member). */

@@ -143,7 +143,7 @@ export function UserAccountActions({
             <Button onClick={close}>Concluir</Button>
           ) : (
             <>
-              <Button variant="secondary" onClick={close} disabled={pending}>
+              <Button variant="cancel" onClick={close} disabled={pending}>
                 Cancelar
               </Button>
               <Button

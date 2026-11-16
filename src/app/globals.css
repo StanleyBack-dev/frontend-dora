@@ -4,7 +4,8 @@
  * Dora design tokens: white, orange and black.
  *   - content: clean white surfaces on a warm off-white page;
  *   - chrome:  near-black (sidebar, drawer and dialog headers);
- *   - accent:  black for the main actions (buttons), white text on it;
+ *   - accent:  black for selections and strong marks, white text on it;
+ *   - positive: light green for create/confirm buttons, dark text on it;
  *   - brand:   Dora orange for highlights, the logo, active states and
  *              focus. Text on orange is always black (contrast); orange
  *              text on white uses `brand-ink`, a deeper shade that reads.
@@ -52,6 +53,11 @@
   --chrome-fg: #fafafa;
   --chrome-muted: #b5b0a9;
   --chrome-subtle: #7c7770;
+
+  /* Create / confirm / accept: light green with dark text. */
+  --positive: #22c55e;
+  --positive-hover: #16a34a;
+  --positive-fg: #052e16;
 
   /* Status (light-surface friendly) */
   --success: #15803d;
@@ -107,6 +113,9 @@
   --color-chrome-fg: var(--chrome-fg);
   --color-chrome-muted: var(--chrome-muted);
   --color-chrome-subtle: var(--chrome-subtle);
+  --color-positive: var(--positive);
+  --color-positive-hover: var(--positive-hover);
+  --color-positive-fg: var(--positive-fg);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
   --color-success-border: var(--success-border);

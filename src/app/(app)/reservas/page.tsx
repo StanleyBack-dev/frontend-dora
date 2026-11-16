@@ -65,7 +65,7 @@ export default async function MyBookingsPage({
         title="Reservas"
         description="Suas reservas de quadras, salão e outros espaços."
         actions={
-          <Link href="/reservas/nova" className={buttonClasses()}>
+          <Link href="/reservas/nova" className={buttonClasses("brand")}>
             <Plus aria-hidden className="mr-1.5 size-4" />
             Nova reserva
           </Link>

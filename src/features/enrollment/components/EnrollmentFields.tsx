@@ -1,7 +1,13 @@
 "use client";
 
-import { BriefcaseBusiness, House, UserRound } from "lucide-react";
-import { Combobox, Field, FormSection, cn } from "@/design-system";
+import { BriefcaseBusiness, House, UserRound, Users } from "lucide-react";
+import {
+  ChoiceCards,
+  CollapsibleSection,
+  Combobox,
+  Field,
+  type ChoiceOption,
+} from "@/design-system";
 import {
   APPLICANT_LABELS,
   type EnrollmentErrors,
@@ -9,20 +15,18 @@ import {
 } from "@/features/enrollment/model/enrollment-form";
 import type { EnrollmentApplicant } from "@/shared/contracts/enrollment";
 
-const APPLICANT_OPTIONS: {
-  value: EnrollmentApplicant;
-  hint: string;
-  icon: React.ReactNode;
-}[] = [
+const APPLICANT_OPTIONS: ChoiceOption<EnrollmentApplicant>[] = [
   {
     value: "RESIDENT",
+    title: APPLICANT_LABELS.RESIDENT,
     hint: "Moro no condomínio",
-    icon: <House aria-hidden className="size-5" />,
+    icon: <House />,
   },
   {
     value: "EMPLOYEE",
+    title: APPLICANT_LABELS.EMPLOYEE,
     hint: "Trabalho no condomínio",
-    icon: <BriefcaseBusiness aria-hidden className="size-5" />,
+    icon: <BriefcaseBusiness />,
   },
 ];
 import { maskPhone } from "@/shared/lib/masks";
@@ -65,59 +69,32 @@ export function EnrollmentFields({
 
   return (
     <>
-      <fieldset>
-        <legend className="mb-2 text-sm font-semibold text-fg">
-          Você é morador ou funcionário do condomínio?
-          {!reviewing && <span className="text-danger"> *</span>}
-        </legend>
-        <div className="grid grid-cols-2 gap-3">
-          {APPLICANT_OPTIONS.map((option) => {
-            const checked = form.applicant === option.value;
-            return (
-              <label
-                key={option.value}
-                className={cn(
-                  "flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
-                  checked
-                    ? "border-accent bg-accent-soft text-fg"
-                    : "border-border text-muted hover:border-border-strong",
-                  reviewing && !checked && "hidden",
-                  reviewing && "cursor-default",
-                )}
-              >
-                <input
-                  type="radio"
-                  name="applicant"
-                  value={option.value}
-                  checked={checked}
-                  disabled={reviewing}
-                  onChange={() => set("applicant", option.value)}
-                  className="sr-only"
-                />
-                <span className={checked ? "text-accent" : "text-soft"}>
-                  {option.icon}
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold">
-                    {APPLICANT_LABELS[option.value]}
-                  </span>
-                  <span className="block text-xs text-muted">
-                    {option.hint}
-                  </span>
-                </span>
-              </label>
-            );
-          })}
-        </div>
+      <CollapsibleSection
+        icon={<Users />}
+        title="Vínculo com o condomínio"
+        description={
+          reviewing
+            ? "O que a pessoa informou no cadastro."
+            : "Você é morador ou funcionário do condomínio?"
+        }
+      >
+        <ChoiceCards
+          name="applicant"
+          options={APPLICANT_OPTIONS.filter(
+            (option) => !reviewing || option.value === form.applicant,
+          )}
+          value={form.applicant}
+          onChange={(value) => !reviewing && set("applicant", value)}
+        />
         {employee && (
-          <p className="mt-2 text-xs text-soft">
+          <p className="text-xs text-soft">
             {reviewing
               ? "Funcionário: sem unidade nem endereço. Aprove como Portaria ou Administrador."
               : "Funcionários não informam endereço. A administração define o seu acesso na aprovação."}
           </p>
         )}
-      </fieldset>
-      <FormSection
+      </CollapsibleSection>
+      <CollapsibleSection
         icon={<UserRound />}
         title="Dados pessoais"
         description="A senha de acesso chega no seu e-mail depois da aprovação."
@@ -155,9 +132,9 @@ export function EnrollmentFields({
             error={error("phone")}
           />
         </div>
-      </FormSection>
+      </CollapsibleSection>
       {!employee && (
-        <FormSection
+        <CollapsibleSection
           icon={<House />}
           title="Endereço no condomínio"
           description={
@@ -268,7 +245,7 @@ export function EnrollmentFields({
                 : "Ao aprovar, a unidade digitada é vinculada à pessoa (e cadastrada em Unidades, se ainda não existir)."}
             </p>
           )}
-        </FormSection>
+        </CollapsibleSection>
       )}
     </>
   );

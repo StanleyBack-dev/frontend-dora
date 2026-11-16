@@ -9,6 +9,7 @@ import {
   HeartHandshake,
   House,
   MapPin,
+  PartyPopper,
   LifeBuoy,
   type LucideIcon,
   Megaphone,
@@ -17,7 +18,7 @@ import {
   UserCog,
   UsersRound,
 } from "lucide-react";
-import type { Permission } from "@/shared/contracts/api";
+import type { AppModule, Permission } from "@/shared/contracts/api";
 
 export type NavItem = {
   href: string;
@@ -29,10 +30,17 @@ export type NavItem = {
   permission?: Permission;
   /** Shown with any of these permissions. */
   anyPermission?: Permission[];
+  /** An optional module (contracted apart): shown only while it is on. */
+  module?: AppModule;
 };
 
 /** Whether the menu shows the entry to someone with `permissions`. */
-export const canSee = (item: NavItem, permissions: readonly Permission[]) =>
+export const canSee = (
+  item: NavItem,
+  permissions: readonly Permission[],
+  modules: readonly AppModule[] = [],
+) =>
+  (!item.module || modules.includes(item.module)) &&
   (!item.permission || permissions.includes(item.permission)) &&
   (!item.anyPermission ||
     item.anyPermission.some((permission) => permissions.includes(permission)));
@@ -75,6 +83,14 @@ export const PRIMARY_NAV: NavItem[] = [
     label: "Comunicados",
     icon: Megaphone,
     permission: "NOTIFICATIONS_BROADCAST",
+  },
+  // Condominium events (module contracted apart): everyone of the
+  // condominium; managers also create and publish.
+  {
+    href: "/eventos",
+    label: "Eventos",
+    icon: PartyPopper,
+    module: "EVENTS",
   },
   // The residents of the open condominium: managers and the platform.
   {

@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Camera, CheckCircle2, KeyRound, Send } from "lucide-react";
-import { Button, Field, FormSection } from "@/design-system";
+import { Button, CollapsibleSection, Field } from "@/design-system";
 import { enrollmentClient } from "@/features/enrollment/api/enrollment.client";
 import { EnrollmentFields } from "@/features/enrollment/components/EnrollmentFields";
 import {
@@ -157,13 +157,13 @@ export function EnrollmentFlow() {
         Código confirmado. Preencha os seus dados: o acesso ao app é liberado
         depois da aprovação da administração.
       </p>
-      <FormSection
+      <CollapsibleSection
         icon={<Camera />}
         title="Foto de perfil"
         description="Ajuda a administração a identificar você."
       >
         <ProfilePhotoField value={photo} onChange={setPhoto} />
-      </FormSection>
+      </CollapsibleSection>
       <EnrollmentFields
         form={form}
         onChange={setForm}

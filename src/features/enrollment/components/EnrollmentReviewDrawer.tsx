@@ -10,15 +10,11 @@ import {
   Badge,
   Button,
   Drawer,
-  FormSection,
+  CollapsibleSection,
   Modal,
-  Select,
   TextArea,
 } from "@/design-system";
-import {
-  GROUP_DESCRIPTIONS,
-  GROUP_LABELS,
-} from "@/features/access/model/access-labels";
+import { GroupChoice } from "@/features/access/components/GroupChoice";
 import { TemporaryAccessPanel } from "@/features/admin/components/TemporaryAccessPanel";
 import { enrollmentClient } from "@/features/enrollment/api/enrollment.client";
 import { EnrollmentFields } from "@/features/enrollment/components/EnrollmentFields";
@@ -176,35 +172,19 @@ export function EnrollmentReviewDrawer({
                 gerado a partir do nome (ex.: <strong>ana.souza</strong>) e o
                 e-mail também serve para entrar.
               </Alert>
-              <FormSection
+              <CollapsibleSection
                 icon={<KeyRound />}
                 title="Acesso ao app"
                 description="O grupo define o que a pessoa pode fazer no app."
               >
-                <div>
-                  <Select
-                    label="Grupo"
-                    required
-                    placeholder="Selecione"
-                    value={group}
-                    onChange={(event) =>
-                      setGroup(event.target.value as UserGroup)
-                    }
-                    options={groups.map((value) => ({
-                      value,
-                      label: GROUP_LABELS[value],
-                    }))}
-                    error={
-                      submitted && !group ? "Selecione o grupo." : undefined
-                    }
-                  />
-                  {group && (
-                    <p className="mt-1.5 text-xs text-soft">
-                      {GROUP_DESCRIPTIONS[group]}
-                    </p>
-                  )}
-                </div>
-              </FormSection>
+                <GroupChoice
+                  groups={groups}
+                  legend="Grupo"
+                  value={group}
+                  onChange={setGroup}
+                  error={submitted && !group ? "Escolha o grupo." : undefined}
+                />
+              </CollapsibleSection>
               <EnrollmentFields
                 form={form}
                 onChange={setForm}
