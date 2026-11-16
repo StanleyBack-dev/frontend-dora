@@ -3,13 +3,14 @@ import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { MembersDirectory } from "@/features/admin/components/MembersDirectory";
 import { NoCondominium } from "@/features/condominiums/components/NoCondominium";
 import { getSessionUser } from "@/server/auth/current-user";
+import { ROLES_BY_KIND } from "@/features/admin/model/member-kind";
 import { loadMembers } from "@/server/loaders/load-members";
 import { can } from "@/shared/lib/access";
 import type { RawSearchParams } from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Moradores" };
 
-// The residents only: managers and the gate are in Equipe.
+// The residents (a resident síndico too); the employees are in Equipe.
 export default async function ResidentsPage({
   searchParams,
 }: {
@@ -21,9 +22,14 @@ export default async function ResidentsPage({
   if (!can(user, "USERS_MANAGE")) return <AccessDenied />;
   if (!user.condominium) return <NoCondominium user={user} />;
 
-  const roles = ["USER"] as const;
+  const kind = "RESIDENT" as const;
+  const roles = ROLES_BY_KIND[kind];
   const unitFilter = true;
-  const data = await loadMembers(await searchParams, { roles, unitFilter });
+  const data = await loadMembers(await searchParams, {
+    kind,
+    roles,
+    unitFilter,
+  });
 
   return (
     <MembersDirectory
@@ -32,7 +38,8 @@ export default async function ResidentsPage({
       config={{
         basePath: "/moradores",
         title: "Moradores",
-        description: `Quem mora no ${user.condominium.name}: unidade, contato e acesso. A administração e a portaria ficam em Equipe.`,
+        description: `Quem mora no ${user.condominium.name}: unidade, contato e acesso. Os funcionários ficam em Equipe.`,
+        kind,
         roles,
         unitFilter,
         emptyTitle: "Nenhum morador ainda",

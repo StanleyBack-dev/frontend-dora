@@ -3,14 +3,16 @@ import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { MembersDirectory } from "@/features/admin/components/MembersDirectory";
 import { NoCondominium } from "@/features/condominiums/components/NoCondominium";
 import { getSessionUser } from "@/server/auth/current-user";
+import { ROLES_BY_KIND } from "@/features/admin/model/member-kind";
 import { loadMembers } from "@/server/loaders/load-members";
 import { can } from "@/shared/lib/access";
 import type { RawSearchParams } from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Equipe" };
 
-// Who runs the condominium: managers (administração, síndico) and the gate
-// (Portaria). The platform administrator is not a member, so never listed.
+// The condominium's employees: the gate, the staff and a hired síndico or
+// administrator, with their staff record. The platform administrator is not
+// a member, so never listed.
 export default async function TeamPage({
   searchParams,
 }: {
@@ -20,9 +22,14 @@ export default async function TeamPage({
   if (!can(user, "USERS_MANAGE")) return <AccessDenied />;
   if (!user.condominium) return <NoCondominium user={user} />;
 
-  const roles = ["ADMIN", "CONCIERGE"] as const;
+  const kind = "EMPLOYEE" as const;
+  const roles = ROLES_BY_KIND[kind];
   const unitFilter = false;
-  const data = await loadMembers(await searchParams, { roles, unitFilter });
+  const data = await loadMembers(await searchParams, {
+    kind,
+    roles,
+    unitFilter,
+  });
 
   return (
     <MembersDirectory
@@ -31,7 +38,8 @@ export default async function TeamPage({
       config={{
         basePath: "/equipe",
         title: "Equipe",
-        description: `A administração e a portaria do ${user.condominium.name}: contato, papel e acesso.`,
+        description: `Os funcionários do ${user.condominium.name}: cargo, contato, papel e acesso.`,
+        kind,
         roles,
         unitFilter,
         emptyTitle: "Ninguém na equipe ainda",

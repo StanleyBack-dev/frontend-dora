@@ -5,6 +5,7 @@ import type {
   AddressFormat,
   AppModule,
   CondominiumStatus,
+  MemberKind,
   Permission,
   UserGroup,
 } from "@/shared/graphql/schema-enums";
@@ -13,8 +14,25 @@ export type {
   AddressFormat,
   AppModule,
   CondominiumStatus,
+  MemberKind,
   Permission,
   UserGroup,
+};
+
+export type EmployeeProfileInput = {
+  [K in keyof EmployeeProfile]?: string | null;
+};
+
+/** An employee's record (the base for a future time sheet). */
+export type EmployeeProfile = {
+  /** "Porteiro", "Zelador"… */
+  jobTitle: string | null;
+  /** YYYY-MM-DD. */
+  hiredOn: string | null;
+  /** "Diurno 7h–19h", "12x36"… */
+  workShift: string | null;
+  /** The outsourcing company, when there is one. */
+  contractor: string | null;
 };
 
 /** Error shape returned by every BFF route. */
@@ -86,11 +104,15 @@ export type UserAccount = {
   group: UserGroup;
   /** Access to this condominium. */
   active: boolean;
+  /** Resident (unit) or employee (staff record); the role is apart. */
+  kind: MemberKind;
   unitId: string | null;
   /** "Bloco A · 101". */
   unitLabel: string | null;
   /** Address detail inside the condominium ("casa dos fundos"). */
   unitComplement: string | null;
+  /** Employees only. */
+  employee: EmployeeProfile | null;
   /** Contact phone, digits only (DDD + number). */
   phone: string | null;
   /** Short-lived link to the profile photo (null: none). */
@@ -119,15 +141,21 @@ export type TemporaryAccess = {
   existingAccount?: boolean;
 };
 
+// The login is never typed: the API makes it from the name (nome.sobrenome)
+// and the e-mail also signs in.
 export type UserInput = {
   name: string;
   email: string;
-  /** Empty: generated from the name. */
-  username?: string | null;
+  /** Permissions. */
   group: UserGroup;
+  /** Resident or employee. */
+  kind: MemberKind;
+  /** Residents only. */
   unitId?: string | null;
-  /** On update: undefined keeps it, "" or null clears it. */
+  /** Residents only. On update: undefined keeps it, "" or null clears it. */
   unitComplement?: string | null;
+  /** Employees only (each field optional; "" or null: none). */
+  employee?: EmployeeProfileInput | null;
   /** Any format (the API keeps the digits); "" or null clears it. */
   phone?: string | null;
 };

@@ -11,8 +11,10 @@ import {
 } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { CreateUserButton } from "@/features/admin/components/CreateUserButton";
-import { UsersTable } from "@/features/admin/components/UsersTable";
+import { MembersList } from "@/features/admin/components/MembersList";
+import { rolesFor } from "@/features/admin/model/member-kind";
 import type {
+  MemberKind,
   Paginated,
   SessionUser,
   UserAccount,
@@ -32,7 +34,9 @@ export type MembersDirectoryConfig = {
   basePath: string;
   title: string;
   description: string;
-  /** The roles listed here (one: no role filter). */
+  /** Residents (Moradores) or employees (Equipe). */
+  kind: MemberKind;
+  /** The roles of that tie (the role filter). */
   roles: readonly UserGroup[];
   /** Units matter for residents only (filter by unit). */
   unitFilter: boolean;
@@ -52,8 +56,8 @@ export type MembersDirectoryData = {
   };
 };
 
-// The members of the condominium with some roles: Moradores (residents)
-// and Equipe (managers and the gate). Search, filters, pagination and
+// The members of the condominium by tie: Moradores (residents, a resident
+// síndico included) and Equipe (employees: the gate, a hired síndico). Search, filters, pagination and
 // "Adicionar pessoa" with the roles of this list. The page loads the data
 // (server/loaders/load-members.ts).
 export function MembersDirectory({
@@ -77,9 +81,7 @@ export function MembersDirectory({
       ...overrides,
     });
   const filtered = Boolean(search || group || unitId || status);
-  const creatable = assignableGroups(user.group).filter((value) =>
-    config.roles.includes(value),
-  );
+  const creatable = assignableGroups(user.group);
 
   return (
     <>
@@ -87,8 +89,12 @@ export function MembersDirectory({
         title={config.title}
         description={config.description}
         actions={
-          creatable.length > 0 ? (
-            <CreateUserButton assignableGroups={creatable} units={units} />
+          rolesFor(config.kind, creatable).length > 0 ? (
+            <CreateUserButton
+              kind={config.kind}
+              assignableGroups={creatable}
+              units={units}
+            />
           ) : undefined
         }
       />
@@ -157,7 +163,11 @@ export function MembersDirectory({
             }
           />
         ) : (
-          <UsersTable users={users.items} basePath={config.basePath} />
+          <MembersList
+            users={users.items}
+            basePath={config.basePath}
+            kind={config.kind}
+          />
         )}
 
         <Pagination

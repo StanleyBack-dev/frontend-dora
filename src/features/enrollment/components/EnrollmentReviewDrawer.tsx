@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { rolesFor } from "@/features/admin/model/member-kind";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, KeyRound, UserRound, X } from "lucide-react";
@@ -68,11 +69,9 @@ export function EnrollmentReviewDrawer({
     request.applicant,
     request.typedUnitStreet ? "HOUSE" : "APARTMENT",
   );
-  // Employees join the team (Portaria or Administrador), never Moradores.
-  const groups =
-    request.applicant === "EMPLOYEE"
-      ? assignableGroups.filter((value) => value !== "USER")
-      : assignableGroups;
+  // The applicant's answer is the tie: employees go to Equipe (Portaria or
+  // Gestor), residents to Moradores (Morador or a resident síndico).
+  const groups = rolesFor(request.applicant, assignableGroups);
   const errors = enrollmentErrors(form, unitMode);
 
   const finish = () => {

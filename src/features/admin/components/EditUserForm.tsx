@@ -21,17 +21,18 @@ export function EditUserForm({
   user: UserAccount;
   assignableGroups: UserGroup[];
   units: Pick<Unit, "id" | "label">[];
-  /** Shared account: only role and unit can change here. */
+  /** Shared account: only the tie, role and its data can change here. */
   accountLocked: boolean;
 }) {
   const router = useRouter();
   const initial: UserInput = {
     name: user.name,
     email: user.email,
-    username: user.username,
     group: user.group,
+    kind: user.kind,
     unitId: user.unitId,
     unitComplement: user.unitComplement ?? "",
+    employee: user.employee,
     phone: user.phone ? formatPhone(user.phone) : "",
   };
   const [form, setForm] = useState<UserInput>(initial);
@@ -83,7 +84,6 @@ export function EditUserForm({
             : [user.group, ...assignableGroups]
         }
         units={units}
-        mode="edit"
         accountLocked={accountLocked}
       />
       <Button

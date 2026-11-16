@@ -22,9 +22,16 @@ export const userAccountFieldsFragment = graphql(`
     username
     group
     active
+    kind
     unitId
     unitLabel
     unitComplement
+    employee {
+      jobTitle
+      hiredOn
+      workShift
+      contractor
+    }
     phone
     photoUrl
     sharedAccount
