@@ -72,7 +72,7 @@ export function EnrollmentReviewDrawer({
   // The applicant's answer is the tie: employees go to Equipe (Portaria or
   // Gestor), residents to Moradores (Morador or a resident síndico).
   const groups = rolesFor(request.applicant, assignableGroups);
-  const errors = enrollmentErrors(form, unitMode);
+  const errors = enrollmentErrors(form, unitMode, false);
 
   const finish = () => {
     router.refresh();

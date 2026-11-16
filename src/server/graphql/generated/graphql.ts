@@ -18,6 +18,27 @@ export type AddressFormat =
 export type AppModule =
   | 'EVENTS';
 
+export type AttendeeInput = {
+  /** Com GUEST: idade. */
+  age?: number | null | undefined;
+  /** Com DEPENDENT: qual. */
+  dependentId?: string | number | null | undefined;
+  /** Com GUEST: nome completo. */
+  name?: string | null | undefined;
+  /** Com GUEST: convidado de fora do condomínio. */
+  outside: boolean;
+  /** Eu, um dependente aprovado ou outra pessoa. */
+  source: AttendeeSource;
+  /** Ingresso (público) da pessoa, em evento com ingresso. */
+  ticketTypeId?: string | number | null | undefined;
+};
+
+/** Quem é a pessoa do pedido: eu, um dependente ou outra pessoa. */
+export type AttendeeSource =
+  | 'DEPENDENT'
+  | 'GUEST'
+  | 'SELF';
+
 export type BookingFilterInput = {
   spaceId?: string | number | null | undefined;
   status?: BookingStatus | null | undefined;
@@ -125,6 +146,8 @@ export type CreateUnitsInput = {
 };
 
 export type CreateUserInput = {
+  /** Data de nascimento AAAA-MM-DD. */
+  birthDate?: string | null | undefined;
   email: string;
   /** Só para funcionários. */
   employee?: EmployeeProfileInput | null | undefined;
@@ -140,6 +163,31 @@ export type CreateUserInput = {
   /** Só para moradores. */
   unitId?: string | number | null | undefined;
 };
+
+export type DependentInput = {
+  /** Data de nascimento AAAA-MM-DD. */
+  birthDate: string;
+  /** Documento com a data de nascimento (imagem ou PDF em base64, até 1,2 MB). */
+  document: string;
+  /** Nome completo. */
+  name: string;
+  relationship: DependentRelationship;
+};
+
+/** Parentesco com o morador. */
+export type DependentRelationship =
+  | 'CHILD'
+  | 'GRANDCHILD'
+  | 'OTHER'
+  | 'PARENT'
+  | 'SIBLING'
+  | 'SPOUSE';
+
+/** Aguardando aprovação, aprovado ou recusado. */
+export type DependentStatus =
+  | 'APPROVED'
+  | 'PENDING'
+  | 'REJECTED';
 
 /** Documento de identidade: CPF ou RG. */
 export type DocumentType =
@@ -165,6 +213,8 @@ export type EnrollmentApplicant =
 
 /** Dados do cadastro (formulário ou correção). */
 export type EnrollmentDataInput = {
+  /** Data de nascimento AAAA-MM-DD (obrigatória no formulário público). */
+  birthDate?: string | null | undefined;
   email: string;
   fullName: string;
   phone: string;
@@ -210,19 +260,54 @@ export type EventInput = {
   address?: EventAddressInput | null | undefined;
   /** Lotação total. */
   capacity: number;
+  /** Com pixSource CUSTOM: o PIX do evento. */
+  customPix?: EventPixInput | null | undefined;
   description?: string | null | undefined;
   endsAt: string;
   /** Convidados de fora do condomínio (0: só moradores). */
   externalGuestLimit: number;
+  /** Com ingresso: o valor da inteira, em centavos. */
+  fullPriceCents?: number | null | undefined;
   /** Com espaço, um detalhe ("área coberta"); fora, o nome do local ("Chácara Bela Vista"). */
   location?: string | null | undefined;
+  /** Com ingresso: o PIX do condomínio ou outro. */
+  pixSource?: EventPixSource | null | undefined;
   /** Espaço do condomínio (sem espaço: informe o endereço). */
   spaceId?: string | number | null | undefined;
   startsAt: string;
+  /** Com ingresso: os públicos aceitos, na ordem. */
+  ticketTypes?: Array<TicketTypeInput> | null | undefined;
   /** Entrada com ingresso pago (Pix). */
   ticketed: boolean;
   title: string;
+  /** Máximo de ingressos por unidade (vazio: sem limite). */
+  unitTicketLimit?: number | null | undefined;
 };
+
+/** Aguardando pagamento, em conferência, confirmado, recusado, expirado ou cancelado. */
+export type EventOrderStatus =
+  | 'AWAITING_REVIEW'
+  | 'CANCELLED'
+  | 'CONFIRMED'
+  | 'EXPIRED'
+  | 'PENDING_PAYMENT'
+  | 'REJECTED';
+
+export type EventPixInput = {
+  /** Cidade de quem recebe. */
+  city: string;
+  /** Chave PIX. */
+  key: string;
+  /** Tipo da chave: define como ela é conferida. */
+  keyType: PixKeyType;
+  /** Nome de quem recebe, como aparece no banco. */
+  name: string;
+};
+
+/** Quem recebe os ingressos: o PIX do condomínio ou outro. */
+export type EventPixSource =
+  | 'CONDOMINIUM'
+  | 'CUSTOM';
 
 /** Rascunho (só gestores), publicado ou cancelado. */
 export type EventStatus =
@@ -296,8 +381,14 @@ export type NotificationType =
   | 'BOOKING_REJECTED'
   | 'BOOKING_SLOT_FREED'
   | 'BROADCAST'
+  | 'DEPENDENT_APPROVED'
+  | 'DEPENDENT_REJECTED'
+  | 'DEPENDENT_SUBMITTED'
   | 'ENROLLMENT_SUBMITTED'
   | 'EVENT_CANCELLED'
+  | 'EVENT_ORDER_CONFIRMED'
+  | 'EVENT_ORDER_RECEIPT'
+  | 'EVENT_ORDER_REJECTED'
   | 'EVENT_PUBLISHED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
@@ -328,12 +419,32 @@ export type Permission =
   | 'EVENTS_MANAGE'
   | 'GUESTS_CHECKIN'
   | 'NOTIFICATIONS_BROADCAST'
+  | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
   | 'SPACES_MANAGE'
   | 'SUPPORTERS_MANAGE'
   | 'SUPPORT_MANAGE'
   | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
+
+/** Tipo da chave PIX: CPF, CNPJ, celular, e-mail ou aleatória. */
+export type PixKeyType =
+  | 'CNPJ'
+  | 'CPF'
+  | 'EMAIL'
+  | 'PHONE'
+  | 'RANDOM';
+
+export type PixReceiverInput = {
+  /** Cidade de quem recebe. */
+  city: string;
+  /** Chave PIX: e-mail, CPF/CNPJ, celular com DDD ou aleatória. */
+  key: string;
+  /** Tipo da chave: define como ela é conferida. */
+  keyType: PixKeyType;
+  /** Nome de quem recebe, como aparece no banco. */
+  name: string;
+};
 
 export type PlatformMetricsFilterInput = {
   /** Um condomínio (vazio: todos). */
@@ -468,12 +579,46 @@ export type SystemLogFilterInput = {
   to?: string | null | undefined;
 };
 
+/** Público do ingresso: adulto, criança, infantil, idoso, estudante, PcD ou professor. */
+export type TicketKind =
+  | 'ADULT'
+  | 'CHILD'
+  | 'INFANT'
+  | 'PCD'
+  | 'SENIOR'
+  | 'STUDENT'
+  | 'TEACHER';
+
+/** Quanto o público paga: inteira, meia, grátis ou outro valor. */
+export type TicketPriceMode =
+  | 'CUSTOM'
+  | 'FREE'
+  | 'FULL'
+  | 'HALF';
+
+export type TicketTypeInput = {
+  /** Com Outro valor: o valor em centavos. */
+  customPriceCents?: number | null | undefined;
+  /** Público já existente (vazio: novo). */
+  id?: string | number | null | undefined;
+  /** Público (uma vez por evento). */
+  kind: TicketKind;
+  /** Idade máxima. */
+  maxAge?: number | null | undefined;
+  /** Idade mínima. */
+  minAge?: number | null | undefined;
+  /** Quanto paga. */
+  priceMode: TicketPriceMode;
+};
+
 export type UnitLimitInput = {
   count: number;
   period: LimitPeriod;
 };
 
 export type UpdateMyProfileInput = {
+  /** Data de nascimento AAAA-MM-DD (ausente: mantém; vazio: remove). */
+  birthDate?: string | null | undefined;
   email: string;
   name: string;
   /** Telefone de contato (ausente: mantém; vazio: remove). */
@@ -494,6 +639,8 @@ export type UpdateUnitInput = {
 };
 
 export type UpdateUserInput = {
+  /** Data de nascimento AAAA-MM-DD. */
+  birthDate?: string | null | undefined;
   email?: string | null | undefined;
   /** Só para funcionários. */
   employee?: EmployeeProfileInput | null | undefined;
@@ -548,23 +695,23 @@ export type UsersQueryVariables = Exact<{
 }>;
 
 
-export type UsersQuery = { users: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null }> } };
+export type UsersQuery = { users: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null }> } };
 
-export type UserAccountFieldsFragment = { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null };
+export type UserAccountFieldsFragment = { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null };
 
 export type UserQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type UserQuery = { user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
+export type UserQuery = { user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
 
 export type CreateUserMutationVariables = Exact<{
   input: CreateUserInput;
 }>;
 
 
-export type CreateUserMutation = { createUser: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } } };
+export type CreateUserMutation = { createUser: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } } };
 
 export type UpdateUserMutationVariables = Exact<{
   id: string | number;
@@ -572,7 +719,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { updateUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
+export type UpdateUserMutation = { updateUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
 
 export type SetUserActiveMutationVariables = Exact<{
   id: string | number;
@@ -580,28 +727,28 @@ export type SetUserActiveMutationVariables = Exact<{
 }>;
 
 
-export type SetUserActiveMutation = { setUserActive: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
+export type SetUserActiveMutation = { setUserActive: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
 
 export type ResetUserPasswordMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type ResetUserPasswordMutation = { resetUserPassword: { temporaryPassword: string | null, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } } };
+export type ResetUserPasswordMutation = { resetUserPassword: { temporaryPassword: string | null, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } } };
 
 export type UnlockUserMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type UnlockUserMutation = { unlockUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
+export type UnlockUserMutation = { unlockUser: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
 
 export type RevokeUserSessionsMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type RevokeUserSessionsMutation = { revokeUserSessions: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
+export type RevokeUserSessionsMutation = { revokeUserSessions: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } };
 
 export type UserPermissionsQueryVariables = Exact<{
   id: string | number;
@@ -635,7 +782,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
+export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, birthDate: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
 
 export type RefreshSessionMutationVariables = Exact<{
   refreshToken: string;
@@ -652,7 +799,7 @@ export type LogoutMutation = { logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, birthDate: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type CompleteOnboardingMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -671,7 +818,7 @@ export type UpdateMyProfileMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, birthDate: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type SetMyPhotoMutationVariables = Exact<{
   photo: string;
@@ -974,6 +1121,49 @@ export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, activeSpaces: number, pendingBookings: number, bookingsToday: number, openSupportRequests: number | null, failedNotifications: number | null } };
 
+export type DependentFieldsFragment = { id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string };
+
+export type MyDependentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyDependentsQuery = { myDependents: Array<{ id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string }> };
+
+export type AddDependentMutationVariables = Exact<{
+  input: DependentInput;
+}>;
+
+
+export type AddDependentMutation = { addDependent: { id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string } };
+
+export type RemoveDependentMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type RemoveDependentMutation = { removeDependent: boolean };
+
+export type DependentsQueryVariables = Exact<{
+  status?: DependentStatus | null | undefined;
+}>;
+
+
+export type DependentsQuery = { dependents: Array<{ id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string }> };
+
+export type ApproveDependentMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ApproveDependentMutation = { approveDependent: { id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string } };
+
+export type RejectDependentMutationVariables = Exact<{
+  id: string | number;
+  reason: string;
+}>;
+
+
+export type RejectDependentMutation = { rejectDependent: { id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string } };
+
 export type VerifyEnrollmentCodeMutationVariables = Exact<{
   code: string;
 }>;
@@ -997,7 +1187,7 @@ export type SubmitEnrollmentMutation = { submitEnrollment: boolean };
 
 export type EnrollmentInviteFieldsFragment = { id: string, code: string, label: string, expiresAt: string, revokedAt: string | null, createdAt: string, requestCount: number };
 
-export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
+export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, birthDate: string | null, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null };
 
 export type EnrollmentInvitesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1024,7 +1214,7 @@ export type EnrollmentRequestsQueryVariables = Exact<{
 }>;
 
 
-export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
+export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, birthDate: string | null, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }> } };
 
 export type ApproveEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -1033,7 +1223,7 @@ export type ApproveEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } } } };
+export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, birthDate: string | null, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null }, access: { temporaryPassword: string | null, emailSent: boolean, existingAccount: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, kind: MemberKind, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, birthDate: string | null, photoUrl: string | null, sharedAccount: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string, employee: { jobTitle: string | null, hiredOn: string | null, workShift: string | null, contractor: string | null } | null } } } };
 
 export type RejectEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -1041,30 +1231,30 @@ export type RejectEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
+export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, birthDate: string | null, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
 
-export type EventFieldsFragment = { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null };
+export type EventFieldsFragment = { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null };
 
 export type EventsQueryVariables = Exact<{
   when?: EventWhen | null | undefined;
 }>;
 
 
-export type EventsQuery = { events: Array<{ id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null }> };
+export type EventsQuery = { events: Array<{ id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
 
 export type EventQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type EventQuery = { event: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
+export type EventQuery = { event: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type CreateEventMutationVariables = Exact<{
   input: EventInput;
 }>;
 
 
-export type CreateEventMutation = { createEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
+export type CreateEventMutation = { createEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type UpdateEventMutationVariables = Exact<{
   id: string | number;
@@ -1072,14 +1262,14 @@ export type UpdateEventMutationVariables = Exact<{
 }>;
 
 
-export type UpdateEventMutation = { updateEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
+export type UpdateEventMutation = { updateEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type PublishEventMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type PublishEventMutation = { publishEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
+export type PublishEventMutation = { publishEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type CancelEventMutationVariables = Exact<{
   id: string | number;
@@ -1087,7 +1277,71 @@ export type CancelEventMutationVariables = Exact<{
 }>;
 
 
-export type CancelEventMutation = { cancelEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
+export type CancelEventMutation = { cancelEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+
+export type EventOrderFieldsFragment = { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null };
+
+export type MyEventOrdersQueryVariables = Exact<{
+  eventId: string | number;
+}>;
+
+
+export type MyEventOrdersQuery = { myEventOrders: Array<{ id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
+
+export type EventOrdersQueryVariables = Exact<{
+  eventId: string | number;
+  status?: EventOrderStatus | null | undefined;
+}>;
+
+
+export type EventOrdersQuery = { eventOrders: Array<{ id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
+
+export type CreateEventOrderMutationVariables = Exact<{
+  eventId: string | number;
+  attendees: Array<AttendeeInput> | AttendeeInput;
+}>;
+
+
+export type CreateEventOrderMutation = { createEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+
+export type SubmitEventOrderReceiptMutationVariables = Exact<{
+  id: string | number;
+  file: string;
+}>;
+
+
+export type SubmitEventOrderReceiptMutation = { submitEventOrderReceipt: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+
+export type CancelEventOrderMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type CancelEventOrderMutation = { cancelEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+
+export type ApproveEventOrderMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ApproveEventOrderMutation = { approveEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+
+export type RejectEventOrderMutationVariables = Exact<{
+  id: string | number;
+  reason: string;
+}>;
+
+
+export type RejectEventOrderMutation = { rejectEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+
+export type SubmitEventAttendeeProofMutationVariables = Exact<{
+  orderId: string | number;
+  attendeeId: string | number;
+  file: string;
+}>;
+
+
+export type SubmitEventAttendeeProofMutation = { submitEventAttendeeProof: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -1150,6 +1404,23 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SendTestPushMutation = { sendTestPush: number };
+
+export type CondominiumPixQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CondominiumPixQuery = { condominiumPix: { keyType: PixKeyType, key: string, name: string, city: string } | null };
+
+export type SetCondominiumPixMutationVariables = Exact<{
+  input: PixReceiverInput;
+}>;
+
+
+export type SetCondominiumPixMutation = { setCondominiumPix: { keyType: PixKeyType, key: string, name: string, city: string } };
+
+export type RemoveCondominiumPixMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RemoveCondominiumPixMutation = { removeCondominiumPix: boolean };
 
 export type PlatformMetricsQueryVariables = Exact<{
   filter?: PlatformMetricsFilterInput | null | undefined;
@@ -1359,6 +1630,7 @@ export const UserAccountFieldsFragmentDoc = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -1466,6 +1738,22 @@ export const UnitFieldsFragmentDoc = new TypedDocumentString(`
   residents
 }
     `, {"fragmentName":"UnitFields"}) as unknown as TypedDocumentString<UnitFieldsFragment, unknown>;
+export const DependentFieldsFragmentDoc = new TypedDocumentString(`
+    fragment DependentFields on Dependent {
+  id
+  name
+  birthDate
+  relationship
+  status
+  holderName
+  unitLabel
+  rejectReason
+  reviewedAt
+  createdAt
+  documentUrl
+  documentContentType
+}
+    `, {"fragmentName":"DependentFields"}) as unknown as TypedDocumentString<DependentFieldsFragment, unknown>;
 export const EnrollmentInviteFieldsFragmentDoc = new TypedDocumentString(`
     fragment EnrollmentInviteFields on EnrollmentInvite {
   id
@@ -1485,6 +1773,7 @@ export const EnrollmentRequestFieldsFragmentDoc = new TypedDocumentString(`
   fullName
   email
   phone
+  birthDate
   unitId
   unitLabel
   unitComplement
@@ -1521,6 +1810,27 @@ export const EventFieldsFragmentDoc = new TypedDocumentString(`
   capacity
   externalGuestLimit
   ticketed
+  fullPriceCents
+  ticketTypes {
+    id
+    kind
+    name
+    priceMode
+    customPriceCents
+    priceCents
+    minAge
+    maxAge
+  }
+  unitTicketLimit
+  pixSource
+  customPix {
+    keyType
+    key
+    name
+    city
+  }
+  placesLeft
+  outsidePlacesLeft
   status
   cancelReason
   publishedAt
@@ -1528,6 +1838,46 @@ export const EventFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"EventFields"}) as unknown as TypedDocumentString<EventFieldsFragment, unknown>;
+export const EventOrderFieldsFragmentDoc = new TypedDocumentString(`
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}
+    `, {"fragmentName":"EventOrderFields"}) as unknown as TypedDocumentString<EventOrderFieldsFragment, unknown>;
 export const SpaceFieldsFragmentDoc = new TypedDocumentString(`
     fragment SpaceFields on Space {
   id
@@ -1617,6 +1967,7 @@ export const UsersDocument = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -1650,6 +2001,7 @@ export const UserDocument = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -1688,6 +2040,7 @@ export const CreateUserDocument = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -1721,6 +2074,7 @@ export const UpdateUserDocument = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -1754,6 +2108,7 @@ export const SetUserActiveDocument = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -1791,6 +2146,7 @@ export const ResetUserPasswordDocument = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -1824,6 +2180,7 @@ export const UnlockUserDocument = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -1857,6 +2214,7 @@ export const RevokeUserSessionsDocument = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -1926,6 +2284,7 @@ export const LoginDocument = new TypedDocumentString(`
       permissions
       photoUrl
       phone
+      birthDate
       onboardingCompleted
       platformAdmin
       condominium {
@@ -1975,6 +2334,7 @@ export const MeDocument = new TypedDocumentString(`
     permissions
     photoUrl
     phone
+    birthDate
     onboardingCompleted
     platformAdmin
     condominium {
@@ -2018,6 +2378,7 @@ export const UpdateMyProfileDocument = new TypedDocumentString(`
     permissions
     photoUrl
     phone
+    birthDate
     onboardingCompleted
     platformAdmin
     condominium {
@@ -2717,6 +3078,111 @@ export const DashboardDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<DashboardQuery, DashboardQueryVariables>;
+export const MyDependentsDocument = new TypedDocumentString(`
+    query MyDependents {
+  myDependents {
+    ...DependentFields
+  }
+}
+    fragment DependentFields on Dependent {
+  id
+  name
+  birthDate
+  relationship
+  status
+  holderName
+  unitLabel
+  rejectReason
+  reviewedAt
+  createdAt
+  documentUrl
+  documentContentType
+}`) as unknown as TypedDocumentString<MyDependentsQuery, MyDependentsQueryVariables>;
+export const AddDependentDocument = new TypedDocumentString(`
+    mutation AddDependent($input: DependentInput!) {
+  addDependent(input: $input) {
+    ...DependentFields
+  }
+}
+    fragment DependentFields on Dependent {
+  id
+  name
+  birthDate
+  relationship
+  status
+  holderName
+  unitLabel
+  rejectReason
+  reviewedAt
+  createdAt
+  documentUrl
+  documentContentType
+}`) as unknown as TypedDocumentString<AddDependentMutation, AddDependentMutationVariables>;
+export const RemoveDependentDocument = new TypedDocumentString(`
+    mutation RemoveDependent($id: ID!) {
+  removeDependent(id: $id)
+}
+    `) as unknown as TypedDocumentString<RemoveDependentMutation, RemoveDependentMutationVariables>;
+export const DependentsDocument = new TypedDocumentString(`
+    query Dependents($status: DependentStatus) {
+  dependents(status: $status) {
+    ...DependentFields
+  }
+}
+    fragment DependentFields on Dependent {
+  id
+  name
+  birthDate
+  relationship
+  status
+  holderName
+  unitLabel
+  rejectReason
+  reviewedAt
+  createdAt
+  documentUrl
+  documentContentType
+}`) as unknown as TypedDocumentString<DependentsQuery, DependentsQueryVariables>;
+export const ApproveDependentDocument = new TypedDocumentString(`
+    mutation ApproveDependent($id: ID!) {
+  approveDependent(id: $id) {
+    ...DependentFields
+  }
+}
+    fragment DependentFields on Dependent {
+  id
+  name
+  birthDate
+  relationship
+  status
+  holderName
+  unitLabel
+  rejectReason
+  reviewedAt
+  createdAt
+  documentUrl
+  documentContentType
+}`) as unknown as TypedDocumentString<ApproveDependentMutation, ApproveDependentMutationVariables>;
+export const RejectDependentDocument = new TypedDocumentString(`
+    mutation RejectDependent($id: ID!, $reason: String!) {
+  rejectDependent(id: $id, reason: $reason) {
+    ...DependentFields
+  }
+}
+    fragment DependentFields on Dependent {
+  id
+  name
+  birthDate
+  relationship
+  status
+  holderName
+  unitLabel
+  rejectReason
+  reviewedAt
+  createdAt
+  documentUrl
+  documentContentType
+}`) as unknown as TypedDocumentString<RejectDependentMutation, RejectDependentMutationVariables>;
 export const VerifyEnrollmentCodeDocument = new TypedDocumentString(`
     mutation VerifyEnrollmentCode($code: String!) {
   verifyEnrollmentCode(code: $code)
@@ -2804,6 +3270,7 @@ export const EnrollmentRequestsDocument = new TypedDocumentString(`
   fullName
   email
   phone
+  birthDate
   unitId
   unitLabel
   unitComplement
@@ -2851,6 +3318,7 @@ export const ApproveEnrollmentRequestDocument = new TypedDocumentString(`
     contractor
   }
   phone
+  birthDate
   photoUrl
   sharedAccount
   mustChangePassword
@@ -2867,6 +3335,7 @@ fragment EnrollmentRequestFields on EnrollmentRequest {
   fullName
   email
   phone
+  birthDate
   unitId
   unitLabel
   unitComplement
@@ -2893,6 +3362,7 @@ export const RejectEnrollmentRequestDocument = new TypedDocumentString(`
   fullName
   email
   phone
+  birthDate
   unitId
   unitLabel
   unitComplement
@@ -2933,6 +3403,27 @@ export const EventsDocument = new TypedDocumentString(`
   capacity
   externalGuestLimit
   ticketed
+  fullPriceCents
+  ticketTypes {
+    id
+    kind
+    name
+    priceMode
+    customPriceCents
+    priceCents
+    minAge
+    maxAge
+  }
+  unitTicketLimit
+  pixSource
+  customPix {
+    keyType
+    key
+    name
+    city
+  }
+  placesLeft
+  outsidePlacesLeft
   status
   cancelReason
   publishedAt
@@ -2966,6 +3457,27 @@ export const EventDocument = new TypedDocumentString(`
   capacity
   externalGuestLimit
   ticketed
+  fullPriceCents
+  ticketTypes {
+    id
+    kind
+    name
+    priceMode
+    customPriceCents
+    priceCents
+    minAge
+    maxAge
+  }
+  unitTicketLimit
+  pixSource
+  customPix {
+    keyType
+    key
+    name
+    city
+  }
+  placesLeft
+  outsidePlacesLeft
   status
   cancelReason
   publishedAt
@@ -2999,6 +3511,27 @@ export const CreateEventDocument = new TypedDocumentString(`
   capacity
   externalGuestLimit
   ticketed
+  fullPriceCents
+  ticketTypes {
+    id
+    kind
+    name
+    priceMode
+    customPriceCents
+    priceCents
+    minAge
+    maxAge
+  }
+  unitTicketLimit
+  pixSource
+  customPix {
+    keyType
+    key
+    name
+    city
+  }
+  placesLeft
+  outsidePlacesLeft
   status
   cancelReason
   publishedAt
@@ -3032,6 +3565,27 @@ export const UpdateEventDocument = new TypedDocumentString(`
   capacity
   externalGuestLimit
   ticketed
+  fullPriceCents
+  ticketTypes {
+    id
+    kind
+    name
+    priceMode
+    customPriceCents
+    priceCents
+    minAge
+    maxAge
+  }
+  unitTicketLimit
+  pixSource
+  customPix {
+    keyType
+    key
+    name
+    city
+  }
+  placesLeft
+  outsidePlacesLeft
   status
   cancelReason
   publishedAt
@@ -3065,6 +3619,27 @@ export const PublishEventDocument = new TypedDocumentString(`
   capacity
   externalGuestLimit
   ticketed
+  fullPriceCents
+  ticketTypes {
+    id
+    kind
+    name
+    priceMode
+    customPriceCents
+    priceCents
+    minAge
+    maxAge
+  }
+  unitTicketLimit
+  pixSource
+  customPix {
+    keyType
+    key
+    name
+    city
+  }
+  placesLeft
+  outsidePlacesLeft
   status
   cancelReason
   publishedAt
@@ -3098,12 +3673,389 @@ export const CancelEventDocument = new TypedDocumentString(`
   capacity
   externalGuestLimit
   ticketed
+  fullPriceCents
+  ticketTypes {
+    id
+    kind
+    name
+    priceMode
+    customPriceCents
+    priceCents
+    minAge
+    maxAge
+  }
+  unitTicketLimit
+  pixSource
+  customPix {
+    keyType
+    key
+    name
+    city
+  }
+  placesLeft
+  outsidePlacesLeft
   status
   cancelReason
   publishedAt
   cancelledAt
   createdAt
 }`) as unknown as TypedDocumentString<CancelEventMutation, CancelEventMutationVariables>;
+export const MyEventOrdersDocument = new TypedDocumentString(`
+    query MyEventOrders($eventId: ID!) {
+  myEventOrders(eventId: $eventId) {
+    ...EventOrderFields
+  }
+}
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<MyEventOrdersQuery, MyEventOrdersQueryVariables>;
+export const EventOrdersDocument = new TypedDocumentString(`
+    query EventOrders($eventId: ID!, $status: EventOrderStatus) {
+  eventOrders(eventId: $eventId, status: $status) {
+    ...EventOrderFields
+  }
+}
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<EventOrdersQuery, EventOrdersQueryVariables>;
+export const CreateEventOrderDocument = new TypedDocumentString(`
+    mutation CreateEventOrder($eventId: ID!, $attendees: [AttendeeInput!]!) {
+  createEventOrder(eventId: $eventId, attendees: $attendees) {
+    ...EventOrderFields
+  }
+}
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<CreateEventOrderMutation, CreateEventOrderMutationVariables>;
+export const SubmitEventOrderReceiptDocument = new TypedDocumentString(`
+    mutation SubmitEventOrderReceipt($id: ID!, $file: String!) {
+  submitEventOrderReceipt(id: $id, file: $file) {
+    ...EventOrderFields
+  }
+}
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<SubmitEventOrderReceiptMutation, SubmitEventOrderReceiptMutationVariables>;
+export const CancelEventOrderDocument = new TypedDocumentString(`
+    mutation CancelEventOrder($id: ID!) {
+  cancelEventOrder(id: $id) {
+    ...EventOrderFields
+  }
+}
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<CancelEventOrderMutation, CancelEventOrderMutationVariables>;
+export const ApproveEventOrderDocument = new TypedDocumentString(`
+    mutation ApproveEventOrder($id: ID!) {
+  approveEventOrder(id: $id) {
+    ...EventOrderFields
+  }
+}
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<ApproveEventOrderMutation, ApproveEventOrderMutationVariables>;
+export const RejectEventOrderDocument = new TypedDocumentString(`
+    mutation RejectEventOrder($id: ID!, $reason: String!) {
+  rejectEventOrder(id: $id, reason: $reason) {
+    ...EventOrderFields
+  }
+}
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<RejectEventOrderMutation, RejectEventOrderMutationVariables>;
+export const SubmitEventAttendeeProofDocument = new TypedDocumentString(`
+    mutation SubmitEventAttendeeProof($orderId: ID!, $attendeeId: ID!, $file: String!) {
+  submitEventAttendeeProof(
+    orderId: $orderId
+    attendeeId: $attendeeId
+    file: $file
+  ) {
+    ...EventOrderFields
+  }
+}
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<SubmitEventAttendeeProofMutation, SubmitEventAttendeeProofMutationVariables>;
 export const MyNotificationsDocument = new TypedDocumentString(`
     query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {
   myNotifications(unreadOnly: $unreadOnly, page: $page) {
@@ -3173,6 +4125,31 @@ export const SendTestPushDocument = new TypedDocumentString(`
   sendTestPush
 }
     `) as unknown as TypedDocumentString<SendTestPushMutation, SendTestPushMutationVariables>;
+export const CondominiumPixDocument = new TypedDocumentString(`
+    query CondominiumPix {
+  condominiumPix {
+    keyType
+    key
+    name
+    city
+  }
+}
+    `) as unknown as TypedDocumentString<CondominiumPixQuery, CondominiumPixQueryVariables>;
+export const SetCondominiumPixDocument = new TypedDocumentString(`
+    mutation SetCondominiumPix($input: PixReceiverInput!) {
+  setCondominiumPix(input: $input) {
+    keyType
+    key
+    name
+    city
+  }
+}
+    `) as unknown as TypedDocumentString<SetCondominiumPixMutation, SetCondominiumPixMutationVariables>;
+export const RemoveCondominiumPixDocument = new TypedDocumentString(`
+    mutation RemoveCondominiumPix {
+  removeCondominiumPix
+}
+    `) as unknown as TypedDocumentString<RemoveCondominiumPixMutation, RemoveCondominiumPixMutationVariables>;
 export const PlatformMetricsDocument = new TypedDocumentString(`
     query PlatformMetrics($filter: PlatformMetricsFilterInput) {
   platformMetrics(filter: $filter) {

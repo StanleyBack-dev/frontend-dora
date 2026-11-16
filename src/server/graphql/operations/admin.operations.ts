@@ -33,6 +33,7 @@ export const userAccountFieldsFragment = graphql(`
       contractor
     }
     phone
+    birthDate
     photoUrl
     sharedAccount
     mustChangePassword

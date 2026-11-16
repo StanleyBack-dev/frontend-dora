@@ -49,6 +49,7 @@ export const enrollmentRequestFieldsFragment = graphql(`
     fullName
     email
     phone
+    birthDate
     unitId
     unitLabel
     unitComplement

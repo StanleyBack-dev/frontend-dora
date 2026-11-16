@@ -58,7 +58,7 @@ export const authService = {
 
   async updateProfile(
     token: string,
-    input: { name: string; email: string; phone?: string },
+    input: { name: string; email: string; phone?: string; birthDate?: string },
   ): Promise<SessionUser> {
     const { updateMyProfile } = await backendGraphql(updateMyProfileDocument, {
       token,

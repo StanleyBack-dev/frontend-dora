@@ -7,6 +7,12 @@ export type AddressFormat =
 export type AppModule =
   | 'EVENTS';
 
+/** Quem é a pessoa do pedido: eu, um dependente ou outra pessoa. */
+export type AttendeeSource =
+  | 'DEPENDENT'
+  | 'GUEST'
+  | 'SELF';
+
 /** Situação da reserva. */
 export type BookingStatus =
   | 'CANCELLED'
@@ -29,6 +35,21 @@ export type CondominiumStatus =
   | 'ACTIVE'
   | 'SUSPENDED';
 
+/** Parentesco com o morador. */
+export type DependentRelationship =
+  | 'CHILD'
+  | 'GRANDCHILD'
+  | 'OTHER'
+  | 'PARENT'
+  | 'SIBLING'
+  | 'SPOUSE';
+
+/** Aguardando aprovação, aprovado ou recusado. */
+export type DependentStatus =
+  | 'APPROVED'
+  | 'PENDING'
+  | 'REJECTED';
+
 /** Documento de identidade: CPF ou RG. */
 export type DocumentType =
   | 'CPF'
@@ -44,6 +65,20 @@ export type EnrollmentStatus =
   | 'APROVADA'
   | 'PENDENTE'
   | 'RECUSADA';
+
+/** Aguardando pagamento, em conferência, confirmado, recusado, expirado ou cancelado. */
+export type EventOrderStatus =
+  | 'AWAITING_REVIEW'
+  | 'CANCELLED'
+  | 'CONFIRMED'
+  | 'EXPIRED'
+  | 'PENDING_PAYMENT'
+  | 'REJECTED';
+
+/** Quem recebe os ingressos: o PIX do condomínio ou outro. */
+export type EventPixSource =
+  | 'CONDOMINIUM'
+  | 'CUSTOM';
 
 /** Rascunho (só gestores), publicado ou cancelado. */
 export type EventStatus =
@@ -93,8 +128,14 @@ export type NotificationType =
   | 'BOOKING_REJECTED'
   | 'BOOKING_SLOT_FREED'
   | 'BROADCAST'
+  | 'DEPENDENT_APPROVED'
+  | 'DEPENDENT_REJECTED'
+  | 'DEPENDENT_SUBMITTED'
   | 'ENROLLMENT_SUBMITTED'
   | 'EVENT_CANCELLED'
+  | 'EVENT_ORDER_CONFIRMED'
+  | 'EVENT_ORDER_RECEIPT'
+  | 'EVENT_ORDER_REJECTED'
   | 'EVENT_PUBLISHED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
@@ -111,12 +152,21 @@ export type Permission =
   | 'EVENTS_MANAGE'
   | 'GUESTS_CHECKIN'
   | 'NOTIFICATIONS_BROADCAST'
+  | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
   | 'SPACES_MANAGE'
   | 'SUPPORTERS_MANAGE'
   | 'SUPPORT_MANAGE'
   | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
+
+/** Tipo da chave PIX: CPF, CNPJ, celular, e-mail ou aleatória. */
+export type PixKeyType =
+  | 'CNPJ'
+  | 'CPF'
+  | 'EMAIL'
+  | 'PHONE'
+  | 'RANDOM';
 
 /** Situação de um horário na grade do dia. */
 export type SlotState =
@@ -149,6 +199,23 @@ export type SupportStatus =
   | 'ABERTO'
   | 'FINALIZADO'
   | 'RESPONDIDO';
+
+/** Público do ingresso: adulto, criança, infantil, idoso, estudante, PcD ou professor. */
+export type TicketKind =
+  | 'ADULT'
+  | 'CHILD'
+  | 'INFANT'
+  | 'PCD'
+  | 'SENIOR'
+  | 'STUDENT'
+  | 'TEACHER';
+
+/** Quanto o público paga: inteira, meia, grátis ou outro valor. */
+export type TicketPriceMode =
+  | 'CUSTOM'
+  | 'FREE'
+  | 'FULL'
+  | 'HALF';
 
 /** Perfil de acesso: Morador, Gestor, Portaria ou Administrador geral. */
 export type UserGroup =

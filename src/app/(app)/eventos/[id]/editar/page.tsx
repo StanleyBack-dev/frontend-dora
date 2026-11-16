@@ -7,6 +7,7 @@ import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { EventForm } from "@/features/events/components/EventForm";
 import { isEventOpen } from "@/features/events/model/event-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
+import { loadCondominiumPix } from "@/server/loaders/load-condominium-pix";
 import { loadEvent } from "@/server/loaders/load-event";
 import { requestTime } from "@/server/request-time";
 import { spacesService } from "@/server/services/spaces.service";
@@ -24,9 +25,12 @@ export default async function EditEventPage({
   const event = await loadEvent((await params).id);
   if (!event) notFound();
   const open = isEventOpen(event, (await requestTime()).getTime());
-  const spaces = open
-    ? await authed((token) => spacesService.list(token, true))
-    : [];
+  const [spaces, condominiumPix] = open
+    ? await Promise.all([
+        authed((token) => spacesService.list(token, true)),
+        loadCondominiumPix(user),
+      ])
+    : [[], undefined];
 
   return (
     <>
@@ -47,6 +51,7 @@ export default async function EditEventPage({
       {open ? (
         <EventForm
           event={event}
+          condominiumPix={condominiumPix}
           spaces={spaces.map((space) => ({
             id: space.id,
             name: space.name,

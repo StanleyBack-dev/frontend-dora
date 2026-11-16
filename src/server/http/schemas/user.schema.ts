@@ -46,6 +46,12 @@ export const userInputSchema = z.object({
   // "" or null: none (on update: clear it). The API validates the content.
   unitComplement: z.string().trim().max(80).nullish(),
   phone: z.string().trim().max(30).nullish(),
+  // YYYY-MM-DD; "" or null clears it (the API checks the date).
+  birthDate: z
+    .string()
+    .trim()
+    .regex(/^(\d{4}-\d{2}-\d{2})?$/)
+    .nullish(),
 });
 
 // The API checks the value against its own enum; here it only has to look

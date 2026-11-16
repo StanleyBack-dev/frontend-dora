@@ -34,6 +34,7 @@ export function EditUserForm({
     unitComplement: user.unitComplement ?? "",
     employee: user.employee,
     phone: user.phone ? formatPhone(user.phone) : "",
+    birthDate: user.birthDate ?? "",
   };
   const [form, setForm] = useState<UserInput>(initial);
   const { showError } = useToast();

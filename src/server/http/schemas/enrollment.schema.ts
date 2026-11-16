@@ -12,6 +12,12 @@ export const enrollmentDataSchema = z.object({
   fullName: z.string().trim().min(1).max(160),
   email: z.string().trim().min(1).max(254),
   phone: z.string().trim().min(1).max(20),
+  // YYYY-MM-DD; the API requires it on the public form.
+  birthDate: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullish(),
   // Absent on approval: keeps the unit chosen on the form.
   unitId: z.uuid().nullish(),
   unitComplement: z.string().trim().max(80).nullish(),
