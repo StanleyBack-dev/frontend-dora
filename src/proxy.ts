@@ -12,9 +12,9 @@ import { authService } from "@/server/services/auth.service";
 const PUBLIC_PAGES = new Set(["/entrar", "/recuperar-senha"]);
 // Open to everyone, signed in or not.
 const OPEN_PAGES = new Set(["/termos", "/cadastro"]);
-// Open by prefix: a guest's invite (/convite/<code>) is for people without
-// an account.
-const OPEN_PREFIXES = ["/convite/"];
+// Open by prefix: a guest's invite (/convite/<code>) and an event ticket
+// (/ingresso/<code>) are for people without an account.
+const OPEN_PREFIXES = ["/convite/", "/ingresso/"];
 
 // Keeps the session usable before anything renders. The access cookie
 // expires just before its token; when it is gone but the refresh cookie is

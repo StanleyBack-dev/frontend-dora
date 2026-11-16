@@ -355,7 +355,10 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Evento pago: o pedido mostra o PIX com o valor e o código do pedido (QR code ou copia e cola). Pague e toque em “Enviar comprovante” (print ou PDF). A administração confere e você é avisado.",
         },
         {
-          text: "Use “Novo evento” para criar: título, quando, onde (um espaço ou outro local), lotação, convidados de fora e a entrada. Paga: o valor da inteira e os públicos aceitos (adulto, criança, idoso, estudante…), cada um pagando inteira, meia, grátis ou outro valor, com a faixa de idade; o limite por unidade e qual PIX recebe (o do condomínio ou outro). Ele fica como rascunho até você publicar.",
+          text: "Pedido confirmado: cada pessoa tem o próprio ingresso com QR code (botão “Ingresso”). Mostre na portaria pelo app, ou envie o link pelo WhatsApp a quem vai com você (ou todos de uma vez); quem recebe abre o ingresso sem precisar de conta.",
+        },
+        {
+          text: "Use “Novo evento” para criar: título, quando, onde (um espaço ou outro local), lotação, convidados de fora e a entrada. Paga: o valor da inteira e os públicos aceitos (adulto, criança, idoso, estudante…), cada um pagando inteira, meia, grátis ou outro valor, com a faixa de idade; o limite por unidade e qual PIX recebe (o do condomínio ou outro). Escolha também até quando os pedidos são aceitos: algumas horas antes do início (dá tempo de conferir os comprovantes) ou até o fim do evento. Ele fica como rascunho até você publicar.",
           only: ["EVENTS_MANAGE"],
         },
         {
@@ -446,11 +449,14 @@ export const HELP_TOPICS: HelpTopic[] = [
     icon: DoorOpen,
     permission: "GUESTS_CHECKIN",
     area: "main",
-    tour: "Os convidados das reservas de hoje: confira o código do convite e libere a entrada.",
+    tour: "Os convidados das reservas e os ingressos dos eventos de hoje: confira o código e libere a entrada.",
     sections: {
       howto: [
         {
           text: "Leia o QR do convite (ou digite o código de 8 letras e números) e toque em “Liberar entrada”: a entrada daquele convidado é registrada na hora. Confira o documento, se houver.",
+        },
+        {
+          text: "Eventos: leia o QR do ingresso (ou digite o código de 10 letras e números) no mesmo campo. A lista “Eventos de hoje” mostra cada pessoa com o tipo do ingresso, a idade e quem fez o pedido.",
         },
         {
           text: "Sem o convite em mãos, use a lista do dia: busque pelo nome, documento, unidade ou código e toque em “Liberar entrada”. Ela se atualiza sozinha a cada minuto.",
@@ -462,6 +468,9 @@ export const HELP_TOPICS: HelpTopic[] = [
       rules: [
         {
           text: "A entrada é liberada a partir de 3 horas antes da reserva, até o fim dela. Convites de reservas canceladas não valem.",
+        },
+        {
+          text: "Ingressos de eventos valem a partir de 3 horas antes do evento, até o fim, e entram uma vez: um QR já usado (uma cópia, por exemplo) mostra a hora em que a pessoa entrou.",
         },
         {
           text: "A Portaria vê só os convidados do condomínio e não faz reservas.",

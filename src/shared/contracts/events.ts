@@ -2,9 +2,12 @@ import type {
   AttendeeSource,
   EventOrderStatus,
   EventPixSource,
+  EventSalesClose,
   EventStatus,
   PixKeyType,
+  TicketEntryWindow,
   TicketKind,
+  TicketPassStatus,
   TicketPriceMode,
 } from "@/shared/graphql/schema-enums";
 
@@ -12,9 +15,12 @@ export type {
   AttendeeSource,
   EventOrderStatus,
   EventPixSource,
+  EventSalesClose,
   EventStatus,
   PixKeyType,
+  TicketEntryWindow,
   TicketKind,
+  TicketPassStatus,
   TicketPriceMode,
 };
 
@@ -83,6 +89,12 @@ export type CondominiumEvent = {
   ticketTypes: TicketType[];
   /** Most tickets per unit (null: no limit). */
   unitTicketLimit: number | null;
+  /** When orders stop: some hours before the start, or at the end. */
+  salesClose: EventSalesClose;
+  /** BEFORE_START: how many hours before (0: at the start). */
+  salesCloseHours: number;
+  /** The moment orders stop (computed by the API). */
+  salesClosesAt: string;
   /** Ticketed: the condominium's PIX or the event's own. */
   pixSource: EventPixSource | null;
   customPix: PixReceiver | null;
@@ -111,6 +123,8 @@ export type EventInput = {
   fullPriceCents: number | null;
   ticketTypes: TicketTypeInput[];
   unitTicketLimit: number | null;
+  salesClose: EventSalesClose;
+  salesCloseHours: number;
   pixSource: EventPixSource | null;
   customPix: PixReceiver | null;
 };
@@ -134,6 +148,10 @@ export type Attendee = {
   /** Short-lived link to the document sent (null: none yet). */
   proofUrl: string | null;
   proofContentType: string | null;
+  /** The ticket's code (QR), once the order is confirmed (null: not yet). */
+  ticketCode: string | null;
+  /** When the gate let this person in. */
+  checkedInAt: string | null;
 };
 
 export type AttendeeInput = {
@@ -178,3 +196,42 @@ export type EventOrder = {
 
 /** Which events to list. */
 export type EventWhen = "UPCOMING" | "PAST";
+
+/** A ticket on the gate's list (Portaria). */
+export type GateEventTicket = {
+  /** The person of the order. */
+  id: string;
+  name: string;
+  age: number;
+  outside: boolean;
+  source: AttendeeSource;
+  ticketName: string | null;
+  ticketCode: string;
+  checkedInAt: string | null;
+  entryWindow: TicketEntryWindow;
+  eventId: string;
+  eventTitle: string;
+  eventStatus: EventStatus;
+  startsAt: string;
+  endsAt: string;
+  /** The space or the place of the event. */
+  placeName: string;
+  orderCode: string;
+  buyerName: string | null;
+  unitLabel: string | null;
+};
+
+/** A ticket's public page. */
+export type EventTicketPass = {
+  code: string;
+  name: string;
+  ticketName: string | null;
+  eventTitle: string;
+  placeName: string;
+  condominiumName: string;
+  startsAt: string;
+  endsAt: string;
+  buyerFirstName: string | null;
+  status: TicketPassStatus;
+  checkedIn: boolean;
+};

@@ -34,6 +34,9 @@ export const eventFieldsFragment = graphql(`
       maxAge
     }
     unitTicketLimit
+    salesClose
+    salesCloseHours
+    salesClosesAt
     pixSource
     customPix {
       keyType
@@ -121,6 +124,8 @@ export const eventOrderFieldsFragment = graphql(`
       needsProof
       proofUrl
       proofContentType
+      ticketCode
+      checkedInAt
     }
     pix {
       keyType
@@ -208,6 +213,73 @@ export const submitEventAttendeeProofDocument = graphql(`
       file: $file
     ) {
       ...EventOrderFields
+    }
+  }
+`);
+
+// --- the gate (Portaria) and the ticket page ---
+
+export const gateEventTicketFieldsFragment = graphql(`
+  fragment GateEventTicketFields on GateEventTicket {
+    id
+    name
+    age
+    outside
+    source
+    ticketName
+    ticketCode
+    checkedInAt
+    entryWindow
+    eventId
+    eventTitle
+    eventStatus
+    startsAt
+    endsAt
+    placeName
+    orderCode
+    buyerName
+    unitLabel
+  }
+`);
+
+export const gateEventTicketsDocument = graphql(`
+  query GateEventTickets($date: String) {
+    gateEventTickets(date: $date) {
+      ...GateEventTicketFields
+    }
+  }
+`);
+
+export const checkInEventTicketDocument = graphql(`
+  mutation CheckInEventTicket($input: CheckInEventTicketInput!) {
+    checkInEventTicket(input: $input) {
+      ...GateEventTicketFields
+    }
+  }
+`);
+
+export const undoEventTicketCheckInDocument = graphql(`
+  mutation UndoEventTicketCheckIn($attendeeId: ID!) {
+    undoEventTicketCheckIn(attendeeId: $attendeeId) {
+      ...GateEventTicketFields
+    }
+  }
+`);
+
+export const eventTicketPassDocument = graphql(`
+  query EventTicketPass($code: String!) {
+    eventTicket(code: $code) {
+      code
+      name
+      ticketName
+      eventTitle
+      placeName
+      condominiumName
+      startsAt
+      endsAt
+      buyerFirstName
+      status
+      checkedIn
     }
   }
 `);

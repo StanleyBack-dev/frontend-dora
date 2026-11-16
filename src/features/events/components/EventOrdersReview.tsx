@@ -19,6 +19,7 @@ import {
 import type { EventOrder } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { formatCents, formatDateTime } from "@/shared/lib/format";
+import { formatTime } from "@/shared/lib/datetime";
 import { formatPixKey, PIX_KEY_TYPE_LABELS } from "@/shared/lib/pix-key";
 import { useToast } from "@/shared/toast/useToast";
 
@@ -143,6 +144,11 @@ function OrderRow({ order }: { order: EventOrder }) {
               {person.source !== "GUEST" && (
                 <Badge tone="info">
                   {person.source === "SELF" ? "Quem pediu" : "Dependente"}
+                </Badge>
+              )}
+              {person.checkedInAt && (
+                <Badge tone="success">
+                  Entrou às {formatTime(person.checkedInAt)}
                 </Badge>
               )}
               {person.ticketName && (

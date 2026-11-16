@@ -55,6 +55,8 @@ export const eventInputSchema = z.object({
   fullPriceCents: z.number().int().min(1).max(10_000_000).nullable(),
   ticketTypes: z.array(ticketTypeSchema).max(10),
   unitTicketLimit: z.number().int().min(1).max(1000).nullable(),
+  salesClose: z.enum(["BEFORE_START", "AT_END"]),
+  salesCloseHours: z.number().int().min(0).max(720),
   pixSource: z.enum(["CONDOMINIUM", "CUSTOM"]).nullable(),
   customPix: pixReceiverSchema.nullable(),
 });
@@ -104,3 +106,15 @@ export const cancelEventSchema = z.object({
 });
 
 export const attendeeIdSchema = z.uuid();
+
+/** A ticket to let in: from the list, or by its code (typed or scanned). */
+export const ticketCheckInSchema = z
+  .object({
+    attendeeId: z.uuid().nullish(),
+    code: z
+      .string()
+      .trim()
+      .regex(/^[A-Za-z0-9 ·-]{4,20}$/)
+      .nullish(),
+  })
+  .refine((value) => Boolean(value.attendeeId || value.code));

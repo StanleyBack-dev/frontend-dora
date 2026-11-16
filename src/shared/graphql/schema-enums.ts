@@ -80,6 +80,11 @@ export type EventPixSource =
   | 'CONDOMINIUM'
   | 'CUSTOM';
 
+/** Quando as vendas fecham: algumas horas antes do início, ou só no fim do evento. */
+export type EventSalesClose =
+  | 'AT_END'
+  | 'BEFORE_START';
+
 /** Rascunho (só gestores), publicado ou cancelado. */
 export type EventStatus =
   | 'CANCELLED'
@@ -200,6 +205,13 @@ export type SupportStatus =
   | 'FINALIZADO'
   | 'RESPONDIDO';
 
+/** Se a portaria pode liberar o ingresso agora: aberta, cedo demais, encerrado ou cancelado. */
+export type TicketEntryWindow =
+  | 'CANCELLED'
+  | 'FINISHED'
+  | 'OPEN'
+  | 'TOO_EARLY';
+
 /** Público do ingresso: adulto, criança, infantil, idoso, estudante, PcD ou professor. */
 export type TicketKind =
   | 'ADULT'
@@ -209,6 +221,12 @@ export type TicketKind =
   | 'SENIOR'
   | 'STUDENT'
   | 'TEACHER';
+
+/** Ingresso válido, de evento cancelado ou já encerrado. */
+export type TicketPassStatus =
+  | 'CANCELLED'
+  | 'ENDED'
+  | 'VALID';
 
 /** Quanto o público paga: inteira, meia, grátis ou outro valor. */
 export type TicketPriceMode =

@@ -2,6 +2,10 @@ import "server-only";
 import { backendGraphql } from "@/server/graphql/client";
 import {
   approveEventOrderDocument,
+  checkInEventTicketDocument,
+  eventTicketPassDocument,
+  gateEventTicketsDocument,
+  undoEventTicketCheckInDocument,
   cancelEventOrderDocument,
   createEventOrderDocument,
   eventOrdersDocument,
@@ -22,7 +26,9 @@ import type {
   EventInput,
   EventOrder,
   EventOrderStatus,
+  EventTicketPass,
   EventWhen,
+  GateEventTicket,
 } from "@/shared/contracts/events";
 
 export const eventsService = {
@@ -166,5 +172,45 @@ export const eventsService = {
       { token, variables: { orderId, attendeeId, file } },
     );
     return submitEventAttendeeProof;
+  },
+
+  // === the gate (Portaria) and the ticket page ===
+
+  async gateTickets(token: string, date?: string): Promise<GateEventTicket[]> {
+    const { gateEventTickets } = await backendGraphql(
+      gateEventTicketsDocument,
+      { token, variables: { date: date ?? null } },
+    );
+    return gateEventTickets;
+  },
+
+  async checkInTicket(
+    token: string,
+    target: { attendeeId?: string | null; code?: string | null },
+  ): Promise<GateEventTicket> {
+    const { checkInEventTicket } = await backendGraphql(
+      checkInEventTicketDocument,
+      { token, variables: { input: target } },
+    );
+    return checkInEventTicket;
+  },
+
+  async undoTicketCheckIn(
+    token: string,
+    attendeeId: string,
+  ): Promise<GateEventTicket> {
+    const { undoEventTicketCheckIn } = await backendGraphql(
+      undoEventTicketCheckInDocument,
+      { token, variables: { attendeeId } },
+    );
+    return undoEventTicketCheckIn;
+  },
+
+  /** Public: the ticket page (null: no such code, or not confirmed). */
+  async ticketPass(code: string): Promise<EventTicketPass | null> {
+    const { eventTicket } = await backendGraphql(eventTicketPassDocument, {
+      variables: { code },
+    });
+    return eventTicket ?? null;
   },
 };

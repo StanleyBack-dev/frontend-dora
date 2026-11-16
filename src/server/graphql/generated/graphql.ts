@@ -76,6 +76,13 @@ export type ChangePasswordInput = {
   newPassword: string;
 };
 
+export type CheckInEventTicketInput = {
+  /** A pessoa do pedido. */
+  attendeeId?: string | number | null | undefined;
+  /** Código do ingresso. */
+  code?: string | null | undefined;
+};
+
 export type CheckInGuestInput = {
   /** Código do convite. */
   code?: string | null | undefined;
@@ -272,6 +279,10 @@ export type EventInput = {
   location?: string | null | undefined;
   /** Com ingresso: o PIX do condomínio ou outro. */
   pixSource?: EventPixSource | null | undefined;
+  /** Quando as vendas fecham (padrão: no início do evento). */
+  salesClose?: EventSalesClose | null | undefined;
+  /** BEFORE_START: quantas horas antes do início (0 a 720). */
+  salesCloseHours?: number | null | undefined;
   /** Espaço do condomínio (sem espaço: informe o endereço). */
   spaceId?: string | number | null | undefined;
   startsAt: string;
@@ -308,6 +319,11 @@ export type EventPixInput = {
 export type EventPixSource =
   | 'CONDOMINIUM'
   | 'CUSTOM';
+
+/** Quando as vendas fecham: algumas horas antes do início, ou só no fim do evento. */
+export type EventSalesClose =
+  | 'AT_END'
+  | 'BEFORE_START';
 
 /** Rascunho (só gestores), publicado ou cancelado. */
 export type EventStatus =
@@ -579,6 +595,13 @@ export type SystemLogFilterInput = {
   to?: string | null | undefined;
 };
 
+/** Se a portaria pode liberar o ingresso agora: aberta, cedo demais, encerrado ou cancelado. */
+export type TicketEntryWindow =
+  | 'CANCELLED'
+  | 'FINISHED'
+  | 'OPEN'
+  | 'TOO_EARLY';
+
 /** Público do ingresso: adulto, criança, infantil, idoso, estudante, PcD ou professor. */
 export type TicketKind =
   | 'ADULT'
@@ -588,6 +611,12 @@ export type TicketKind =
   | 'SENIOR'
   | 'STUDENT'
   | 'TEACHER';
+
+/** Ingresso válido, de evento cancelado ou já encerrado. */
+export type TicketPassStatus =
+  | 'CANCELLED'
+  | 'ENDED'
+  | 'VALID';
 
 /** Quanto o público paga: inteira, meia, grátis ou outro valor. */
 export type TicketPriceMode =
@@ -1233,28 +1262,28 @@ export type RejectEnrollmentRequestMutationVariables = Exact<{
 
 export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, birthDate: string | null, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
 
-export type EventFieldsFragment = { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null };
+export type EventFieldsFragment = { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, salesClose: EventSalesClose, salesCloseHours: number, salesClosesAt: string, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null };
 
 export type EventsQueryVariables = Exact<{
   when?: EventWhen | null | undefined;
 }>;
 
 
-export type EventsQuery = { events: Array<{ id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
+export type EventsQuery = { events: Array<{ id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, salesClose: EventSalesClose, salesCloseHours: number, salesClosesAt: string, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
 
 export type EventQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type EventQuery = { event: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type EventQuery = { event: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, salesClose: EventSalesClose, salesCloseHours: number, salesClosesAt: string, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type CreateEventMutationVariables = Exact<{
   input: EventInput;
 }>;
 
 
-export type CreateEventMutation = { createEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type CreateEventMutation = { createEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, salesClose: EventSalesClose, salesCloseHours: number, salesClosesAt: string, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type UpdateEventMutationVariables = Exact<{
   id: string | number;
@@ -1262,14 +1291,14 @@ export type UpdateEventMutationVariables = Exact<{
 }>;
 
 
-export type UpdateEventMutation = { updateEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type UpdateEventMutation = { updateEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, salesClose: EventSalesClose, salesCloseHours: number, salesClosesAt: string, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type PublishEventMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type PublishEventMutation = { publishEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type PublishEventMutation = { publishEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, salesClose: EventSalesClose, salesCloseHours: number, salesClosesAt: string, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type CancelEventMutationVariables = Exact<{
   id: string | number;
@@ -1277,16 +1306,16 @@ export type CancelEventMutationVariables = Exact<{
 }>;
 
 
-export type CancelEventMutation = { cancelEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type CancelEventMutation = { cancelEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, salesClose: EventSalesClose, salesCloseHours: number, salesClosesAt: string, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
-export type EventOrderFieldsFragment = { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null };
+export type EventOrderFieldsFragment = { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null };
 
 export type MyEventOrdersQueryVariables = Exact<{
   eventId: string | number;
 }>;
 
 
-export type MyEventOrdersQuery = { myEventOrders: Array<{ id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
+export type MyEventOrdersQuery = { myEventOrders: Array<{ id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
 
 export type EventOrdersQueryVariables = Exact<{
   eventId: string | number;
@@ -1294,7 +1323,7 @@ export type EventOrdersQueryVariables = Exact<{
 }>;
 
 
-export type EventOrdersQuery = { eventOrders: Array<{ id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
+export type EventOrdersQuery = { eventOrders: Array<{ id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
 
 export type CreateEventOrderMutationVariables = Exact<{
   eventId: string | number;
@@ -1302,7 +1331,7 @@ export type CreateEventOrderMutationVariables = Exact<{
 }>;
 
 
-export type CreateEventOrderMutation = { createEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type CreateEventOrderMutation = { createEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type SubmitEventOrderReceiptMutationVariables = Exact<{
   id: string | number;
@@ -1310,21 +1339,21 @@ export type SubmitEventOrderReceiptMutationVariables = Exact<{
 }>;
 
 
-export type SubmitEventOrderReceiptMutation = { submitEventOrderReceipt: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type SubmitEventOrderReceiptMutation = { submitEventOrderReceipt: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type CancelEventOrderMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type CancelEventOrderMutation = { cancelEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type CancelEventOrderMutation = { cancelEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type ApproveEventOrderMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type ApproveEventOrderMutation = { approveEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type ApproveEventOrderMutation = { approveEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type RejectEventOrderMutationVariables = Exact<{
   id: string | number;
@@ -1332,7 +1361,7 @@ export type RejectEventOrderMutationVariables = Exact<{
 }>;
 
 
-export type RejectEventOrderMutation = { rejectEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type RejectEventOrderMutation = { rejectEventOrder: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
 
 export type SubmitEventAttendeeProofMutationVariables = Exact<{
   orderId: string | number;
@@ -1341,7 +1370,37 @@ export type SubmitEventAttendeeProofMutationVariables = Exact<{
 }>;
 
 
-export type SubmitEventAttendeeProofMutation = { submitEventAttendeeProof: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+export type SubmitEventAttendeeProofMutation = { submitEventAttendeeProof: { id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null } };
+
+export type GateEventTicketFieldsFragment = { id: string, name: string, age: number, outside: boolean, source: AttendeeSource, ticketName: string | null, ticketCode: string, checkedInAt: string | null, entryWindow: TicketEntryWindow, eventId: string, eventTitle: string, eventStatus: EventStatus, startsAt: string, endsAt: string, placeName: string, orderCode: string, buyerName: string | null, unitLabel: string | null };
+
+export type GateEventTicketsQueryVariables = Exact<{
+  date?: string | null | undefined;
+}>;
+
+
+export type GateEventTicketsQuery = { gateEventTickets: Array<{ id: string, name: string, age: number, outside: boolean, source: AttendeeSource, ticketName: string | null, ticketCode: string, checkedInAt: string | null, entryWindow: TicketEntryWindow, eventId: string, eventTitle: string, eventStatus: EventStatus, startsAt: string, endsAt: string, placeName: string, orderCode: string, buyerName: string | null, unitLabel: string | null }> };
+
+export type CheckInEventTicketMutationVariables = Exact<{
+  input: CheckInEventTicketInput;
+}>;
+
+
+export type CheckInEventTicketMutation = { checkInEventTicket: { id: string, name: string, age: number, outside: boolean, source: AttendeeSource, ticketName: string | null, ticketCode: string, checkedInAt: string | null, entryWindow: TicketEntryWindow, eventId: string, eventTitle: string, eventStatus: EventStatus, startsAt: string, endsAt: string, placeName: string, orderCode: string, buyerName: string | null, unitLabel: string | null } };
+
+export type UndoEventTicketCheckInMutationVariables = Exact<{
+  attendeeId: string | number;
+}>;
+
+
+export type UndoEventTicketCheckInMutation = { undoEventTicketCheckIn: { id: string, name: string, age: number, outside: boolean, source: AttendeeSource, ticketName: string | null, ticketCode: string, checkedInAt: string | null, entryWindow: TicketEntryWindow, eventId: string, eventTitle: string, eventStatus: EventStatus, startsAt: string, endsAt: string, placeName: string, orderCode: string, buyerName: string | null, unitLabel: string | null } };
+
+export type EventTicketPassQueryVariables = Exact<{
+  code: string;
+}>;
+
+
+export type EventTicketPassQuery = { eventTicket: { code: string, name: string, ticketName: string | null, eventTitle: string, placeName: string, condominiumName: string, startsAt: string, endsAt: string, buyerFirstName: string | null, status: TicketPassStatus, checkedIn: boolean } | null };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -1822,6 +1881,9 @@ export const EventFieldsFragmentDoc = new TypedDocumentString(`
     maxAge
   }
   unitTicketLimit
+  salesClose
+  salesCloseHours
+  salesClosesAt
   pixSource
   customPix {
     keyType
@@ -1860,6 +1922,8 @@ export const EventOrderFieldsFragmentDoc = new TypedDocumentString(`
     needsProof
     proofUrl
     proofContentType
+    ticketCode
+    checkedInAt
   }
   pix {
     keyType
@@ -1878,6 +1942,28 @@ export const EventOrderFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"EventOrderFields"}) as unknown as TypedDocumentString<EventOrderFieldsFragment, unknown>;
+export const GateEventTicketFieldsFragmentDoc = new TypedDocumentString(`
+    fragment GateEventTicketFields on GateEventTicket {
+  id
+  name
+  age
+  outside
+  source
+  ticketName
+  ticketCode
+  checkedInAt
+  entryWindow
+  eventId
+  eventTitle
+  eventStatus
+  startsAt
+  endsAt
+  placeName
+  orderCode
+  buyerName
+  unitLabel
+}
+    `, {"fragmentName":"GateEventTicketFields"}) as unknown as TypedDocumentString<GateEventTicketFieldsFragment, unknown>;
 export const SpaceFieldsFragmentDoc = new TypedDocumentString(`
     fragment SpaceFields on Space {
   id
@@ -3415,6 +3501,9 @@ export const EventsDocument = new TypedDocumentString(`
     maxAge
   }
   unitTicketLimit
+  salesClose
+  salesCloseHours
+  salesClosesAt
   pixSource
   customPix {
     keyType
@@ -3469,6 +3558,9 @@ export const EventDocument = new TypedDocumentString(`
     maxAge
   }
   unitTicketLimit
+  salesClose
+  salesCloseHours
+  salesClosesAt
   pixSource
   customPix {
     keyType
@@ -3523,6 +3615,9 @@ export const CreateEventDocument = new TypedDocumentString(`
     maxAge
   }
   unitTicketLimit
+  salesClose
+  salesCloseHours
+  salesClosesAt
   pixSource
   customPix {
     keyType
@@ -3577,6 +3672,9 @@ export const UpdateEventDocument = new TypedDocumentString(`
     maxAge
   }
   unitTicketLimit
+  salesClose
+  salesCloseHours
+  salesClosesAt
   pixSource
   customPix {
     keyType
@@ -3631,6 +3729,9 @@ export const PublishEventDocument = new TypedDocumentString(`
     maxAge
   }
   unitTicketLimit
+  salesClose
+  salesCloseHours
+  salesClosesAt
   pixSource
   customPix {
     keyType
@@ -3685,6 +3786,9 @@ export const CancelEventDocument = new TypedDocumentString(`
     maxAge
   }
   unitTicketLimit
+  salesClose
+  salesCloseHours
+  salesClosesAt
   pixSource
   customPix {
     keyType
@@ -3727,6 +3831,8 @@ export const MyEventOrdersDocument = new TypedDocumentString(`
     needsProof
     proofUrl
     proofContentType
+    ticketCode
+    checkedInAt
   }
   pix {
     keyType
@@ -3771,6 +3877,8 @@ export const EventOrdersDocument = new TypedDocumentString(`
     needsProof
     proofUrl
     proofContentType
+    ticketCode
+    checkedInAt
   }
   pix {
     keyType
@@ -3815,6 +3923,8 @@ export const CreateEventOrderDocument = new TypedDocumentString(`
     needsProof
     proofUrl
     proofContentType
+    ticketCode
+    checkedInAt
   }
   pix {
     keyType
@@ -3859,6 +3969,8 @@ export const SubmitEventOrderReceiptDocument = new TypedDocumentString(`
     needsProof
     proofUrl
     proofContentType
+    ticketCode
+    checkedInAt
   }
   pix {
     keyType
@@ -3903,6 +4015,8 @@ export const CancelEventOrderDocument = new TypedDocumentString(`
     needsProof
     proofUrl
     proofContentType
+    ticketCode
+    checkedInAt
   }
   pix {
     keyType
@@ -3947,6 +4061,8 @@ export const ApproveEventOrderDocument = new TypedDocumentString(`
     needsProof
     proofUrl
     proofContentType
+    ticketCode
+    checkedInAt
   }
   pix {
     keyType
@@ -3991,6 +4107,8 @@ export const RejectEventOrderDocument = new TypedDocumentString(`
     needsProof
     proofUrl
     proofContentType
+    ticketCode
+    checkedInAt
   }
   pix {
     keyType
@@ -4039,6 +4157,8 @@ export const SubmitEventAttendeeProofDocument = new TypedDocumentString(`
     needsProof
     proofUrl
     proofContentType
+    ticketCode
+    checkedInAt
   }
   pix {
     keyType
@@ -4056,6 +4176,101 @@ export const SubmitEventAttendeeProofDocument = new TypedDocumentString(`
   cancelledAt
   createdAt
 }`) as unknown as TypedDocumentString<SubmitEventAttendeeProofMutation, SubmitEventAttendeeProofMutationVariables>;
+export const GateEventTicketsDocument = new TypedDocumentString(`
+    query GateEventTickets($date: String) {
+  gateEventTickets(date: $date) {
+    ...GateEventTicketFields
+  }
+}
+    fragment GateEventTicketFields on GateEventTicket {
+  id
+  name
+  age
+  outside
+  source
+  ticketName
+  ticketCode
+  checkedInAt
+  entryWindow
+  eventId
+  eventTitle
+  eventStatus
+  startsAt
+  endsAt
+  placeName
+  orderCode
+  buyerName
+  unitLabel
+}`) as unknown as TypedDocumentString<GateEventTicketsQuery, GateEventTicketsQueryVariables>;
+export const CheckInEventTicketDocument = new TypedDocumentString(`
+    mutation CheckInEventTicket($input: CheckInEventTicketInput!) {
+  checkInEventTicket(input: $input) {
+    ...GateEventTicketFields
+  }
+}
+    fragment GateEventTicketFields on GateEventTicket {
+  id
+  name
+  age
+  outside
+  source
+  ticketName
+  ticketCode
+  checkedInAt
+  entryWindow
+  eventId
+  eventTitle
+  eventStatus
+  startsAt
+  endsAt
+  placeName
+  orderCode
+  buyerName
+  unitLabel
+}`) as unknown as TypedDocumentString<CheckInEventTicketMutation, CheckInEventTicketMutationVariables>;
+export const UndoEventTicketCheckInDocument = new TypedDocumentString(`
+    mutation UndoEventTicketCheckIn($attendeeId: ID!) {
+  undoEventTicketCheckIn(attendeeId: $attendeeId) {
+    ...GateEventTicketFields
+  }
+}
+    fragment GateEventTicketFields on GateEventTicket {
+  id
+  name
+  age
+  outside
+  source
+  ticketName
+  ticketCode
+  checkedInAt
+  entryWindow
+  eventId
+  eventTitle
+  eventStatus
+  startsAt
+  endsAt
+  placeName
+  orderCode
+  buyerName
+  unitLabel
+}`) as unknown as TypedDocumentString<UndoEventTicketCheckInMutation, UndoEventTicketCheckInMutationVariables>;
+export const EventTicketPassDocument = new TypedDocumentString(`
+    query EventTicketPass($code: String!) {
+  eventTicket(code: $code) {
+    code
+    name
+    ticketName
+    eventTitle
+    placeName
+    condominiumName
+    startsAt
+    endsAt
+    buyerFirstName
+    status
+    checkedIn
+  }
+}
+    `) as unknown as TypedDocumentString<EventTicketPassQuery, EventTicketPassQueryVariables>;
 export const MyNotificationsDocument = new TypedDocumentString(`
     query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {
   myNotifications(unreadOnly: $unreadOnly, page: $page) {
