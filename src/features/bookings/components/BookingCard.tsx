@@ -146,7 +146,7 @@ export function BookingCard({
         {cancellable && (
           <Button
             size="sm"
-            variant="secondary"
+            variant="cancel"
             icon={<CalendarX2 className="size-4" />}
             onClick={() => setConfirming(true)}
           >
@@ -156,7 +156,7 @@ export function BookingCard({
         {booking.seriesId && ongoing && (
           <Button
             size="sm"
-            variant="ghost"
+            variant="cancel"
             icon={<Repeat className="size-4" />}
             onClick={() => setConfirmingSeries(true)}
           >

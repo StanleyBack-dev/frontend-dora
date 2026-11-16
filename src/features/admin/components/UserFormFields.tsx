@@ -1,10 +1,7 @@
 "use client";
 
 import { Alert, Field, Select } from "@/design-system";
-import {
-  GROUP_DESCRIPTIONS,
-  GROUP_LABELS,
-} from "@/features/access/model/access-labels";
+import { GroupChoice } from "@/features/access/components/GroupChoice";
 import type { UserGroup, UserInput } from "@/shared/contracts/api";
 import type { Unit } from "@/shared/contracts/condominiums";
 import {
@@ -120,21 +117,11 @@ export function UserFormFields({
         value={value.unitComplement ?? ""}
         onChange={(event) => set("unitComplement", event.target.value)}
       />
-      <div>
-        <Select
-          label="Papel no condomínio"
-          required
-          value={value.group}
-          onChange={(event) => set("group", event.target.value as UserGroup)}
-          options={assignableGroups.map((group) => ({
-            value: group,
-            label: GROUP_LABELS[group],
-          }))}
-        />
-        <p className="mt-1.5 text-xs text-soft">
-          {GROUP_DESCRIPTIONS[value.group]}
-        </p>
-      </div>
+      <GroupChoice
+        groups={assignableGroups}
+        value={value.group}
+        onChange={(group) => set("group", group)}
+      />
     </div>
   );
 }

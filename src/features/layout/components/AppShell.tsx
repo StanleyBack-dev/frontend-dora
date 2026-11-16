@@ -55,7 +55,7 @@ import {
 } from "@/features/layout/model/navigation";
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { PushNotificationsInvite } from "@/features/notifications/components/PushNotificationsInvite";
-import type { SessionUser } from "@/shared/contracts/api";
+import type { SessionUser, AppModule } from "@/shared/contracts/api";
 import { startNavigation } from "@/shared/lib/navigation-progress";
 import { apiRequest } from "@/shared/lib/api-client";
 
@@ -186,6 +186,9 @@ function TabLink({
 // Signed-in frame: black sidebar with the main menu and the account card,
 // an off-canvas drawer and a bottom tab bar on phones, and a light top bar
 // over the content with menu search and notifications.
+/** Stable empty list: no optional module on. */
+const NO_MODULES: readonly AppModule[] = [];
+
 export function AppShell({
   user,
   showAdmin,
@@ -233,9 +236,10 @@ export function AppShell({
     () => ({
       permissions: user.permissions,
       showAdmin,
+      modules: user.condominium?.modules ?? NO_MODULES,
       restartTour: () => setTourOpen(true),
     }),
-    [user.permissions, showAdmin],
+    [user.permissions, showAdmin, user.condominium?.modules],
   );
   const collapsed = useSyncExternalStore(
     subscribeCollapsed,
@@ -243,7 +247,9 @@ export function AppShell({
     () => false,
   );
 
-  const primary = PRIMARY_NAV.filter((item) => canSee(item, user.permissions));
+  const primary = PRIMARY_NAV.filter((item) =>
+    canSee(item, user.permissions, user.condominium?.modules),
+  );
   const account = [
     ...ACCOUNT_NAV,
     ...(showSupportProject ? [SUPPORT_PROJECT_NAV] : []),
@@ -510,12 +516,16 @@ export function AppShell({
             )}
           >
             <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-surface/90 px-4 backdrop-blur-md sm:px-6 lg:px-10">
+              {/* Phones and tablets: the person's photo (initials without
+              one) first, opening their profile. Larger screens have it in
+              the sidebar. */}
               <Link
-                href="/inicio"
-                aria-label="Dora, início"
-                className="flex items-center gap-2 lg:hidden"
+                href="/perfil"
+                aria-label="Meu perfil"
+                title="Meu perfil"
+                className="shrink-0 rounded-full transition-opacity hover:opacity-80 lg:hidden"
               >
-                <LogoMark className="size-8" />
+                <Avatar name={user.name} src={user.photoUrl} size="sm" />
               </Link>
               <MenuSearch
                 items={[...primary, ...account]}
@@ -523,13 +533,6 @@ export function AppShell({
               />
               <div className="ml-auto flex items-center gap-1">
                 <NotificationBell initialCount={unreadNotifications} />
-                <Link
-                  href="/perfil"
-                  aria-label="Meu perfil"
-                  className="hidden rounded-full transition-opacity hover:opacity-80 sm:block"
-                >
-                  <Avatar name={user.name} src={user.photoUrl} size="sm" />
-                </Link>
               </div>
             </header>
 
@@ -589,7 +592,7 @@ export function AppShell({
             footer={
               <>
                 <Button
-                  variant="secondary"
+                  variant="cancel"
                   onClick={() => setLogoutOpen(false)}
                   disabled={leaving}
                 >
@@ -608,6 +611,7 @@ export function AppShell({
             name={user.name.split(" ")[0] ?? user.name}
             permissions={user.permissions}
             showAdmin={showAdmin}
+            modules={user.condominium?.modules ?? NO_MODULES}
             onFinish={finishTour}
             onMobileMenu={setMobileOpen}
           />

@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, LogIn, Pencil, Plus, Power, PowerOff } from "lucide-react";
+import {
+  Building2,
+  House,
+  LogIn,
+  Pencil,
+  Plus,
+  Power,
+  PowerOff,
+} from "lucide-react";
 import {
   Badge,
   Button,
@@ -13,10 +21,14 @@ import {
   Field,
   Modal,
   Select,
+  ChoiceCards,
+  type ChoiceOption,
   type DataTableColumn,
 } from "@/design-system";
 import { condominiumsClient } from "@/features/condominiums/api/condominiums.client";
+import { CondominiumModules } from "@/features/condominiums/components/CondominiumModules";
 import type {
+  AddressFormat,
   Condominium,
   CondominiumInput,
 } from "@/shared/contracts/condominiums";
@@ -24,37 +36,10 @@ import { ApiClientError } from "@/shared/lib/api-client";
 import { formatNumber, formatRelative } from "@/shared/lib/format";
 import { maskCnpj } from "@/shared/lib/masks";
 import { startNavigation } from "@/shared/lib/navigation-progress";
+import { BRAZILIAN_STATES } from "@/shared/lib/brazilian-states";
 import { useToast } from "@/shared/toast/useToast";
 
-const STATES = [
-  "AC",
-  "AL",
-  "AP",
-  "AM",
-  "BA",
-  "CE",
-  "DF",
-  "ES",
-  "GO",
-  "MA",
-  "MT",
-  "MS",
-  "MG",
-  "PA",
-  "PB",
-  "PR",
-  "PE",
-  "PI",
-  "RJ",
-  "RN",
-  "RS",
-  "RO",
-  "RR",
-  "SC",
-  "SP",
-  "SE",
-  "TO",
-];
+const STATES = BRAZILIAN_STATES;
 
 const EMPTY: CondominiumInput = {
   name: "",
@@ -64,9 +49,19 @@ const EMPTY: CondominiumInput = {
   addressFormat: "APARTMENT",
 };
 
-const ADDRESS_FORMATS = [
-  { value: "APARTMENT", label: "Apartamentos (bloco e número)" },
-  { value: "HOUSE", label: "Casas (rua, quadra e lote)" },
+const ADDRESS_FORMATS: ChoiceOption<AddressFormat>[] = [
+  {
+    value: "APARTMENT",
+    title: "Apartamentos",
+    hint: "Bloco e número, escolhidos numa lista no cadastro.",
+    icon: <Building2 />,
+  },
+  {
+    value: "HOUSE",
+    title: "Casas",
+    hint: "Rua, quadra e lote, digitados pelo morador no cadastro.",
+    icon: <House />,
+  },
 ];
 
 type Editing = { mode: "create" } | { mode: "edit"; condominium: Condominium };
@@ -285,7 +280,11 @@ export function CondominiumsConsole({
   return (
     <>
       <div className="mb-4 flex justify-end">
-        <Button onClick={openCreate} icon={<Plus className="size-4" />}>
+        <Button
+          variant="brand"
+          onClick={openCreate}
+          icon={<Plus className="size-4" />}
+        >
           Novo condomínio
         </Button>
       </div>
@@ -322,7 +321,7 @@ export function CondominiumsConsole({
         footer={
           <>
             <Button
-              variant="secondary"
+              variant="cancel"
               onClick={() => setEditing(null)}
               disabled={pending}
             >
@@ -367,24 +366,19 @@ export function CondominiumsConsole({
               options={STATES.map((state) => ({ value: state, label: state }))}
             />
           </div>
-          <div>
-            <Select
-              label="Endereço das moradias"
-              required
-              value={form.addressFormat ?? "APARTMENT"}
-              onChange={(event) =>
-                set(
-                  "addressFormat",
-                  event.target.value as CondominiumInput["addressFormat"],
-                )
-              }
-              options={ADDRESS_FORMATS}
+          <ChoiceCards
+            name="addressFormat"
+            legend="Endereço das moradias"
+            options={ADDRESS_FORMATS}
+            value={form.addressFormat ?? "APARTMENT"}
+            onChange={(value) => set("addressFormat", value)}
+          />
+          {editing?.mode === "edit" && (
+            <CondominiumModules
+              key={editing.condominium.id}
+              condominium={editing.condominium}
             />
-            <p className="mt-1.5 text-xs text-soft">
-              Casas: no cadastro, o morador digita rua, quadra e lote (sem lista
-              de unidades).
-            </p>
-          </div>
+          )}
           {creating && (
             <p className="text-xs text-soft">
               Depois de cadastrar, clique em <strong>Entrar</strong> para
@@ -403,7 +397,7 @@ export function CondominiumsConsole({
         footer={
           <>
             <Button
-              variant="secondary"
+              variant="cancel"
               onClick={() => setToggling(null)}
               disabled={pending}
             >

@@ -7,7 +7,7 @@ import {
   visibleTopics,
   type HelpTopic,
 } from "@/features/help/model/help-topics";
-import type { Permission } from "@/shared/contracts/api";
+import type { Permission, AppModule } from "@/shared/contracts/api";
 
 type Step = {
   id: string;
@@ -28,8 +28,9 @@ function stepsFor(
   name: string,
   permissions: readonly Permission[],
   showAdmin: boolean,
+  modules: readonly AppModule[],
 ): Step[] {
-  const topics = visibleTopics(permissions, showAdmin);
+  const topics = visibleTopics(permissions, showAdmin, modules);
   const main = topics.filter((topic) => topic.area === "main");
   const account = topics.filter((topic) => topic.area === "account");
   const stepOf = (topic: HelpTopic): Step => {
@@ -93,6 +94,7 @@ export function OnboardingTour({
   name,
   permissions,
   showAdmin,
+  modules,
   onFinish,
   onMobileMenu,
 }: {
@@ -100,14 +102,16 @@ export function OnboardingTour({
   name: string;
   permissions: readonly Permission[];
   showAdmin: boolean;
+  /** Optional modules of the condominium that are on. */
+  modules: readonly AppModule[];
   /** Finished or skipped. */
   onFinish: () => void;
   /** Opens or closes the phone menu drawer (where the items are). */
   onMobileMenu: (open: boolean) => void;
 }) {
   const steps = useMemo(
-    () => stepsFor(name, permissions, showAdmin),
-    [name, permissions, showAdmin],
+    () => stepsFor(name, permissions, showAdmin, modules),
+    [name, permissions, showAdmin, modules],
   );
   const [index, setIndex] = useState(0);
   const step = steps[Math.min(index, steps.length - 1)]!;

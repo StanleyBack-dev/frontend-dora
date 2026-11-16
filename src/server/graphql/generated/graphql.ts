@@ -14,6 +14,10 @@ export type AddressFormat =
   | 'APARTMENT'
   | 'HOUSE';
 
+/** Módulos contratados à parte pelo condomínio. */
+export type AppModule =
+  | 'EVENTS';
+
 export type BookingFilterInput = {
   spaceId?: string | number | null | undefined;
   status?: BookingStatus | null | undefined;
@@ -172,6 +176,50 @@ export type EnrollmentStatus =
   | 'PENDENTE'
   | 'RECUSADA';
 
+/** Endereço do local fora do condomínio. */
+export type EventAddressInput = {
+  city: string;
+  complement?: string | null | undefined;
+  district: string;
+  /** Número ou "S/N". */
+  number: string;
+  /** UF. */
+  state: string;
+  street: string;
+  /** CEP (8 números). */
+  zip: string;
+};
+
+export type EventInput = {
+  /** Obrigatório sem espaço: o evento é fora do condomínio. */
+  address?: EventAddressInput | null | undefined;
+  /** Lotação total. */
+  capacity: number;
+  description?: string | null | undefined;
+  endsAt: string;
+  /** Convidados de fora do condomínio (0: só moradores). */
+  externalGuestLimit: number;
+  /** Com espaço, um detalhe ("área coberta"); fora, o nome do local ("Chácara Bela Vista"). */
+  location?: string | null | undefined;
+  /** Espaço do condomínio (sem espaço: informe o endereço). */
+  spaceId?: string | number | null | undefined;
+  startsAt: string;
+  /** Entrada com ingresso pago (Pix). */
+  ticketed: boolean;
+  title: string;
+};
+
+/** Rascunho (só gestores), publicado ou cancelado. */
+export type EventStatus =
+  | 'CANCELLED'
+  | 'DRAFT'
+  | 'PUBLISHED';
+
+/** Próximos (ainda não terminaram) ou passados. */
+export type EventWhen =
+  | 'PAST'
+  | 'UPCOMING';
+
 /** Se a portaria já pode liberar a entrada do convidado. */
 export type GuestCheckInWindow =
   | 'CANCELLED'
@@ -229,6 +277,8 @@ export type NotificationType =
   | 'BOOKING_SLOT_FREED'
   | 'BROADCAST'
   | 'ENROLLMENT_SUBMITTED'
+  | 'EVENT_CANCELLED'
+  | 'EVENT_PUBLISHED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
   | 'SUPPORT_REQUESTED'
@@ -255,6 +305,7 @@ export type Permission =
   | 'BOOKINGS_MANAGE'
   | 'CONDOMINIUMS_MANAGE'
   | 'DASHBOARD_READ'
+  | 'EVENTS_MANAGE'
   | 'GUESTS_CHECKIN'
   | 'NOTIFICATIONS_BROADCAST'
   | 'PERMISSIONS_MANAGE'
@@ -559,7 +610,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
+export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
 
 export type RefreshSessionMutationVariables = Exact<{
   refreshToken: string;
@@ -576,7 +627,7 @@ export type LogoutMutation = { logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type CompleteOnboardingMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -595,7 +646,7 @@ export type UpdateMyProfileMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type SetMyPhotoMutationVariables = Exact<{
   photo: string;
@@ -823,21 +874,21 @@ export type SendBroadcastMutationVariables = Exact<{
 
 export type SendBroadcastMutation = { sendBroadcast: { id: string, title: string, body: string, audience: BroadcastAudience, targetGroup: UserGroup | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string } };
 
-export type CondominiumFieldsFragment = { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string };
+export type CondominiumFieldsFragment = { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string };
 
 export type CondominiumsQueryVariables = Exact<{
   filter?: CondominiumFilterInput | null | undefined;
 }>;
 
 
-export type CondominiumsQuery = { condominiums: Array<{ id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string }> };
+export type CondominiumsQuery = { condominiums: Array<{ id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string }> };
 
 export type CreateCondominiumMutationVariables = Exact<{
   input: CondominiumInput;
 }>;
 
 
-export type CreateCondominiumMutation = { createCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+export type CreateCondominiumMutation = { createCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
 
 export type UpdateCondominiumMutationVariables = Exact<{
   id: string | number;
@@ -845,7 +896,7 @@ export type UpdateCondominiumMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCondominiumMutation = { updateCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+export type UpdateCondominiumMutation = { updateCondominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
 
 export type SetCondominiumStatusMutationVariables = Exact<{
   id: string | number;
@@ -853,7 +904,16 @@ export type SetCondominiumStatusMutationVariables = Exact<{
 }>;
 
 
-export type SetCondominiumStatusMutation = { setCondominiumStatus: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+export type SetCondominiumStatusMutation = { setCondominiumStatus: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+
+export type SetCondominiumModuleMutationVariables = Exact<{
+  id: string | number;
+  module: AppModule;
+  enabled: boolean;
+}>;
+
+
+export type SetCondominiumModuleMutation = { setCondominiumModule: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
 
 export type UnitFieldsFragment = { id: string, street: string, block: string, number: string, label: string, residents: number };
 
@@ -957,6 +1017,52 @@ export type RejectEnrollmentRequestMutationVariables = Exact<{
 
 
 export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
+
+export type EventFieldsFragment = { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null };
+
+export type EventsQueryVariables = Exact<{
+  when?: EventWhen | null | undefined;
+}>;
+
+
+export type EventsQuery = { events: Array<{ id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null }> };
+
+export type EventQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type EventQuery = { event: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
+
+export type CreateEventMutationVariables = Exact<{
+  input: EventInput;
+}>;
+
+
+export type CreateEventMutation = { createEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
+
+export type UpdateEventMutationVariables = Exact<{
+  id: string | number;
+  input: EventInput;
+}>;
+
+
+export type UpdateEventMutation = { updateEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
+
+export type PublishEventMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type PublishEventMutation = { publishEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
+
+export type CancelEventMutationVariables = Exact<{
+  id: string | number;
+  reason: string;
+}>;
+
+
+export type CancelEventMutation = { cancelEvent: { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null } };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -1309,6 +1415,7 @@ export const CondominiumFieldsFragmentDoc = new TypedDocumentString(`
   state
   status
   addressFormat
+  modules
   activeMembers
   managers
   units
@@ -1360,6 +1467,35 @@ export const EnrollmentRequestFieldsFragmentDoc = new TypedDocumentString(`
   photoUrl
 }
     `, {"fragmentName":"EnrollmentRequestFields"}) as unknown as TypedDocumentString<EnrollmentRequestFieldsFragment, unknown>;
+export const EventFieldsFragmentDoc = new TypedDocumentString(`
+    fragment EventFields on Event {
+  id
+  title
+  description
+  spaceId
+  spaceName
+  location
+  address {
+    zip
+    street
+    number
+    complement
+    district
+    city
+    state
+  }
+  startsAt
+  endsAt
+  capacity
+  externalGuestLimit
+  ticketed
+  status
+  cancelReason
+  publishedAt
+  cancelledAt
+  createdAt
+}
+    `, {"fragmentName":"EventFields"}) as unknown as TypedDocumentString<EventFieldsFragment, unknown>;
 export const SpaceFieldsFragmentDoc = new TypedDocumentString(`
     fragment SpaceFields on Space {
   id
@@ -1711,6 +1847,7 @@ export const LoginDocument = new TypedDocumentString(`
         state
         status
         addressFormat
+        modules
       }
       condominiums {
         id
@@ -1759,6 +1896,7 @@ export const MeDocument = new TypedDocumentString(`
       state
       status
       addressFormat
+      modules
     }
     condominiums {
       id
@@ -1801,6 +1939,7 @@ export const UpdateMyProfileDocument = new TypedDocumentString(`
       state
       status
       addressFormat
+      modules
     }
     condominiums {
       id
@@ -2333,6 +2472,7 @@ export const CondominiumsDocument = new TypedDocumentString(`
   state
   status
   addressFormat
+  modules
   activeMembers
   managers
   units
@@ -2354,6 +2494,7 @@ export const CreateCondominiumDocument = new TypedDocumentString(`
   state
   status
   addressFormat
+  modules
   activeMembers
   managers
   units
@@ -2375,6 +2516,7 @@ export const UpdateCondominiumDocument = new TypedDocumentString(`
   state
   status
   addressFormat
+  modules
   activeMembers
   managers
   units
@@ -2396,6 +2538,7 @@ export const SetCondominiumStatusDocument = new TypedDocumentString(`
   state
   status
   addressFormat
+  modules
   activeMembers
   managers
   units
@@ -2403,6 +2546,28 @@ export const SetCondominiumStatusDocument = new TypedDocumentString(`
   lastActivityAt
   createdAt
 }`) as unknown as TypedDocumentString<SetCondominiumStatusMutation, SetCondominiumStatusMutationVariables>;
+export const SetCondominiumModuleDocument = new TypedDocumentString(`
+    mutation SetCondominiumModule($id: ID!, $module: AppModule!, $enabled: Boolean!) {
+  setCondominiumModule(id: $id, module: $module, enabled: $enabled) {
+    ...CondominiumFields
+  }
+}
+    fragment CondominiumFields on Condominium {
+  id
+  name
+  document
+  city
+  state
+  status
+  addressFormat
+  modules
+  activeMembers
+  managers
+  units
+  pendingEnrollments
+  lastActivityAt
+  createdAt
+}`) as unknown as TypedDocumentString<SetCondominiumModuleMutation, SetCondominiumModuleMutationVariables>;
 export const UnitsDocument = new TypedDocumentString(`
     query Units {
   units {
@@ -2646,6 +2811,204 @@ export const RejectEnrollmentRequestDocument = new TypedDocumentString(`
   userId
   photoUrl
 }`) as unknown as TypedDocumentString<RejectEnrollmentRequestMutation, RejectEnrollmentRequestMutationVariables>;
+export const EventsDocument = new TypedDocumentString(`
+    query Events($when: EventWhen) {
+  events(when: $when) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  description
+  spaceId
+  spaceName
+  location
+  address {
+    zip
+    street
+    number
+    complement
+    district
+    city
+    state
+  }
+  startsAt
+  endsAt
+  capacity
+  externalGuestLimit
+  ticketed
+  status
+  cancelReason
+  publishedAt
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<EventsQuery, EventsQueryVariables>;
+export const EventDocument = new TypedDocumentString(`
+    query Event($id: ID!) {
+  event(id: $id) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  description
+  spaceId
+  spaceName
+  location
+  address {
+    zip
+    street
+    number
+    complement
+    district
+    city
+    state
+  }
+  startsAt
+  endsAt
+  capacity
+  externalGuestLimit
+  ticketed
+  status
+  cancelReason
+  publishedAt
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<EventQuery, EventQueryVariables>;
+export const CreateEventDocument = new TypedDocumentString(`
+    mutation CreateEvent($input: EventInput!) {
+  createEvent(input: $input) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  description
+  spaceId
+  spaceName
+  location
+  address {
+    zip
+    street
+    number
+    complement
+    district
+    city
+    state
+  }
+  startsAt
+  endsAt
+  capacity
+  externalGuestLimit
+  ticketed
+  status
+  cancelReason
+  publishedAt
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<CreateEventMutation, CreateEventMutationVariables>;
+export const UpdateEventDocument = new TypedDocumentString(`
+    mutation UpdateEvent($id: ID!, $input: EventInput!) {
+  updateEvent(id: $id, input: $input) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  description
+  spaceId
+  spaceName
+  location
+  address {
+    zip
+    street
+    number
+    complement
+    district
+    city
+    state
+  }
+  startsAt
+  endsAt
+  capacity
+  externalGuestLimit
+  ticketed
+  status
+  cancelReason
+  publishedAt
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<UpdateEventMutation, UpdateEventMutationVariables>;
+export const PublishEventDocument = new TypedDocumentString(`
+    mutation PublishEvent($id: ID!) {
+  publishEvent(id: $id) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  description
+  spaceId
+  spaceName
+  location
+  address {
+    zip
+    street
+    number
+    complement
+    district
+    city
+    state
+  }
+  startsAt
+  endsAt
+  capacity
+  externalGuestLimit
+  ticketed
+  status
+  cancelReason
+  publishedAt
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<PublishEventMutation, PublishEventMutationVariables>;
+export const CancelEventDocument = new TypedDocumentString(`
+    mutation CancelEvent($id: ID!, $reason: String!) {
+  cancelEvent(id: $id, reason: $reason) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  description
+  spaceId
+  spaceName
+  location
+  address {
+    zip
+    street
+    number
+    complement
+    district
+    city
+    state
+  }
+  startsAt
+  endsAt
+  capacity
+  externalGuestLimit
+  ticketed
+  status
+  cancelReason
+  publishedAt
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<CancelEventMutation, CancelEventMutationVariables>;
 export const MyNotificationsDocument = new TypedDocumentString(`
     query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {
   myNotifications(unreadOnly: $unreadOnly, page: $page) {

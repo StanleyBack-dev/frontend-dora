@@ -244,7 +244,7 @@ export function SupportersManager({
         footer={
           <>
             <Button
-              variant="secondary"
+              variant="cancel"
               onClick={() => setDraft(null)}
               disabled={pending}
             >
@@ -332,7 +332,7 @@ export function SupportersManager({
         footer={
           <>
             <Button
-              variant="secondary"
+              variant="cancel"
               onClick={() => setEditing(null)}
               disabled={pending}
             >
@@ -379,7 +379,7 @@ export function SupportersManager({
         footer={
           <>
             <Button
-              variant="secondary"
+              variant="cancel"
               onClick={() => setRemoval(null)}
               disabled={pending}
             >

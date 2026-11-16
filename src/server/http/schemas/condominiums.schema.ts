@@ -16,6 +16,11 @@ export const condominiumStatusSchema = z.object({
   status: z.enum(["ACTIVE", "SUSPENDED"]),
 });
 
+export const condominiumModuleSchema = z.object({
+  module: z.enum(["EVENTS"]),
+  enabled: z.boolean(),
+});
+
 export const switchCondominiumSchema = z.object({
   condominiumId: z.uuid().nullable(),
 });

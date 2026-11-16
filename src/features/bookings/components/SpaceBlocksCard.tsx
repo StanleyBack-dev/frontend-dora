@@ -171,7 +171,7 @@ export function SpaceBlocksCard({
         busy={pending}
         footer={
           <>
-            <Button variant="secondary" onClick={close} disabled={pending}>
+            <Button variant="cancel" onClick={close} disabled={pending}>
               Cancelar
             </Button>
             {overlaps ? (
