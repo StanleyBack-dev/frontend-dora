@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.1](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.8.0...v0.8.1) (2026-11-16)
+
+
+### Bug Fixes
+
+* dependents page only for residents ([e1f3afb](https://github.com/StanleyBack-dev/frontend-dora/commit/e1f3afbc2f9b280d145aab5e79c82a641a903af8))
+* dependents page only for residents ([0226623](https://github.com/StanleyBack-dev/frontend-dora/commit/022662352353ad3cda019923b31372a5e1fc8d29))
+
 ## [0.8.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.7.0...v0.8.0) (2026-11-16)
 
 
