@@ -60,6 +60,11 @@ export type LimitPeriod =
   | 'MONTH'
   | 'WEEK';
 
+/** Vínculo com o condomínio: morador ou funcionário. */
+export type MemberKind =
+  | 'EMPLOYEE'
+  | 'RESIDENT';
+
 /** Tamanho de cada intervalo da série: dia, semana ou mês. */
 export type MetricsGranularity =
   | 'DAY'

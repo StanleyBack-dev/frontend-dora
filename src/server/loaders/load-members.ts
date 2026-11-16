@@ -2,7 +2,12 @@ import "server-only";
 import { authed } from "@/server/auth/current-user";
 import { adminService } from "@/server/services/admin.service";
 import { condominiumsService } from "@/server/services/condominiums.service";
-import type { Paginated, UserAccount, UserGroup } from "@/shared/contracts/api";
+import type {
+  MemberKind,
+  Paginated,
+  UserAccount,
+  UserGroup,
+} from "@/shared/contracts/api";
 import type { Unit } from "@/shared/contracts/condominiums";
 import {
   firstParam,
@@ -31,12 +36,16 @@ export type MembersList = {
 };
 
 /**
- * A list of members with some roles (Moradores: residents; Equipe: managers
- * and the gate), filtered by the address's query.
+ * A list of members of one tie (Moradores: residents; Equipe: employees),
+ * filtered by the address's query.
  */
 export async function loadMembers(
   params: RawSearchParams,
-  options: { roles: readonly UserGroup[]; unitFilter: boolean },
+  options: {
+    kind: MemberKind;
+    roles: readonly UserGroup[];
+    unitFilter: boolean;
+  },
 ): Promise<MembersList> {
   const search = firstParam(params, "busca")?.slice(0, 100) ?? "";
   const group =
@@ -58,7 +67,7 @@ export async function loadMembers(
     adminService.listUsers(token, {
       search,
       group,
-      groups: [...options.roles],
+      kind: options.kind,
       unitId,
       active: status === undefined ? undefined : status === "ativos",
       page,

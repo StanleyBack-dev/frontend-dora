@@ -7,7 +7,9 @@ import { Button, Drawer } from "@/design-system";
 import { adminClient } from "@/features/admin/api/admin.client";
 import { TemporaryAccessPanel } from "@/features/admin/components/TemporaryAccessPanel";
 import { UserFormFields } from "@/features/admin/components/UserFormFields";
+import { rolesFor } from "@/features/admin/model/member-kind";
 import type {
+  MemberKind,
   TemporaryAccess,
   UserGroup,
   UserInput,
@@ -16,28 +18,29 @@ import type { Unit } from "@/shared/contracts/condominiums";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
-const EMPTY: UserInput = {
-  name: "",
-  email: "",
-  username: "",
-  group: "USER",
-  unitId: null,
-  unitComplement: "",
-  phone: "",
-};
-
 export function CreateUserButton({
+  kind,
   assignableGroups,
   units,
 }: {
+  /** The page's tie: Moradores adds residents, Equipe employees. */
+  kind: MemberKind;
   assignableGroups: UserGroup[];
   units: Pick<Unit, "id" | "label">[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  // The first role offered is the default (Moradores: resident; Equipe:
-  // the first team role).
-  const empty: UserInput = { ...EMPTY, group: assignableGroups[0] ?? "USER" };
+  // The page's tie and its first role (resident; or the gate) by default.
+  const empty: UserInput = {
+    name: "",
+    email: "",
+    kind,
+    group: rolesFor(kind, assignableGroups)[0] ?? "USER",
+    unitId: null,
+    unitComplement: "",
+    employee: null,
+    phone: "",
+  };
   const [form, setForm] = useState<UserInput>(empty);
   const [created, setCreated] = useState<TemporaryAccess | null>(null);
   const { showError } = useToast();
@@ -109,7 +112,6 @@ export function CreateUserButton({
               onChange={setForm}
               assignableGroups={assignableGroups}
               units={units}
-              mode="create"
             />
             <p className="text-xs text-soft">
               Conta nova: o sistema gera uma senha temporária e envia por

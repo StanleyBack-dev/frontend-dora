@@ -47,6 +47,8 @@
   --chrome-bottom: #050505;
   --chrome-line: #262626;
   --chrome-hover: rgb(255 255 255 / 0.07);
+  /* Hover of a dark header over a light page (opaque, never washes out). */
+  --chrome-raised: #262626;
   --chrome-fg: #fafafa;
   --chrome-muted: #b5b0a9;
   --chrome-subtle: #7c7770;
@@ -101,6 +103,7 @@
   --color-chrome-bottom: var(--chrome-bottom);
   --color-chrome-line: var(--chrome-line);
   --color-chrome-hover: var(--chrome-hover);
+  --color-chrome-raised: var(--chrome-raised);
   --color-chrome-fg: var(--chrome-fg);
   --color-chrome-muted: var(--chrome-muted);
   --color-chrome-subtle: var(--chrome-subtle);

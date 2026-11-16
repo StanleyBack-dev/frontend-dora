@@ -20,6 +20,7 @@ import type {
   RecordStamp,
   TemporaryAccess,
   UserAccount,
+  MemberKind,
   UserGroup,
   UserInput,
 } from "@/shared/contracts/api";
@@ -28,8 +29,8 @@ export type UserListQuery = {
   limit?: number;
   search?: string;
   group?: UserGroup;
-  /** Any of these roles (e.g. the team: ADMIN and CONCIERGE). */
-  groups?: UserGroup[];
+  /** Residents (Moradores) or employees (Equipe). */
+  kind?: MemberKind;
   unitId?: string;
   active?: boolean;
   page: number;
@@ -48,7 +49,7 @@ export const adminService = {
         filter: {
           search: query.search || undefined,
           group: query.group,
-          groups: query.groups,
+          kind: query.kind,
           unitId: query.unitId,
           active: query.active,
         },
