@@ -111,7 +111,7 @@ type Documents = {
     "\n  mutation CancelEvent($id: ID!, $reason: String!) {\n    cancelEvent(id: $id, reason: $reason) {\n      ...EventFields\n    }\n  }\n": typeof types.CancelEventDocument,
     "\n  fragment EventOrderFields on EventOrder {\n    id\n    eventId\n    eventTitle\n    code\n    status\n    totalCents\n    buyerName\n    unitLabel\n    attendees {\n      id\n      source\n      dependentId\n      name\n      age\n      outside\n      ticketName\n      priceCents\n      needsProof\n      proofUrl\n      proofContentType\n      ticketCode\n      checkedInAt\n    }\n    pix {\n      keyType\n      key\n      name\n      city\n    }\n    pixCode\n    expiresAt\n    receiptSentAt\n    receiptContentType\n    receiptUrl\n    reviewedAt\n    rejectReason\n    cancelledAt\n    createdAt\n  }\n": typeof types.EventOrderFieldsFragmentDoc,
     "\n  query MyEventOrders($eventId: ID!) {\n    myEventOrders(eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.MyEventOrdersDocument,
-    "\n  query EventOrders($eventId: ID!, $status: EventOrderStatus) {\n    eventOrders(eventId: $eventId, status: $status) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.EventOrdersDocument,
+    "\n  query EventOrders($eventId: ID!, $filter: EventOrderFilterInput) {\n    eventOrders(eventId: $eventId, filter: $filter) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.EventOrdersDocument,
     "\n  mutation CreateEventOrder($eventId: ID!, $attendees: [AttendeeInput!]!) {\n    createEventOrder(eventId: $eventId, attendees: $attendees) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.CreateEventOrderDocument,
     "\n  mutation SubmitEventOrderReceipt($id: ID!, $file: String!) {\n    submitEventOrderReceipt(id: $id, file: $file) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.SubmitEventOrderReceiptDocument,
     "\n  mutation CancelEventOrder($id: ID!) {\n    cancelEventOrder(id: $id) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.CancelEventOrderDocument,
@@ -124,7 +124,7 @@ type Documents = {
     "\n  mutation UndoEventTicketCheckIn($attendeeId: ID!) {\n    undoEventTicketCheckIn(attendeeId: $attendeeId) {\n      ...GateEventTicketFields\n    }\n  }\n": typeof types.UndoEventTicketCheckInDocument,
     "\n  query EventTicketPass($code: String!) {\n    eventTicket(code: $code) {\n      code\n      name\n      ticketName\n      eventTitle\n      placeName\n      condominiumName\n      startsAt\n      endsAt\n      buyerFirstName\n      status\n      checkedIn\n    }\n  }\n": typeof types.EventTicketPassDocument,
     "\n  query EventOrdersQueue($status: EventOrderStatus, $eventId: ID) {\n    eventOrdersQueue(status: $status, eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.EventOrdersQueueDocument,
-    "\n  query EventTickets($eventId: ID!) {\n    eventTickets(eventId: $eventId) {\n      ...GateEventTicketFields\n    }\n  }\n": typeof types.EventTicketsDocument,
+    "\n  query EventTickets($eventId: ID!, $filter: EventTicketFilterInput) {\n    eventTickets(eventId: $eventId, filter: $filter) {\n      ...GateEventTicketFields\n    }\n  }\n": typeof types.EventTicketsDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": typeof types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": typeof types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": typeof types.MarkNotificationReadDocument,
@@ -263,7 +263,7 @@ const documents: Documents = {
     "\n  mutation CancelEvent($id: ID!, $reason: String!) {\n    cancelEvent(id: $id, reason: $reason) {\n      ...EventFields\n    }\n  }\n": types.CancelEventDocument,
     "\n  fragment EventOrderFields on EventOrder {\n    id\n    eventId\n    eventTitle\n    code\n    status\n    totalCents\n    buyerName\n    unitLabel\n    attendees {\n      id\n      source\n      dependentId\n      name\n      age\n      outside\n      ticketName\n      priceCents\n      needsProof\n      proofUrl\n      proofContentType\n      ticketCode\n      checkedInAt\n    }\n    pix {\n      keyType\n      key\n      name\n      city\n    }\n    pixCode\n    expiresAt\n    receiptSentAt\n    receiptContentType\n    receiptUrl\n    reviewedAt\n    rejectReason\n    cancelledAt\n    createdAt\n  }\n": types.EventOrderFieldsFragmentDoc,
     "\n  query MyEventOrders($eventId: ID!) {\n    myEventOrders(eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n": types.MyEventOrdersDocument,
-    "\n  query EventOrders($eventId: ID!, $status: EventOrderStatus) {\n    eventOrders(eventId: $eventId, status: $status) {\n      ...EventOrderFields\n    }\n  }\n": types.EventOrdersDocument,
+    "\n  query EventOrders($eventId: ID!, $filter: EventOrderFilterInput) {\n    eventOrders(eventId: $eventId, filter: $filter) {\n      ...EventOrderFields\n    }\n  }\n": types.EventOrdersDocument,
     "\n  mutation CreateEventOrder($eventId: ID!, $attendees: [AttendeeInput!]!) {\n    createEventOrder(eventId: $eventId, attendees: $attendees) {\n      ...EventOrderFields\n    }\n  }\n": types.CreateEventOrderDocument,
     "\n  mutation SubmitEventOrderReceipt($id: ID!, $file: String!) {\n    submitEventOrderReceipt(id: $id, file: $file) {\n      ...EventOrderFields\n    }\n  }\n": types.SubmitEventOrderReceiptDocument,
     "\n  mutation CancelEventOrder($id: ID!) {\n    cancelEventOrder(id: $id) {\n      ...EventOrderFields\n    }\n  }\n": types.CancelEventOrderDocument,
@@ -276,7 +276,7 @@ const documents: Documents = {
     "\n  mutation UndoEventTicketCheckIn($attendeeId: ID!) {\n    undoEventTicketCheckIn(attendeeId: $attendeeId) {\n      ...GateEventTicketFields\n    }\n  }\n": types.UndoEventTicketCheckInDocument,
     "\n  query EventTicketPass($code: String!) {\n    eventTicket(code: $code) {\n      code\n      name\n      ticketName\n      eventTitle\n      placeName\n      condominiumName\n      startsAt\n      endsAt\n      buyerFirstName\n      status\n      checkedIn\n    }\n  }\n": types.EventTicketPassDocument,
     "\n  query EventOrdersQueue($status: EventOrderStatus, $eventId: ID) {\n    eventOrdersQueue(status: $status, eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n": types.EventOrdersQueueDocument,
-    "\n  query EventTickets($eventId: ID!) {\n    eventTickets(eventId: $eventId) {\n      ...GateEventTicketFields\n    }\n  }\n": types.EventTicketsDocument,
+    "\n  query EventTickets($eventId: ID!, $filter: EventTicketFilterInput) {\n    eventTickets(eventId: $eventId, filter: $filter) {\n      ...GateEventTicketFields\n    }\n  }\n": types.EventTicketsDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": types.MarkNotificationReadDocument,
@@ -706,7 +706,7 @@ export function graphql(source: "\n  query MyEventOrders($eventId: ID!) {\n    m
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query EventOrders($eventId: ID!, $status: EventOrderStatus) {\n    eventOrders(eventId: $eventId, status: $status) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').EventOrdersDocument;
+export function graphql(source: "\n  query EventOrders($eventId: ID!, $filter: EventOrderFilterInput) {\n    eventOrders(eventId: $eventId, filter: $filter) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').EventOrdersDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -758,7 +758,7 @@ export function graphql(source: "\n  query EventOrdersQueue($status: EventOrderS
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query EventTickets($eventId: ID!) {\n    eventTickets(eventId: $eventId) {\n      ...GateEventTicketFields\n    }\n  }\n"): typeof import('./graphql').EventTicketsDocument;
+export function graphql(source: "\n  query EventTickets($eventId: ID!, $filter: EventTicketFilterInput) {\n    eventTickets(eventId: $eventId, filter: $filter) {\n      ...GateEventTicketFields\n    }\n  }\n"): typeof import('./graphql').EventTicketsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

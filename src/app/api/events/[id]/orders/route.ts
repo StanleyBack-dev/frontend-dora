@@ -13,7 +13,11 @@ export const GET = bffRoute<{ id: string }>(async (request, { params }) => {
   const raw = new URL(request.url).searchParams.get("status");
   const status = raw ? orderStatusSchema.parse(raw) : null;
   return NextResponse.json(
-    await eventsService.orders(await requireToken(), id, status),
+    await eventsService.orders(
+      await requireToken(),
+      id,
+      status ? { statuses: [status] } : {},
+    ),
   );
 });
 

@@ -154,8 +154,8 @@ export const myEventOrdersDocument = graphql(`
 `);
 
 export const eventOrdersDocument = graphql(`
-  query EventOrders($eventId: ID!, $status: EventOrderStatus) {
-    eventOrders(eventId: $eventId, status: $status) {
+  query EventOrders($eventId: ID!, $filter: EventOrderFilterInput) {
+    eventOrders(eventId: $eventId, filter: $filter) {
       ...EventOrderFields
     }
   }
@@ -295,8 +295,8 @@ export const eventOrdersQueueDocument = graphql(`
 `);
 
 export const eventTicketsDocument = graphql(`
-  query EventTickets($eventId: ID!) {
-    eventTickets(eventId: $eventId) {
+  query EventTickets($eventId: ID!, $filter: EventTicketFilterInput) {
+    eventTickets(eventId: $eventId, filter: $filter) {
       ...GateEventTicketFields
     }
   }

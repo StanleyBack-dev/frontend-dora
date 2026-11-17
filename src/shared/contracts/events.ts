@@ -235,3 +235,21 @@ export type EventTicketPass = {
   status: TicketPassStatus;
   checkedIn: boolean;
 };
+
+/** Filters of an event's tickets (the API applies them). */
+export type EventTicketFilter = {
+  /** Name, who ordered, unit or a code. */
+  search?: string;
+  checkedIn?: boolean;
+  ticketName?: string;
+  outside?: boolean;
+  /** true: who ordered; false: who came in someone's order. */
+  buyer?: boolean;
+};
+
+/** Filters of an event's orders (the API applies them). */
+export type EventOrderFilter = {
+  statuses?: EventOrderStatus[];
+  /** Who ordered, the order code, the unit or one of its people. */
+  search?: string;
+};
