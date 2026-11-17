@@ -116,7 +116,7 @@ export default async function HomePage() {
           <Shortcut
             href="/plataforma"
             icon={<ChartColumn aria-hidden />}
-            title="Painel"
+            title="Administração"
             description="Reservas, uso dos espaços, moradores e o que precisa de atenção em todos os condomínios."
           />
           <Shortcut

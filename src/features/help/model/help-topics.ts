@@ -465,7 +465,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: "painel",
     href: "/plataforma",
-    title: "Painel",
+    title: "Administração",
     icon: ChartColumn,
     permission: "CONDOMINIUMS_MANAGE",
     area: "platform",
