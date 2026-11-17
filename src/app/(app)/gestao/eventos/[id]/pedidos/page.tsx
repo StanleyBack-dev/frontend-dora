@@ -6,10 +6,15 @@ import { Card, PageHeader, SegmentedNav } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { EventOrdersReview } from "@/features/events/components/EventOrdersReview";
 import { eventPeriod } from "@/features/events/model/event-labels";
+import {
+  ORDER_FILTER_KEYS,
+  ORDER_FILTERS,
+  ordersIn,
+  type OrderFilter,
+} from "@/features/events/model/order-filters";
 import { getSessionUser } from "@/server/auth/current-user";
 import { loadEvent } from "@/server/loaders/load-event";
 import { loadEventOrders } from "@/server/loaders/load-event-orders";
-import type { EventOrderStatus } from "@/shared/contracts/events";
 import { can } from "@/shared/lib/access";
 import { formatCents } from "@/shared/lib/format";
 import {
@@ -19,22 +24,6 @@ import {
 } from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Pedidos do evento" };
-
-// The address's filter → the statuses it lists.
-const FILTERS = {
-  conferir: { label: "Para conferir", statuses: ["AWAITING_REVIEW"] },
-  aguardando: { label: "Aguardando envio", statuses: ["PENDING_PAYMENT"] },
-  confirmados: { label: "Confirmados", statuses: ["CONFIRMED"] },
-  encerrados: {
-    label: "Recusados e expirados",
-    statuses: ["REJECTED", "EXPIRED", "CANCELLED"],
-  },
-} as const satisfies Record<
-  string,
-  { label: string; statuses: readonly EventOrderStatus[] }
->;
-type Filter = keyof typeof FILTERS;
-const FILTER_KEYS = Object.keys(FILTERS) as Filter[];
 
 // An event's orders for whoever reviews payments: the receipts to check
 // first, then the unpaid, the confirmed and the closed ones.
@@ -50,16 +39,11 @@ export default async function EventOrdersPage({
   const event = await loadEvent((await params).id);
   if (!event) notFound();
   const filter =
-    oneOf(firstParam(await searchParams, "situacao"), FILTER_KEYS) ??
+    oneOf(firstParam(await searchParams, "situacao"), ORDER_FILTER_KEYS) ??
     "conferir";
 
   const orders = await loadEventOrders(event.id, null);
-  const of = (key: Filter) =>
-    orders.filter((order) =>
-      (FILTERS[key].statuses as readonly EventOrderStatus[]).includes(
-        order.status,
-      ),
-    );
+  const of = (key: OrderFilter) => ordersIn(orders, key);
   const confirmed = of("confirmados");
   const received = confirmed.reduce((sum, order) => sum + order.totalCents, 0);
   const people = confirmed.reduce(
@@ -82,8 +66,8 @@ export default async function EventOrdersPage({
       <SegmentedNav
         label="Situação"
         className="mb-4"
-        items={FILTER_KEYS.map((key) => ({
-          label: FILTERS[key].label,
+        items={ORDER_FILTER_KEYS.map((key) => ({
+          label: ORDER_FILTERS[key].label,
           href:
             key === "conferir"
               ? `/gestao/eventos/${event.id}/pedidos`

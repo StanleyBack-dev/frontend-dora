@@ -48,6 +48,7 @@ import { AreaSwitcher } from "@/features/layout/components/AreaSwitcher";
 import { ModuleTabs } from "@/features/layout/components/ModuleTabs";
 import {
   ACCOUNT_NAV,
+  activeEntry,
   APP_NAV,
   AREAS,
   areaOf,
@@ -283,6 +284,7 @@ export function AppShell({
       : area === "platform"
         ? platformItems
         : appItems;
+  const activePrimary = activeEntry(pathname, primary);
   const homeHref = AREAS[area].href;
   const account = [
     ...ACCOUNT_NAV,
@@ -443,7 +445,7 @@ export function AppShell({
                 <NavLink
                   key={item.href}
                   item={item}
-                  active={isActive(pathname, item)}
+                  active={item === activePrimary}
                   collapsed={collapsed}
                   onNavigate={closeMobile}
                 />

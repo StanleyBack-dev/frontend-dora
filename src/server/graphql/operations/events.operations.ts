@@ -283,3 +283,21 @@ export const eventTicketPassDocument = graphql(`
     }
   }
 `);
+
+// --- the events module in the management ---
+
+export const eventOrdersQueueDocument = graphql(`
+  query EventOrdersQueue($status: EventOrderStatus, $eventId: ID) {
+    eventOrdersQueue(status: $status, eventId: $eventId) {
+      ...EventOrderFields
+    }
+  }
+`);
+
+export const eventTicketsDocument = graphql(`
+  query EventTickets($eventId: ID!) {
+    eventTickets(eventId: $eventId) {
+      ...GateEventTicketFields
+    }
+  }
+`);

@@ -27,7 +27,14 @@ import { useToast } from "@/shared/toast/useToast";
 // the code, who ordered, the people and the amount; open, the people, the
 // receipt and (under review) approve or reject with a reason. The bank
 // statement is checked by the order code (the PIX reference).
-export function EventOrdersReview({ orders }: { orders: EventOrder[] }) {
+export function EventOrdersReview({
+  orders,
+  showEvent = false,
+}: {
+  orders: EventOrder[];
+  /** The list mixes events (the queue): each order shows its event. */
+  showEvent?: boolean;
+}) {
   if (orders.length === 0) {
     return (
       <EmptyState
@@ -39,13 +46,19 @@ export function EventOrdersReview({ orders }: { orders: EventOrder[] }) {
   return (
     <ul className="divide-y divide-border">
       {orders.map((order) => (
-        <OrderRow key={order.id} order={order} />
+        <OrderRow key={order.id} order={order} showEvent={showEvent} />
       ))}
     </ul>
   );
 }
 
-function OrderRow({ order }: { order: EventOrder }) {
+function OrderRow({
+  order,
+  showEvent,
+}: {
+  order: EventOrder;
+  showEvent: boolean;
+}) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
   const [open, setOpen] = useState(order.status === "AWAITING_REVIEW");
@@ -109,6 +122,7 @@ function OrderRow({ order }: { order: EventOrder }) {
           </span>
           <span className="block truncate text-xs text-soft">
             {[
+              showEvent ? order.eventTitle : null,
               order.unitLabel,
               peopleCount(order),
               order.totalCents > 0 ? formatCents(order.totalCents) : "Grátis",
