@@ -14,6 +14,7 @@ export { Drawer } from "./components/Drawer";
 export { EmptyState } from "./components/EmptyState";
 export { Field, inputClasses, labelClasses } from "./components/Field";
 export { AutoFilterForm } from "./components/AutoFilterForm";
+export { BackLink } from "./components/BackLink";
 export { FilterActions } from "./components/FilterActions";
 export { FilterCombobox } from "./components/FilterCombobox";
 export { FilterField } from "./components/FilterField";

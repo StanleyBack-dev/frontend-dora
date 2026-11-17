@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Building2, CircleCheck, UserPlus, Users } from "lucide-react";
 import {
   AutoFilterForm,
+  BackLink,
   FilterActions,
   FilterCombobox,
   FilterField,
@@ -60,6 +61,7 @@ export default async function CondominiumsAdminPage({
 
   return (
     <>
+      <BackLink href="/plataforma" label="Administração" />
       <PageHeader
         title="Condomínios"
         description="Os clientes do Dora: situação, gestores, moradores e cadastros de cada condomínio."

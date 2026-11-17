@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Building2 } from "lucide-react";
-import { Card, EmptyState, PageHeader } from "@/design-system";
+import { BackLink, Card, EmptyState, PageHeader } from "@/design-system";
 import { ModulesMatrix } from "@/features/platform/components/ModulesMatrix";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { authed, getSessionUser } from "@/server/auth/current-user";
@@ -18,6 +18,7 @@ export default async function PlatformModulesPage() {
 
   return (
     <>
+      <BackLink href="/plataforma" label="Administração" />
       <PageHeader
         title="Módulos"
         description="O que cada condomínio contratou. Desligar não apaga nada: só fecha o menu e as páginas do módulo."

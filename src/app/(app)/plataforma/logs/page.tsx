@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import {
   AutoFilterForm,
+  BackLink,
   Card,
   EmptyState,
   FilterActions,
@@ -122,6 +123,7 @@ export default async function SystemLogsPage({
 
   return (
     <>
+      <BackLink href="/plataforma" label="Administração" />
       <PageHeader
         title="Logs e alertas"
         description="Erros, segurança, avisos não entregues e rotinas que falharam, em toda a plataforma."
