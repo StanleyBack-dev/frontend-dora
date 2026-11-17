@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { CondominiumPixForm } from "@/features/payments/components/CondominiumPixForm";
 import { authed, getSessionUser } from "@/server/auth/current-user";
@@ -13,5 +14,13 @@ export default async function PaymentsPage() {
   if (!can(user, "PAYMENTS_MANAGE")) return <AccessDenied />;
 
   const pix = await authed((token) => paymentsService.condominiumPix(token));
-  return <CondominiumPixForm pix={pix} />;
+  return (
+    <>
+      <PageHeader
+        title="Pagamentos"
+        description="O PIX do condomínio, que recebe os ingressos dos eventos."
+      />
+      <CondominiumPixForm pix={pix} />
+    </>
+  );
 }

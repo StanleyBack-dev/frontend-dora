@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Card, SegmentedNav } from "@/design-system";
+import { Card, PageHeader, SegmentedNav } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { DependentsReview } from "@/features/dependents/components/DependentsReview";
 import { getSessionUser } from "@/server/auth/current-user";
@@ -37,6 +37,10 @@ export default async function DependentsPage({
     all.filter((item) => item.status === FILTERS[key].status);
   return (
     <>
+      <PageHeader
+        title="Dependentes"
+        description="Quem os moradores cadastraram: confira o documento e aprove ou recuse."
+      />
       <SegmentedNav
         label="Situação"
         className="mb-4"

@@ -472,6 +472,14 @@ export type PlatformMetricsFilterInput = {
   to?: string | null | undefined;
 };
 
+export type PlatformPeopleFilterInput = {
+  condominiumId?: string | number | null | undefined;
+  /** ADMIN_MASTER: a plataforma; os outros: o papel em algum condomínio. */
+  role?: UserGroup | null | undefined;
+  /** Nome, e-mail ou usuário (a partir de 2 letras). */
+  search?: string | null | undefined;
+};
+
 /** PushSubscription do navegador (PushManager). */
 export type PushSubscriptionInput = {
   /** Segredo de autenticação (base64url). */
@@ -1146,6 +1154,13 @@ export type DeleteUnitMutationVariables = Exact<{
 
 export type DeleteUnitMutation = { deleteUnit: boolean };
 
+export type CondominiumQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type CondominiumQuery = { condominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
+
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1488,6 +1503,21 @@ export type PlatformMetricsQueryVariables = Exact<{
 
 
 export type PlatformMetricsQuery = { platformMetrics: { from: string, to: string, days: number, condominiumId: string | null, bookings: { total: number, confirmed: number, pending: number, cancelled: number, rejected: number, stalePending: number, granularity: MetricsGranularity, series: Array<{ bucket: string, total: number, cancelled: number }>, byCondominium: Array<{ condominiumId: string, name: string, total: number, cancelled: number }> }, spaces: { activeSpaces: number, unusedCount: number, mostUsed: Array<{ spaceId: string, name: string, condominiumName: string, bookings: number, hours: number }>, unused: Array<{ spaceId: string, name: string, condominiumName: string, bookings: number, hours: number }>, byWeekday: Array<{ weekday: number, bookings: number }>, byHour: Array<{ hour: number, bookings: number }> }, engagement: { members: number, active7d: number, active30d: number, newMembers: number, enrollments: number, inactiveCount: number, inactiveCondominiums: Array<{ condominiumId: string, name: string, lastActivityAt: string | null }> }, health: { staleEnrollments: number, failedNotifications: number, delayedNotifications: number, withoutManager: number, withoutUnits: number, openSupport: number } } };
+
+export type PlatformPeopleQueryVariables = Exact<{
+  filter?: PlatformPeopleFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type PlatformPeopleQuery = { platformPeople: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, email: string, username: string, phone: string | null, platformAdmin: boolean, active: boolean, lockedUntil: string | null, lastLoginAt: string | null, createdAt: string, memberships: Array<{ condominiumId: string, condominiumName: string, role: UserGroup, kind: MemberKind, active: boolean }> }> } };
+
+export type CondominiumMembersQueryVariables = Exact<{
+  condominiumId: string | number;
+}>;
+
+
+export type CondominiumMembersQuery = { condominiumMembers: Array<{ userId: string, name: string, email: string, username: string, phone: string | null, role: UserGroup, kind: MemberKind, active: boolean, unitLabel: string | null, jobTitle: string | null, lastLoginAt: string | null, since: string }> };
 
 export type SpaceFieldsFragment = { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, feeCents: number | null, recurringAllowed: boolean, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null, guests: { allowed: boolean, max: number | null, documentRequired: boolean } } };
 
@@ -3151,6 +3181,28 @@ export const DeleteUnitDocument = new TypedDocumentString(`
   deleteUnit(id: $id)
 }
     `) as unknown as TypedDocumentString<DeleteUnitMutation, DeleteUnitMutationVariables>;
+export const CondominiumDocument = new TypedDocumentString(`
+    query Condominium($id: ID!) {
+  condominium(id: $id) {
+    ...CondominiumFields
+  }
+}
+    fragment CondominiumFields on Condominium {
+  id
+  name
+  document
+  city
+  state
+  status
+  addressFormat
+  modules
+  activeMembers
+  managers
+  units
+  pendingEnrollments
+  lastActivityAt
+  createdAt
+}`) as unknown as TypedDocumentString<CondominiumQuery, CondominiumQueryVariables>;
 export const DashboardDocument = new TypedDocumentString(`
     query Dashboard {
   dashboard {
@@ -4443,6 +4495,53 @@ export const PlatformMetricsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<PlatformMetricsQuery, PlatformMetricsQueryVariables>;
+export const PlatformPeopleDocument = new TypedDocumentString(`
+    query PlatformPeople($filter: PlatformPeopleFilterInput, $page: PageInput) {
+  platformPeople(filter: $filter, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      id
+      name
+      email
+      username
+      phone
+      platformAdmin
+      active
+      lockedUntil
+      lastLoginAt
+      createdAt
+      memberships {
+        condominiumId
+        condominiumName
+        role
+        kind
+        active
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<PlatformPeopleQuery, PlatformPeopleQueryVariables>;
+export const CondominiumMembersDocument = new TypedDocumentString(`
+    query CondominiumMembers($condominiumId: ID!) {
+  condominiumMembers(condominiumId: $condominiumId) {
+    userId
+    name
+    email
+    username
+    phone
+    role
+    kind
+    active
+    unitLabel
+    jobTitle
+    lastLoginAt
+    since
+  }
+}
+    `) as unknown as TypedDocumentString<CondominiumMembersQuery, CondominiumMembersQueryVariables>;
 export const SpacesDocument = new TypedDocumentString(`
     query Spaces($includeInactive: Boolean!) {
   spaces(includeInactive: $includeInactive) {

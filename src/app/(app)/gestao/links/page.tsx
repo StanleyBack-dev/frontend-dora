@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { InvitesPanel } from "@/features/enrollment/components/InvitesPanel";
 import { authed, getSessionUser } from "@/server/auth/current-user";
@@ -14,5 +15,13 @@ export default async function EnrollmentLinksPage() {
   if (!can(user, "USERS_MANAGE")) return <AccessDenied />;
 
   const invites = await authed((token) => enrollmentService.invites(token));
-  return <InvitesPanel invites={invites} />;
+  return (
+    <>
+      <PageHeader
+        title="Links de cadastro"
+        description="Códigos de convite para enviar aos moradores pelo WhatsApp."
+      />
+      <InvitesPanel invites={invites} />
+    </>
+  );
 }
