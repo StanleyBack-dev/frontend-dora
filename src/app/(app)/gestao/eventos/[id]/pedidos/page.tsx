@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import { Card, PageHeader, SegmentedNav } from "@/design-system";
+import {
+  ArrowLeft,
+  CircleCheck,
+  Clock,
+  FileSearch,
+  Users,
+  Wallet,
+} from "lucide-react";
+import { Card, PageHeader, SegmentedNav, StatCard } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { EventOrdersReview } from "@/features/events/components/EventOrdersReview";
 import { eventPeriod } from "@/features/events/model/event-labels";
@@ -61,8 +68,41 @@ export default async function EventOrdersPage({
       </Link>
       <PageHeader
         title={event.title}
-        description={`Pedidos e comprovantes · ${eventPeriod(event)}. Confirmados: ${people} ${people === 1 ? "pessoa" : "pessoas"}${event.ticketed ? `, ${formatCents(received)}` : ""}.`}
+        description={`Pedidos e comprovantes · ${eventPeriod(event)}.`}
       />
+      {/* The numbers of the orders, as on the tickets page. */}
+      <div className="mb-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <StatCard
+          label="Para conferir"
+          value={String(of("conferir").length)}
+          icon={<FileSearch />}
+          tone={of("conferir").length > 0 ? "warning" : "neutral"}
+        />
+        <StatCard
+          label="Aguardando envio"
+          value={String(of("aguardando").length)}
+          icon={<Clock />}
+        />
+        <StatCard
+          label="Confirmados"
+          value={String(confirmed.length)}
+          icon={<CircleCheck />}
+          tone="success"
+        />
+        {event.ticketed ? (
+          <StatCard
+            label="Recebido"
+            value={formatCents(received)}
+            icon={<Wallet />}
+          />
+        ) : (
+          <StatCard
+            label="Pessoas confirmadas"
+            value={String(people)}
+            icon={<Users />}
+          />
+        )}
+      </div>
       <SegmentedNav
         label="Situação"
         className="mb-4"
