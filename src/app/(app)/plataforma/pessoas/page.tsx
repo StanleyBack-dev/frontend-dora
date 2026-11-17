@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { UsersRound } from "lucide-react";
 import {
   AutoFilterForm,
+  BackLink,
   Card,
   EmptyState,
   FilterActions,
@@ -83,6 +84,7 @@ export default async function PlatformPeoplePage({
 
   return (
     <>
+      <BackLink href="/plataforma" label="Administração" />
       <PageHeader
         title="Pessoas"
         description={`Todas as contas do Dora: ${people.total} ${people.total === 1 ? "pessoa" : "pessoas"}${filtered ? " com estes filtros" : ""}, e onde cada uma tem acesso.`}
