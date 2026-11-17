@@ -4,6 +4,8 @@ import { ModuleUnavailable } from "@/features/access/components/ModuleUnavailabl
 import { EventsList } from "@/features/events/components/EventsList";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { eventsService } from "@/server/services/events.service";
+import { spacesService } from "@/server/services/spaces.service";
+import { photosBySpace } from "@/features/spaces/model/space-photos";
 import {
   firstParam,
   oneOf,
@@ -27,8 +29,11 @@ export default async function EventsPage({
   }
   const period =
     oneOf(firstParam(await searchParams, "quando"), PERIODS) ?? "proximos";
-  const events = await authed((token) =>
-    eventsService.list(token, period === "passados" ? "PAST" : "UPCOMING"),
+  const [events, spaces] = await authed((token) =>
+    Promise.all([
+      eventsService.list(token, period === "passados" ? "PAST" : "UPCOMING"),
+      spacesService.list(token),
+    ]),
   );
 
   return (
@@ -41,6 +46,7 @@ export default async function EventsPage({
         events={events.filter((event) => event.status !== "DRAFT")}
         period={period}
         basePath="/eventos"
+        spacePhotos={photosBySpace(spaces)}
         emptyHint="Quando a administração publicar um evento, ele aparece aqui e você recebe um aviso."
       />
     </>

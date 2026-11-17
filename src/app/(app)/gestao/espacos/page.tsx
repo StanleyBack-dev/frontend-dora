@@ -25,10 +25,7 @@ export default async function SpacesPage() {
         title="Espaços"
         description="Os espaços do condomínio, com fotos, horário e as regras de reserva de cada um."
         actions={
-          <Link
-            href="/gestao/reservas/espacos/novo"
-            className={buttonClasses("brand")}
-          >
+          <Link href="/gestao/espacos/novo" className={buttonClasses("brand")}>
             <Plus aria-hidden className="mr-1.5 size-4" />
             Novo espaço
           </Link>

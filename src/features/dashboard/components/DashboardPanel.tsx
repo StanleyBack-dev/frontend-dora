@@ -87,7 +87,7 @@ export function DashboardPanel({
       tone: dashboard.pendingEnrollments > 0 ? "warning" : "neutral",
     },
     {
-      href: canManageSpaces ? "/gestao/reservas/espacos" : null,
+      href: canManageSpaces ? "/gestao/espacos" : null,
       label: "Espaços ativos",
       value: dashboard.activeSpaces,
       hint:

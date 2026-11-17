@@ -108,7 +108,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "espacos",
-    href: "/gestao/reservas/espacos",
+    href: "/gestao/espacos",
     title: "Espaços",
     icon: MapPin,
     permission: "SPACES_MANAGE",
@@ -582,7 +582,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     sections: {
       howto: [
         {
-          text: "Em Bloqueios, veja os períodos fechados de todos os espaços e bloqueie um espaço para uma manutenção ou um evento; reservas no período só são canceladas depois que você confirmar. Na página de cada espaço também há os bloqueios dele.",
+          text: "Em Condomínio → Bloqueios, veja os períodos fechados de todos os espaços e bloqueie um espaço para uma manutenção ou um evento; reservas no período só são canceladas depois que você confirmar. Na página de cada espaço também há os bloqueios dele.",
           only: ["BOOKINGS_MANAGE"],
         },
         {
@@ -626,11 +626,11 @@ export const HELP_TOPICS: HelpTopic[] = [
           only: ["EVENTS_MANAGE"],
         },
         {
-          text: "Em Eventos → Pedidos, no menu, veja a fila de todos os eventos, os mais antigos primeiro, e filtre por evento. Em “Pedidos”, na página do evento, confira o comprovante no extrato pelo código do pedido e os documentos de quem tem desconto, e aprove ou recuse com o motivo. O PIX do condomínio fica em Condomínio → Pagamentos.",
+          text: "Em Eventos, o botão “Pedidos” de cada card mostra quantos pedidos esperam a conferência. Em “Pedidos”, na página do evento, confira o comprovante no extrato pelo código do pedido e os documentos de quem tem desconto, e aprove ou recuse com o motivo. O PIX do condomínio fica em Condomínio → Pagamentos.",
           only: ["PAYMENTS_MANAGE"],
         },
         {
-          text: "Em Eventos → Ingressos, no menu (ou “Ingressos”, na página do evento), escolha o evento e veja quem tem ingresso e quem já entrou pela portaria, com a hora, por tipo de ingresso.",
+          text: "Em Eventos, o botão “Ingressos” do card (ou da página do evento) mostra quem tem ingresso e quem já entrou pela portaria, com a hora, por tipo de ingresso.",
           only: ["EVENTS_MANAGE"],
         },
         {

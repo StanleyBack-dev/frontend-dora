@@ -54,14 +54,14 @@ export default async function EventOrdersPage({
   return (
     <>
       <Link
-        href={`/gestao/eventos/${event.id}`}
+        href="/gestao/eventos"
         className="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
       >
-        <ArrowLeft className="size-4" /> {event.title}
+        <ArrowLeft className="size-4" /> Eventos
       </Link>
       <PageHeader
-        title="Pedidos e comprovantes"
-        description={`${event.title} · ${eventPeriod(event)}. Confirmados: ${people} ${people === 1 ? "pessoa" : "pessoas"}${event.ticketed ? `, ${formatCents(received)}` : ""}.`}
+        title={event.title}
+        description={`Pedidos e comprovantes · ${eventPeriod(event)}. Confirmados: ${people} ${people === 1 ? "pessoa" : "pessoas"}${event.ticketed ? `, ${formatCents(received)}` : ""}.`}
       />
       <SegmentedNav
         label="Situação"

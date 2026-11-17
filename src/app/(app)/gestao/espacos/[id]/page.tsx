@@ -38,7 +38,7 @@ export default async function SpacePage({
   return (
     <div className="space-y-6">
       <Link
-        href="/gestao/reservas/espacos"
+        href="/gestao/espacos"
         className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
       >
         <ArrowLeft className="size-4" /> Espaços

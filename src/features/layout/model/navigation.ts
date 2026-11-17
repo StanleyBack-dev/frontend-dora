@@ -19,9 +19,7 @@ import {
   Megaphone,
   PartyPopper,
   Receipt,
-  ReceiptText,
   ScrollText,
-  Ticket,
   Settings,
   UserCheck,
   UserCog,
@@ -50,7 +48,7 @@ export type NavItem = {
 
 /**
  * The entry of a menu the address belongs to: the most specific one when
- * several match (/gestao/eventos/pedidos is Pedidos, not Eventos).
+ * several match (/gestao/reservas/convidados is Convidados, not Reservas).
  */
 export function activeEntry(
   pathname: string,
@@ -143,18 +141,6 @@ export const SIDEBAR: SidebarEntry[] = [
         permission: "BOOKINGS_MANAGE",
       },
       {
-        href: "/gestao/reservas/espacos",
-        label: "Espaços",
-        icon: MapPin,
-        permission: "SPACES_MANAGE",
-      },
-      {
-        href: "/gestao/reservas/bloqueios",
-        label: "Bloqueios",
-        icon: CalendarOff,
-        permission: "BOOKINGS_MANAGE",
-      },
-      {
         href: "/gestao/reservas/convidados",
         label: "Convidados",
         icon: UserCheck,
@@ -175,7 +161,8 @@ export const SIDEBAR: SidebarEntry[] = [
     module: "EVENTS",
     items: [
       // The residents' list; whoever manages events has the management's
-      // (drafts, actions), where they can still order their own tickets.
+      // (drafts, actions, each event's tickets and orders), where they can
+      // still order their own tickets. One entry either way.
       {
         href: "/eventos",
         label: "Eventos",
@@ -187,20 +174,6 @@ export const SIDEBAR: SidebarEntry[] = [
         label: "Eventos",
         icon: PartyPopper,
         anyPermission: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
-      },
-      // Each event's tickets and who already came in.
-      {
-        href: "/gestao/eventos/ingressos",
-        label: "Ingressos",
-        icon: Ticket,
-        permission: "EVENTS_MANAGE",
-      },
-      // The orders of every event, to review.
-      {
-        href: "/gestao/eventos/pedidos",
-        label: "Pedidos",
-        icon: ReceiptText,
-        permission: "PAYMENTS_MANAGE",
       },
     ],
   },
@@ -246,6 +219,19 @@ export const SIDEBAR: SidebarEntry[] = [
         label: "Unidades",
         icon: Building,
         permission: "UNITS_MANAGE",
+      },
+      // The spaces and their closed periods serve bookings and events.
+      {
+        href: "/gestao/espacos",
+        label: "Espaços",
+        icon: MapPin,
+        permission: "SPACES_MANAGE",
+      },
+      {
+        href: "/gestao/bloqueios",
+        label: "Bloqueios",
+        icon: CalendarOff,
+        permission: "BOOKINGS_MANAGE",
       },
       {
         href: "/gestao/cadastros",
