@@ -1,5 +1,6 @@
 import {
   Bell,
+  Blocks,
   Building,
   Building2,
   CalendarDays,
@@ -293,6 +294,18 @@ export const PLATFORM_NAV: NavItem[] = [
     href: "/plataforma/condominios",
     label: "Condomínios",
     icon: Building2,
+    permission: "CONDOMINIUMS_MANAGE",
+  },
+  {
+    href: "/plataforma/pessoas",
+    label: "Pessoas",
+    icon: UsersRound,
+    permission: "CONDOMINIUMS_MANAGE",
+  },
+  {
+    href: "/plataforma/modulos",
+    label: "Módulos",
+    icon: Blocks,
     permission: "CONDOMINIUMS_MANAGE",
   },
   {

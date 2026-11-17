@@ -15,6 +15,7 @@ import {
   Pagination,
   Select,
   StatCard,
+  PageHeader,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { SystemLogsTable } from "@/features/admin/components/SystemLogsTable";
@@ -118,6 +119,10 @@ export default async function SystemLogsPage({
 
   return (
     <>
+      <PageHeader
+        title="Logs e alertas"
+        description="Erros, segurança, avisos não entregues e rotinas que falharam, em toda a plataforma."
+      />
       <ul className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {SYSTEM_LEVELS.map((value) => {
           const count = countOf(value);

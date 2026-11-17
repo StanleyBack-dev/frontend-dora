@@ -17,6 +17,7 @@ import {
   UsersRound,
   type LucideIcon,
   ScrollText,
+  Blocks,
 } from "lucide-react";
 import type { Permission, AppModule } from "@/shared/contracts/api";
 
@@ -498,7 +499,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     sections: {
       howto: [
         {
-          text: "Crie um condomínio, entre nele para administrar como gestor, edite os dados ou suspenda o acesso.",
+          text: "Crie um condomínio, entre nele para administrar como gestor, edite os dados ou suspenda o acesso. Toque no nome para abrir a página dele: os números, os módulos contratados e as pessoas (gestão, portaria e moradores), sem precisar entrar.",
         },
         {
           text: "Para trocar de condomínio a qualquer momento, use o seletor no topo do menu lateral; “Visão da plataforma” sai de todos. A escolha fica salva e o próximo login abre no mesmo lugar.",
@@ -616,6 +617,51 @@ export const HELP_TOPICS: HelpTopic[] = [
         {
           text: "Na página do evento, publique o rascunho (todos são avisados), edite enquanto ele não terminar ou cancele com o motivo (quem já foi avisado recebe o cancelamento).",
           only: ["EVENTS_MANAGE"],
+        },
+      ],
+    },
+  },
+  {
+    id: "pessoas",
+    href: "/plataforma/pessoas",
+    title: "Pessoas",
+    icon: UsersRound,
+    permission: "CONDOMINIUMS_MANAGE",
+    area: "platform",
+    tour: "Todas as contas do Dora e onde cada pessoa tem acesso.",
+    sections: {
+      howto: [
+        {
+          text: "Busque pelo nome, e-mail ou usuário, e filtre pelo papel (administração da plataforma, gestor, portaria, morador) ou por um condomínio.",
+        },
+        {
+          text: "Cada condomínio da pessoa aparece com o papel dela; toque para abrir a página do condomínio. Um acesso riscado foi retirado.",
+        },
+      ],
+      rules: [
+        {
+          text: "A conta mostra se está ativa, desativada ou bloqueada por senhas erradas (até quando). As mudanças nas pessoas são feitas dentro de cada condomínio, na Gestão.",
+        },
+      ],
+    },
+  },
+  {
+    id: "modulos",
+    href: "/plataforma/modulos",
+    title: "Módulos",
+    icon: Blocks,
+    permission: "CONDOMINIUMS_MANAGE",
+    area: "platform",
+    tour: "O que cada condomínio contratou: Reservas, Eventos e os próximos.",
+    sections: {
+      howto: [
+        {
+          text: "Ligue ou desligue cada módulo de um condomínio na tabela; o topo de cada coluna mostra quantos condomínios têm o módulo.",
+        },
+      ],
+      rules: [
+        {
+          text: "Desligar não apaga nada: só fecha o menu, as páginas e a API do módulo naquele condomínio. Um condomínio novo começa sem módulos.",
         },
       ],
     },

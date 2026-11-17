@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Building2,
@@ -170,14 +171,17 @@ export function CondominiumsConsole({
       mobile: "title",
       render: (item) => (
         <span className="flex flex-col">
-          <span className="font-semibold text-fg">
+          <Link
+            href={`/plataforma/condominios/${item.id}`}
+            className="font-semibold text-fg hover:underline"
+          >
             {item.name}
             {item.id === currentId && (
               <Badge tone="brand" className="ml-2 align-middle">
                 Aberto agora
               </Badge>
             )}
-          </span>
+          </Link>
           <span className="text-xs text-soft">
             {item.city}/{item.state}
           </span>

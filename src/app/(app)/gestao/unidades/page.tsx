@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { UnitsManager } from "@/features/condominiums/components/UnitsManager";
 import { authed, getSessionUser } from "@/server/auth/current-user";
@@ -13,10 +14,16 @@ export default async function UnitsPage() {
 
   const units = await authed((token) => condominiumsService.units(token));
   return (
-    <UnitsManager
-      units={units}
-      editable
-      house={user.condominium?.addressFormat === "HOUSE"}
-    />
+    <>
+      <PageHeader
+        title="Unidades"
+        description="Os blocos e números (ou ruas, quadras e lotes) do condomínio."
+      />
+      <UnitsManager
+        units={units}
+        editable
+        house={user.condominium?.addressFormat === "HOUSE"}
+      />
+    </>
   );
 }

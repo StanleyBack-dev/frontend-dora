@@ -8,6 +8,7 @@ import {
   FilterPanel,
   Pagination,
   Select,
+  PageHeader,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { EnrollmentRequestsTable } from "@/features/enrollment/components/EnrollmentRequestsTable";
@@ -73,6 +74,10 @@ export default async function EnrollmentsPage({
 
   return (
     <>
+      <PageHeader
+        title="Cadastros"
+        description="Quem se cadastrou pelo link: confira a unidade e aprove ou recuse."
+      />
       <FilterPanel hasActiveFilters={filtered}>
         <form
           role="search"

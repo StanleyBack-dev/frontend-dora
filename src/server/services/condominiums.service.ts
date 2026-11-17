@@ -2,6 +2,7 @@ import "server-only";
 import { backendGraphql } from "@/server/graphql/client";
 import { switchCondominiumDocument } from "@/server/graphql/operations/auth.operations";
 import {
+  condominiumDocument,
   condominiumsDocument,
   createCondominiumDocument,
   createUnitsDocument,
@@ -46,6 +47,14 @@ export const condominiumsService = {
       },
     });
     return condominiums;
+  },
+
+  async get(token: string, id: string): Promise<Condominium> {
+    const { condominium } = await backendGraphql(condominiumDocument, {
+      token,
+      variables: { id },
+    });
+    return condominium;
   },
 
   async create(token: string, input: CondominiumInput): Promise<Condominium> {
