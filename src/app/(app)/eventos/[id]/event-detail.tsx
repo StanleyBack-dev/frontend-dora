@@ -96,7 +96,7 @@ export async function EventDetail({
             <div className="flex flex-wrap gap-2">
               {manager && published && (
                 <Link
-                  href={`/gestao/eventos/ingressos?evento=${event.id}`}
+                  href={`/gestao/eventos/${event.id}/ingressos`}
                   className={buttonClasses("secondary")}
                 >
                   <Ticket aria-hidden className="size-4" />

@@ -15,7 +15,7 @@ import type { Space } from "@/shared/contracts/spaces";
 // photo arrows sit above that link, so flipping photos doesn't open it.
 export function SpaceCard({
   space,
-  href = `/gestao/reservas/espacos/${space.id}`,
+  href = `/gestao/espacos/${space.id}`,
   cta = "Ver detalhes",
 }: {
   space: Space;

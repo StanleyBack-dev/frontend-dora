@@ -33,7 +33,7 @@ export function SpaceManageActions({ space }: { space: Space }) {
         await spacesClient.remove(space.id);
         showSuccess(`${space.name} excluído.`);
         startNavigation();
-        router.push("/gestao/reservas/espacos");
+        router.push("/gestao/espacos");
         router.refresh();
       }
     } catch (cause) {
@@ -52,7 +52,7 @@ export function SpaceManageActions({ space }: { space: Space }) {
     <>
       <div className="flex flex-wrap gap-2">
         <Link
-          href={`/gestao/reservas/espacos/${space.id}/editar`}
+          href={`/gestao/espacos/${space.id}/editar`}
           className={buttonClasses("primary", "sm")}
         >
           <Pencil aria-hidden className="mr-1.5 size-4" />
