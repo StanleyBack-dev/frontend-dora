@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.10.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.9.1...v0.10.0) (2026-11-17)
+
+
+### Features
+
+* **events:** clearer order rows and details; stat cards fit phones ([0662776](https://github.com/StanleyBack-dev/frontend-dora/commit/06627768f097519976b00b72d0d90dffd3aa6468))
+* **events:** one events menu with tickets and orders ([9cccc0d](https://github.com/StanleyBack-dev/frontend-dora/commit/9cccc0d8b37a2f06bed4d8248108d1c517757169))
+* **events:** one events page with cards; spaces under the condominium ([a27aaeb](https://github.com/StanleyBack-dev/frontend-dora/commit/a27aaeb9b63b7e75e64033202ed7b7aaaf28df21))
+* **events:** orders and tickets in the list table ([4ad1fbd](https://github.com/StanleyBack-dev/frontend-dora/commit/4ad1fbdf4d155dad8c26c4f67c5efd23c95aefb6))
+* **events:** standard filters on an event's tickets and orders ([bfed26b](https://github.com/StanleyBack-dev/frontend-dora/commit/bfed26b8f23a518b249cf13eec7488c58e4fafa6))
+* **filters:** filters apply themselves, with typed pick lists ([ebd45e7](https://github.com/StanleyBack-dev/frontend-dora/commit/ebd45e73e99163b82ce1f0f9e3f0d909290910bd))
+* **layout:** organize the sidebar by module ([584c77d](https://github.com/StanleyBack-dev/frontend-dora/commit/584c77dec8226644442bdaa7da42609576127ba8))
+* module-based navigation, administration area and standard filters ([bd49892](https://github.com/StanleyBack-dev/frontend-dora/commit/bd49892fab3e25010aeb1c445704aa0e5222f61b))
+* **platform:** /plataforma becomes /administracao ([b6e09ff](https://github.com/StanleyBack-dev/frontend-dora/commit/b6e09ffd04582e5adcdde281e9932978d90bf2cf))
+* **platform:** Administração entry below Início with page shortcuts ([760aa52](https://github.com/StanleyBack-dev/frontend-dora/commit/760aa524e8b68fd8d30261dd0caabcc6c341e25e))
+* **platform:** back to Administração on its pages ([3bb2090](https://github.com/StanleyBack-dev/frontend-dora/commit/3bb2090f287c6d8effb6d6d500887ab4000b322f))
+
+
+### Bug Fixes
+
+* **events:** ticket tags side by side on phones ([23a624c](https://github.com/StanleyBack-dev/frontend-dora/commit/23a624caa36d827dc49ade21a0e52171993813be))
+* **platform:** Condomínios filters below Novo condomínio ([8621003](https://github.com/StanleyBack-dev/frontend-dora/commit/8621003d07f0a63a9a4cf06c645b6325632b2751))
+
 ## [0.9.1](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.9.0...v0.9.1) (2026-11-17)
 
 
