@@ -10,6 +10,7 @@ import {
   CircleUserRound,
   ClipboardList,
   DoorOpen,
+  Globe,
   HeartHandshake,
   House,
   LifeBuoy,
@@ -291,8 +292,16 @@ export const sidebarPages = (entries: readonly SidebarEntry[]): NavItem[] =>
   entries.flatMap((entry) => (isSection(entry) ? entry.items : [entry]));
 
 // ---------------------------------------------------------------------------
-// Dora's own administration (every condominium): a group of the account
-// menu, for the platform administrator.
+// Dora's own administration: one sidebar entry below Início, for the
+// platform administrator; its page opens the others.
+export const ADMIN_NAV: NavItem = {
+  href: "/plataforma",
+  label: "Administração",
+  icon: Globe,
+  permission: "CONDOMINIUMS_MANAGE",
+};
+
+// The administration's pages (its home's cards and the menu search).
 export const PLATFORM_NAV: NavItem[] = [
   {
     href: "/plataforma",

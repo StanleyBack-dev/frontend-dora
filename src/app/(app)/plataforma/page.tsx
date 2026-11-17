@@ -12,6 +12,8 @@ import {
   SegmentedNav,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
+import { PLATFORM_NAV } from "@/features/layout/model/navigation";
+import { PlatformShortcuts } from "@/features/platform/components/PlatformShortcuts";
 import { BookingsSection } from "@/features/platform-metrics/components/BookingsSection";
 import { EngagementSection } from "@/features/platform-metrics/components/EngagementSection";
 import { HealthSection } from "@/features/platform-metrics/components/HealthSection";
@@ -35,7 +37,7 @@ import {
   type RawSearchParams,
 } from "@/shared/lib/search-params";
 
-export const metadata: Metadata = { title: "Painel" };
+export const metadata: Metadata = { title: "Administração" };
 
 // The platform administrator's panel: bookings, use of the spaces, residents
 // and what needs attention, across every condominium or one of them.
@@ -101,7 +103,7 @@ export default async function PlatformPanelPage({
   return (
     <>
       <PageHeader
-        title="Painel"
+        title="Administração"
         description={`${scopeName ?? "Todos os condomínios"} · de ${formatPeriodDay(metrics.from)} a ${formatPeriodDay(metrics.to)} (${metrics.days} dia${metrics.days === 1 ? "" : "s"}).`}
       />
 
@@ -150,6 +152,14 @@ export default async function PlatformPanelPage({
             />
           </AutoFilterForm>
         </FilterPanel>
+
+        <PlatformShortcuts
+          pages={PLATFORM_NAV.filter(
+            (item) =>
+              item.href !== "/plataforma" &&
+              (!item.permission || can(user, item.permission)),
+          )}
+        />
         <FilterResults>
           {error && (
             <div className="mb-6">

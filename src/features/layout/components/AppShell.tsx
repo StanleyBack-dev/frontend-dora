@@ -14,7 +14,6 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
   ChevronUp,
-  Globe,
   House,
   LogOut,
   Menu,
@@ -52,6 +51,7 @@ import {
   canSee,
   isActive,
   isSection,
+  ADMIN_NAV,
   PLATFORM_NAV,
   sidebarPages,
   SUPPORT_PROJECT_NAV,
@@ -256,29 +256,22 @@ export function AppShell({
   );
 
   // One menu by module (Início, Reservas, Eventos, Portaria, Condomínio),
-  // with what this person can open; Dora's administration in the account
-  // menu.
+  // with what this person can open; for the platform administrator,
+  // Administração right below Início.
   const modules = user.condominium?.modules ?? NO_MODULES;
-  const entries = visibleSidebar(user.permissions, modules);
-  const platformGroup: NavSection | null = canRunPlatform(user)
-    ? {
-        id: "platform",
-        label: "Administração do Dora",
-        icon: Globe,
-        items: PLATFORM_NAV.filter((item) =>
-          canSee(item, user.permissions, modules),
-        ),
-      }
-    : null;
+  const byModule = visibleSidebar(user.permissions, modules);
+  const entries = canRunPlatform(user)
+    ? [...byModule.slice(0, 1), ADMIN_NAV, ...byModule.slice(1)]
+    : byModule;
+  // The administration's pages: found by the menu search.
+  const platformPages = canRunPlatform(user)
+    ? PLATFORM_NAV.filter((item) => canSee(item, user.permissions, modules))
+    : [];
   const account = [
     ...ACCOUNT_NAV,
     ...(showSupportProject ? [SUPPORT_PROJECT_NAV] : []),
   ];
-  const everyItem = [
-    ...sidebarPages(entries),
-    ...(platformGroup?.items ?? []),
-    ...account,
-  ];
+  const everyItem = [...sidebarPages(entries), ...account];
   // The entry of the page on the screen: the most specific match.
   const activeItem = activeEntry(pathname, everyItem);
   // A group is open while its page is on the screen, unless folded by hand.
@@ -293,10 +286,11 @@ export function AppShell({
     isSection(entry) ? entry.items[0].href : entry.href,
   );
   // The menu search finds every page this person can open.
-  const searchable = everyItem;
-  const accountActive =
-    account.some((item) => isActive(pathname, item)) ||
-    (platformGroup?.items.some((item) => item === activeItem) ?? false);
+  const searchable = [
+    ...everyItem,
+    ...platformPages.filter((item) => item.href !== ADMIN_NAV.href),
+  ];
+  const accountActive = account.some((item) => isActive(pathname, item));
 
   // Pin the page behind the open mobile drawer: on iOS only `position:
   // fixed` stops touch scrolling from reaching the page.
@@ -450,16 +444,6 @@ export function AppShell({
                       onNavigate={closeMobile}
                     />
                   ))}
-                  {platformGroup && (
-                    <SidebarGroup
-                      group={platformGroup}
-                      open={false}
-                      onToggle={() => undefined}
-                      activeItem={activeItem}
-                      collapsed
-                      onNavigate={closeMobile}
-                    />
-                  )}
                   <button
                     type="button"
                     onClick={openLogout}
@@ -492,19 +476,6 @@ export function AppShell({
                         }}
                       />
                     ))}
-                    {platformGroup && (
-                      <SidebarGroup
-                        group={platformGroup}
-                        open={isOpen(platformGroup)}
-                        onToggle={() => toggle(platformGroup)}
-                        activeItem={activeItem}
-                        collapsed={false}
-                        onNavigate={() => {
-                          setAccountOpen(false);
-                          closeMobile();
-                        }}
-                      />
-                    )}
                     <button
                       type="button"
                       onClick={() => {

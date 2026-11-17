@@ -75,9 +75,9 @@ function stepsFor(
             id: "platform",
             title: "Administração do Dora",
             description:
-              "No menu da sua conta, no rodapé, o grupo Administração do Dora abre a visão geral, os condomínios, as pessoas, os módulos e os logs.",
+              "Em Administração, logo abaixo de Início: os números de todos os condomínios e os atalhos para condomínios, pessoas, módulos e logs.",
             icon: <Globe className="size-5" />,
-            target: '[data-tour="account"]',
+            target: '[data-tour-nav="/plataforma"]',
           },
         ]
       : []),
