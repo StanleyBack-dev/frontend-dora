@@ -58,6 +58,8 @@ export async function EventDetail({
   const event = await loadEvent(id);
   if (!event) notFound();
   const managing = area === "manage";
+  // Orders their own tickets here: in the app, or a member managing.
+  const buying = !managing || user.member;
   const manager = can(user, "EVENTS_MANAGE");
   const reviewer = can(user, "PAYMENTS_MANAGE");
   const now = (await requestTime()).getTime();
@@ -67,7 +69,7 @@ export async function EventDetail({
   // its end), as the API checks.
   const onSale = published && new Date(event.salesClosesAt).getTime() > now;
   const [myOrders, dependents] =
-    published && !managing
+    published && buying
       ? await Promise.all([
           loadMyEventOrders(event.id),
           onSale ? loadApprovedDependents() : Promise.resolve([]),
@@ -94,7 +96,7 @@ export async function EventDetail({
             <div className="flex flex-wrap gap-2">
               {manager && published && (
                 <Link
-                  href={`/gestao/eventos/${event.id}/ingressos`}
+                  href={`/gestao/eventos/ingressos?evento=${event.id}`}
                   className={buttonClasses("secondary")}
                 >
                   <Ticket aria-hidden className="size-4" />
@@ -154,7 +156,7 @@ export async function EventDetail({
               event={event}
               onSale={onSale}
               action={
-                managing ? undefined : onSale ? (
+                !buying ? undefined : onSale ? (
                   <EventOrderButton
                     event={event}
                     viewer={{
@@ -184,7 +186,7 @@ export async function EventDetail({
               }
             />
           )}
-          {!managing && <MyEventOrders orders={myOrders} />}
+          {buying && <MyEventOrders orders={myOrders} />}
         </div>
         <Card className="self-start">
           <CardBody className="space-y-3 text-sm">

@@ -68,6 +68,7 @@ const nextConfig: NextConfig = {
       ["/moradores", "/gestao/moradores"],
       ["/moradores/:id", "/gestao/moradores/:id"],
       ["/equipe", "/gestao/equipe"],
+      ["/gestao/eventos/:id/ingressos", "/gestao/eventos/ingressos?evento=:id"],
       ["/equipe/:id", "/gestao/equipe/:id"],
       ["/espacos", "/gestao/reservas/espacos"],
       ["/espacos/:path*", "/gestao/reservas/espacos/:path*"],
