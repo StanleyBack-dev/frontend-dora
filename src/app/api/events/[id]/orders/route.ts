@@ -7,7 +7,8 @@ import {
 } from "@/server/http/schemas/events.schema";
 import { eventsService } from "@/server/services/events.service";
 
-// GET: the event's orders (whoever reviews payments; ?status= filters).
+// GET: a page (the first 100) of the event's orders (whoever reviews
+// payments; ?status= filters).
 export const GET = bffRoute<{ id: string }>(async (request, { params }) => {
   const id = eventIdSchema.parse((await params).id);
   const raw = new URL(request.url).searchParams.get("status");
@@ -17,6 +18,7 @@ export const GET = bffRoute<{ id: string }>(async (request, { params }) => {
       await requireToken(),
       id,
       status ? { statuses: [status] } : {},
+      { page: 1, limit: 100 },
     ),
   );
 });

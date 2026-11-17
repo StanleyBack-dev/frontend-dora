@@ -10,12 +10,15 @@ import {
   Wallet,
 } from "lucide-react";
 import {
+  AutoFilterForm,
   Card,
-  Field,
   FilterActions,
+  FilterCombobox,
   FilterPanel,
+  FilterResults,
+  FilterScope,
   PageHeader,
-  Select,
+  Pagination,
   StatCard,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
@@ -24,25 +27,38 @@ import { eventPeriod } from "@/features/events/model/event-labels";
 import {
   ORDER_FILTER_KEYS,
   ORDER_FILTERS,
-  ordersIn,
+  type OrderFilter,
 } from "@/features/events/model/order-filters";
 import { getSessionUser } from "@/server/auth/current-user";
 import { loadEvent } from "@/server/loaders/load-event";
-import { loadEventOrders } from "@/server/loaders/load-event-orders";
-import type { EventOrderFilter } from "@/shared/contracts/events";
+import {
+  loadEventOrderOverview,
+  loadEventOrders,
+} from "@/server/loaders/load-event-orders";
+import type {
+  EventOrderFilter,
+  EventOrderStatus,
+} from "@/shared/contracts/events";
 import { can } from "@/shared/lib/access";
 import { formatCents } from "@/shared/lib/format";
 import {
+  buildHref,
+  DEFAULT_PAGE_SIZE,
   firstParam,
   oneOf,
+  PAGE_SIZES,
+  pageParam,
+  pageSizeParam,
+  pageSizeQuery,
   type RawSearchParams,
 } from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Pedidos do evento" };
 
 // An event's orders for whoever reviews payments: the numbers of the event
-// and its orders, filtered by the API (who ordered, code, unit or a person;
-// the status). Those waiting for review come first, open.
+// and a page of its orders, filtered by the API. Every filter is a list to
+// pick from (who ordered, unit, code, status). Those waiting for review
+// come first, open.
 export default async function EventOrdersPage({
   params,
   searchParams,
@@ -54,26 +70,58 @@ export default async function EventOrdersPage({
   if (!can(user, "PAYMENTS_MANAGE")) return <AccessDenied />;
   const event = await loadEvent((await params).id);
   if (!event) notFound();
+  const base = `/gestao/eventos/${event.id}/pedidos`;
 
+  // The numbers and what the filters offer, whatever the filters.
+  const overview = await loadEventOrderOverview(event.id);
   const query = await searchParams;
-  const search = firstParam(query, "busca")?.trim().slice(0, 80) ?? "";
+  const buyer = oneOf(
+    firstParam(query, "quem"),
+    overview.buyers.map((item) => item.id),
+  );
+  const unit = oneOf(
+    firstParam(query, "unidade"),
+    overview.units.map((item) => item.id),
+  );
+  const code = oneOf(
+    firstParam(query, "codigo"),
+    overview.codes.map((item) => item.code),
+  );
   const status = oneOf(firstParam(query, "situacao"), ORDER_FILTER_KEYS);
+  const page = pageParam(query);
+  const pageSize = pageSizeParam(query);
+
   const filter: EventOrderFilter = {
-    ...(search && { search }),
+    ...(buyer && { buyerId: buyer }),
+    ...(unit && { unitId: unit }),
+    ...(code && { code }),
     ...(status && { statuses: [...ORDER_FILTERS[status].statuses] }),
   };
   const filtered = Object.keys(filter).length > 0;
+  const orders = await loadEventOrders(event.id, filter, {
+    page,
+    limit: pageSize,
+  });
+  const hrefWith = (overrides: Record<string, string | number | undefined>) =>
+    buildHref(base, {
+      quem: buyer,
+      unidade: unit,
+      codigo: code,
+      situacao: status,
+      "por-pagina": pageSizeQuery(pageSize),
+      ...overrides,
+    });
 
-  // Every order (the numbers) and, with filters, the ones that match.
-  const all = await loadEventOrders(event.id);
-  const orders = filtered ? await loadEventOrders(event.id, filter) : all;
-  const toCheck = ordersIn(all, "conferir").length;
-  const confirmed = ordersIn(all, "confirmados");
-  const received = confirmed.reduce((sum, order) => sum + order.totalCents, 0);
-  const people = confirmed.reduce(
-    (sum, order) => sum + order.attendees.length,
-    0,
-  );
+  // How many orders of each tab, from the API's counts.
+  const countOf = (key: OrderFilter) =>
+    overview.byStatus
+      .filter((item) =>
+        (ORDER_FILTERS[key].statuses as readonly EventOrderStatus[]).includes(
+          item.status,
+        ),
+      )
+      .reduce((sum, item) => sum + item.count, 0);
+  const toCheck = countOf("conferir");
 
   return (
     <>
@@ -97,61 +145,101 @@ export default async function EventOrdersPage({
         />
         <StatCard
           label="Aguardando envio"
-          value={String(ordersIn(all, "aguardando").length)}
+          value={String(countOf("aguardando"))}
           icon={<Clock />}
         />
         <StatCard
           label="Confirmados"
-          value={String(confirmed.length)}
+          value={String(countOf("confirmados"))}
           icon={<CircleCheck />}
           tone="success"
         />
         {event.ticketed ? (
           <StatCard
             label="Recebido"
-            value={formatCents(received)}
+            value={formatCents(overview.receivedCents)}
             icon={<Wallet />}
           />
         ) : (
           <StatCard
             label="Pessoas confirmadas"
-            value={String(people)}
+            value={String(overview.confirmedPeople)}
             icon={<Users />}
           />
         )}
       </div>
 
-      <FilterPanel hasActiveFilters={filtered}>
-        <form
-          role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          <Field
-            label="Buscar"
-            name="busca"
-            defaultValue={search}
-            placeholder="Quem pediu, código, unidade ou pessoa"
-          />
-          <Select
-            label="Situação"
-            name="situacao"
-            defaultValue={status ?? ""}
-            placeholder="Todas"
-            options={ORDER_FILTER_KEYS.map((key) => ({
-              value: key,
-              label: ORDER_FILTERS[key].label,
-            }))}
-          />
-          <FilterActions
-            clearHref={`/gestao/eventos/${event.id}/pedidos`}
-            hasActiveFilters={filtered}
-          />
-        </form>
-      </FilterPanel>
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {pageSize !== DEFAULT_PAGE_SIZE && (
+              <input type="hidden" name="por-pagina" value={pageSize} />
+            )}
+            <FilterCombobox
+              label="Quem pediu"
+              name="quem"
+              defaultValue={buyer ?? ""}
+              placeholder="Todos"
+              options={overview.buyers.map((item) => ({
+                value: item.id,
+                label: item.name,
+              }))}
+            />
+            <FilterCombobox
+              label="Unidade"
+              name="unidade"
+              defaultValue={unit ?? ""}
+              placeholder="Todas"
+              options={overview.units.map((item) => ({
+                value: item.id,
+                label: item.label,
+              }))}
+            />
+            <FilterCombobox
+              label="Código do pedido"
+              name="codigo"
+              defaultValue={code ?? ""}
+              placeholder="Todos"
+              options={overview.codes.map((item) => ({
+                value: item.code,
+                label: item.buyerName
+                  ? `${item.code} · ${item.buyerName}`
+                  : item.code,
+              }))}
+            />
+            <FilterCombobox
+              label="Situação"
+              name="situacao"
+              defaultValue={status ?? ""}
+              placeholder="Todas"
+              options={ORDER_FILTER_KEYS.map((key) => ({
+                value: key,
+                label: ORDER_FILTERS[key].label,
+              }))}
+            />
+            <FilterActions
+              clearHref={base}
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
 
-      <Card>
-        <EventOrdersReview orders={orders} filtered={filtered} />
-      </Card>
+        <FilterResults>
+          <Card>
+            <EventOrdersReview orders={orders.items} filtered={filtered} />
+            <Pagination
+              page={orders.page}
+              totalPages={orders.totalPages}
+              total={orders.total}
+              pageSize={pageSize}
+              hrefFor={(target) => hrefWith({ page: target })}
+              pageSizes={PAGE_SIZES}
+              pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+            />
+          </Card>
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }

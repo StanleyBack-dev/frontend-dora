@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import { UsersRound } from "lucide-react";
 import {
+  AutoFilterForm,
   Card,
   EmptyState,
-  Field,
   FilterActions,
+  FilterCombobox,
+  FilterField,
   FilterPanel,
+  FilterResults,
+  FilterScope,
   PageHeader,
   Pagination,
-  Select,
 } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { PeopleTable } from "@/features/platform/components/PeopleTable";
@@ -84,74 +87,71 @@ export default async function PlatformPeoplePage({
         title="Pessoas"
         description={`Todas as contas do Dora: ${people.total} ${people.total === 1 ? "pessoa" : "pessoas"}${filtered ? " com estes filtros" : ""}, e onde cada uma tem acesso.`}
       />
-      <FilterPanel hasActiveFilters={filtered}>
-        <form
-          role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {pageSize !== DEFAULT_PAGE_SIZE && (
-            <input type="hidden" name="por-pagina" value={pageSize} />
-          )}
-          <Field
-            label="Buscar"
-            name="busca"
-            defaultValue={search}
-            placeholder="Nome, e-mail ou usuário"
-          />
-          <Select
-            label="Papel"
-            name="papel"
-            defaultValue={role ?? ""}
-            options={[
-              { value: "", label: "Todos" },
-              ...ROLES.map((value) => ({
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {pageSize !== DEFAULT_PAGE_SIZE && (
+              <input type="hidden" name="por-pagina" value={pageSize} />
+            )}
+            <FilterField
+              label="Buscar"
+              name="busca"
+              defaultValue={search}
+              placeholder="Nome, e-mail ou usuário"
+            />
+            <FilterCombobox
+              label="Papel"
+              name="papel"
+              defaultValue={role ?? ""}
+              placeholder="Todos"
+              options={ROLES.map((value) => ({
                 value,
                 label:
                   value === "ADMIN_MASTER"
                     ? "Administração da plataforma"
                     : GROUP_LABELS[value],
-              })),
-            ]}
-          />
-          <Select
-            label="Condomínio"
-            name="condominio"
-            defaultValue={condominiumId ?? ""}
-            options={[
-              { value: "", label: "Todos" },
-              ...condominiums.map((item) => ({
+              }))}
+            />
+            <FilterCombobox
+              label="Condomínio"
+              name="condominio"
+              defaultValue={condominiumId ?? ""}
+              placeholder="Todos"
+              options={condominiums.map((item) => ({
                 value: item.id,
                 label: item.name,
-              })),
-            ]}
-          />
-          <FilterActions
-            clearHref="/plataforma/pessoas"
-            hasActiveFilters={filtered}
-          />
-        </form>
-      </FilterPanel>
-
-      <Card>
-        {people.items.length === 0 ? (
-          <EmptyState
-            icon={<UsersRound className="size-5" />}
-            title="Ninguém encontrado"
-            description="Tente outro nome, papel ou condomínio."
-          />
-        ) : (
-          <PeopleTable people={people.items} now={now} />
-        )}
-        <Pagination
-          page={people.page}
-          totalPages={people.totalPages}
-          total={people.total}
-          pageSize={pageSize}
-          hrefFor={(target) => hrefWith({ page: target })}
-          pageSizes={PAGE_SIZES}
-          pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
-        />
-      </Card>
+              }))}
+            />
+            <FilterActions
+              clearHref="/plataforma/pessoas"
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
+        <FilterResults>
+          <Card>
+            {people.items.length === 0 ? (
+              <EmptyState
+                icon={<UsersRound className="size-5" />}
+                title="Ninguém encontrado"
+                description="Tente outro nome, papel ou condomínio."
+              />
+            ) : (
+              <PeopleTable people={people.items} now={now} />
+            )}
+            <Pagination
+              page={people.page}
+              totalPages={people.totalPages}
+              total={people.total}
+              pageSize={pageSize}
+              hrefFor={(target) => hrefWith({ page: target })}
+              pageSizes={PAGE_SIZES}
+              pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+            />
+          </Card>
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }

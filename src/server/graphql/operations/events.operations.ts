@@ -110,7 +110,9 @@ export const eventOrderFieldsFragment = graphql(`
     code
     status
     totalCents
+    buyerId
     buyerName
+    unitId
     unitLabel
     attendees {
       id
@@ -154,9 +156,19 @@ export const myEventOrdersDocument = graphql(`
 `);
 
 export const eventOrdersDocument = graphql(`
-  query EventOrders($eventId: ID!, $filter: EventOrderFilterInput) {
-    eventOrders(eventId: $eventId, filter: $filter) {
-      ...EventOrderFields
+  query EventOrders(
+    $eventId: ID!
+    $filter: EventOrderFilterInput
+    $page: PageInput
+  ) {
+    eventOrders(eventId: $eventId, filter: $filter, page: $page) {
+      total
+      page
+      limit
+      totalPages
+      items {
+        ...EventOrderFields
+      }
     }
   }
 `);
@@ -238,6 +250,7 @@ export const gateEventTicketFieldsFragment = graphql(`
     placeName
     orderCode
     buyerName
+    unitId
     unitLabel
   }
 `);
@@ -295,9 +308,67 @@ export const eventOrdersQueueDocument = graphql(`
 `);
 
 export const eventTicketsDocument = graphql(`
-  query EventTickets($eventId: ID!, $filter: EventTicketFilterInput) {
-    eventTickets(eventId: $eventId, filter: $filter) {
-      ...GateEventTicketFields
+  query EventTickets(
+    $eventId: ID!
+    $filter: EventTicketFilterInput
+    $page: PageInput
+  ) {
+    eventTickets(eventId: $eventId, filter: $filter, page: $page) {
+      total
+      page
+      limit
+      totalPages
+      items {
+        ...GateEventTicketFields
+      }
+    }
+  }
+`);
+
+export const eventTicketOverviewDocument = graphql(`
+  query EventTicketOverview($eventId: ID!) {
+    eventTicketOverview(eventId: $eventId) {
+      total
+      checkedIn
+      outside
+      byType {
+        name
+        count
+      }
+      people {
+        id
+        name
+        ticketCode
+      }
+      units {
+        id
+        label
+      }
+    }
+  }
+`);
+
+export const eventOrderOverviewDocument = graphql(`
+  query EventOrderOverview($eventId: ID!) {
+    eventOrderOverview(eventId: $eventId) {
+      byStatus {
+        status
+        count
+      }
+      receivedCents
+      confirmedPeople
+      buyers {
+        id
+        name
+      }
+      units {
+        id
+        label
+      }
+      codes {
+        code
+        buyerName
+      }
     }
   }
 `);

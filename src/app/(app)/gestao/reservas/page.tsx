@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { CalendarDays } from "lucide-react";
 import {
+  AutoFilterForm,
   Card,
   EmptyState,
   FilterActions,
+  FilterCombobox,
   FilterPanel,
+  FilterResults,
+  FilterScope,
   PageHeader,
   Pagination,
-  Select,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { BookingsManageTable } from "@/features/bookings/components/BookingsManageTable";
@@ -88,66 +91,71 @@ export default async function ManageBookingsPage({
         }
       />
 
-      <FilterPanel hasActiveFilters={filtered}>
-        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Select
-            label="Espaço"
-            name="espaco"
-            defaultValue={spaceId ?? ""}
-            placeholder="Todos"
-            options={spaces.map((space) => ({
-              value: space.id,
-              label: space.name,
-            }))}
-          />
-          <Select
-            label="Situação"
-            name="situacao"
-            defaultValue={status ?? ""}
-            placeholder="Todas"
-            options={BOOKING_STATUS_ORDER.map((value) => ({
-              value,
-              label: BOOKING_STATUS[value].label,
-            }))}
-          />
-          <Select
-            label="Período"
-            name="periodo"
-            defaultValue={period}
-            options={[
-              { value: "proximas", label: "Próximas" },
-              { value: "passadas", label: "Passadas" },
-            ]}
-          />
-          <FilterActions
-            clearHref="/gestao/reservas"
-            hasActiveFilters={filtered}
-          />
-        </form>
-      </FilterPanel>
-
-      <Card>
-        {bookings.items.length === 0 ? (
-          <EmptyState
-            icon={<CalendarDays className="size-5" />}
-            title="Nenhuma reserva encontrada"
-            description={
-              filtered
-                ? "Tente outros filtros."
-                : "As reservas dos moradores aparecem aqui."
-            }
-          />
-        ) : (
-          <BookingsManageTable bookings={bookings.items} now={now} />
-        )}
-        <Pagination
-          page={bookings.page}
-          totalPages={bookings.totalPages}
-          total={bookings.total}
-          pageSize={PAGE_SIZE}
-          hrefFor={(target) => hrefWith({ page: target })}
-        />
-      </Card>
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <FilterCombobox
+              label="Espaço"
+              name="espaco"
+              defaultValue={spaceId ?? ""}
+              placeholder="Todos"
+              options={spaces.map((space) => ({
+                value: space.id,
+                label: space.name,
+              }))}
+            />
+            <FilterCombobox
+              label="Situação"
+              name="situacao"
+              defaultValue={status ?? ""}
+              placeholder="Todas"
+              options={BOOKING_STATUS_ORDER.map((value) => ({
+                value,
+                label: BOOKING_STATUS[value].label,
+              }))}
+            />
+            <FilterCombobox
+              label="Período"
+              name="periodo"
+              defaultValue={period}
+              placeholder="Próximas"
+              options={[
+                { value: "proximas", label: "Próximas" },
+                { value: "passadas", label: "Passadas" },
+              ]}
+            />
+            <FilterActions
+              clearHref="/gestao/reservas"
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
+        <FilterResults>
+          <Card>
+            {bookings.items.length === 0 ? (
+              <EmptyState
+                icon={<CalendarDays className="size-5" />}
+                title="Nenhuma reserva encontrada"
+                description={
+                  filtered
+                    ? "Tente outros filtros."
+                    : "As reservas dos moradores aparecem aqui."
+                }
+              />
+            ) : (
+              <BookingsManageTable bookings={bookings.items} now={now} />
+            )}
+            <Pagination
+              page={bookings.page}
+              totalPages={bookings.totalPages}
+              total={bookings.total}
+              pageSize={PAGE_SIZE}
+              hrefFor={(target) => hrefWith({ page: target })}
+            />
+          </Card>
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }

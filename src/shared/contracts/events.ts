@@ -175,7 +175,10 @@ export type EventOrder = {
   code: string;
   status: EventOrderStatus;
   totalCents: number;
+  /** Who ordered (null: the account was removed). */
+  buyerId: string | null;
   buyerName: string | null;
+  unitId: string | null;
   unitLabel: string | null;
   attendees: Attendee[];
   /** Who receives (null: free order). */
@@ -218,6 +221,7 @@ export type GateEventTicket = {
   placeName: string;
   orderCode: string;
   buyerName: string | null;
+  unitId: string | null;
   unitLabel: string | null;
 };
 
@@ -238,8 +242,11 @@ export type EventTicketPass = {
 
 /** Filters of an event's tickets (the API applies them). */
 export type EventTicketFilter = {
-  /** Name, who ordered, unit or a code. */
-  search?: string;
+  /** One person (the ticket's id). */
+  attendeeId?: string;
+  unitId?: string;
+  /** A ticket's code. */
+  code?: string;
   checkedIn?: boolean;
   ticketName?: string;
   outside?: boolean;
@@ -250,6 +257,32 @@ export type EventTicketFilter = {
 /** Filters of an event's orders (the API applies them). */
 export type EventOrderFilter = {
   statuses?: EventOrderStatus[];
-  /** Who ordered, the order code, the unit or one of its people. */
-  search?: string;
+  /** Who ordered (their user id). */
+  buyerId?: string;
+  unitId?: string;
+  /** The order's code. */
+  code?: string;
+};
+
+/** A unit to pick in a filter. */
+export type UnitOption = { id: string; label: string };
+
+/** An event's tickets at a glance: the numbers and the filter options. */
+export type EventTicketOverview = {
+  total: number;
+  checkedIn: number;
+  outside: number;
+  byType: { name: string | null; count: number }[];
+  people: { id: string; name: string; ticketCode: string }[];
+  units: UnitOption[];
+};
+
+/** An event's orders at a glance: the numbers and the filter options. */
+export type EventOrderOverview = {
+  byStatus: { status: EventOrderStatus; count: number }[];
+  receivedCents: number;
+  confirmedPeople: number;
+  buyers: { id: string; name: string }[];
+  units: UnitOption[];
+  codes: { code: string; buyerName: string | null }[];
 };

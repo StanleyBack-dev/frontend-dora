@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { Building2, CircleCheck, UserPlus, Users } from "lucide-react";
 import {
-  Field,
+  AutoFilterForm,
   FilterActions,
-  PageHeader,
+  FilterCombobox,
+  FilterField,
   FilterPanel,
-  Select,
+  FilterResults,
+  FilterScope,
+  PageHeader,
   StatCard,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
@@ -97,36 +100,40 @@ export default async function CondominiumsAdminPage({
         />
       </section>
 
-      <FilterPanel hasActiveFilters={filtered}>
-        <form role="search" className="grid gap-3 sm:grid-cols-3">
-          <Field
-            label="Buscar"
-            name="busca"
-            defaultValue={search}
-            placeholder="Nome ou cidade"
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-3">
+            <FilterField
+              label="Buscar"
+              name="busca"
+              defaultValue={search}
+              placeholder="Nome ou cidade"
+            />
+            <FilterCombobox
+              label="Situação"
+              name="situacao"
+              defaultValue={status ?? ""}
+              placeholder="Todas"
+              options={[
+                { value: "ativos", label: "Ativos" },
+                { value: "suspensos", label: "Suspensos" },
+              ]}
+            />
+            <FilterActions
+              clearHref="/plataforma/condominios"
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
+        <FilterResults>
+          <CondominiumsConsole
+            condominiums={condominiums}
+            currentId={user.condominium?.id ?? null}
+            filtered={filtered}
           />
-          <Select
-            label="Situação"
-            name="situacao"
-            defaultValue={status ?? ""}
-            placeholder="Todas"
-            options={[
-              { value: "ativos", label: "Ativos" },
-              { value: "suspensos", label: "Suspensos" },
-            ]}
-          />
-          <FilterActions
-            clearHref="/plataforma/condominios"
-            hasActiveFilters={filtered}
-          />
-        </form>
-      </FilterPanel>
-
-      <CondominiumsConsole
-        condominiums={condominiums}
-        currentId={user.condominium?.id ?? null}
-        filtered={filtered}
-      />
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }

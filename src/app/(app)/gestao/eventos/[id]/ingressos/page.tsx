@@ -3,11 +3,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import {
-  Field,
+  AutoFilterForm,
+  Card,
   FilterActions,
+  FilterCombobox,
   FilterPanel,
+  FilterResults,
+  FilterScope,
   PageHeader,
-  Select,
+  Pagination,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { EventTicketsSummary } from "@/features/events/components/EventTicketsSummary";
@@ -19,8 +23,14 @@ import { eventsService } from "@/server/services/events.service";
 import type { EventTicketFilter } from "@/shared/contracts/events";
 import { can } from "@/shared/lib/access";
 import {
+  buildHref,
+  DEFAULT_PAGE_SIZE,
   firstParam,
   oneOf,
+  PAGE_SIZES,
+  pageParam,
+  pageSizeParam,
+  pageSizeQuery,
   type RawSearchParams,
 } from "@/shared/lib/search-params";
 
@@ -33,8 +43,9 @@ const keysOf = <K extends string>(map: Record<K, boolean>) =>
   Object.keys(map) as K[];
 
 // An event's tickets and entries for its managers: the numbers of the
-// event and the people of the confirmed orders, filtered by the API (name,
-// unit or code, entry, ticket type, from outside, who ordered).
+// event and a page of the people of the confirmed orders, filtered by the
+// API. Every filter is a list to pick from (person, unit, code, entry,
+// ticket type, who ordered, origin).
 export default async function EventTicketsPage({
   params,
   searchParams,
@@ -46,31 +57,61 @@ export default async function EventTicketsPage({
   if (!can(user, "EVENTS_MANAGE")) return <AccessDenied />;
   const event = await loadEvent((await params).id);
   if (!event) notFound();
+  const base = `/gestao/eventos/${event.id}/ingressos`;
 
+  // The numbers and what the filters offer, whatever the filters.
+  const overview = await authed((token) =>
+    eventsService.ticketOverview(token, event.id),
+  );
   const query = await searchParams;
-  const search = firstParam(query, "busca")?.trim().slice(0, 80) ?? "";
+  const person = oneOf(
+    firstParam(query, "pessoa"),
+    overview.people.map((item) => item.id),
+  );
+  const unit = oneOf(
+    firstParam(query, "unidade"),
+    overview.units.map((item) => item.id),
+  );
+  const code = oneOf(
+    firstParam(query, "codigo"),
+    overview.people.map((item) => item.ticketCode),
+  );
+  const types = overview.byType.flatMap((item) => item.name ?? []);
+  const ticketName = oneOf(firstParam(query, "ingresso"), types);
   const entry = oneOf(firstParam(query, "entrada"), keysOf(ENTRIES));
   const origin = oneOf(firstParam(query, "origem"), keysOf(ORIGINS));
   const who = oneOf(firstParam(query, "quem"), keysOf(WHO));
-
-  // Every ticket: the numbers and the ticket types to pick from.
-  const all = await authed((token) => eventsService.tickets(token, event.id));
-  const types = [
-    ...new Set(all.flatMap((ticket) => ticket.ticketName ?? [])),
-  ].sort((a, b) => a.localeCompare(b, "pt-BR"));
-  const ticketName = oneOf(firstParam(query, "ingresso"), types);
+  const page = pageParam(query);
+  const pageSize = pageSizeParam(query);
 
   const filter: EventTicketFilter = {
-    ...(search && { search }),
+    ...(person && { attendeeId: person }),
+    ...(unit && { unitId: unit }),
+    ...(code && { code }),
     ...(entry && { checkedIn: ENTRIES[entry] }),
     ...(ticketName && { ticketName }),
     ...(origin && { outside: ORIGINS[origin] }),
     ...(who && { buyer: WHO[who] }),
   };
   const filtered = Object.keys(filter).length > 0;
-  const tickets = filtered
-    ? await authed((token) => eventsService.tickets(token, event.id, filter))
-    : all;
+  const tickets = await authed((token) =>
+    eventsService.tickets(token, event.id, filter, {
+      page,
+      limit: pageSize,
+    }),
+  );
+  const hrefWith = (overrides: Record<string, string | number | undefined>) =>
+    buildHref(base, {
+      pessoa: person,
+      unidade: unit,
+      codigo: code,
+      ingresso: ticketName,
+      entrada: entry,
+      origem: origin,
+      quem: who,
+      "por-pagina": pageSizeQuery(pageSize),
+      ...overrides,
+    });
 
   return (
     <>
@@ -84,66 +125,106 @@ export default async function EventTicketsPage({
         title={event.title}
         description={`Ingressos e entradas · ${eventPeriod(event)}. Quem tem ingresso e quem já entrou pela portaria.`}
       />
-      <EventTicketsSummary tickets={all} />
+      <EventTicketsSummary overview={overview} />
 
-      <FilterPanel hasActiveFilters={filtered}>
-        <form
-          role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          <Field
-            label="Buscar"
-            name="busca"
-            defaultValue={search}
-            placeholder="Nome, unidade ou código"
-          />
-          <Select
-            label="Entrada"
-            name="entrada"
-            defaultValue={entry ?? ""}
-            placeholder="Todos"
-            options={[
-              { value: "entraram", label: "Já entraram" },
-              { value: "faltam", label: "Ainda não entraram" },
-            ]}
-          />
-          {types.length > 1 && (
-            <Select
-              label="Ingresso"
-              name="ingresso"
-              defaultValue={ticketName ?? ""}
-              placeholder="Todos"
-              options={types.map((name) => ({ value: name, label: name }))}
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {pageSize !== DEFAULT_PAGE_SIZE && (
+              <input type="hidden" name="por-pagina" value={pageSize} />
+            )}
+            <FilterCombobox
+              label="Pessoa"
+              name="pessoa"
+              defaultValue={person ?? ""}
+              placeholder="Todas"
+              options={overview.people.map((item) => ({
+                value: item.id,
+                label: item.name,
+              }))}
             />
-          )}
-          <Select
-            label="Quem"
-            name="quem"
-            defaultValue={who ?? ""}
-            placeholder="Todos"
-            options={[
-              { value: "pediram", label: "Quem fez o pedido" },
-              { value: "acompanhantes", label: "Acompanhantes" },
-            ]}
-          />
-          <Select
-            label="Origem"
-            name="origem"
-            defaultValue={origin ?? ""}
-            placeholder="Todos"
-            options={[
-              { value: "condominio", label: "Do condomínio" },
-              { value: "fora", label: "De fora" },
-            ]}
-          />
-          <FilterActions
-            clearHref={`/gestao/eventos/${event.id}/ingressos`}
-            hasActiveFilters={filtered}
-          />
-        </form>
-      </FilterPanel>
+            <FilterCombobox
+              label="Unidade"
+              name="unidade"
+              defaultValue={unit ?? ""}
+              placeholder="Todas"
+              options={overview.units.map((item) => ({
+                value: item.id,
+                label: item.label,
+              }))}
+            />
+            <FilterCombobox
+              label="Código do ingresso"
+              name="codigo"
+              defaultValue={code ?? ""}
+              placeholder="Todos"
+              options={overview.people.map((item) => ({
+                value: item.ticketCode,
+                label: `${item.ticketCode} · ${item.name}`,
+              }))}
+            />
+            <FilterCombobox
+              label="Entrada"
+              name="entrada"
+              defaultValue={entry ?? ""}
+              placeholder="Todos"
+              options={[
+                { value: "entraram", label: "Já entraram" },
+                { value: "faltam", label: "Ainda não entraram" },
+              ]}
+            />
+            {types.length > 1 && (
+              <FilterCombobox
+                label="Ingresso"
+                name="ingresso"
+                defaultValue={ticketName ?? ""}
+                placeholder="Todos"
+                options={types.map((name) => ({ value: name, label: name }))}
+              />
+            )}
+            <FilterCombobox
+              label="Quem"
+              name="quem"
+              defaultValue={who ?? ""}
+              placeholder="Todos"
+              options={[
+                { value: "pediram", label: "Quem fez o pedido" },
+                { value: "acompanhantes", label: "Acompanhantes" },
+              ]}
+            />
+            <FilterCombobox
+              label="Origem"
+              name="origem"
+              defaultValue={origin ?? ""}
+              placeholder="Todos"
+              options={[
+                { value: "condominio", label: "Do condomínio" },
+                { value: "fora", label: "De fora" },
+              ]}
+            />
+            <FilterActions
+              clearHref={base}
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
 
-      <EventTicketsTable tickets={tickets} filtered={filtered} />
+        <FilterResults>
+          <Card>
+            <EventTicketsTable tickets={tickets.items} filtered={filtered} />
+            <Pagination
+              page={tickets.page}
+              totalPages={tickets.totalPages}
+              total={tickets.total}
+              pageSize={pageSize}
+              hrefFor={(target) => hrefWith({ page: target })}
+              pageSizes={PAGE_SIZES}
+              pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+            />
+          </Card>
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }
