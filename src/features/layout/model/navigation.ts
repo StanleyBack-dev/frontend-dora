@@ -21,6 +21,7 @@ import {
   Receipt,
   ReceiptText,
   ScrollText,
+  Ticket,
   Settings,
   UserCheck,
   UserCog,
@@ -41,6 +42,8 @@ export type NavItem = {
   permission?: Permission;
   /** Shown with any of these permissions. */
   anyPermission?: Permission[];
+  /** Hidden with any of these (another entry does its job for them). */
+  unless?: Permission[];
   /** An optional module (contracted apart): shown only while it is on. */
   module?: AppModule;
 };
@@ -67,7 +70,10 @@ export const canSee = (
   (!item.module || modules.includes(item.module)) &&
   (!item.permission || permissions.includes(item.permission)) &&
   (!item.anyPermission ||
-    item.anyPermission.some((permission) => permissions.includes(permission)));
+    item.anyPermission.some((permission) =>
+      permissions.includes(permission),
+    )) &&
+  !item.unless?.some((permission) => permissions.includes(permission));
 
 export function isActive(pathname: string, item: NavItem): boolean {
   if (item.exact) return pathname === item.href;
@@ -168,12 +174,26 @@ export const SIDEBAR: SidebarEntry[] = [
     icon: PartyPopper,
     module: "EVENTS",
     items: [
-      { href: "/eventos", label: "Eventos", icon: PartyPopper },
+      // The residents' list; whoever manages events has the management's
+      // (drafts, actions), where they can still order their own tickets.
+      {
+        href: "/eventos",
+        label: "Eventos",
+        icon: PartyPopper,
+        unless: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
+      },
       {
         href: "/gestao/eventos",
-        label: "Gerenciar eventos",
+        label: "Eventos",
         icon: PartyPopper,
         anyPermission: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
+      },
+      // Each event's tickets and who already came in.
+      {
+        href: "/gestao/eventos/ingressos",
+        label: "Ingressos",
+        icon: Ticket,
+        permission: "EVENTS_MANAGE",
       },
       // The orders of every event, to review.
       {

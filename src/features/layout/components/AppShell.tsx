@@ -46,11 +46,9 @@ import {
   type Viewer,
 } from "@/features/layout/components/ViewerContext";
 import { SidebarGroup } from "@/features/layout/components/SidebarGroup";
-import { SupportModeBanner } from "@/features/layout/components/SupportModeBanner";
 import {
   ACCOUNT_NAV,
   activeEntry,
-  areaOf,
   canSee,
   isActive,
   isSection,
@@ -294,12 +292,6 @@ export function AppShell({
   const menuHrefs = entries.map((entry) =>
     isSection(entry) ? entry.items[0].href : entry.href,
   );
-  // The platform administrator inside a condominium they don't belong to.
-  const supportMode =
-    user.platformAdmin &&
-    !user.member &&
-    user.condominium !== null &&
-    areaOf(pathname) !== "platform";
   // The menu search finds every page this person can open.
   const searchable = everyItem;
   const accountActive =
@@ -611,9 +603,6 @@ export function AppShell({
                 <NotificationBell initialCount={unreadNotifications} />
               </div>
             </header>
-            {supportMode && user.condominium && (
-              <SupportModeBanner condominiumName={user.condominium.name} />
-            )}
 
             {/* Bottom padding on phones: room for the tab bar. */}
             <main className="mx-auto w-full max-w-6xl min-w-0 flex-1 px-4 pt-6 pb-28 sm:px-6 lg:px-10 lg:pt-10 lg:pb-12">

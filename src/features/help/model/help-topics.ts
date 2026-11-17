@@ -618,7 +618,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     module: "EVENTS",
     anyPermission: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
     area: "manage",
-    tour: "Crie e publique os eventos e confira os pedidos de ingressos.",
+    tour: "Os eventos do condomínio: crie e publique, acompanhe os ingressos e confira os pedidos. Você também faz os seus pedidos na página do evento.",
     sections: {
       howto: [
         {
@@ -626,11 +626,11 @@ export const HELP_TOPICS: HelpTopic[] = [
           only: ["EVENTS_MANAGE"],
         },
         {
-          text: "Em Pedidos (no menu do módulo), veja a fila de todos os eventos, os mais antigos primeiro, e filtre por evento. Em “Pedidos”, na página do evento, confira o comprovante no extrato pelo código do pedido e os documentos de quem tem desconto, e aprove ou recuse com o motivo. O PIX do condomínio fica em Administração → Pagamentos.",
+          text: "Em Eventos → Pedidos, no menu, veja a fila de todos os eventos, os mais antigos primeiro, e filtre por evento. Em “Pedidos”, na página do evento, confira o comprovante no extrato pelo código do pedido e os documentos de quem tem desconto, e aprove ou recuse com o motivo. O PIX do condomínio fica em Condomínio → Pagamentos.",
           only: ["PAYMENTS_MANAGE"],
         },
         {
-          text: "Em “Ingressos”, na página do evento, veja quem tem ingresso e quem já entrou pela portaria, com a hora, por tipo de ingresso.",
+          text: "Em Eventos → Ingressos, no menu (ou “Ingressos”, na página do evento), escolha o evento e veja quem tem ingresso e quem já entrou pela portaria, com a hora, por tipo de ingresso.",
           only: ["EVENTS_MANAGE"],
         },
         {
