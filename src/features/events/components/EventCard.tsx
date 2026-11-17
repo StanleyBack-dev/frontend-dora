@@ -11,14 +11,21 @@ import type { CondominiumEvent } from "@/shared/contracts/events";
 import { dateParts } from "@/shared/lib/datetime";
 
 // One event in the list: a calendar-style date, the title, when and where,
-// and badges for drafts, cancellations and tickets.
-export function EventCard({ event }: { event: CondominiumEvent }) {
+// and badges for drafts, cancellations and tickets. It opens the event in
+// the area it is listed in (the resident's app or the management).
+export function EventCard({
+  event,
+  basePath = "/eventos",
+}: {
+  event: CondominiumEvent;
+  basePath?: string;
+}) {
   const date = dateParts(event.startsAt);
   const cancelled = event.status === "CANCELLED";
   const limits = eventLimits(event);
 
   return (
-    <Link href={`/eventos/${event.id}`} className="block">
+    <Link href={`${basePath}/${event.id}`} className="block">
       <Card
         className={cn(
           "flex gap-4 p-4 transition-shadow hover:shadow-pop sm:p-5",

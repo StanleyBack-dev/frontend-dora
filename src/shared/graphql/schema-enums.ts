@@ -5,6 +5,7 @@ export type AddressFormat =
 
 /** Módulos contratados à parte pelo condomínio. */
 export type AppModule =
+  | 'BOOKINGS'
   | 'EVENTS';
 
 /** Quem é a pessoa do pedido: eu, um dependente ou outra pessoa. */

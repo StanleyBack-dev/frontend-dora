@@ -44,13 +44,20 @@ import {
   ViewerProvider,
   type Viewer,
 } from "@/features/layout/components/ViewerContext";
+import { AreaSwitcher } from "@/features/layout/components/AreaSwitcher";
+import { ModuleTabs } from "@/features/layout/components/ModuleTabs";
 import {
   ACCOUNT_NAV,
-  ADMIN_NAV,
-  SUPPORT_PROJECT_NAV,
+  APP_NAV,
+  AREAS,
+  areaOf,
   canSee,
   isActive,
-  PRIMARY_NAV,
+  manageModuleOf,
+  PLATFORM_NAV,
+  SUPPORT_PROJECT_NAV,
+  visibleManageModules,
+  type Area,
   type NavItem,
 } from "@/features/layout/model/navigation";
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
@@ -58,6 +65,7 @@ import { PushNotificationsInvite } from "@/features/notifications/components/Pus
 import type { SessionUser, AppModule } from "@/shared/contracts/api";
 import { startNavigation } from "@/shared/lib/navigation-progress";
 import { apiRequest } from "@/shared/lib/api-client";
+import { canManageHere, canRunPlatform } from "@/shared/lib/access";
 
 // The collapsed state is a per-browser preference. It lives in localStorage
 // (read through an external store so the server render stays expanded).
@@ -247,13 +255,45 @@ export function AppShell({
     () => false,
   );
 
-  const primary = PRIMARY_NAV.filter((item) =>
-    canSee(item, user.permissions, user.condominium?.modules),
+  // The areas this person works in, and the menu of the one open now: the
+  // resident's app, the management (by module) or the platform.
+  const modules = user.condominium?.modules ?? NO_MODULES;
+  const areas: Area[] = [
+    AREAS.app,
+    ...(canManageHere(user) ? [AREAS.manage] : []),
+    ...(canRunPlatform(user) ? [AREAS.platform] : []),
+  ];
+  const pathArea = areaOf(pathname);
+  const area = areas.some((item) => item.id === pathArea) ? pathArea : "app";
+  const appItems = APP_NAV.filter((item) =>
+    canSee(item, user.permissions, modules),
   );
+  const manageModules = areas.some((item) => item.id === "manage")
+    ? visibleManageModules(user.permissions, modules)
+    : [];
+  const pathModule = manageModuleOf(pathname);
+  const manageModule =
+    manageModules.find((item) => item.id === pathModule) ?? manageModules[0];
+  const platformItems = areas.some((item) => item.id === "platform")
+    ? PLATFORM_NAV.filter((item) => canSee(item, user.permissions, modules))
+    : [];
+  const primary =
+    area === "manage"
+      ? (manageModule?.items ?? [])
+      : area === "platform"
+        ? platformItems
+        : appItems;
+  const homeHref = AREAS[area].href;
   const account = [
     ...ACCOUNT_NAV,
     ...(showSupportProject ? [SUPPORT_PROJECT_NAV] : []),
-    ...(showAdmin ? [ADMIN_NAV] : []),
+  ];
+  // The menu search finds every page this person can open, in any area.
+  const searchable = [
+    ...appItems,
+    ...manageModules.flatMap((item) => item.items),
+    ...platformItems,
+    ...account,
   ];
   const accountActive = account.some((item) => isActive(pathname, item));
 
@@ -325,7 +365,7 @@ export function AppShell({
               )}
             >
               <Link
-                href="/inicio"
+                href={homeHref}
                 onClick={closeMobile}
                 className="flex min-w-0 flex-1 items-center gap-2.5"
                 aria-label="Dora, início"
@@ -352,9 +392,20 @@ export function AppShell({
               </button>
             </div>
 
-            <div className={cn("px-4 pb-2", collapsed && "lg:px-3")}>
+            <div
+              className={cn(
+                "flex flex-col gap-2 px-4 pb-2",
+                collapsed && "lg:px-3",
+              )}
+            >
               <CondominiumSwitcher
                 user={user}
+                collapsed={collapsed}
+                onNavigate={closeMobile}
+              />
+              <AreaSwitcher
+                areas={areas}
+                current={area}
                 collapsed={collapsed}
                 onNavigate={closeMobile}
               />
@@ -368,13 +419,25 @@ export function AppShell({
                 collapsed ? "px-4 lg:px-3" : "px-4",
               )}
             >
+              {area === "manage" && manageModule && (
+                <div className="pb-2">
+                  <ModuleTabs
+                    modules={manageModules}
+                    current={manageModule.id}
+                    collapsed={collapsed}
+                    onNavigate={closeMobile}
+                  />
+                </div>
+              )}
               <p
                 className={cn(
                   "px-3.5 pb-1 text-[10px] font-bold tracking-[0.14em] text-chrome-subtle uppercase",
                   collapsed && "lg:sr-only",
                 )}
               >
-                Menu
+                {area === "manage" && manageModule
+                  ? manageModule.label
+                  : AREAS[area].label}
               </p>
               {primary.map((item) => (
                 <NavLink
@@ -528,7 +591,7 @@ export function AppShell({
                 <Avatar name={user.name} src={user.photoUrl} size="sm" />
               </Link>
               <MenuSearch
-                items={[...primary, ...account]}
+                items={searchable}
                 className="min-w-0 flex-1 sm:max-w-sm"
               />
               <div className="ml-auto flex items-center gap-1">
@@ -551,10 +614,10 @@ export function AppShell({
             className="fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
           >
             <TabLink
-              href="/inicio"
-              label="Início"
+              href={homeHref}
+              label={area === "app" ? "Início" : AREAS[area].label}
               icon={<House aria-hidden />}
-              active={pathname === "/inicio"}
+              active={pathname === homeHref}
             />
             <TabLink
               href="/notificacoes"

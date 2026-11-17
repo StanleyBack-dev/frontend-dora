@@ -48,23 +48,40 @@ const nextConfig: NextConfig = {
   },
   allowedDevOrigins,
   reactStrictMode: true,
-  // Old addresses: the condominiums console and the members list now live
-  // in the main menu.
+  // Old addresses: the app is split in areas (Meu condomínio, /gestao,
+  // /plataforma). Temporary redirects, so they can still change.
   async redirects() {
-    return [
-      { source: "/plataforma", destination: "/condominios", permanent: true },
-      {
-        source: "/admin/condominios",
-        destination: "/condominios",
-        permanent: true,
-      },
-      { source: "/admin/usuarios", destination: "/moradores", permanent: true },
-      {
-        source: "/admin/usuarios/:id",
-        destination: "/moradores/:id",
-        permanent: true,
-      },
+    const moved: [string, string][] = [
+      ["/painel", "/plataforma"],
+      ["/condominios", "/plataforma/condominios"],
+      ["/admin/condominios", "/plataforma/condominios"],
+      ["/admin/logs", "/plataforma/logs"],
+      ["/admin/cadastros", "/gestao/cadastros"],
+      ["/admin/links", "/gestao/links"],
+      ["/admin/dependentes", "/gestao/dependentes"],
+      ["/admin/unidades", "/gestao/unidades"],
+      ["/admin/pagamentos", "/gestao/pagamentos"],
+      ["/admin", "/gestao"],
+      ["/admin/usuarios", "/gestao/moradores"],
+      ["/admin/usuarios/:id", "/gestao/moradores/:id"],
+      ["/comunicados", "/gestao/comunicados"],
+      ["/moradores", "/gestao/moradores"],
+      ["/moradores/:id", "/gestao/moradores/:id"],
+      ["/equipe", "/gestao/equipe"],
+      ["/equipe/:id", "/gestao/equipe/:id"],
+      ["/espacos", "/gestao/reservas/espacos"],
+      ["/espacos/:path*", "/gestao/reservas/espacos/:path*"],
+      ["/reservas/gestao", "/gestao/reservas"],
+      ["/reservas/taxas", "/gestao/reservas/taxas"],
+      ["/eventos/novo", "/gestao/eventos/novo"],
+      ["/eventos/:id/editar", "/gestao/eventos/:id/editar"],
+      ["/eventos/:id/pedidos", "/gestao/eventos/:id/pedidos"],
     ];
+    return moved.map(([source, destination]) => ({
+      source,
+      destination,
+      permanent: false,
+    }));
   },
   async headers() {
     return [

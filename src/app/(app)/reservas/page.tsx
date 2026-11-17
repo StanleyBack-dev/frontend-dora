@@ -10,7 +10,6 @@ import {
   SegmentedNav,
 } from "@/design-system";
 import { BookingCard } from "@/features/bookings/components/BookingCard";
-import { BookingsTabs } from "@/features/bookings/components/BookingsTabs";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { bookingsService } from "@/server/services/bookings.service";
 import { requestTime } from "@/server/request-time";
@@ -70,11 +69,6 @@ export default async function MyBookingsPage({
             Nova reserva
           </Link>
         }
-      />
-      <BookingsTabs
-        current="mine"
-        manager={manager}
-        pending={pendingApproval}
       />
       <SegmentedNav
         label="Período"

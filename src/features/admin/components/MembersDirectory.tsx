@@ -30,7 +30,7 @@ import {
 } from "@/shared/lib/search-params";
 
 export type MembersDirectoryConfig = {
-  /** "/moradores" or "/equipe": filters and links stay on this page. */
+  /** "/gestao/moradores" or "/gestao/equipe": filters and links stay on this page. */
   basePath: string;
   title: string;
   description: string;

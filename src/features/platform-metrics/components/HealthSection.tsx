@@ -17,17 +17,17 @@ const ITEMS: Item[] = [
   {
     key: "staleEnrollments",
     label: "Cadastros esperando análise há mais de 3 dias",
-    href: "/condominios",
+    href: "/plataforma/condominios",
   },
   {
     key: "withoutManager",
     label: "Condomínios ativos sem gestor",
-    href: "/condominios",
+    href: "/plataforma/condominios",
   },
   {
     key: "withoutUnits",
     label: "Condomínios ativos sem unidades",
-    href: "/condominios",
+    href: "/plataforma/condominios",
   },
   {
     key: "openSupport",
@@ -37,13 +37,13 @@ const ITEMS: Item[] = [
   {
     key: "delayedNotifications",
     label: "Avisos na fila há mais de 1 hora (e-mail com problema?)",
-    href: "/admin/logs",
+    href: "/plataforma/logs",
     platformWide: true,
   },
   {
     key: "failedNotifications",
     label: "Avisos que não puderam ser entregues",
-    href: "/admin/logs",
+    href: "/plataforma/logs",
     platformWide: true,
   },
 ];

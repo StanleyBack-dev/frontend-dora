@@ -330,7 +330,7 @@ export function EventForm({
         event ? undefined : "Confira os detalhes e publique quando quiser.",
       );
       startNavigation();
-      router.push(`/eventos/${saved.id}`);
+      router.push(`/gestao/eventos/${saved.id}`);
       router.refresh();
     } catch (cause) {
       const message =

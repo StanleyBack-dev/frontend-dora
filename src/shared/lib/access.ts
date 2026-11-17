@@ -20,13 +20,31 @@ export function canAny(
   return options.some((permission) => user.permissions.includes(permission));
 }
 
-/** Permissions that open some part of the admin area. */
-export const ADMIN_AREA_PERMISSIONS: Permission[] = [
+/** Permissions that open the management area (Gestão) of a condominium. */
+export const MANAGE_AREA_PERMISSIONS: Permission[] = [
+  "DASHBOARD_READ",
+  "NOTIFICATIONS_BROADCAST",
   "USERS_MANAGE",
-  "PERMISSIONS_MANAGE",
   "UNITS_MANAGE",
-  "AUDIT_READ",
+  "SPACES_MANAGE",
+  "BOOKINGS_MANAGE",
+  "EVENTS_MANAGE",
+  "PAYMENTS_MANAGE",
 ];
+
+/** Manages the condominium they are working in (Gestão). */
+export function canManageHere(
+  user: Pick<SessionUser, "permissions" | "condominium">,
+): boolean {
+  return user.condominium !== null && canAny(user, ...MANAGE_AREA_PERMISSIONS);
+}
+
+/** Runs the platform (Plataforma): every condominium. */
+export function canRunPlatform(
+  user: Pick<SessionUser, "permissions">,
+): boolean {
+  return can(user, "CONDOMINIUMS_MANAGE");
+}
 
 /**
  * Roles `actor` may give to a member of the condominium (mirrors the API
