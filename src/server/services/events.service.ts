@@ -27,7 +27,9 @@ import type {
   CondominiumEvent,
   EventInput,
   EventOrder,
+  EventOrderFilter,
   EventOrderStatus,
+  EventTicketFilter,
   EventTicketPass,
   EventWhen,
   GateEventTicket,
@@ -99,14 +101,15 @@ export const eventsService = {
     return myEventOrders;
   },
 
+  /** An event's orders that match the filter (none: every order). */
   async orders(
     token: string,
     eventId: string,
-    status: EventOrderStatus | null,
+    filter: EventOrderFilter = {},
   ): Promise<EventOrder[]> {
     const { eventOrders } = await backendGraphql(eventOrdersDocument, {
       token,
-      variables: { eventId, status },
+      variables: { eventId, filter },
     });
     return eventOrders;
   },
@@ -231,10 +234,15 @@ export const eventsService = {
   },
 
   /** An event's tickets (confirmed orders) and who came in. */
-  async tickets(token: string, eventId: string): Promise<GateEventTicket[]> {
+  /** An event's tickets that match the filter (none: every ticket). */
+  async tickets(
+    token: string,
+    eventId: string,
+    filter: EventTicketFilter = {},
+  ): Promise<GateEventTicket[]> {
     const { eventTickets } = await backendGraphql(eventTicketsDocument, {
       token,
-      variables: { eventId },
+      variables: { eventId, filter },
     });
     return eventTickets;
   },

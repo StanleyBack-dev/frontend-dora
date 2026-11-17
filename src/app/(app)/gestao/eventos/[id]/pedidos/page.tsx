@@ -9,7 +9,15 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { Card, PageHeader, SegmentedNav, StatCard } from "@/design-system";
+import {
+  Card,
+  Field,
+  FilterActions,
+  FilterPanel,
+  PageHeader,
+  Select,
+  StatCard,
+} from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { EventOrdersReview } from "@/features/events/components/EventOrdersReview";
 import { eventPeriod } from "@/features/events/model/event-labels";
@@ -17,11 +25,11 @@ import {
   ORDER_FILTER_KEYS,
   ORDER_FILTERS,
   ordersIn,
-  type OrderFilter,
 } from "@/features/events/model/order-filters";
 import { getSessionUser } from "@/server/auth/current-user";
 import { loadEvent } from "@/server/loaders/load-event";
 import { loadEventOrders } from "@/server/loaders/load-event-orders";
+import type { EventOrderFilter } from "@/shared/contracts/events";
 import { can } from "@/shared/lib/access";
 import { formatCents } from "@/shared/lib/format";
 import {
@@ -32,8 +40,9 @@ import {
 
 export const metadata: Metadata = { title: "Pedidos do evento" };
 
-// An event's orders for whoever reviews payments: the receipts to check
-// first, then the unpaid, the confirmed and the closed ones.
+// An event's orders for whoever reviews payments: the numbers of the event
+// and its orders, filtered by the API (who ordered, code, unit or a person;
+// the status). Those waiting for review come first, open.
 export default async function EventOrdersPage({
   params,
   searchParams,
@@ -45,13 +54,21 @@ export default async function EventOrdersPage({
   if (!can(user, "PAYMENTS_MANAGE")) return <AccessDenied />;
   const event = await loadEvent((await params).id);
   if (!event) notFound();
-  const filter =
-    oneOf(firstParam(await searchParams, "situacao"), ORDER_FILTER_KEYS) ??
-    "conferir";
 
-  const orders = await loadEventOrders(event.id, null);
-  const of = (key: OrderFilter) => ordersIn(orders, key);
-  const confirmed = of("confirmados");
+  const query = await searchParams;
+  const search = firstParam(query, "busca")?.trim().slice(0, 80) ?? "";
+  const status = oneOf(firstParam(query, "situacao"), ORDER_FILTER_KEYS);
+  const filter: EventOrderFilter = {
+    ...(search && { search }),
+    ...(status && { statuses: [...ORDER_FILTERS[status].statuses] }),
+  };
+  const filtered = Object.keys(filter).length > 0;
+
+  // Every order (the numbers) and, with filters, the ones that match.
+  const all = await loadEventOrders(event.id);
+  const orders = filtered ? await loadEventOrders(event.id, filter) : all;
+  const toCheck = ordersIn(all, "conferir").length;
+  const confirmed = ordersIn(all, "confirmados");
   const received = confirmed.reduce((sum, order) => sum + order.totalCents, 0);
   const people = confirmed.reduce(
     (sum, order) => sum + order.attendees.length,
@@ -74,13 +91,13 @@ export default async function EventOrdersPage({
       <div className="mb-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           label="Para conferir"
-          value={String(of("conferir").length)}
+          value={String(toCheck)}
           icon={<FileSearch />}
-          tone={of("conferir").length > 0 ? "warning" : "neutral"}
+          tone={toCheck > 0 ? "warning" : "neutral"}
         />
         <StatCard
           label="Aguardando envio"
-          value={String(of("aguardando").length)}
+          value={String(ordersIn(all, "aguardando").length)}
           icon={<Clock />}
         />
         <StatCard
@@ -103,21 +120,37 @@ export default async function EventOrdersPage({
           />
         )}
       </div>
-      <SegmentedNav
-        label="Situação"
-        className="mb-4"
-        items={ORDER_FILTER_KEYS.map((key) => ({
-          label: ORDER_FILTERS[key].label,
-          href:
-            key === "conferir"
-              ? `/gestao/eventos/${event.id}/pedidos`
-              : `/gestao/eventos/${event.id}/pedidos?situacao=${key}`,
-          active: filter === key,
-          count: of(key).length,
-        }))}
-      />
+
+      <FilterPanel hasActiveFilters={filtered}>
+        <form
+          role="search"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          <Field
+            label="Buscar"
+            name="busca"
+            defaultValue={search}
+            placeholder="Quem pediu, código, unidade ou pessoa"
+          />
+          <Select
+            label="Situação"
+            name="situacao"
+            defaultValue={status ?? ""}
+            placeholder="Todas"
+            options={ORDER_FILTER_KEYS.map((key) => ({
+              value: key,
+              label: ORDER_FILTERS[key].label,
+            }))}
+          />
+          <FilterActions
+            clearHref={`/gestao/eventos/${event.id}/pedidos`}
+            hasActiveFilters={filtered}
+          />
+        </form>
+      </FilterPanel>
+
       <Card>
-        <EventOrdersReview orders={of(filter)} />
+        <EventOrdersReview orders={orders} filtered={filtered} />
       </Card>
     </>
   );

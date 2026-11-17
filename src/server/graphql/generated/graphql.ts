@@ -296,6 +296,14 @@ export type EventInput = {
   unitTicketLimit?: number | null | undefined;
 };
 
+/** Filtros dos pedidos de um evento. */
+export type EventOrderFilterInput = {
+  /** Quem pediu, código do pedido, unidade ou nome de uma pessoa. */
+  search?: string | null | undefined;
+  /** Só estas situações (vazio: todas). */
+  statuses?: Array<EventOrderStatus> | null | undefined;
+};
+
 /** Aguardando pagamento, em conferência, confirmado, recusado, expirado ou cancelado. */
 export type EventOrderStatus =
   | 'AWAITING_REVIEW'
@@ -331,6 +339,20 @@ export type EventStatus =
   | 'CANCELLED'
   | 'DRAFT'
   | 'PUBLISHED';
+
+/** Filtros dos ingressos de um evento. */
+export type EventTicketFilterInput = {
+  /** true: só quem fez o pedido; false: só os acompanhantes. */
+  buyer?: boolean | null | undefined;
+  /** true: só quem já entrou; false: só quem ainda não entrou. */
+  checkedIn?: boolean | null | undefined;
+  /** true: só convidados de fora; false: só do condomínio. */
+  outside?: boolean | null | undefined;
+  /** Nome, quem pediu, unidade ou código (do ingresso ou do pedido). */
+  search?: string | null | undefined;
+  /** O tipo de ingresso (pelo nome). */
+  ticketName?: string | null | undefined;
+};
 
 /** Próximos (ainda não terminaram) ou passados. */
 export type EventWhen =
@@ -1340,7 +1362,7 @@ export type MyEventOrdersQuery = { myEventOrders: Array<{ id: string, eventId: s
 
 export type EventOrdersQueryVariables = Exact<{
   eventId: string | number;
-  status?: EventOrderStatus | null | undefined;
+  filter?: EventOrderFilterInput | null | undefined;
 }>;
 
 
@@ -1433,6 +1455,7 @@ export type EventOrdersQueueQuery = { eventOrdersQueue: Array<{ id: string, even
 
 export type EventTicketsQueryVariables = Exact<{
   eventId: string | number;
+  filter?: EventTicketFilterInput | null | undefined;
 }>;
 
 
@@ -3940,8 +3963,8 @@ export const MyEventOrdersDocument = new TypedDocumentString(`
   createdAt
 }`) as unknown as TypedDocumentString<MyEventOrdersQuery, MyEventOrdersQueryVariables>;
 export const EventOrdersDocument = new TypedDocumentString(`
-    query EventOrders($eventId: ID!, $status: EventOrderStatus) {
-  eventOrders(eventId: $eventId, status: $status) {
+    query EventOrders($eventId: ID!, $filter: EventOrderFilterInput) {
+  eventOrders(eventId: $eventId, filter: $filter) {
     ...EventOrderFields
   }
 }
@@ -4407,8 +4430,8 @@ export const EventOrdersQueueDocument = new TypedDocumentString(`
   createdAt
 }`) as unknown as TypedDocumentString<EventOrdersQueueQuery, EventOrdersQueueQueryVariables>;
 export const EventTicketsDocument = new TypedDocumentString(`
-    query EventTickets($eventId: ID!) {
-  eventTickets(eventId: $eventId) {
+    query EventTickets($eventId: ID!, $filter: EventTicketFilterInput) {
+  eventTickets(eventId: $eventId, filter: $filter) {
     ...GateEventTicketFields
   }
 }

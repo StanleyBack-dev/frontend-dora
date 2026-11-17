@@ -88,12 +88,23 @@ const COLUMNS: DataTableColumn<EventOrder>[] = [
 // An event's orders for whoever reviews payments, in the list table: a row
 // per order and, under its chevron, the people, the PIX, the receipt and
 // the decision. What waits for review comes open.
-export function EventOrdersReview({ orders }: { orders: EventOrder[] }) {
+export function EventOrdersReview({
+  orders,
+  filtered = false,
+}: {
+  orders: EventOrder[];
+  /** Some filter is on (the empty state says so). */
+  filtered?: boolean;
+}) {
   if (orders.length === 0) {
     return (
       <EmptyState
-        title="Nenhum pedido aqui"
-        description="Os pedidos desta situação aparecem nesta lista."
+        title={filtered ? "Nenhum pedido encontrado" : "Nenhum pedido ainda"}
+        description={
+          filtered
+            ? "Tente outros filtros."
+            : "Os pedidos dos moradores aparecem aqui."
+        }
       />
     );
   }
