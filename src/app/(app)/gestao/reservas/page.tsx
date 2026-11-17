@@ -81,7 +81,11 @@ export default async function ManageBookingsPage({
     <>
       <PageHeader
         title="Reservas"
-        description="Todas as reservas do condomínio: aprove, recuse ou cancele."
+        description={
+          pending > 0
+            ? `Todas as reservas do condomínio: ${pending} ${pending === 1 ? "aguarda" : "aguardam"} aprovação. Aprove, recuse ou cancele.`
+            : "Todas as reservas do condomínio: aprove, recuse ou cancele."
+        }
       />
 
       <FilterPanel hasActiveFilters={filtered}>

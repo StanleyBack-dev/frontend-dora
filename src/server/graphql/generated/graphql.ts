@@ -820,7 +820,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, birthDate: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
+export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, birthDate: string | null, onboardingCompleted: boolean, platformAdmin: boolean, member: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } } };
 
 export type RefreshSessionMutationVariables = Exact<{
   refreshToken: string;
@@ -837,7 +837,7 @@ export type LogoutMutation = { logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, birthDate: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, birthDate: string | null, onboardingCompleted: boolean, platformAdmin: boolean, member: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type CompleteOnboardingMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -856,7 +856,7 @@ export type UpdateMyProfileMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, birthDate: string | null, onboardingCompleted: boolean, platformAdmin: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
+export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, phone: string | null, birthDate: string | null, onboardingCompleted: boolean, platformAdmin: boolean, member: boolean, condominium: { id: string, name: string, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule> } | null, condominiums: Array<{ id: string, name: string, city: string, state: string, role: UserGroup }> } };
 
 export type SetMyPhotoMutationVariables = Exact<{
   photo: string;
@@ -2424,6 +2424,7 @@ export const LoginDocument = new TypedDocumentString(`
       birthDate
       onboardingCompleted
       platformAdmin
+      member
       condominium {
         id
         name
@@ -2474,6 +2475,7 @@ export const MeDocument = new TypedDocumentString(`
     birthDate
     onboardingCompleted
     platformAdmin
+    member
     condominium {
       id
       name
@@ -2518,6 +2520,7 @@ export const UpdateMyProfileDocument = new TypedDocumentString(`
     birthDate
     onboardingCompleted
     platformAdmin
+    member
     condominium {
       id
       name

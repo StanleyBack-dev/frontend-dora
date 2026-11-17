@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import {
   ArrowUpRight,
@@ -72,6 +73,8 @@ function Shortcut({
 export default async function HomePage() {
   const user = await getSessionUser();
   const condominium = user.condominium;
+  // The gate staff work at the gate: their home is the Portaria.
+  if (user.group === "CONCIERGE" && condominium) redirect("/portaria");
   const manages = canManageHere(user);
   const firstName = user.name.split(" ")[0];
 

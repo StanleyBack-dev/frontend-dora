@@ -67,6 +67,14 @@ export type HelpTopic = {
   sections: Partial<Record<HelpSectionKind, HelpItem[]>>;
 };
 
+/** The help page groups the topics by area, in this order. */
+export const HELP_GROUPS: { area: HelpTopic["area"]; label: string }[] = [
+  { area: "main", label: "Meu condomínio" },
+  { area: "manage", label: "Gestão" },
+  { area: "platform", label: "Plataforma" },
+  { area: "account", label: "Sua conta" },
+];
+
 export const HELP_TOPICS: HelpTopic[] = [
   {
     id: "inicio",
