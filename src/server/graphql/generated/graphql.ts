@@ -16,6 +16,7 @@ export type AddressFormat =
 
 /** Módulos contratados à parte pelo condomínio. */
 export type AppModule =
+  | 'BOOKINGS'
   | 'EVENTS';
 
 export type AttendeeInput = {

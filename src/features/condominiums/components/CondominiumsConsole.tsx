@@ -154,7 +154,8 @@ export function CondominiumsConsole({
     try {
       await condominiumsClient.switchTo(condominium.id);
       startNavigation();
-      router.push("/inicio");
+      // The platform enters a condominium to administer it.
+      router.push("/gestao");
       router.refresh();
     } catch (cause) {
       fail(cause, "Não foi possível entrar no condomínio.");

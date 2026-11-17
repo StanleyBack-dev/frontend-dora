@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PartyPopper } from "lucide-react";
+import { CalendarDays, PartyPopper } from "lucide-react";
 import { Spinner } from "@/design-system";
 import { condominiumsClient } from "@/features/condominiums/api/condominiums.client";
 import type { AppModule, Condominium } from "@/shared/contracts/condominiums";
@@ -15,6 +15,13 @@ const MODULES: {
   description: string;
   icon: React.ReactNode;
 }[] = [
+  {
+    module: "BOOKINGS",
+    label: "Reservas",
+    description:
+      "Espaços reservados pelos moradores: aprovações, convidados com convite e taxas de uso.",
+    icon: <CalendarDays aria-hidden className="size-4" />,
+  },
   {
     module: "EVENTS",
     label: "Eventos",

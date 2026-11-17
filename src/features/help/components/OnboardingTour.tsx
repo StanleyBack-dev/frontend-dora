@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { CircleHelp, PartyPopper, Sparkles, UserRound, X } from "lucide-react";
+import {
+  CircleHelp,
+  LayoutGrid,
+  PartyPopper,
+  Sparkles,
+  UserRound,
+  X,
+} from "lucide-react";
 import { Button, cn } from "@/design-system";
 import {
   visibleTopics,
@@ -52,6 +59,36 @@ function stepsFor(
       icon: <Sparkles className="size-6" />,
     },
     ...main.map(stepOf),
+    // Managers and the platform: the other areas, each with its own menu.
+    ...(showAdmin || permissions.includes("CONDOMINIUMS_MANAGE")
+      ? [
+          {
+            id: "areas",
+            title: "Suas áreas",
+            description: (
+              <>
+                No topo do menu, troque de área: <strong>Meu condomínio</strong>{" "}
+                (o app de todos)
+                {showAdmin && (
+                  <>
+                    , <strong>Gestão</strong> (a administração do condomínio,
+                    com uma aba por módulo: Geral, Reservas, Eventos)
+                  </>
+                )}
+                {permissions.includes("CONDOMINIUMS_MANAGE") && (
+                  <>
+                    {" "}
+                    e <strong>Plataforma</strong> (todos os condomínios)
+                  </>
+                )}
+                . Cada área mostra só os menus dela.
+              </>
+            ),
+            icon: <LayoutGrid className="size-5" />,
+            target: '[data-tour="areas"]',
+          },
+        ]
+      : []),
     {
       id: "account",
       title: "Sua conta",

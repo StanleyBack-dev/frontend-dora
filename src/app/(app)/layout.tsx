@@ -3,7 +3,7 @@ import { AppShell } from "@/features/layout/components/AppShell";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { pixReceiver } from "@/server/config/pix";
 import { notificationsService } from "@/server/services/notifications.service";
-import { ADMIN_AREA_PERMISSIONS, canAny } from "@/shared/lib/access";
+import { canManageHere } from "@/shared/lib/access";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +21,7 @@ export default async function AppLayout({
   return (
     <AppShell
       user={user}
-      showAdmin={canAny(user, ...ADMIN_AREA_PERMISSIONS)}
+      showAdmin={canManageHere(user)}
       showSupportProject={pixReceiver() !== null}
       unreadNotifications={unread}
     >

@@ -237,7 +237,7 @@ function ReviewedSummary({ request }: { request: EnrollmentRequest }) {
       </dl>
       {request.userId && (
         <Link
-          href={`/moradores/${request.userId}`}
+          href={`/gestao/moradores/${request.userId}`}
           className="text-sm font-medium text-brand-ink hover:underline"
         >
           Ver o morador
