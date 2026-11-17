@@ -2,6 +2,8 @@ import "server-only";
 import { backendGraphql } from "@/server/graphql/client";
 import {
   approveEventOrderDocument,
+  eventOrdersQueueDocument,
+  eventTicketsDocument,
   checkInEventTicketDocument,
   eventTicketPassDocument,
   gateEventTicketsDocument,
@@ -212,5 +214,28 @@ export const eventsService = {
       variables: { code },
     });
     return eventTicket ?? null;
+  },
+
+  // === the events module in the management ===
+
+  /** The orders of every event (or one), oldest first: the review queue. */
+  async ordersQueue(
+    token: string,
+    eventId: string | null,
+  ): Promise<EventOrder[]> {
+    const { eventOrdersQueue } = await backendGraphql(
+      eventOrdersQueueDocument,
+      { token, variables: { status: null, eventId } },
+    );
+    return eventOrdersQueue;
+  },
+
+  /** An event's tickets (confirmed orders) and who came in. */
+  async tickets(token: string, eventId: string): Promise<GateEventTicket[]> {
+    const { eventTickets } = await backendGraphql(eventTicketsDocument, {
+      token,
+      variables: { eventId },
+    });
+    return eventTickets;
   },
 };

@@ -122,6 +122,8 @@ type Documents = {
     "\n  mutation CheckInEventTicket($input: CheckInEventTicketInput!) {\n    checkInEventTicket(input: $input) {\n      ...GateEventTicketFields\n    }\n  }\n": typeof types.CheckInEventTicketDocument,
     "\n  mutation UndoEventTicketCheckIn($attendeeId: ID!) {\n    undoEventTicketCheckIn(attendeeId: $attendeeId) {\n      ...GateEventTicketFields\n    }\n  }\n": typeof types.UndoEventTicketCheckInDocument,
     "\n  query EventTicketPass($code: String!) {\n    eventTicket(code: $code) {\n      code\n      name\n      ticketName\n      eventTitle\n      placeName\n      condominiumName\n      startsAt\n      endsAt\n      buyerFirstName\n      status\n      checkedIn\n    }\n  }\n": typeof types.EventTicketPassDocument,
+    "\n  query EventOrdersQueue($status: EventOrderStatus, $eventId: ID) {\n    eventOrdersQueue(status: $status, eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n": typeof types.EventOrdersQueueDocument,
+    "\n  query EventTickets($eventId: ID!) {\n    eventTickets(eventId: $eventId) {\n      ...GateEventTicketFields\n    }\n  }\n": typeof types.EventTicketsDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": typeof types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": typeof types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": typeof types.MarkNotificationReadDocument,
@@ -271,6 +273,8 @@ const documents: Documents = {
     "\n  mutation CheckInEventTicket($input: CheckInEventTicketInput!) {\n    checkInEventTicket(input: $input) {\n      ...GateEventTicketFields\n    }\n  }\n": types.CheckInEventTicketDocument,
     "\n  mutation UndoEventTicketCheckIn($attendeeId: ID!) {\n    undoEventTicketCheckIn(attendeeId: $attendeeId) {\n      ...GateEventTicketFields\n    }\n  }\n": types.UndoEventTicketCheckInDocument,
     "\n  query EventTicketPass($code: String!) {\n    eventTicket(code: $code) {\n      code\n      name\n      ticketName\n      eventTitle\n      placeName\n      condominiumName\n      startsAt\n      endsAt\n      buyerFirstName\n      status\n      checkedIn\n    }\n  }\n": types.EventTicketPassDocument,
+    "\n  query EventOrdersQueue($status: EventOrderStatus, $eventId: ID) {\n    eventOrdersQueue(status: $status, eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n": types.EventOrdersQueueDocument,
+    "\n  query EventTickets($eventId: ID!) {\n    eventTickets(eventId: $eventId) {\n      ...GateEventTicketFields\n    }\n  }\n": types.EventTicketsDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": types.MarkNotificationReadDocument,
@@ -741,6 +745,14 @@ export function graphql(source: "\n  mutation UndoEventTicketCheckIn($attendeeId
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query EventTicketPass($code: String!) {\n    eventTicket(code: $code) {\n      code\n      name\n      ticketName\n      eventTitle\n      placeName\n      condominiumName\n      startsAt\n      endsAt\n      buyerFirstName\n      status\n      checkedIn\n    }\n  }\n"): typeof import('./graphql').EventTicketPassDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query EventOrdersQueue($status: EventOrderStatus, $eventId: ID) {\n    eventOrdersQueue(status: $status, eventId: $eventId) {\n      ...EventOrderFields\n    }\n  }\n"): typeof import('./graphql').EventOrdersQueueDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query EventTickets($eventId: ID!) {\n    eventTickets(eventId: $eventId) {\n      ...GateEventTicketFields\n    }\n  }\n"): typeof import('./graphql').EventTicketsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

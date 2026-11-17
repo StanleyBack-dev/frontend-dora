@@ -1418,6 +1418,21 @@ export type EventTicketPassQueryVariables = Exact<{
 
 export type EventTicketPassQuery = { eventTicket: { code: string, name: string, ticketName: string | null, eventTitle: string, placeName: string, condominiumName: string, startsAt: string, endsAt: string, buyerFirstName: string | null, status: TicketPassStatus, checkedIn: boolean } | null };
 
+export type EventOrdersQueueQueryVariables = Exact<{
+  status?: EventOrderStatus | null | undefined;
+  eventId?: string | number | null | undefined;
+}>;
+
+
+export type EventOrdersQueueQuery = { eventOrdersQueue: Array<{ id: string, eventId: string, eventTitle: string, code: string, status: EventOrderStatus, totalCents: number, buyerName: string | null, unitLabel: string | null, pixCode: string | null, expiresAt: string | null, receiptSentAt: string | null, receiptContentType: string | null, receiptUrl: string | null, reviewedAt: string | null, rejectReason: string | null, cancelledAt: string | null, createdAt: string, attendees: Array<{ id: string, source: AttendeeSource, dependentId: string | null, name: string, age: number, outside: boolean, ticketName: string | null, priceCents: number, needsProof: boolean, proofUrl: string | null, proofContentType: string | null, ticketCode: string | null, checkedInAt: string | null }>, pix: { keyType: PixKeyType, key: string, name: string, city: string } | null }> };
+
+export type EventTicketsQueryVariables = Exact<{
+  eventId: string | number;
+}>;
+
+
+export type EventTicketsQuery = { eventTickets: Array<{ id: string, name: string, age: number, outside: boolean, source: AttendeeSource, ticketName: string | null, ticketCode: string, checkedInAt: string | null, entryWindow: TicketEntryWindow, eventId: string, eventTitle: string, eventStatus: EventStatus, startsAt: string, endsAt: string, placeName: string, orderCode: string, buyerName: string | null, unitLabel: string | null }> };
+
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
   page?: PageInput | null | undefined;
@@ -4324,6 +4339,78 @@ export const EventTicketPassDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<EventTicketPassQuery, EventTicketPassQueryVariables>;
+export const EventOrdersQueueDocument = new TypedDocumentString(`
+    query EventOrdersQueue($status: EventOrderStatus, $eventId: ID) {
+  eventOrdersQueue(status: $status, eventId: $eventId) {
+    ...EventOrderFields
+  }
+}
+    fragment EventOrderFields on EventOrder {
+  id
+  eventId
+  eventTitle
+  code
+  status
+  totalCents
+  buyerName
+  unitLabel
+  attendees {
+    id
+    source
+    dependentId
+    name
+    age
+    outside
+    ticketName
+    priceCents
+    needsProof
+    proofUrl
+    proofContentType
+    ticketCode
+    checkedInAt
+  }
+  pix {
+    keyType
+    key
+    name
+    city
+  }
+  pixCode
+  expiresAt
+  receiptSentAt
+  receiptContentType
+  receiptUrl
+  reviewedAt
+  rejectReason
+  cancelledAt
+  createdAt
+}`) as unknown as TypedDocumentString<EventOrdersQueueQuery, EventOrdersQueueQueryVariables>;
+export const EventTicketsDocument = new TypedDocumentString(`
+    query EventTickets($eventId: ID!) {
+  eventTickets(eventId: $eventId) {
+    ...GateEventTicketFields
+  }
+}
+    fragment GateEventTicketFields on GateEventTicket {
+  id
+  name
+  age
+  outside
+  source
+  ticketName
+  ticketCode
+  checkedInAt
+  entryWindow
+  eventId
+  eventTitle
+  eventStatus
+  startsAt
+  endsAt
+  placeName
+  orderCode
+  buyerName
+  unitLabel
+}`) as unknown as TypedDocumentString<EventTicketsQuery, EventTicketsQueryVariables>;
 export const MyNotificationsDocument = new TypedDocumentString(`
     query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {
   myNotifications(unreadOnly: $unreadOnly, page: $page) {

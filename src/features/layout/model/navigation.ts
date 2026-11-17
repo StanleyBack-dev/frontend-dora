@@ -20,6 +20,7 @@ import {
   Megaphone,
   PartyPopper,
   Receipt,
+  ReceiptText,
   ScrollText,
   Settings,
   ShieldCheck,
@@ -44,6 +45,19 @@ export type NavItem = {
   /** An optional module (contracted apart): shown only while it is on. */
   module?: AppModule;
 };
+
+/**
+ * The entry of a menu the address belongs to: the most specific one when
+ * several match (/gestao/eventos/pedidos is Pedidos, not Eventos).
+ */
+export function activeEntry(
+  pathname: string,
+  items: readonly NavItem[],
+): NavItem | undefined {
+  return items
+    .filter((item) => isActive(pathname, item))
+    .sort((a, b) => b.href.length - a.href.length)[0];
+}
 
 /** Whether the menu shows the entry to someone with `permissions`. */
 export const canSee = (
@@ -247,6 +261,13 @@ export const MANAGE_MODULES: ManageModule[] = [
         label: "Eventos",
         icon: PartyPopper,
         anyPermission: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
+      },
+      // The orders of every event, to review.
+      {
+        href: "/gestao/eventos/pedidos",
+        label: "Pedidos",
+        icon: ReceiptText,
+        permission: "PAYMENTS_MANAGE",
       },
     ],
   },
