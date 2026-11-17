@@ -29,11 +29,14 @@ export function SpaceBlocksCard({
   spaceId,
   blocks,
   manager,
+  title = "Bloqueios",
 }: {
   spaceId: string;
   blocks: SpaceBlock[];
   /** BOOKINGS_MANAGE. */
   manager: boolean;
+  /** The overview of every space names each card after its space. */
+  title?: string;
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
@@ -113,7 +116,7 @@ export function SpaceBlocksCard({
   return (
     <Card>
       <CardHeader
-        title="Bloqueios"
+        title={title}
         description="Períodos em que o espaço não aceita reservas."
         action={
           manager ? (
