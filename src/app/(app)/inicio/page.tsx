@@ -133,8 +133,8 @@ export default async function HomePage() {
           <Shortcut
             href="/gestao"
             icon={<ShieldCheck aria-hidden />}
-            title="Gestão do condomínio"
-            description="Os números do condomínio, moradores, cadastros e os módulos contratados (reservas, eventos)."
+            title="Visão geral do condomínio"
+            description="Os números do condomínio e o que precisa de atenção: reservas para aprovar, cadastros, espaços."
           />
           {user.platformAdmin && (
             <Shortcut

@@ -42,7 +42,9 @@ export function HelpBrowser() {
 
   // How many areas the topics shown come from (headings only with more).
   const groups = (topics: HelpTopic[]) =>
-    new Set(topics.map((topic) => topic.area)).size;
+    HELP_GROUPS.filter((group) =>
+      topics.some((topic) => group.areas.includes(topic.area)),
+    ).length;
   const topics = useMemo(
     () =>
       viewer
@@ -212,12 +214,12 @@ export function HelpBrowser() {
       ) : (
         <div className="space-y-6">
           {HELP_GROUPS.map((group) => {
-            const inGroup = matches.filter(
-              (topic) => topic.area === group.area,
+            const inGroup = matches.filter((topic) =>
+              group.areas.includes(topic.area),
             );
             if (inGroup.length === 0) return null;
             return (
-              <section key={group.area} className="space-y-3">
+              <section key={group.label} className="space-y-3">
                 {groups(matches) > 1 && (
                   <h2 className="text-sm font-bold tracking-[0.08em] text-muted uppercase">
                     {group.label}
