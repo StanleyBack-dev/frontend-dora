@@ -42,6 +42,7 @@ export function DataTable<T>({
   getId,
   renderExpanded,
   renderDesktopExpanded,
+  initiallyOpen,
   className,
 }: {
   rows: T[];
@@ -54,6 +55,8 @@ export function DataTable<T>({
    * "detail" columns (e.g. the record organized in sections).
    */
   renderDesktopExpanded?: (row: T) => ReactNode;
+  /** Rows that start expanded (e.g. what waits for a decision). */
+  initiallyOpen?: (row: T) => boolean;
   className?: string;
 }) {
   const role = (column: DataTableColumn<T>) => column.mobile ?? "detail";
@@ -79,6 +82,7 @@ export function DataTable<T>({
             controls={controls}
             details={details}
             renderExpanded={renderExpanded}
+            initiallyOpen={initiallyOpen?.(row) ?? false}
           />
         ))}
       </ul>
@@ -119,6 +123,7 @@ export function DataTable<T>({
                 collapsed={collapsed}
                 expandable={expandable}
                 renderExpanded={renderDesktopExpanded}
+                initiallyOpen={initiallyOpen?.(row) ?? false}
               />
             ))}
           </tbody>
@@ -134,14 +139,16 @@ function DesktopRow<T>({
   collapsed,
   expandable,
   renderExpanded,
+  initiallyOpen,
 }: {
   row: T;
   columns: DataTableColumn<T>[];
   collapsed: DataTableColumn<T>[];
   expandable: boolean;
   renderExpanded?: (row: T) => ReactNode;
+  initiallyOpen: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initiallyOpen && expandable);
 
   return (
     <>
@@ -214,6 +221,7 @@ function MobileCard<T>({
   controls,
   details,
   renderExpanded,
+  initiallyOpen,
 }: {
   row: T;
   title?: DataTableColumn<T>;
@@ -221,9 +229,10 @@ function MobileCard<T>({
   controls: DataTableColumn<T>[];
   details: DataTableColumn<T>[];
   renderExpanded?: (row: T) => ReactNode;
+  initiallyOpen: boolean;
 }) {
-  const [open, setOpen] = useState(false);
   const expandable = details.length > 0 || Boolean(renderExpanded);
+  const [open, setOpen] = useState(initiallyOpen && expandable);
 
   return (
     <li className="overflow-hidden rounded-lg border border-border bg-surface">
