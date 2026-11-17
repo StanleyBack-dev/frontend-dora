@@ -281,7 +281,7 @@ export function EventTicketingFields({
         <Alert tone="warning">
           O condomínio ainda não tem PIX cadastrado: o evento só pode ser
           publicado depois do cadastro em{" "}
-          <Link href="/admin/pagamentos" className="font-semibold underline">
+          <Link href="/gestao/pagamentos" className="font-semibold underline">
             Administração → Pagamentos
           </Link>
           .

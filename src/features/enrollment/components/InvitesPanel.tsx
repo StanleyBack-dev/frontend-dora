@@ -50,7 +50,7 @@ function shareMessage(invite: EnrollmentInvite): string {
   const link = `${window.location.origin}/cadastro`;
   return (
     "Olá! 👋\n\n" +
-    "Faça o seu cadastro no Dora, o app de reservas e avisos do nosso condomínio.\n\n" +
+    "Faça o seu cadastro no Dora, o app do nosso condomínio: reservas, eventos, portaria e avisos.\n\n" +
     `🔗 *Link:* ${link}\n` +
     `🔑 *Código:* ${invite.code}\n\n` +
     `O código vale até ${formatDateTime(invite.expiresAt)}. ` +

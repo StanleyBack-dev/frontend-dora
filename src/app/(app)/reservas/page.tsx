@@ -10,11 +10,9 @@ import {
   SegmentedNav,
 } from "@/design-system";
 import { BookingCard } from "@/features/bookings/components/BookingCard";
-import { BookingsTabs } from "@/features/bookings/components/BookingsTabs";
-import { authed, getSessionUser } from "@/server/auth/current-user";
+import { authed } from "@/server/auth/current-user";
 import { bookingsService } from "@/server/services/bookings.service";
 import { requestTime } from "@/server/request-time";
-import { can } from "@/shared/lib/access";
 import {
   firstParam,
   pageParam,
@@ -30,29 +28,15 @@ export default async function MyBookingsPage({
 }: {
   searchParams: Promise<RawSearchParams>;
 }) {
-  const user = await getSessionUser();
   const params = await searchParams;
   const past = firstParam(params, "periodo") === "passadas";
   const page = pageParam(params);
-  const manager = can(user, "BOOKINGS_MANAGE");
 
-  const [bookings, pendingApproval] = await authed((token) =>
-    Promise.all([
-      bookingsService.mine(token, past ? "PAST" : "UPCOMING", {
-        page,
-        limit: PAGE_SIZE,
-      }),
-      manager
-        ? bookingsService
-            .all(token, {
-              status: "PENDING",
-              when: "UPCOMING",
-              page: 1,
-              limit: 1,
-            })
-            .then((result) => result.total)
-        : 0,
-    ]),
+  const bookings = await authed((token) =>
+    bookingsService.mine(token, past ? "PAST" : "UPCOMING", {
+      page,
+      limit: PAGE_SIZE,
+    }),
   );
   const href = (target: number) =>
     `/reservas?${past ? "periodo=passadas&" : ""}page=${target}`;
@@ -70,11 +54,6 @@ export default async function MyBookingsPage({
             Nova reserva
           </Link>
         }
-      />
-      <BookingsTabs
-        current="mine"
-        manager={manager}
-        pending={pendingApproval}
       />
       <SegmentedNav
         label="Período"

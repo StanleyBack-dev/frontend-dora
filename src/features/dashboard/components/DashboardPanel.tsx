@@ -49,7 +49,7 @@ export function DashboardPanel({
   const failed = dashboard.failedNotifications;
   const cards: DashboardCard[] = [
     {
-      href: canManageBookings ? "/reservas/gestao?situacao=PENDING" : null,
+      href: canManageBookings ? "/gestao/reservas?situacao=PENDING" : null,
       label: "Reservas para aprovar",
       value: dashboard.pendingBookings,
       hint:
@@ -60,7 +60,7 @@ export function DashboardPanel({
       tone: dashboard.pendingBookings > 0 ? "warning" : "neutral",
     },
     {
-      href: canManageBookings ? "/reservas/gestao" : null,
+      href: canManageBookings ? "/gestao/reservas" : null,
       label: "Reservas hoje",
       value: dashboard.bookingsToday,
       hint: "Confirmadas ou aguardando",
@@ -68,7 +68,7 @@ export function DashboardPanel({
       tone: "brand",
     },
     {
-      href: canManageUsers ? "/moradores" : null,
+      href: canManageUsers ? "/gestao/moradores" : null,
       label: "Moradores ativos",
       value: dashboard.activeUsers,
       hint: "Com acesso ao app (sem a equipe)",
@@ -76,7 +76,7 @@ export function DashboardPanel({
       tone: "neutral",
     },
     {
-      href: canManageUsers ? "/admin/cadastros" : null,
+      href: canManageUsers ? "/gestao/cadastros" : null,
       label: "Cadastros pendentes",
       value: dashboard.pendingEnrollments,
       hint:
@@ -87,7 +87,7 @@ export function DashboardPanel({
       tone: dashboard.pendingEnrollments > 0 ? "warning" : "neutral",
     },
     {
-      href: canManageSpaces ? "/espacos" : null,
+      href: canManageSpaces ? "/gestao/espacos" : null,
       label: "Espaços ativos",
       value: dashboard.activeSpaces,
       hint:
@@ -98,7 +98,7 @@ export function DashboardPanel({
       tone: dashboard.activeSpaces > 0 ? "neutral" : "warning",
     },
     {
-      href: canManageUnits ? "/admin/unidades" : null,
+      href: canManageUnits ? "/gestao/unidades" : null,
       label: "Unidades",
       value: dashboard.units,
       hint:

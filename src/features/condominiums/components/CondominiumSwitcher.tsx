@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Building2,
   Check,
@@ -15,6 +15,7 @@ import {
 import { cn } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { condominiumsClient } from "@/features/condominiums/api/condominiums.client";
+import { areaOf } from "@/features/layout/model/navigation";
 import type { SessionUser } from "@/shared/contracts/api";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { startNavigation } from "@/shared/lib/navigation-progress";
@@ -47,6 +48,7 @@ type Props = {
 // choice is remembered: the next login reopens it.
 export function CondominiumSwitcher({ user, collapsed, onNavigate }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const { showError } = useToast();
   const [open, setOpen] = useState(false);
   // "platform": going back to the platform view.
@@ -91,7 +93,17 @@ export function CondominiumSwitcher({ user, collapsed, onNavigate }: Props) {
       setSearch("");
       onNavigate();
       startNavigation();
-      router.push("/inicio");
+      // Out of every condominium: the platform. Into another: the same area
+      // (the management stays in the management).
+      router.push(
+        id === null
+          ? user.platformAdmin
+            ? "/administracao"
+            : "/inicio"
+          : areaOf(pathname) === "manage"
+            ? "/gestao"
+            : "/inicio",
+      );
       router.refresh();
     } catch (cause) {
       showError(
@@ -243,7 +255,7 @@ export function CondominiumSwitcher({ user, collapsed, onNavigate }: Props) {
           )}
           {user.platformAdmin && (
             <Link
-              href="/condominios"
+              href="/administracao/condominios"
               role="menuitem"
               onClick={() => {
                 setOpen(false);

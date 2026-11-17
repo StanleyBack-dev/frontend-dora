@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import type { AppModule } from "@/shared/graphql/schema-enums";
 
 export const condominiumIdSchema = z.uuid();
 
@@ -16,8 +17,17 @@ export const condominiumStatusSchema = z.object({
   status: z.enum(["ACTIVE", "SUSPENDED"]),
 });
 
+/** Every module sold apart (the type makes a new one show up here). */
+const APP_MODULES = [
+  "BOOKINGS",
+  "EVENTS",
+] as const satisfies readonly AppModule[];
+type MissingModule = Exclude<AppModule, (typeof APP_MODULES)[number]>;
+const everyModule: MissingModule extends never ? true : false = true;
+void everyModule;
+
 export const condominiumModuleSchema = z.object({
-  module: z.enum(["EVENTS"]),
+  module: z.enum(APP_MODULES),
   enabled: z.boolean(),
 });
 

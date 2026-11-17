@@ -285,11 +285,11 @@ export function SpaceForm({ space }: { space: Space | null }) {
         );
         // Back to the form (edit) so the photos can be sent again.
         startNavigation();
-        router.push(`/espacos/${saved.id}/editar`);
+        router.push(`/gestao/espacos/${saved.id}/editar`);
       } else {
         showSuccess(space ? "Espaço atualizado." : `${saved.name} cadastrado.`);
         startNavigation();
-        router.push(`/espacos/${saved.id}`);
+        router.push(`/gestao/espacos/${saved.id}`);
       }
       router.refresh();
     } catch (cause) {

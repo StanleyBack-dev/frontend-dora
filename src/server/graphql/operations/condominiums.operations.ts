@@ -107,3 +107,11 @@ export const deleteUnitDocument = graphql(`
     deleteUnit(id: $id)
   }
 `);
+
+export const condominiumDocument = graphql(`
+  query Condominium($id: ID!) {
+    condominium(id: $id) {
+      ...CondominiumFields
+    }
+  }
+`);

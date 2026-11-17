@@ -16,6 +16,8 @@ import {
   UserCog,
   UsersRound,
   type LucideIcon,
+  ScrollText,
+  Blocks,
 } from "lucide-react";
 import type { Permission, AppModule } from "@/shared/contracts/api";
 
@@ -51,16 +53,26 @@ export type HelpTopic = {
   permission?: Permission;
   /** …or with any of these. */
   anyPermission?: Permission[];
-  /** Only for who sees the admin area. */
+  /** Only for who manages the condominium. */
   admin?: boolean;
   /** An optional module (contracted apart): only while it is on. */
   module?: AppModule;
-  /** Where the topic lives in the menu (tour and help page). */
-  area: "main" | "account";
+  /**
+   * Where the topic lives: the resident's app menu (the tour walks it),
+   * the condominium's administration, the platform or the account menu.
+   */
+  area: "main" | "manage" | "platform" | "account";
   /** One or two lines for the guided tour. */
   tour: string;
   sections: Partial<Record<HelpSectionKind, HelpItem[]>>;
 };
+
+/** The help page groups the topics by area, in this order. */
+export const HELP_GROUPS: { areas: HelpTopic["area"][]; label: string }[] = [
+  { areas: ["main", "manage"], label: "Menus" },
+  { areas: ["platform"], label: "Administração do Dora" },
+  { areas: ["account"], label: "Sua conta" },
+];
 
 export const HELP_TOPICS: HelpTopic[] = [
   {
@@ -96,11 +108,11 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "espacos",
-    href: "/espacos",
+    href: "/gestao/espacos",
     title: "Espaços",
     icon: MapPin,
     permission: "SPACES_MANAGE",
-    area: "main",
+    area: "manage",
     tour: "Os espaços do condomínio: cadastre, edite e desative quadras, salão e outros, com fotos, horário e regras de reserva e de uso.",
     sections: {
       purpose: [
@@ -157,19 +169,7 @@ export const HELP_TOPICS: HelpTopic[] = [
           only: ["BOOKINGS_CREATE"],
         },
         {
-          text: "Na tela de reserva do espaço, use “Bloquear período” para fechá-lo numa manutenção ou evento; se houver reservas no período, você confirma o cancelamento e os moradores são avisados.",
-          only: ["BOOKINGS_MANAGE"],
-        },
-        {
           text: "Em “Próximas”, veja as reservas marcadas e cancele se precisar.",
-        },
-        {
-          text: "Em “Gestão”, veja todas as reservas do condomínio, aprove ou recuse as pendentes (com motivo), veja os convidados e cancele quando necessário.",
-          only: ["BOOKINGS_MANAGE"],
-        },
-        {
-          text: "Em “Taxas”, veja as taxas de uso do mês por unidade, marque as que já foram lançadas na cobrança do condomínio e exporte a planilha.",
-          only: ["BOOKINGS_MANAGE"],
         },
       ],
       rules: [
@@ -187,20 +187,16 @@ export const HELP_TOPICS: HelpTopic[] = [
         {
           text: "Reserva confirmada chega no app e no e-mail, com um convite que coloca o horário na agenda do celular. Recusa e cancelamento também são avisados.",
         },
-        {
-          text: "Você é avisado quando uma reserva precisa da sua aprovação.",
-          only: ["BOOKINGS_MANAGE"],
-        },
       ],
     },
   },
   {
     id: "comunicados",
-    href: "/comunicados",
+    href: "/gestao/comunicados",
     title: "Comunicados",
     icon: Megaphone,
     permission: "NOTIFICATIONS_BROADCAST",
-    area: "main",
+    area: "manage",
     tour: "Avisos para todo o condomínio ou para um grupo de acesso (moradores, gestores…).",
     sections: {
       howto: [
@@ -357,18 +353,6 @@ export const HELP_TOPICS: HelpTopic[] = [
         {
           text: "Pedido confirmado: cada pessoa tem o próprio ingresso com QR code (botão “Ingresso”). Mostre na portaria pelo app, ou envie o link pelo WhatsApp a quem vai com você (ou todos de uma vez); quem recebe abre o ingresso sem precisar de conta.",
         },
-        {
-          text: "Use “Novo evento” para criar: título, quando, onde (um espaço ou outro local), lotação, convidados de fora e a entrada. Paga: o valor da inteira e os públicos aceitos (adulto, criança, idoso, estudante…), cada um pagando inteira, meia, grátis ou outro valor, com a faixa de idade; o limite por unidade e qual PIX recebe (o do condomínio ou outro). Escolha também até quando os pedidos são aceitos: algumas horas antes do início (dá tempo de conferir os comprovantes) ou até o fim do evento. Ele fica como rascunho até você publicar.",
-          only: ["EVENTS_MANAGE"],
-        },
-        {
-          text: "Em “Pedidos”, na página do evento, confira o comprovante no extrato pelo código do pedido e os documentos de quem tem desconto, e aprove ou recuse com o motivo. O PIX do condomínio fica em Administração → Pagamentos.",
-          only: ["PAYMENTS_MANAGE"],
-        },
-        {
-          text: "Na página do evento, publique o rascunho (todos são avisados), edite enquanto ele não terminar ou cancele com o motivo (quem já foi avisado recebe o cancelamento).",
-          only: ["EVENTS_MANAGE"],
-        },
       ],
       rules: [
         {
@@ -382,11 +366,11 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "moradores",
-    href: "/moradores",
+    href: "/gestao/moradores",
     title: "Moradores",
     icon: UsersRound,
     permission: "USERS_MANAGE",
-    area: "main",
+    area: "manage",
     tour: "Quem mora no condomínio: unidade, complemento, telefone e acesso de cada morador.",
     sections: {
       purpose: [
@@ -417,11 +401,11 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "equipe",
-    href: "/equipe",
+    href: "/gestao/equipe",
     title: "Equipe",
     icon: UserCog,
     permission: "USERS_MANAGE",
-    area: "main",
+    area: "manage",
     tour: "A administração e a portaria do condomínio: contato, papel e acesso de cada pessoa.",
     sections: {
       purpose: [
@@ -480,11 +464,11 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "painel",
-    href: "/painel",
-    title: "Painel",
+    href: "/administracao",
+    title: "Administração",
     icon: ChartColumn,
     permission: "CONDOMINIUMS_MANAGE",
-    area: "main",
+    area: "platform",
     tour: "Os números do Dora: reservas, uso dos espaços, moradores e o que precisa de atenção, em todos os condomínios ou em um.",
     sections: {
       howto: [
@@ -513,16 +497,16 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "condominios",
-    href: "/condominios",
+    href: "/administracao/condominios",
     title: "Condomínios",
     icon: Building2,
     permission: "CONDOMINIUMS_MANAGE",
-    area: "main",
+    area: "platform",
     tour: "Todos os condomínios que usam o Dora: situação, gestores, membros e cadastros pendentes.",
     sections: {
       howto: [
         {
-          text: "Crie um condomínio, entre nele para administrar como gestor, edite os dados ou suspenda o acesso.",
+          text: "Crie um condomínio, entre nele para administrar como gestor, edite os dados ou suspenda o acesso. Toque no nome para abrir a página dele: os números, os módulos contratados e as pessoas (gestão, portaria e moradores), sem precisar entrar.",
         },
         {
           text: "Para trocar de condomínio a qualquer momento, use o seletor no topo do menu lateral; “Visão da plataforma” sai de todos. A escolha fica salva e o próximo login abre no mesmo lugar.",
@@ -539,15 +523,22 @@ export const HELP_TOPICS: HelpTopic[] = [
     },
   },
   {
-    id: "admin",
-    href: "/admin",
-    title: "Administração",
+    id: "gestao",
+    href: "/gestao",
+    title: "Condomínio",
     icon: ShieldCheck,
     admin: true,
-    area: "account",
-    tour: "Unidades, cadastros pelo link público, links de convite e os logs do sistema.",
+    area: "manage",
+    tour: "A administração do condomínio: a visão geral, comunicados, moradores, equipe, unidades e cadastros.",
     sections: {
       howto: [
+        {
+          text: "No menu lateral, cada módulo é um grupo (Reservas, Eventos, Condomínio) com as páginas de quem gerencia junto com as dos moradores: toque no grupo para abrir. Só aparecem os módulos contratados.",
+        },
+        {
+          text: "Visão geral: os números do condomínio e o que precisa de atenção.",
+          only: ["DASHBOARD_READ"],
+        },
         {
           text: "Unidades: cadastre blocos e números de uma vez (ex.: 101-110, 201). Os moradores ficam vinculados a uma unidade.",
           only: ["UNITS_MANAGE"],
@@ -561,8 +552,12 @@ export const HELP_TOPICS: HelpTopic[] = [
           only: ["USERS_MANAGE"],
         },
         {
-          text: "Logs e alertas: erros da API e do banco, eventos de segurança, avisos não entregues, rotinas do GitHub que falharam e erros de tela. Filtre por período, nível, tipo, ambiente ou busca e abra a seta para ver os detalhes.",
-          only: ["AUDIT_READ"],
+          text: "Dependentes: confira o documento de quem os moradores cadastraram e aprove ou recuse com o motivo.",
+          only: ["USERS_MANAGE"],
+        },
+        {
+          text: "Pagamentos: o PIX do condomínio, que recebe os ingressos dos eventos.",
+          only: ["PAYMENTS_MANAGE"],
         },
       ],
       rules: [
@@ -570,14 +565,149 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Tudo aqui vale só para o condomínio aberto no topo do menu. Algumas permissões só vêm do papel e não podem ser dadas a uma pessoa (moradores, permissões, histórico, suporte e condomínios).",
         },
         {
-          text: "Os logs ficam 90 dias e não guardam senhas, tokens ou e-mails completos.",
+          text: "Um módulo que o condomínio não contratou não aparece no menu.",
+        },
+      ],
+    },
+  },
+  {
+    id: "gestao-reservas",
+    href: "/gestao/reservas",
+    title: "Reservas: administração",
+    icon: CalendarDays,
+    module: "BOOKINGS",
+    anyPermission: ["BOOKINGS_MANAGE", "SPACES_MANAGE"],
+    area: "manage",
+    tour: "Todas as reservas do condomínio, os espaços e as taxas de uso.",
+    sections: {
+      howto: [
+        {
+          text: "Em Condomínio → Bloqueios, veja os períodos fechados de todos os espaços e bloqueie um espaço para uma manutenção ou um evento; reservas no período só são canceladas depois que você confirmar. Na página de cada espaço também há os bloqueios dele.",
+          only: ["BOOKINGS_MANAGE"],
+        },
+        {
+          text: "Em Convidados, veja os convidados das reservas de um dia (passe para o dia anterior ou o seguinte), quem convidou e quem já entrou pela portaria.",
+          only: ["GUESTS_CHECKIN"],
+        },
+        {
+          text: "Em Reservas, veja todas as reservas do condomínio, aprove ou recuse as pendentes (com motivo), veja os convidados e cancele quando necessário.",
+          only: ["BOOKINGS_MANAGE"],
+        },
+        {
+          text: "Em Taxas de uso, veja as taxas de uso do mês por unidade, marque as que já foram lançadas na cobrança do condomínio e exporte a planilha.",
+          only: ["BOOKINGS_MANAGE"],
+        },
+        {
+          text: "Na tela de reserva do espaço, use “Bloquear período” para fechá-lo numa manutenção ou evento; se houver reservas no período, você confirma o cancelamento e os moradores são avisados.",
+          only: ["BOOKINGS_MANAGE"],
+        },
+      ],
+      notices: [
+        {
+          text: "Você é avisado quando uma reserva precisa da sua aprovação.",
+          only: ["BOOKINGS_MANAGE"],
+        },
+      ],
+    },
+  },
+  {
+    id: "gestao-eventos",
+    href: "/gestao/eventos",
+    title: "Eventos: administração",
+    icon: PartyPopper,
+    module: "EVENTS",
+    anyPermission: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
+    area: "manage",
+    tour: "Os eventos do condomínio: crie e publique, acompanhe os ingressos e confira os pedidos. Você também faz os seus pedidos na página do evento.",
+    sections: {
+      howto: [
+        {
+          text: "Use “Novo evento” para criar: título, quando, onde (um espaço ou outro local), lotação, convidados de fora e a entrada. Paga: o valor da inteira e os públicos aceitos (adulto, criança, idoso, estudante…), cada um pagando inteira, meia, grátis ou outro valor, com a faixa de idade; o limite por unidade e qual PIX recebe (o do condomínio ou outro). Escolha também até quando os pedidos são aceitos: algumas horas antes do início (dá tempo de conferir os comprovantes) ou até o fim do evento. Ele fica como rascunho até você publicar.",
+          only: ["EVENTS_MANAGE"],
+        },
+        {
+          text: "Em Eventos, o botão “Pedidos” de cada card mostra quantos pedidos esperam a conferência. Em “Pedidos”, na página do evento, confira o comprovante no extrato pelo código do pedido e os documentos de quem tem desconto, e aprove ou recuse com o motivo. O PIX do condomínio fica em Condomínio → Pagamentos.",
+          only: ["PAYMENTS_MANAGE"],
+        },
+        {
+          text: "Em Eventos, o botão “Ingressos” do card (ou da página do evento) mostra quem tem ingresso e quem já entrou pela portaria, com a hora, por tipo de ingresso.",
+          only: ["EVENTS_MANAGE"],
+        },
+        {
+          text: "Na página do evento, publique o rascunho (todos são avisados), edite enquanto ele não terminar ou cancele com o motivo (quem já foi avisado recebe o cancelamento).",
+          only: ["EVENTS_MANAGE"],
+        },
+      ],
+    },
+  },
+  {
+    id: "pessoas",
+    href: "/administracao/pessoas",
+    title: "Pessoas",
+    icon: UsersRound,
+    permission: "CONDOMINIUMS_MANAGE",
+    area: "platform",
+    tour: "Todas as contas do Dora e onde cada pessoa tem acesso.",
+    sections: {
+      howto: [
+        {
+          text: "Busque pelo nome, e-mail ou usuário, e filtre pelo papel (administração da plataforma, gestor, portaria, morador) ou por um condomínio.",
+        },
+        {
+          text: "Cada condomínio da pessoa aparece com o papel dela; toque para abrir a página do condomínio. Um acesso riscado foi retirado.",
+        },
+      ],
+      rules: [
+        {
+          text: "A conta mostra se está ativa, desativada ou bloqueada por senhas erradas (até quando). As mudanças nas pessoas são feitas dentro de cada condomínio, no grupo Condomínio do menu.",
+        },
+      ],
+    },
+  },
+  {
+    id: "modulos",
+    href: "/administracao/modulos",
+    title: "Módulos",
+    icon: Blocks,
+    permission: "CONDOMINIUMS_MANAGE",
+    area: "platform",
+    tour: "O que cada condomínio contratou: Reservas, Eventos e os próximos.",
+    sections: {
+      howto: [
+        {
+          text: "Ligue ou desligue cada módulo de um condomínio na tabela; o topo de cada coluna mostra quantos condomínios têm o módulo.",
+        },
+      ],
+      rules: [
+        {
+          text: "Desligar não apaga nada: só fecha o menu, as páginas e a API do módulo naquele condomínio. Um condomínio novo começa sem módulos.",
+        },
+      ],
+    },
+  },
+  {
+    id: "logs",
+    href: "/administracao/logs",
+    title: "Logs e alertas",
+    icon: ScrollText,
+    permission: "AUDIT_READ",
+    area: "platform",
+    tour: "Erros, segurança, avisos não entregues e rotinas que falharam.",
+    sections: {
+      howto: [
+        {
+          text: "Erros da API e do banco, eventos de segurança, avisos não entregues, rotinas do GitHub que falharam e erros de tela. Filtre por período, nível, tipo, ambiente ou busca e abra a seta para ver os detalhes.",
           only: ["AUDIT_READ"],
+        },
+      ],
+      rules: [
+        {
+          text: "Os logs ficam 90 dias e não guardam senhas, tokens ou e-mails completos.",
         },
       ],
       notices: [
         {
           text: "Problemas sérios (erros, contas bloqueadas, excesso de tentativas, rotinas que falharam) também chegam no app e por e-mail, no máximo um aviso a cada 30 minutos por tipo.",
-          only: ["AUDIT_READ"],
         },
       ],
     },

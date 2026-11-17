@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { CircleHelp, PartyPopper, Sparkles, UserRound, X } from "lucide-react";
+import {
+  CircleHelp,
+  Globe,
+  PartyPopper,
+  Sparkles,
+  UserRound,
+  X,
+} from "lucide-react";
 import { Button, cn } from "@/design-system";
 import {
   visibleTopics,
@@ -23,15 +30,24 @@ const GAP = 16;
 const EDGE = 16;
 const CARD_WIDTH = 360;
 
-/** The tour, built from the manual and the menus this person can open. */
+/**
+ * The tour: the menu's entries in order (a page, or a module's group),
+ * Dora's administration in the account menu for the platform
+ * administrator, then the account; built from the manual and the menus
+ * this person can open.
+ */
 function stepsFor(
   name: string,
   permissions: readonly Permission[],
   showAdmin: boolean,
   modules: readonly AppModule[],
+  menuHrefs: readonly string[],
 ): Step[] {
   const topics = visibleTopics(permissions, showAdmin, modules);
-  const main = topics.filter((topic) => topic.area === "main");
+  // In the order of the menu on the screen.
+  const main = topics
+    .filter((topic) => topic.area === "main" && menuHrefs.includes(topic.href))
+    .sort((a, b) => menuHrefs.indexOf(a.href) - menuHrefs.indexOf(b.href));
   const account = topics.filter((topic) => topic.area === "account");
   const stepOf = (topic: HelpTopic): Step => {
     const Icon = topic.icon;
@@ -52,6 +68,19 @@ function stepsFor(
       icon: <Sparkles className="size-6" />,
     },
     ...main.map(stepOf),
+    // The platform administrator: every condominium, in the account menu.
+    ...(permissions.includes("CONDOMINIUMS_MANAGE")
+      ? [
+          {
+            id: "platform",
+            title: "Administração do Dora",
+            description:
+              "Em Administração, logo abaixo de Início: os números de todos os condomínios e os atalhos para condomínios, pessoas, módulos e logs.",
+            icon: <Globe className="size-5" />,
+            target: '[data-tour-nav="/administracao"]',
+          },
+        ]
+      : []),
     {
       id: "account",
       title: "Sua conta",
@@ -95,6 +124,7 @@ export function OnboardingTour({
   permissions,
   showAdmin,
   modules,
+  menuHrefs,
   onFinish,
   onMobileMenu,
 }: {
@@ -104,14 +134,16 @@ export function OnboardingTour({
   showAdmin: boolean;
   /** Optional modules of the condominium that are on. */
   modules: readonly AppModule[];
+  /** The menu's entries on the screen: a page, or a group's first page. */
+  menuHrefs: readonly string[];
   /** Finished or skipped. */
   onFinish: () => void;
   /** Opens or closes the phone menu drawer (where the items are). */
   onMobileMenu: (open: boolean) => void;
 }) {
   const steps = useMemo(
-    () => stepsFor(name, permissions, showAdmin, modules),
-    [name, permissions, showAdmin, modules],
+    () => stepsFor(name, permissions, showAdmin, modules, menuHrefs),
+    [name, permissions, showAdmin, modules, menuHrefs],
   );
   const [index, setIndex] = useState(0);
   const step = steps[Math.min(index, steps.length - 1)]!;

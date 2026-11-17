@@ -20,6 +20,7 @@ export const loginDocument = graphql(`
         birthDate
         onboardingCompleted
         platformAdmin
+        member
         condominium {
           id
           name
@@ -73,6 +74,7 @@ export const meDocument = graphql(`
       birthDate
       onboardingCompleted
       platformAdmin
+      member
       condominium {
         id
         name
@@ -120,6 +122,7 @@ export const updateMyProfileDocument = graphql(`
       birthDate
       onboardingCompleted
       platformAdmin
+      member
       condominium {
         id
         name

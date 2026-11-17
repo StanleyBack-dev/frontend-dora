@@ -2,27 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PartyPopper } from "lucide-react";
 import { Spinner } from "@/design-system";
 import { condominiumsClient } from "@/features/condominiums/api/condominiums.client";
+import { APP_MODULES } from "@/features/condominiums/model/app-modules";
 import type { AppModule, Condominium } from "@/shared/contracts/condominiums";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
-
-const MODULES: {
-  module: AppModule;
-  label: string;
-  description: string;
-  icon: React.ReactNode;
-}[] = [
-  {
-    module: "EVENTS",
-    label: "Eventos",
-    description:
-      "Eventos do condomínio com ingressos (gratuitos ou pagos por Pix) e entrada por QR code.",
-    icon: <PartyPopper aria-hidden className="size-4" />,
-  },
-];
 
 // The optional modules a condominium contracted apart (platform only).
 // Each switch saves on its own; turning one off keeps its data and only
@@ -71,7 +56,7 @@ export function CondominiumModules({
         Cobrados à parte. Desligar não apaga nada: só fecha o menu e as páginas
         do módulo.
       </p>
-      {MODULES.map((item) => {
+      {APP_MODULES.map((item) => {
         const on = enabled.includes(item.module);
         return (
           <label

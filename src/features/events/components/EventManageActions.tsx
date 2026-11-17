@@ -61,7 +61,7 @@ export function EventManageActions({ event }: { event: CondominiumEvent }) {
     <>
       <div className="flex flex-wrap gap-2">
         <Link
-          href={`/eventos/${event.id}/editar`}
+          href={`/gestao/eventos/${event.id}/editar`}
           className={cn(buttonClasses("secondary"), "gap-2")}
         >
           <Pencil aria-hidden className="size-4" />

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Building2,
@@ -15,13 +16,14 @@ import {
   Badge,
   Button,
   Card,
+  ChoiceCards,
   DataTable,
   Drawer,
   EmptyState,
   Field,
+  FilterResults,
   Modal,
   Select,
-  ChoiceCards,
   type ChoiceOption,
   type DataTableColumn,
 } from "@/design-system";
@@ -72,12 +74,15 @@ export function CondominiumsConsole({
   condominiums,
   currentId,
   filtered,
+  filters,
 }: {
   condominiums: Condominium[];
   /** The condominium the session is working in (highlighted). */
   currentId: string | null;
   /** Search or status filter applied (changes the empty message). */
   filtered: boolean;
+  /** The filter panel: below "Novo condomínio", above the list. */
+  filters?: ReactNode;
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
@@ -154,7 +159,8 @@ export function CondominiumsConsole({
     try {
       await condominiumsClient.switchTo(condominium.id);
       startNavigation();
-      router.push("/inicio");
+      // The platform enters a condominium to administer it.
+      router.push("/gestao");
       router.refresh();
     } catch (cause) {
       fail(cause, "Não foi possível entrar no condomínio.");
@@ -169,14 +175,17 @@ export function CondominiumsConsole({
       mobile: "title",
       render: (item) => (
         <span className="flex flex-col">
-          <span className="font-semibold text-fg">
+          <Link
+            href={`/administracao/condominios/${item.id}`}
+            className="font-semibold text-fg hover:underline"
+          >
             {item.name}
             {item.id === currentId && (
               <Badge tone="brand" className="ml-2 align-middle">
                 Aberto agora
               </Badge>
             )}
-          </span>
+          </Link>
           <span className="text-xs text-soft">
             {item.city}/{item.state}
           </span>
@@ -289,29 +298,33 @@ export function CondominiumsConsole({
         </Button>
       </div>
 
-      <Card>
-        {condominiums.length === 0 ? (
-          <EmptyState
-            icon={<Building2 className="size-5" />}
-            title={
-              filtered
-                ? "Nenhum condomínio encontrado"
-                : "Nenhum condomínio ainda"
-            }
-            description={
-              filtered
-                ? "Tente outra busca."
-                : "Cadastre o primeiro condomínio, entre nele e adicione o gestor."
-            }
-          />
-        ) : (
-          <DataTable
-            rows={condominiums}
-            columns={columns}
-            getId={(item) => item.id}
-          />
-        )}
-      </Card>
+      {filters}
+
+      <FilterResults>
+        <Card>
+          {condominiums.length === 0 ? (
+            <EmptyState
+              icon={<Building2 className="size-5" />}
+              title={
+                filtered
+                  ? "Nenhum condomínio encontrado"
+                  : "Nenhum condomínio ainda"
+              }
+              description={
+                filtered
+                  ? "Tente outra busca."
+                  : "Cadastre o primeiro condomínio, entre nele e adicione o gestor."
+              }
+            />
+          ) : (
+            <DataTable
+              rows={condominiums}
+              columns={columns}
+              getId={(item) => item.id}
+            />
+          )}
+        </Card>
+      </FilterResults>
 
       <Drawer
         open={editing !== null}

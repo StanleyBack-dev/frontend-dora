@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import {
   ArrowUpRight,
@@ -11,13 +12,13 @@ import {
   DoorOpen,
   LifeBuoy,
   Megaphone,
+  Globe,
+  ShieldCheck,
 } from "lucide-react";
 import { Card } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
-import { DashboardPanel } from "@/features/dashboard/components/DashboardPanel";
-import { authed, getSessionUser } from "@/server/auth/current-user";
-import { dashboardService } from "@/server/services/dashboard.service";
-import { can } from "@/shared/lib/access";
+import { getSessionUser } from "@/server/auth/current-user";
+import { can, canManageHere } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Início" };
 
@@ -72,11 +73,9 @@ function Shortcut({
 export default async function HomePage() {
   const user = await getSessionUser();
   const condominium = user.condominium;
-  // The overview is the condominium's: none without one.
-  const isManager = Boolean(condominium) && can(user, "DASHBOARD_READ");
-  const dashboard = isManager
-    ? await authed((token) => dashboardService.get(token))
-    : null;
+  // The gate staff work at the gate: their home is the Portaria.
+  if (user.group === "CONCIERGE" && condominium) redirect("/portaria");
+  const manages = canManageHere(user);
   const firstName = user.name.split(" ")[0];
 
   return (
@@ -104,9 +103,9 @@ export default async function HomePage() {
           </h1>
           <p className="mt-3 text-[15px] text-chrome-muted">
             {condominium
-              ? `Você está como ${GROUP_LABELS[user.group].toLowerCase()}. Reserve quadras e espaços, acompanhe avisos e fale com a administração.`
+              ? `Você está como ${GROUP_LABELS[user.group].toLowerCase()}. Reserve espaços, participe dos eventos, acompanhe os avisos e fale com a administração.`
               : user.platformAdmin
-                ? "Você está na visão da plataforma. Escolha um condomínio para trabalhar nele, ou gerencie todos no menu Condomínios."
+                ? "Você está na visão da plataforma. Abra Administração no menu lateral, ou escolha um condomínio para trabalhar nele."
                 : "Você ainda não tem acesso a um condomínio. Peça à administração do seu condomínio o link de cadastro."}
           </p>
         </div>
@@ -115,13 +114,13 @@ export default async function HomePage() {
       {!condominium && user.platformAdmin && (
         <div className="grid gap-4 sm:grid-cols-2">
           <Shortcut
-            href="/painel"
+            href="/administracao"
             icon={<ChartColumn aria-hidden />}
-            title="Painel"
+            title="Administração"
             description="Reservas, uso dos espaços, moradores e o que precisa de atenção em todos os condomínios."
           />
           <Shortcut
-            href="/condominios"
+            href="/administracao/condominios"
             icon={<Building2 aria-hidden />}
             title="Condomínios"
             description="Cadastre condomínios, veja os números de cada um e entre para administrar."
@@ -129,15 +128,23 @@ export default async function HomePage() {
         </div>
       )}
 
-      {dashboard && (
-        <DashboardPanel
-          dashboard={dashboard}
-          canManageUsers={can(user, "USERS_MANAGE")}
-          canManageUnits={can(user, "UNITS_MANAGE")}
-          canManageSupport={can(user, "SUPPORT_MANAGE")}
-          canManageBookings={can(user, "BOOKINGS_MANAGE")}
-          canManageSpaces={can(user, "SPACES_MANAGE")}
-        />
+      {manages && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Shortcut
+            href="/gestao"
+            icon={<ShieldCheck aria-hidden />}
+            title="Visão geral do condomínio"
+            description="Os números do condomínio e o que precisa de atenção: reservas para aprovar, cadastros, espaços."
+          />
+          {user.platformAdmin && (
+            <Shortcut
+              href="/administracao"
+              icon={<Globe aria-hidden />}
+              title="Administração"
+              description="Todos os condomínios, os números do Dora, as pessoas, os módulos e os logs."
+            />
+          )}
+        </div>
       )}
 
       <section aria-label="Atalhos" className="space-y-3">
@@ -145,7 +152,8 @@ export default async function HomePage() {
           Acesso rápido
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
-          {condominium && can(user, "BOOKINGS_CREATE") ? (
+          {condominium?.modules.includes("BOOKINGS") &&
+          can(user, "BOOKINGS_CREATE") ? (
             <Shortcut
               href="/reservas/nova"
               icon={<CalendarClock aria-hidden />}
@@ -180,7 +188,7 @@ export default async function HomePage() {
           />
           {can(user, "NOTIFICATIONS_BROADCAST") ? (
             <Shortcut
-              href="/comunicados"
+              href="/gestao/comunicados"
               icon={<Megaphone aria-hidden />}
               title="Comunicados"
               description="Envie um aviso para os moradores."

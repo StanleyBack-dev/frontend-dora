@@ -44,20 +44,27 @@ import {
   ViewerProvider,
   type Viewer,
 } from "@/features/layout/components/ViewerContext";
+import { SidebarGroup } from "@/features/layout/components/SidebarGroup";
 import {
   ACCOUNT_NAV,
-  ADMIN_NAV,
-  SUPPORT_PROJECT_NAV,
+  activeEntry,
   canSee,
   isActive,
-  PRIMARY_NAV,
+  isSection,
+  ADMIN_NAV,
+  PLATFORM_NAV,
+  sidebarPages,
+  SUPPORT_PROJECT_NAV,
+  visibleSidebar,
   type NavItem,
+  type NavSection,
 } from "@/features/layout/model/navigation";
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { PushNotificationsInvite } from "@/features/notifications/components/PushNotificationsInvite";
 import type { SessionUser, AppModule } from "@/shared/contracts/api";
 import { startNavigation } from "@/shared/lib/navigation-progress";
 import { apiRequest } from "@/shared/lib/api-client";
+import { canRunPlatform } from "@/shared/lib/access";
 
 // The collapsed state is a per-browser preference. It lives in localStorage
 // (read through an external store so the server render stays expanded).
@@ -204,6 +211,7 @@ export function AppShell({
     | "photoUrl"
     | "onboardingCompleted"
     | "platformAdmin"
+    | "member"
     | "condominium"
     | "condominiums"
   >;
@@ -247,13 +255,40 @@ export function AppShell({
     () => false,
   );
 
-  const primary = PRIMARY_NAV.filter((item) =>
-    canSee(item, user.permissions, user.condominium?.modules),
-  );
+  // One menu by module (Início, Reservas, Eventos, Portaria, Condomínio),
+  // with what this person can open; for the platform administrator,
+  // Administração right below Início.
+  const modules = user.condominium?.modules ?? NO_MODULES;
+  const byModule = visibleSidebar(user.permissions, modules);
+  const entries = canRunPlatform(user)
+    ? [...byModule.slice(0, 1), ADMIN_NAV, ...byModule.slice(1)]
+    : byModule;
+  // The administration's pages: found by the menu search.
+  const platformPages = canRunPlatform(user)
+    ? PLATFORM_NAV.filter((item) => canSee(item, user.permissions, modules))
+    : [];
   const account = [
     ...ACCOUNT_NAV,
     ...(showSupportProject ? [SUPPORT_PROJECT_NAV] : []),
-    ...(showAdmin ? [ADMIN_NAV] : []),
+  ];
+  const everyItem = [...sidebarPages(entries), ...account];
+  // The entry of the page on the screen: the most specific match.
+  const activeItem = activeEntry(pathname, everyItem);
+  // A group is open while its page is on the screen, unless folded by hand.
+  const [folded, setFolded] = useState<Record<string, boolean>>({});
+  const isOpen = (group: NavSection) =>
+    folded[group.id] ?? group.items.some((item) => item === activeItem);
+  const toggle = (group: NavSection) =>
+    setFolded((current) => ({ ...current, [group.id]: !isOpen(group) }));
+  // The menu's entries on the screen (the tour walks them): a page, or a
+  // group by its first page.
+  const menuHrefs = entries.map((entry) =>
+    isSection(entry) ? entry.items[0].href : entry.href,
+  );
+  // The menu search finds every page this person can open.
+  const searchable = [
+    ...everyItem,
+    ...platformPages.filter((item) => item.href !== ADMIN_NAV.href),
   ];
   const accountActive = account.some((item) => isActive(pathname, item));
 
@@ -368,23 +403,27 @@ export function AppShell({
                 collapsed ? "px-4 lg:px-3" : "px-4",
               )}
             >
-              <p
-                className={cn(
-                  "px-3.5 pb-1 text-[10px] font-bold tracking-[0.14em] text-chrome-subtle uppercase",
-                  collapsed && "lg:sr-only",
-                )}
-              >
-                Menu
-              </p>
-              {primary.map((item) => (
-                <NavLink
-                  key={item.href}
-                  item={item}
-                  active={isActive(pathname, item)}
-                  collapsed={collapsed}
-                  onNavigate={closeMobile}
-                />
-              ))}
+              {entries.map((entry) =>
+                isSection(entry) ? (
+                  <SidebarGroup
+                    key={entry.id}
+                    group={entry}
+                    open={isOpen(entry)}
+                    onToggle={() => toggle(entry)}
+                    activeItem={activeItem}
+                    collapsed={collapsed}
+                    onNavigate={closeMobile}
+                  />
+                ) : (
+                  <NavLink
+                    key={entry.href}
+                    item={entry}
+                    active={entry === activeItem}
+                    collapsed={collapsed}
+                    onNavigate={closeMobile}
+                  />
+                ),
+              )}
             </nav>
 
             <div
@@ -400,7 +439,7 @@ export function AppShell({
                     <NavLink
                       key={item.href}
                       item={item}
-                      active={isActive(pathname, item)}
+                      active={item === activeItem}
                       collapsed
                       onNavigate={closeMobile}
                     />
@@ -428,7 +467,7 @@ export function AppShell({
                       <NavLink
                         key={item.href}
                         item={item}
-                        active={isActive(pathname, item)}
+                        active={item === activeItem}
                         collapsed={false}
                         onNavigate={() => {
                           // Picking an item folds the "Conta" section back.
@@ -528,7 +567,7 @@ export function AppShell({
                 <Avatar name={user.name} src={user.photoUrl} size="sm" />
               </Link>
               <MenuSearch
-                items={[...primary, ...account]}
+                items={searchable}
                 className="min-w-0 flex-1 sm:max-w-sm"
               />
               <div className="ml-auto flex items-center gap-1">
@@ -612,6 +651,7 @@ export function AppShell({
             permissions={user.permissions}
             showAdmin={showAdmin}
             modules={user.condominium?.modules ?? NO_MODULES}
+            menuHrefs={menuHrefs}
             onFinish={finishTour}
             onMobileMenu={setMobileOpen}
           />
