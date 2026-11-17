@@ -12,47 +12,59 @@ import {
   peopleCount,
 } from "@/features/events/model/order-labels";
 import type { EventOrder } from "@/shared/contracts/events";
-import { formatCents, formatDateTime } from "@/shared/lib/format";
+import { formatCents } from "@/shared/lib/format";
+
+/** Whose tickets these are: up to two names and how many more. */
+const holders = (order: EventOrder) => {
+  const names = order.attendees.map((person) => person.name);
+  const more = names.length - 2;
+  return more > 0
+    ? `${names.slice(0, 2).join(", ")} +${more}`
+    : names.join(", ");
+};
 
 const amount = (order: EventOrder) =>
   order.totalCents > 0 ? formatCents(order.totalCents) : "Grátis";
 
-// The columns: who ordered, the unit, the people, the amount and the
-// status; when it was ordered goes under the row (and into the phone card).
+// The columns: who ordered, whose tickets, the unit, the amount and the
+// status (on phones: whose tickets, a summary line and the status; who
+// ordered goes inside). The code, the dates, the people and the receipt
+// open under the row.
 const COLUMNS: DataTableColumn<EventOrder>[] = [
   {
-    key: "order",
-    label: "Pedido",
-    mobile: "title",
+    key: "buyer",
+    label: "Quem pediu",
+    // Phones: inside the card (its title is whose tickets).
+    mobile: "hidden",
     render: (order) => (
-      <span className="flex flex-col">
-        <span className="font-semibold text-fg">
-          {order.buyerName ?? "Conta removida"}
-        </span>
-        <span className="font-mono text-xs text-soft">{order.code}</span>
+      <span className="font-semibold text-fg">
+        {order.buyerName ?? "Conta removida"}
       </span>
     ),
-    renderMobile: (order) => (
-      <>
-        <span className="font-mono">{order.code}</span> ·{" "}
-        {order.buyerName ?? "Conta removida"}
-      </>
+  },
+  {
+    key: "holders",
+    label: "Ingressos de",
+    mobile: "title",
+    render: (order) => (
+      <span
+        className="block max-w-56 truncate text-fg"
+        title={order.attendees.map((person) => person.name).join(", ")}
+      >
+        {holders(order)}
+      </span>
     ),
   },
   {
     key: "unit",
+    mobile: "hidden",
     label: "Unidade",
     className: "whitespace-nowrap",
     render: (order) => order.unitLabel ?? "—",
   },
   {
-    key: "people",
-    label: "Pessoas",
-    className: "whitespace-nowrap",
-    render: (order) => peopleCount(order),
-  },
-  {
     key: "amount",
+    mobile: "hidden",
     label: "Valor",
     className: "whitespace-nowrap",
     render: amount,
@@ -76,12 +88,6 @@ const COLUMNS: DataTableColumn<EventOrder>[] = [
       [order.unitLabel, peopleCount(order), amount(order)]
         .filter(Boolean)
         .join(" · "),
-  },
-  {
-    key: "createdAt",
-    label: "Pedido em",
-    desktop: "detail",
-    render: (order) => formatDateTime(order.createdAt),
   },
 ];
 
@@ -116,8 +122,8 @@ export function EventOrdersReview({
       initiallyOpen={(order) => order.status === "AWAITING_REVIEW"}
       renderDesktopExpanded={(order) => <EventOrderDetails order={order} />}
       renderExpanded={(order) => (
-        <div className="border-t border-border">
-          <EventOrderDetails order={order} />
+        <div className="border-t border-border bg-surface-muted/40 px-3 py-3">
+          <EventOrderDetails order={order} showBuyer />
         </div>
       )}
     />
