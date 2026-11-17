@@ -18,7 +18,7 @@ export default async function PlatformModulesPage() {
 
   return (
     <>
-      <BackLink href="/plataforma" label="Administração" />
+      <BackLink href="/administracao" label="Administração" />
       <PageHeader
         title="Módulos"
         description="O que cada condomínio contratou. Desligar não apaga nada: só fecha o menu e as páginas do módulo."

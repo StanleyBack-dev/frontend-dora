@@ -105,7 +105,7 @@ export default async function HomePage() {
             {condominium
               ? `Você está como ${GROUP_LABELS[user.group].toLowerCase()}. Reserve quadras e espaços, acompanhe avisos e fale com a administração.`
               : user.platformAdmin
-                ? "Você está na visão da plataforma. Abra a área Plataforma no menu lateral, ou escolha um condomínio para trabalhar nele."
+                ? "Você está na visão da plataforma. Abra Administração no menu lateral, ou escolha um condomínio para trabalhar nele."
                 : "Você ainda não tem acesso a um condomínio. Peça à administração do seu condomínio o link de cadastro."}
           </p>
         </div>
@@ -114,13 +114,13 @@ export default async function HomePage() {
       {!condominium && user.platformAdmin && (
         <div className="grid gap-4 sm:grid-cols-2">
           <Shortcut
-            href="/plataforma"
+            href="/administracao"
             icon={<ChartColumn aria-hidden />}
             title="Administração"
             description="Reservas, uso dos espaços, moradores e o que precisa de atenção em todos os condomínios."
           />
           <Shortcut
-            href="/plataforma/condominios"
+            href="/administracao/condominios"
             icon={<Building2 aria-hidden />}
             title="Condomínios"
             description="Cadastre condomínios, veja os números de cada um e entre para administrar."
@@ -138,10 +138,10 @@ export default async function HomePage() {
           />
           {user.platformAdmin && (
             <Shortcut
-              href="/plataforma"
+              href="/administracao"
               icon={<Globe aria-hidden />}
-              title="Plataforma"
-              description="Todos os condomínios, os números do Dora e os logs."
+              title="Administração"
+              description="Todos os condomínios, os números do Dora, as pessoas, os módulos e os logs."
             />
           )}
         </div>

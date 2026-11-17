@@ -46,7 +46,7 @@ export default async function PlatformCondominiumPage({
   return (
     <>
       <Link
-        href="/plataforma/condominios"
+        href="/administracao/condominios"
         className="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
       >
         <ArrowLeft className="size-4" /> Condomínios

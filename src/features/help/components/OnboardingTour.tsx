@@ -77,7 +77,7 @@ function stepsFor(
             description:
               "Em Administração, logo abaixo de Início: os números de todos os condomínios e os atalhos para condomínios, pessoas, módulos e logs.",
             icon: <Globe className="size-5" />,
-            target: '[data-tour-nav="/plataforma"]',
+            target: '[data-tour-nav="/administracao"]',
           },
         ]
       : []),

@@ -22,7 +22,7 @@ export function NoCondominium({
         description={description}
         action={
           user.platformAdmin ? (
-            <Link href="/plataforma/condominios" className={buttonClasses()}>
+            <Link href="/administracao/condominios" className={buttonClasses()}>
               Ver condomínios
             </Link>
           ) : undefined

@@ -98,7 +98,7 @@ export function CondominiumSwitcher({ user, collapsed, onNavigate }: Props) {
       router.push(
         id === null
           ? user.platformAdmin
-            ? "/plataforma"
+            ? "/administracao"
             : "/inicio"
           : areaOf(pathname) === "manage"
             ? "/gestao"
@@ -255,7 +255,7 @@ export function CondominiumSwitcher({ user, collapsed, onNavigate }: Props) {
           )}
           {user.platformAdmin && (
             <Link
-              href="/plataforma/condominios"
+              href="/administracao/condominios"
               role="menuitem"
               onClick={() => {
                 setOpen(false);

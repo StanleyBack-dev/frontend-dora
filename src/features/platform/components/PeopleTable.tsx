@@ -40,7 +40,7 @@ export function PeopleTable({
           {person.memberships.map((membership) => (
             <Link
               key={membership.condominiumId}
-              href={`/plataforma/condominios/${membership.condominiumId}`}
+              href={`/administracao/condominios/${membership.condominiumId}`}
               className={cn(
                 "rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-fg transition-colors hover:border-brand-border hover:bg-brand-soft",
                 !membership.active && "line-through opacity-60",
