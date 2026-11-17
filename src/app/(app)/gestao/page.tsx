@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import { Card, PageHeader } from "@/design-system";
+import { ArrowUpRight, House } from "lucide-react";
+import { buttonClasses, Card, PageHeader } from "@/design-system";
 import { DashboardPanel } from "@/features/dashboard/components/DashboardPanel";
 import { visibleManageModules } from "@/features/layout/model/navigation";
 import { authed, getSessionUser } from "@/server/auth/current-user";
@@ -36,6 +36,12 @@ export default async function ManagementPage() {
       <PageHeader
         title="Gestão"
         description={`A administração do ${condominium?.name ?? "condomínio"}: escolha o módulo no menu lateral para ver só o que é dele.`}
+        actions={
+          <Link href="/inicio" className={buttonClasses("secondary")}>
+            <House aria-hidden className="size-4" />
+            Ver como morador
+          </Link>
+        }
       />
 
       <section aria-label="Módulos" className="space-y-3">

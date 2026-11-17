@@ -82,6 +82,11 @@ export type SessionUser = {
   group: UserGroup;
   /** Runs the platform (every condominium). */
   platformAdmin: boolean;
+  /**
+   * Has a membership (resident or staff) in the session's condominium. The
+   * platform administrator opens any condominium without one (support).
+   */
+  member: boolean;
   /** Null: no condominium chosen or available. */
   condominium: CurrentCondominium | null;
   condominiums: MemberCondominium[];

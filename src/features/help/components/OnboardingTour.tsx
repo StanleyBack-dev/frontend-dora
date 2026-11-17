@@ -15,6 +15,7 @@ import {
   type HelpTopic,
 } from "@/features/help/model/help-topics";
 import type { Permission, AppModule } from "@/shared/contracts/api";
+import type { AreaId } from "@/features/layout/model/navigation";
 
 type Step = {
   id: string;
@@ -30,15 +31,34 @@ const GAP = 16;
 const EDGE = 16;
 const CARD_WIDTH = 360;
 
-/** The tour, built from the manual and the menus this person can open. */
+/** The help topics' area of each area of the app. */
+const TOPIC_AREA: Record<AreaId, HelpTopic["area"]> = {
+  app: "main",
+  manage: "manage",
+  platform: "platform",
+};
+
+/**
+ * The tour of the area the person is in (the resident's app, the
+ * management or the platform), over the menu items on the screen, built
+ * from the manual and the menus this person can open.
+ */
 function stepsFor(
   name: string,
   permissions: readonly Permission[],
   showAdmin: boolean,
   modules: readonly AppModule[],
+  area: AreaId,
+  menuHrefs: readonly string[],
 ): Step[] {
   const topics = visibleTopics(permissions, showAdmin, modules);
-  const main = topics.filter((topic) => topic.area === "main");
+  // In the order of the menu on the screen.
+  const main = topics
+    .filter(
+      (topic) =>
+        topic.area === TOPIC_AREA[area] && menuHrefs.includes(topic.href),
+    )
+    .sort((a, b) => menuHrefs.indexOf(a.href) - menuHrefs.indexOf(b.href));
   const account = topics.filter((topic) => topic.area === "account");
   const stepOf = (topic: HelpTopic): Step => {
     const Icon = topic.icon;
@@ -59,6 +79,19 @@ function stepsFor(
       icon: <Sparkles className="size-6" />,
     },
     ...main.map(stepOf),
+    // The management: one tab per module, each with its own menu.
+    ...(area === "manage"
+      ? [
+          {
+            id: "modules",
+            title: "Módulos",
+            description:
+              "As abas Geral, Reservas e Eventos mostram só os menus de cada módulo contratado pelo condomínio.",
+            icon: <LayoutGrid className="size-5" />,
+            target: '[data-tour="modules"]',
+          },
+        ]
+      : []),
     // Managers and the platform: the other areas, each with its own menu.
     ...(showAdmin || permissions.includes("CONDOMINIUMS_MANAGE")
       ? [
@@ -132,6 +165,8 @@ export function OnboardingTour({
   permissions,
   showAdmin,
   modules,
+  area,
+  menuHrefs,
   onFinish,
   onMobileMenu,
 }: {
@@ -141,14 +176,18 @@ export function OnboardingTour({
   showAdmin: boolean;
   /** Optional modules of the condominium that are on. */
   modules: readonly AppModule[];
+  /** The area on the screen: the tour walks its menu. */
+  area: AreaId;
+  /** The menu items on the screen now. */
+  menuHrefs: readonly string[];
   /** Finished or skipped. */
   onFinish: () => void;
   /** Opens or closes the phone menu drawer (where the items are). */
   onMobileMenu: (open: boolean) => void;
 }) {
   const steps = useMemo(
-    () => stepsFor(name, permissions, showAdmin, modules),
-    [name, permissions, showAdmin, modules],
+    () => stepsFor(name, permissions, showAdmin, modules, area, menuHrefs),
+    [name, permissions, showAdmin, modules, area, menuHrefs],
   );
   const [index, setIndex] = useState(0);
   const step = steps[Math.min(index, steps.length - 1)]!;

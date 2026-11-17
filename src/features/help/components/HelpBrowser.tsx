@@ -7,6 +7,7 @@ import { HelpTopicContent } from "@/features/help/components/HelpTopicContent";
 import {
   sectionsFor,
   visibleTopics,
+  HELP_GROUPS,
   type HelpTopic,
 } from "@/features/help/model/help-topics";
 import { useViewer } from "@/features/layout/components/ViewerContext";
@@ -39,6 +40,9 @@ export function HelpBrowser() {
     });
   const box = useRef<HTMLDivElement>(null);
 
+  // How many areas the topics shown come from (headings only with more).
+  const groups = (topics: HelpTopic[]) =>
+    new Set(topics.map((topic) => topic.area)).size;
   const topics = useMemo(
     () =>
       viewer
@@ -206,54 +210,71 @@ export function HelpBrowser() {
           Nenhuma ajuda com “{query.trim()}”.
         </p>
       ) : (
-        <div className="grid items-start gap-3 lg:grid-cols-2">
-          {matches.map((topic) => {
-            const Icon = topic.icon;
-            const isOpen = expanded.has(topic.id);
+        <div className="space-y-6">
+          {HELP_GROUPS.map((group) => {
+            const inGroup = matches.filter(
+              (topic) => topic.area === group.area,
+            );
+            if (inGroup.length === 0) return null;
             return (
-              <Card
-                key={topic.id}
-                id={topic.id}
-                className={cn(
-                  "scroll-mt-20 overflow-hidden transition-shadow",
-                  highlight === topic.id && "ring-2 ring-brand",
+              <section key={group.area} className="space-y-3">
+                {groups(matches) > 1 && (
+                  <h2 className="text-sm font-bold tracking-[0.08em] text-muted uppercase">
+                    {group.label}
+                  </h2>
                 )}
-              >
-                <h2>
-                  <button
-                    type="button"
-                    onClick={() => toggle(topic.id)}
-                    aria-expanded={isOpen}
-                    aria-controls={`${topic.id}-content`}
-                    className={cn(
-                      "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-muted sm:px-5",
-                      isOpen && "border-b border-border",
-                    )}
-                  >
-                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-accent-soft text-accent">
-                      <Icon aria-hidden className="size-4" />
-                    </span>
-                    <span className="min-w-0 flex-1 text-[15px] font-semibold text-fg">
-                      {topic.title}
-                    </span>
-                    <ChevronDown
-                      aria-hidden
-                      className={cn(
-                        "size-4 shrink-0 text-soft transition-transform",
-                        isOpen && "rotate-180",
-                      )}
-                    />
-                  </button>
-                </h2>
-                {isOpen && (
-                  <CardBody id={`${topic.id}-content`}>
-                    <HelpTopicContent
-                      topic={topic}
-                      permissions={viewer.permissions}
-                    />
-                  </CardBody>
-                )}
-              </Card>
+                <div className="grid items-start gap-3 lg:grid-cols-2">
+                  {inGroup.map((topic) => {
+                    const Icon = topic.icon;
+                    const isOpen = expanded.has(topic.id);
+                    return (
+                      <Card
+                        key={topic.id}
+                        id={topic.id}
+                        className={cn(
+                          "scroll-mt-20 overflow-hidden transition-shadow",
+                          highlight === topic.id && "ring-2 ring-brand",
+                        )}
+                      >
+                        <h3>
+                          <button
+                            type="button"
+                            onClick={() => toggle(topic.id)}
+                            aria-expanded={isOpen}
+                            aria-controls={`${topic.id}-content`}
+                            className={cn(
+                              "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-muted sm:px-5",
+                              isOpen && "border-b border-border",
+                            )}
+                          >
+                            <span className="grid size-8 shrink-0 place-items-center rounded-md bg-accent-soft text-accent">
+                              <Icon aria-hidden className="size-4" />
+                            </span>
+                            <span className="min-w-0 flex-1 text-[15px] font-semibold text-fg">
+                              {topic.title}
+                            </span>
+                            <ChevronDown
+                              aria-hidden
+                              className={cn(
+                                "size-4 shrink-0 text-soft transition-transform",
+                                isOpen && "rotate-180",
+                              )}
+                            />
+                          </button>
+                        </h3>
+                        {isOpen && (
+                          <CardBody id={`${topic.id}-content`}>
+                            <HelpTopicContent
+                              topic={topic}
+                              permissions={viewer.permissions}
+                            />
+                          </CardBody>
+                        )}
+                      </Card>
+                    );
+                  })}
+                </div>
+              </section>
             );
           })}
         </div>

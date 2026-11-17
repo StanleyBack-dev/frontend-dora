@@ -46,6 +46,7 @@ import {
 } from "@/features/layout/components/ViewerContext";
 import { AreaSwitcher } from "@/features/layout/components/AreaSwitcher";
 import { ModuleTabs } from "@/features/layout/components/ModuleTabs";
+import { SupportModeBanner } from "@/features/layout/components/SupportModeBanner";
 import {
   ACCOUNT_NAV,
   activeEntry,
@@ -213,6 +214,7 @@ export function AppShell({
     | "photoUrl"
     | "onboardingCompleted"
     | "platformAdmin"
+    | "member"
     | "condominium"
     | "condominiums"
   >;
@@ -285,6 +287,14 @@ export function AppShell({
         ? platformItems
         : appItems;
   const activePrimary = activeEntry(pathname, primary);
+  // The menu on the screen (the tour walks it).
+  const menuHrefs = primary.map((item) => item.href);
+  // The platform administrator inside a condominium they don't belong to.
+  const supportMode =
+    user.platformAdmin &&
+    !user.member &&
+    user.condominium !== null &&
+    area !== "platform";
   const homeHref = AREAS[area].href;
   const account = [
     ...ACCOUNT_NAV,
@@ -600,6 +610,9 @@ export function AppShell({
                 <NotificationBell initialCount={unreadNotifications} />
               </div>
             </header>
+            {supportMode && user.condominium && (
+              <SupportModeBanner condominiumName={user.condominium.name} />
+            )}
 
             {/* Bottom padding on phones: room for the tab bar. */}
             <main className="mx-auto w-full max-w-6xl min-w-0 flex-1 px-4 pt-6 pb-28 sm:px-6 lg:px-10 lg:pt-10 lg:pb-12">
@@ -677,6 +690,8 @@ export function AppShell({
             permissions={user.permissions}
             showAdmin={showAdmin}
             modules={user.condominium?.modules ?? NO_MODULES}
+            area={area}
+            menuHrefs={menuHrefs}
             onFinish={finishTour}
             onMobileMenu={setMobileOpen}
           />
