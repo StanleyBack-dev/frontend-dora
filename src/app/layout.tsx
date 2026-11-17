@@ -25,12 +25,12 @@ const baseMetadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     siteName: SITE_NAME,
-    title: `${SITE_NAME} · Reservas do seu condomínio`,
+    title: `${SITE_NAME} · O app do seu condomínio`,
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} · Reservas do seu condomínio`,
+    title: `${SITE_NAME} · O app do seu condomínio`,
     description: SITE_DESCRIPTION,
   },
   // Title and status bar of the installed app on iOS.

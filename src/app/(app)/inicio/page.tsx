@@ -103,7 +103,7 @@ export default async function HomePage() {
           </h1>
           <p className="mt-3 text-[15px] text-chrome-muted">
             {condominium
-              ? `Você está como ${GROUP_LABELS[user.group].toLowerCase()}. Reserve quadras e espaços, acompanhe avisos e fale com a administração.`
+              ? `Você está como ${GROUP_LABELS[user.group].toLowerCase()}. Reserve espaços, participe dos eventos, acompanhe os avisos e fale com a administração.`
               : user.platformAdmin
                 ? "Você está na visão da plataforma. Abra Administração no menu lateral, ou escolha um condomínio para trabalhar nele."
                 : "Você ainda não tem acesso a um condomínio. Peça à administração do seu condomínio o link de cadastro."}

@@ -45,7 +45,7 @@ export function AppSplash() {
           <div className="text-center">
             <Wordmark tone="light" className="text-5xl" />
             <p className="mt-3 text-[13px] text-chrome-muted">
-              Reservas do seu condomínio
+              O app do seu condomínio
             </p>
           </div>
         </div>
