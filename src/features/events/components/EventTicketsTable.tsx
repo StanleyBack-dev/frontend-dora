@@ -3,7 +3,6 @@
 import { CircleCheck, Ticket } from "lucide-react";
 import {
   Badge,
-  Card,
   DataTable,
   EmptyState,
   cn,
@@ -104,28 +103,18 @@ export function EventTicketsTable({
     },
   ];
 
-  return (
-    <Card>
-      {tickets.length === 0 ? (
-        <EmptyState
-          icon={<Ticket className="size-5" />}
-          title={
-            filtered ? "Nenhum ingresso encontrado" : "Nenhum ingresso ainda"
-          }
-          description={
-            filtered
-              ? "Tente outros filtros."
-              : "Os ingressos aparecem quando os pedidos forem confirmados."
-          }
-        />
-      ) : (
-        <DataTable
-          rows={tickets}
-          columns={columns}
-          getId={(ticket) => ticket.id}
-        />
-      )}
-    </Card>
+  return tickets.length === 0 ? (
+    <EmptyState
+      icon={<Ticket className="size-5" />}
+      title={filtered ? "Nenhum ingresso encontrado" : "Nenhum ingresso ainda"}
+      description={
+        filtered
+          ? "Tente outros filtros."
+          : "Os ingressos aparecem quando os pedidos forem confirmados."
+      }
+    />
+  ) : (
+    <DataTable rows={tickets} columns={columns} getId={(ticket) => ticket.id} />
   );
 }
 

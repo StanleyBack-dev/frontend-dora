@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import {
   Alert,
-  Field,
+  AutoFilterForm,
   FilterActions,
+  FilterCombobox,
+  FilterField,
   FilterPanel,
+  FilterResults,
+  FilterScope,
   PageHeader,
   SegmentedNav,
-  Select,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { BookingsSection } from "@/features/platform-metrics/components/BookingsSection";
@@ -113,63 +116,69 @@ export default async function PlatformPanelPage({
         />
       </div>
 
-      <FilterPanel hasActiveFilters={filtered}>
-        <form
-          role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          <Field
-            label="De"
-            name="de"
-            type="date"
-            max={today}
-            defaultValue={metrics.from}
-          />
-          <Field
-            label="Até"
-            name="ate"
-            type="date"
-            max={today}
-            defaultValue={metrics.to}
-          />
-          <Select
-            label="Condomínio"
-            name="condominio"
-            defaultValue={condominiumId ?? ""}
-            placeholder="Todos"
-            options={condominiums.map((item) => ({
-              value: item.id,
-              label: item.name,
-            }))}
-          />
-          <FilterActions clearHref="/plataforma" hasActiveFilters={filtered} />
-        </form>
-      </FilterPanel>
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <FilterField
+              label="De"
+              name="de"
+              type="date"
+              max={today}
+              defaultValue={metrics.from}
+            />
+            <FilterField
+              label="Até"
+              name="ate"
+              type="date"
+              max={today}
+              defaultValue={metrics.to}
+            />
+            <FilterCombobox
+              label="Condomínio"
+              name="condominio"
+              defaultValue={condominiumId ?? ""}
+              placeholder="Todos"
+              options={condominiums.map((item) => ({
+                value: item.id,
+                label: item.name,
+              }))}
+            />
+            <FilterActions
+              clearHref="/plataforma"
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
+        <FilterResults>
+          {error && (
+            <div className="mb-6">
+              <Alert tone="warning">
+                {error} Mostrando os últimos 30 dias.
+              </Alert>
+            </div>
+          )}
 
-      {error && (
-        <div className="mb-6">
-          <Alert tone="warning">{error} Mostrando os últimos 30 dias.</Alert>
-        </div>
-      )}
-
-      <div className="space-y-10">
-        <HealthSection
-          health={metrics.health}
-          allCondominiums={allCondominiums}
-        />
-        <BookingsSection
-          bookings={metrics.bookings}
-          allCondominiums={allCondominiums}
-        />
-        <SpacesSection
-          spaces={metrics.spaces}
-          allCondominiums={allCondominiums}
-        />
-        <EngagementSection
-          engagement={metrics.engagement}
-          allCondominiums={allCondominiums}
-        />
-      </div>
+          <div className="space-y-10">
+            <HealthSection
+              health={metrics.health}
+              allCondominiums={allCondominiums}
+            />
+            <BookingsSection
+              bookings={metrics.bookings}
+              allCondominiums={allCondominiums}
+            />
+            <SpacesSection
+              spaces={metrics.spaces}
+              allCondominiums={allCondominiums}
+            />
+            <EngagementSection
+              engagement={metrics.engagement}
+              allCondominiums={allCondominiums}
+            />
+          </div>
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }

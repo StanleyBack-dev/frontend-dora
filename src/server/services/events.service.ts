@@ -1,9 +1,12 @@
 import "server-only";
 import { backendGraphql } from "@/server/graphql/client";
+import type { Paginated } from "@/shared/contracts/api";
 import {
   approveEventOrderDocument,
   eventOrdersQueueDocument,
   eventTicketsDocument,
+  eventTicketOverviewDocument,
+  eventOrderOverviewDocument,
   checkInEventTicketDocument,
   eventTicketPassDocument,
   gateEventTicketsDocument,
@@ -28,12 +31,17 @@ import type {
   EventInput,
   EventOrder,
   EventOrderFilter,
+  EventOrderOverview,
   EventOrderStatus,
   EventTicketFilter,
+  EventTicketOverview,
   EventTicketPass,
   EventWhen,
   GateEventTicket,
 } from "@/shared/contracts/events";
+
+/** Which page of a list, and how many per page. */
+type PageRequest = { page: number; limit: number };
 
 export const eventsService = {
   /** Upcoming or past; managers also get the drafts. */
@@ -101,17 +109,30 @@ export const eventsService = {
     return myEventOrders;
   },
 
-  /** An event's orders that match the filter (none: every order). */
+  /** A page of an event's orders that match the filter. */
   async orders(
     token: string,
     eventId: string,
-    filter: EventOrderFilter = {},
-  ): Promise<EventOrder[]> {
+    filter: EventOrderFilter,
+    page: PageRequest,
+  ): Promise<Paginated<EventOrder>> {
     const { eventOrders } = await backendGraphql(eventOrdersDocument, {
       token,
-      variables: { eventId, filter },
+      variables: { eventId, filter, page },
     });
     return eventOrders;
+  },
+
+  /** An event's orders at a glance: the numbers and the filter options. */
+  async orderOverview(
+    token: string,
+    eventId: string,
+  ): Promise<EventOrderOverview> {
+    const { eventOrderOverview } = await backendGraphql(
+      eventOrderOverviewDocument,
+      { token, variables: { eventId } },
+    );
+    return eventOrderOverview;
   },
 
   async createOrder(
@@ -225,25 +246,39 @@ export const eventsService = {
   async ordersQueue(
     token: string,
     eventId: string | null,
+    status: EventOrderStatus | null = null,
   ): Promise<EventOrder[]> {
     const { eventOrdersQueue } = await backendGraphql(
       eventOrdersQueueDocument,
-      { token, variables: { status: null, eventId } },
+      { token, variables: { status, eventId } },
     );
     return eventOrdersQueue;
   },
 
   /** An event's tickets (confirmed orders) and who came in. */
-  /** An event's tickets that match the filter (none: every ticket). */
+  /** A page of an event's tickets that match the filter. */
   async tickets(
     token: string,
     eventId: string,
-    filter: EventTicketFilter = {},
-  ): Promise<GateEventTicket[]> {
+    filter: EventTicketFilter,
+    page: PageRequest,
+  ): Promise<Paginated<GateEventTicket>> {
     const { eventTickets } = await backendGraphql(eventTicketsDocument, {
       token,
-      variables: { eventId, filter },
+      variables: { eventId, filter, page },
     });
     return eventTickets;
+  },
+
+  /** An event's tickets at a glance: the numbers and the filter options. */
+  async ticketOverview(
+    token: string,
+    eventId: string,
+  ): Promise<EventTicketOverview> {
+    const { eventTicketOverview } = await backendGraphql(
+      eventTicketOverviewDocument,
+      { token, variables: { eventId } },
+    );
+    return eventTicketOverview;
   },
 };

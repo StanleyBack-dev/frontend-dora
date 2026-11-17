@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import { UserPlus } from "lucide-react";
 import {
+  AutoFilterForm,
   Card,
   EmptyState,
-  Field,
   FilterActions,
+  FilterCombobox,
+  FilterField,
   FilterPanel,
-  Pagination,
-  Select,
+  FilterResults,
+  FilterScope,
   PageHeader,
+  Pagination,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { EnrollmentRequestsTable } from "@/features/enrollment/components/EnrollmentRequestsTable";
@@ -78,72 +81,74 @@ export default async function EnrollmentsPage({
         title="Cadastros"
         description="Quem se cadastrou pelo link: confira a unidade e aprove ou recuse."
       />
-      <FilterPanel hasActiveFilters={filtered}>
-        <form
-          role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {pageSize !== DEFAULT_PAGE_SIZE && (
-            <input type="hidden" name="por-pagina" value={pageSize} />
-          )}
-          <Field
-            label="Buscar"
-            name="busca"
-            defaultValue={search}
-            placeholder="Nome ou e-mail"
-          />
-          <Select
-            label="Situação"
-            name="situacao"
-            defaultValue={situation}
-            options={[
-              ...ENROLLMENT_STATUSES.map((value) => ({
-                value,
-                label: `${ENROLLMENT_STATUS[value].label}s`,
-              })),
-              { value: "TODAS", label: "Todas" },
-            ]}
-          />
-          <FilterActions
-            clearHref="/gestao/cadastros"
-            hasActiveFilters={filtered}
-          />
-        </form>
-      </FilterPanel>
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {pageSize !== DEFAULT_PAGE_SIZE && (
+              <input type="hidden" name="por-pagina" value={pageSize} />
+            )}
+            <FilterField
+              label="Buscar"
+              name="busca"
+              defaultValue={search}
+              placeholder="Nome ou e-mail"
+            />
+            <FilterCombobox
+              label="Situação"
+              name="situacao"
+              defaultValue={situation}
+              placeholder="Pendentes"
+              options={[
+                ...ENROLLMENT_STATUSES.map((value) => ({
+                  value,
+                  label: `${ENROLLMENT_STATUS[value].label}s`,
+                })),
+                { value: "TODAS", label: "Todas" },
+              ]}
+            />
+            <FilterActions
+              clearHref="/gestao/cadastros"
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
+        <FilterResults>
+          <Card>
+            {requests.page.items.length === 0 ? (
+              <EmptyState
+                icon={<UserPlus className="size-5" />}
+                title={
+                  situation === "PENDENTE" && !search
+                    ? "Nenhum cadastro aguardando"
+                    : "Nenhum cadastro encontrado"
+                }
+                description={
+                  situation === "PENDENTE" && !search
+                    ? "Gere um código na aba Links de cadastro e envie para os moradores."
+                    : "Tente outros filtros."
+                }
+              />
+            ) : (
+              <EnrollmentRequestsTable
+                requests={requests.page.items}
+                assignableGroups={assignableGroups(user.group)}
+                units={units}
+              />
+            )}
 
-      <Card>
-        {requests.page.items.length === 0 ? (
-          <EmptyState
-            icon={<UserPlus className="size-5" />}
-            title={
-              situation === "PENDENTE" && !search
-                ? "Nenhum cadastro aguardando"
-                : "Nenhum cadastro encontrado"
-            }
-            description={
-              situation === "PENDENTE" && !search
-                ? "Gere um código na aba Links de cadastro e envie para os moradores."
-                : "Tente outros filtros."
-            }
-          />
-        ) : (
-          <EnrollmentRequestsTable
-            requests={requests.page.items}
-            assignableGroups={assignableGroups(user.group)}
-            units={units}
-          />
-        )}
-
-        <Pagination
-          page={requests.page.page}
-          totalPages={requests.page.totalPages}
-          total={requests.page.total}
-          pageSize={pageSize}
-          hrefFor={(target) => hrefWith({ page: target })}
-          pageSizes={PAGE_SIZES}
-          pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
-        />
-      </Card>
+            <Pagination
+              page={requests.page.page}
+              totalPages={requests.page.totalPages}
+              total={requests.page.total}
+              pageSize={pageSize}
+              hrefFor={(target) => hrefWith({ page: target })}
+              pageSizes={PAGE_SIZES}
+              pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+            />
+          </Card>
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }

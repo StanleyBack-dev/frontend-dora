@@ -7,15 +7,18 @@ import {
   XCircle,
 } from "lucide-react";
 import {
+  AutoFilterForm,
   Card,
   EmptyState,
-  Field,
   FilterActions,
+  FilterCombobox,
+  FilterField,
   FilterPanel,
-  Pagination,
-  Select,
-  StatCard,
+  FilterResults,
+  FilterScope,
   PageHeader,
+  Pagination,
+  StatCard,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { SystemLogsTable } from "@/features/admin/components/SystemLogsTable";
@@ -146,81 +149,94 @@ export default async function SystemLogsPage({
         })}
       </ul>
 
-      <FilterPanel hasActiveFilters={filtered}>
-        <form
-          role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
-        >
-          {pageSize !== DEFAULT_PAGE_SIZE && (
-            <input type="hidden" name="por-pagina" value={pageSize} />
-          )}
-          <Field
-            label="Buscar"
-            name="busca"
-            defaultValue={search}
-            placeholder="Mensagem ou origem"
-          />
-          <Field label="De" name="de" type="date" defaultValue={fromDay} />
-          <Field label="Até" name="ate" type="date" defaultValue={toDay} />
-          <Select
-            label="Nível"
-            name="nivel"
-            defaultValue={level ?? ""}
-            placeholder="Todos"
-            options={SYSTEM_LEVELS.map((value) => ({
-              value,
-              label: LEVEL_LABELS[value].label,
-            }))}
-          />
-          <Select
-            label="Tipo"
-            name="tipo"
-            defaultValue={category ?? ""}
-            placeholder="Todos"
-            options={SYSTEM_CATEGORIES.map((value) => ({
-              value,
-              label: CATEGORY_LABELS[value],
-            }))}
-          />
-          <Select
-            label="Ambiente"
-            name="ambiente"
-            defaultValue={environment ?? ""}
-            placeholder="Todos"
-            options={ENVIRONMENTS}
-          />
-          <FilterActions
-            clearHref="/plataforma/logs"
-            hasActiveFilters={filtered}
-          />
-        </form>
-      </FilterPanel>
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            {pageSize !== DEFAULT_PAGE_SIZE && (
+              <input type="hidden" name="por-pagina" value={pageSize} />
+            )}
+            <FilterField
+              label="Buscar"
+              name="busca"
+              defaultValue={search}
+              placeholder="Mensagem ou origem"
+            />
+            <FilterField
+              label="De"
+              name="de"
+              type="date"
+              defaultValue={fromDay}
+            />
+            <FilterField
+              label="Até"
+              name="ate"
+              type="date"
+              defaultValue={toDay}
+            />
+            <FilterCombobox
+              label="Nível"
+              name="nivel"
+              defaultValue={level ?? ""}
+              placeholder="Todos"
+              options={SYSTEM_LEVELS.map((value) => ({
+                value,
+                label: LEVEL_LABELS[value].label,
+              }))}
+            />
+            <FilterCombobox
+              label="Tipo"
+              name="tipo"
+              defaultValue={category ?? ""}
+              placeholder="Todos"
+              options={SYSTEM_CATEGORIES.map((value) => ({
+                value,
+                label: CATEGORY_LABELS[value],
+              }))}
+            />
+            <FilterCombobox
+              label="Ambiente"
+              name="ambiente"
+              defaultValue={environment ?? ""}
+              placeholder="Todos"
+              options={ENVIRONMENTS}
+            />
+            <FilterActions
+              clearHref="/plataforma/logs"
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
+        <FilterResults>
+          <Card>
+            {logs.items.length === 0 ? (
+              <EmptyState
+                icon={<ScrollText className="size-5" />}
+                title={
+                  filtered ? "Nenhum registro encontrado" : "Nenhum registro"
+                }
+                description={
+                  filtered
+                    ? "Tente outros filtros."
+                    : "Erros, eventos de segurança e falhas das rotinas aparecem aqui. Os registros ficam 90 dias."
+                }
+              />
+            ) : (
+              <SystemLogsTable logs={logs.items} />
+            )}
 
-      <Card>
-        {logs.items.length === 0 ? (
-          <EmptyState
-            icon={<ScrollText className="size-5" />}
-            title={filtered ? "Nenhum registro encontrado" : "Nenhum registro"}
-            description={
-              filtered
-                ? "Tente outros filtros."
-                : "Erros, eventos de segurança e falhas das rotinas aparecem aqui. Os registros ficam 90 dias."
-            }
-          />
-        ) : (
-          <SystemLogsTable logs={logs.items} />
-        )}
-
-        <Pagination
-          page={logs.page}
-          totalPages={logs.totalPages}
-          total={logs.total}
-          pageSize={pageSize}
-          hrefFor={(target) => hrefWith({ page: target })}
-          pageSizes={PAGE_SIZES}
-          pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
-        />
-      </Card>
+            <Pagination
+              page={logs.page}
+              totalPages={logs.totalPages}
+              total={logs.total}
+              pageSize={pageSize}
+              hrefFor={(target) => hrefWith({ page: target })}
+              pageSizes={PAGE_SIZES}
+              pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+            />
+          </Card>
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }

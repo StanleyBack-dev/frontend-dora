@@ -39,7 +39,9 @@ export default async function ManagedEventsPage({
   const [events, orders, spaces] = await authed((token) =>
     Promise.all([
       eventsService.list(token, period === "passados" ? "PAST" : "UPCOMING"),
-      reviewer ? eventsService.ordersQueue(token, null) : Promise.resolve([]),
+      reviewer
+        ? eventsService.ordersQueue(token, null, "AWAITING_REVIEW")
+        : Promise.resolve([]),
       spacesService.list(token, can(user, "SPACES_MANAGE")),
     ]),
   );

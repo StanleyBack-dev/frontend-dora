@@ -1,13 +1,16 @@
 import { Users } from "lucide-react";
 import {
+  AutoFilterForm,
   Card,
   EmptyState,
-  Field,
   FilterActions,
+  FilterCombobox,
+  FilterField,
   FilterPanel,
+  FilterResults,
+  FilterScope,
   PageHeader,
   Pagination,
-  Select,
 } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { CreateUserButton } from "@/features/admin/components/CreateUserButton";
@@ -98,88 +101,89 @@ export function MembersDirectory({
           ) : undefined
         }
       />
-      <FilterPanel hasActiveFilters={filtered}>
-        <form
-          role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {pageSize !== DEFAULT_PAGE_SIZE && (
-            <input type="hidden" name="por-pagina" value={pageSize} />
-          )}
-          <Field
-            label="Buscar"
-            name="busca"
-            defaultValue={search}
-            placeholder="Nome, e-mail ou telefone"
-          />
-          {config.roles.length > 1 && (
-            <Select
-              label="Papel"
-              name="grupo"
-              defaultValue={group ?? ""}
-              placeholder="Todos"
-              options={config.roles.map((value) => ({
-                value,
-                label: GROUP_LABELS[value],
-              }))}
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {pageSize !== DEFAULT_PAGE_SIZE && (
+              <input type="hidden" name="por-pagina" value={pageSize} />
+            )}
+            <FilterField
+              label="Buscar"
+              name="busca"
+              defaultValue={search}
+              placeholder="Nome, e-mail ou telefone"
             />
-          )}
-          {config.unitFilter && units.length > 0 && (
-            <Select
-              label="Unidade"
-              name="unidade"
-              defaultValue={unitId ?? ""}
+            {config.roles.length > 1 && (
+              <FilterCombobox
+                label="Papel"
+                name="grupo"
+                defaultValue={group ?? ""}
+                placeholder="Todos"
+                options={config.roles.map((value) => ({
+                  value,
+                  label: GROUP_LABELS[value],
+                }))}
+              />
+            )}
+            {config.unitFilter && units.length > 0 && (
+              <FilterCombobox
+                label="Unidade"
+                name="unidade"
+                defaultValue={unitId ?? ""}
+                placeholder="Todas"
+                options={units.map((unit) => ({
+                  value: unit.id,
+                  label: unit.label,
+                }))}
+              />
+            )}
+            <FilterCombobox
+              label="Situação"
+              name="status"
+              defaultValue={status ?? ""}
               placeholder="Todas"
-              options={units.map((unit) => ({
-                value: unit.id,
-                label: unit.label,
-              }))}
+              options={[
+                { value: "ativos", label: "Ativos" },
+                { value: "desativados", label: "Desativados" },
+              ]}
             />
-          )}
-          <Select
-            label="Situação"
-            name="status"
-            defaultValue={status ?? ""}
-            placeholder="Todas"
-            options={[
-              { value: "ativos", label: "Ativos" },
-              { value: "desativados", label: "Desativados" },
-            ]}
-          />
-          <FilterActions
-            clearHref={config.basePath}
-            hasActiveFilters={filtered}
-          />
-        </form>
-      </FilterPanel>
+            <FilterActions
+              clearHref={config.basePath}
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
+        <FilterResults>
+          <Card>
+            {users.items.length === 0 ? (
+              <EmptyState
+                icon={<Users className="size-5" />}
+                title={filtered ? "Ninguém encontrado" : config.emptyTitle}
+                description={
+                  filtered ? "Tente outros filtros." : config.emptyDescription
+                }
+              />
+            ) : (
+              <MembersList
+                users={users.items}
+                basePath={config.basePath}
+                kind={config.kind}
+              />
+            )}
 
-      <Card>
-        {users.items.length === 0 ? (
-          <EmptyState
-            icon={<Users className="size-5" />}
-            title={filtered ? "Ninguém encontrado" : config.emptyTitle}
-            description={
-              filtered ? "Tente outros filtros." : config.emptyDescription
-            }
-          />
-        ) : (
-          <MembersList
-            users={users.items}
-            basePath={config.basePath}
-            kind={config.kind}
-          />
-        )}
-
-        <Pagination
-          page={users.page}
-          totalPages={users.totalPages}
-          total={users.total}
-          pageSize={pageSize}
-          hrefFor={(target) => hrefWith({ page: target })}
-          pageSizes={PAGE_SIZES}
-          pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
-        />
-      </Card>
+            <Pagination
+              page={users.page}
+              totalPages={users.totalPages}
+              total={users.total}
+              pageSize={pageSize}
+              hrefFor={(target) => hrefWith({ page: target })}
+              pageSizes={PAGE_SIZES}
+              pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+            />
+          </Card>
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }
