@@ -10,10 +10,8 @@ import {
   CircleUserRound,
   ClipboardList,
   DoorOpen,
-  Globe,
   HeartHandshake,
   House,
-  LayoutGrid,
   LifeBuoy,
   Link2,
   type LucideIcon,
@@ -24,7 +22,6 @@ import {
   ReceiptText,
   ScrollText,
   Settings,
-  ShieldCheck,
   UserCheck,
   UserCog,
   UsersRound,
@@ -80,32 +77,16 @@ export function isActive(pathname: string, item: NavItem): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Areas: the app is split in three, each with its own menu. Everyone has the
-// resident's app; managers also the management of the condominium they work
-// in; the platform administrator, the platform (every condominium).
+// One sidebar for everyone, by module: Início, then Reservas and Eventos
+// (each a folding group with the resident's pages and, for managers, the
+// management's), the Portaria, and Condomínio (the common administration:
+// residents, team, units, sign-ups…). Each person sees only what they can
+// open; a group left with one page shows as that page. Dora's own
+// administration is a group of the account menu.
 
+/** Which part of the app an address belongs to (support band, switcher). */
 export type AreaId = "app" | "manage" | "platform";
 
-export type Area = {
-  id: AreaId;
-  label: string;
-  /** Its home. */
-  href: string;
-  icon: LucideIcon;
-};
-
-export const AREAS: Record<AreaId, Area> = {
-  app: { id: "app", label: "Meu condomínio", href: "/inicio", icon: House },
-  manage: { id: "manage", label: "Gestão", href: "/gestao", icon: ShieldCheck },
-  platform: {
-    id: "platform",
-    label: "Plataforma",
-    href: "/plataforma",
-    icon: Globe,
-  },
-};
-
-/** The area of an address. */
 export function areaOf(pathname: string): AreaId {
   if (pathname === "/plataforma" || pathname.startsWith("/plataforma/")) {
     return "platform";
@@ -116,21 +97,92 @@ export function areaOf(pathname: string): AreaId {
   return "app";
 }
 
-// The resident's app (and the gate's): what everyone of the condominium uses.
-export const APP_NAV: NavItem[] = [
+/** A folding group of the sidebar: a module, or the platform. */
+export type NavSection = {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  items: NavItem[];
+  /** A module contracted apart: the group shows only while it is on. */
+  module?: AppModule;
+};
+
+/** An entry of the sidebar: a page, or a folding group of pages. */
+export type SidebarEntry = NavItem | NavSection;
+
+export const isSection = (entry: SidebarEntry): entry is NavSection =>
+  "items" in entry;
+
+// The sidebar, in order. A new paid module is one more group here (and its
+// key in the API).
+export const SIDEBAR: SidebarEntry[] = [
   { href: "/inicio", label: "Início", icon: House },
   {
-    href: "/reservas",
+    id: "bookings",
     label: "Reservas",
     icon: CalendarDays,
-    permission: "BOOKINGS_CREATE",
     module: "BOOKINGS",
+    items: [
+      {
+        href: "/reservas",
+        label: "Minhas reservas",
+        icon: CalendarDays,
+        permission: "BOOKINGS_CREATE",
+      },
+      {
+        href: "/gestao/reservas",
+        label: "Todas as reservas",
+        icon: CalendarDays,
+        exact: true,
+        permission: "BOOKINGS_MANAGE",
+      },
+      {
+        href: "/gestao/reservas/espacos",
+        label: "Espaços",
+        icon: MapPin,
+        permission: "SPACES_MANAGE",
+      },
+      {
+        href: "/gestao/reservas/bloqueios",
+        label: "Bloqueios",
+        icon: CalendarOff,
+        permission: "BOOKINGS_MANAGE",
+      },
+      {
+        href: "/gestao/reservas/convidados",
+        label: "Convidados",
+        icon: UserCheck,
+        permission: "GUESTS_CHECKIN",
+      },
+      {
+        href: "/gestao/reservas/taxas",
+        label: "Taxas de uso",
+        icon: Receipt,
+        permission: "BOOKINGS_MANAGE",
+      },
+    ],
   },
   {
-    href: "/eventos",
+    id: "events",
     label: "Eventos",
     icon: PartyPopper,
     module: "EVENTS",
+    items: [
+      { href: "/eventos", label: "Eventos", icon: PartyPopper },
+      {
+        href: "/gestao/eventos",
+        label: "Gerenciar eventos",
+        icon: PartyPopper,
+        anyPermission: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
+      },
+      // The orders of every event, to review.
+      {
+        href: "/gestao/eventos/pedidos",
+        label: "Pedidos",
+        icon: ReceiptText,
+        permission: "PAYMENTS_MANAGE",
+      },
+    ],
   },
   // The day's guests and tickets at the gate: the gate staff and managers.
   {
@@ -139,32 +191,10 @@ export const APP_NAV: NavItem[] = [
     icon: DoorOpen,
     permission: "GUESTS_CHECKIN",
   },
-];
-
-// ---------------------------------------------------------------------------
-// The management area is organised by module: Geral (the condominium itself)
-// and one tab per module contracted apart, each showing only its own menu.
-// A new paid module is one more entry here (and its key in the API).
-
-export type ManageModuleId = "general" | "bookings" | "events";
-
-export type ManageModule = {
-  id: ManageModuleId;
-  label: string;
-  icon: LucideIcon;
-  /** Where its pages live (the tab is active under it). */
-  base: string;
-  /** The module contracted apart (none: always there). */
-  module?: AppModule;
-  items: NavItem[];
-};
-
-export const MANAGE_MODULES: ManageModule[] = [
   {
-    id: "general",
-    label: "Geral",
-    icon: LayoutGrid,
-    base: "/gestao",
+    id: "condominium",
+    label: "Condomínio",
+    icon: Building,
     items: [
       {
         href: "/gestao",
@@ -223,100 +253,40 @@ export const MANAGE_MODULES: ManageModule[] = [
       },
     ],
   },
-  {
-    id: "bookings",
-    label: "Reservas",
-    icon: CalendarDays,
-    base: "/gestao/reservas",
-    module: "BOOKINGS",
-    items: [
-      {
-        href: "/gestao/reservas",
-        label: "Reservas",
-        icon: CalendarDays,
-        exact: true,
-        permission: "BOOKINGS_MANAGE",
-      },
-      {
-        href: "/gestao/reservas/espacos",
-        label: "Espaços",
-        icon: MapPin,
-        permission: "SPACES_MANAGE",
-      },
-      {
-        href: "/gestao/reservas/bloqueios",
-        label: "Bloqueios",
-        icon: CalendarOff,
-        permission: "BOOKINGS_MANAGE",
-      },
-      {
-        href: "/gestao/reservas/convidados",
-        label: "Convidados",
-        icon: UserCheck,
-        permission: "GUESTS_CHECKIN",
-      },
-      {
-        href: "/gestao/reservas/taxas",
-        label: "Taxas de uso",
-        icon: Receipt,
-        permission: "BOOKINGS_MANAGE",
-      },
-    ],
-  },
-  {
-    id: "events",
-    label: "Eventos",
-    icon: PartyPopper,
-    base: "/gestao/eventos",
-    module: "EVENTS",
-    items: [
-      {
-        href: "/gestao/eventos",
-        label: "Eventos",
-        icon: PartyPopper,
-        anyPermission: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
-      },
-      // The orders of every event, to review.
-      {
-        href: "/gestao/eventos/pedidos",
-        label: "Pedidos",
-        icon: ReceiptText,
-        permission: "PAYMENTS_MANAGE",
-      },
-    ],
-  },
 ];
 
-/** The management module of an address (Geral outside the others). */
-export function manageModuleOf(pathname: string): ManageModuleId {
-  const found = MANAGE_MODULES.find(
-    (item) =>
-      item.id !== "general" &&
-      (pathname === item.base || pathname.startsWith(`${item.base}/`)),
-  );
-  return found?.id ?? "general";
-}
-
 /**
- * The management modules this person works with: contracted by the
- * condominium and with something they can open, each with those items.
+ * The sidebar this person sees: the modules the condominium contracted,
+ * each group with the pages they can open. An empty group is left out; a
+ * group with one page shows as that page, under the group's name and icon.
  */
-export function visibleManageModules(
+export function visibleSidebar(
   permissions: readonly Permission[],
   modules: readonly AppModule[],
-): ManageModule[] {
-  return MANAGE_MODULES.filter(
-    (item) => !item.module || modules.includes(item.module),
-  )
-    .map((item) => ({
-      ...item,
-      items: item.items.filter((entry) => canSee(entry, permissions, modules)),
-    }))
-    .filter((item) => item.items.length > 0);
+): SidebarEntry[] {
+  return SIDEBAR.flatMap((entry): SidebarEntry[] => {
+    if (!isSection(entry)) {
+      return canSee(entry, permissions, modules) ? [entry] : [];
+    }
+    if (entry.module && !modules.includes(entry.module)) return [];
+    const items = entry.items.filter((item) =>
+      canSee(item, permissions, modules),
+    );
+    if (items.length === 0) return [];
+    if (items.length === 1) {
+      return [{ ...items[0], label: entry.label, icon: entry.icon }];
+    }
+    return [{ ...entry, items }];
+  });
 }
 
+/** Every page of a sidebar (the groups' pages included). */
+export const sidebarPages = (entries: readonly SidebarEntry[]): NavItem[] =>
+  entries.flatMap((entry) => (isSection(entry) ? entry.items : [entry]));
+
 // ---------------------------------------------------------------------------
-// The platform (Dora's own administration): every condominium.
+// Dora's own administration (every condominium): a group of the account
+// menu, for the platform administrator.
 export const PLATFORM_NAV: NavItem[] = [
   {
     href: "/plataforma",

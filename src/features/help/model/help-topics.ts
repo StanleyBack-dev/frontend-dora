@@ -53,13 +53,13 @@ export type HelpTopic = {
   permission?: Permission;
   /** …or with any of these. */
   anyPermission?: Permission[];
-  /** Only for who sees the management area (Gestão). */
+  /** Only for who manages the condominium. */
   admin?: boolean;
   /** An optional module (contracted apart): only while it is on. */
   module?: AppModule;
   /**
    * Where the topic lives: the resident's app menu (the tour walks it),
-   * the management area (Gestão), the platform or the account menu.
+   * the condominium's administration, the platform or the account menu.
    */
   area: "main" | "manage" | "platform" | "account";
   /** One or two lines for the guided tour. */
@@ -68,11 +68,10 @@ export type HelpTopic = {
 };
 
 /** The help page groups the topics by area, in this order. */
-export const HELP_GROUPS: { area: HelpTopic["area"]; label: string }[] = [
-  { area: "main", label: "Meu condomínio" },
-  { area: "manage", label: "Gestão" },
-  { area: "platform", label: "Plataforma" },
-  { area: "account", label: "Sua conta" },
+export const HELP_GROUPS: { areas: HelpTopic["area"][]; label: string }[] = [
+  { areas: ["main", "manage"], label: "Menus" },
+  { areas: ["platform"], label: "Administração do Dora" },
+  { areas: ["account"], label: "Sua conta" },
 ];
 
 export const HELP_TOPICS: HelpTopic[] = [
@@ -526,15 +525,15 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: "gestao",
     href: "/gestao",
-    title: "Gestão",
+    title: "Condomínio",
     icon: ShieldCheck,
     admin: true,
     area: "manage",
-    tour: "A administração do condomínio: moradores, equipe, unidades, cadastros e cada módulo contratado.",
+    tour: "A administração do condomínio: a visão geral, comunicados, moradores, equipe, unidades e cadastros.",
     sections: {
       howto: [
         {
-          text: "Troque entre “Meu condomínio” e “Gestão” no topo do menu lateral. Na Gestão, as abas Geral, Reservas e Eventos mostram só os menus de cada módulo contratado.",
+          text: "No menu lateral, cada módulo é um grupo (Reservas, Eventos, Condomínio) com as páginas de quem gerencia junto com as dos moradores: toque no grupo para abrir. Só aparecem os módulos contratados.",
         },
         {
           text: "Visão geral: os números do condomínio e o que precisa de atenção.",
@@ -566,7 +565,7 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Tudo aqui vale só para o condomínio aberto no topo do menu. Algumas permissões só vêm do papel e não podem ser dadas a uma pessoa (moradores, permissões, histórico, suporte e condomínios).",
         },
         {
-          text: "Um módulo que o condomínio não contratou não aparece nas abas.",
+          text: "Um módulo que o condomínio não contratou não aparece no menu.",
         },
       ],
     },
@@ -574,7 +573,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: "gestao-reservas",
     href: "/gestao/reservas",
-    title: "Reservas (gestão)",
+    title: "Reservas: administração",
     icon: CalendarDays,
     module: "BOOKINGS",
     anyPermission: ["BOOKINGS_MANAGE", "SPACES_MANAGE"],
@@ -614,7 +613,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: "gestao-eventos",
     href: "/gestao/eventos",
-    title: "Eventos (gestão)",
+    title: "Eventos: administração",
     icon: PartyPopper,
     module: "EVENTS",
     anyPermission: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
@@ -660,7 +659,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       ],
       rules: [
         {
-          text: "A conta mostra se está ativa, desativada ou bloqueada por senhas erradas (até quando). As mudanças nas pessoas são feitas dentro de cada condomínio, na Gestão.",
+          text: "A conta mostra se está ativa, desativada ou bloqueada por senhas erradas (até quando). As mudanças nas pessoas são feitas dentro de cada condomínio, no grupo Condomínio do menu.",
         },
       ],
     },

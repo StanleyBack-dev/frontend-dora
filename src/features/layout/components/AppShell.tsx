@@ -14,6 +14,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
   ChevronUp,
+  Globe,
   House,
   LogOut,
   Menu,
@@ -44,30 +45,28 @@ import {
   ViewerProvider,
   type Viewer,
 } from "@/features/layout/components/ViewerContext";
-import { AreaSwitcher } from "@/features/layout/components/AreaSwitcher";
-import { ModuleTabs } from "@/features/layout/components/ModuleTabs";
+import { SidebarGroup } from "@/features/layout/components/SidebarGroup";
 import { SupportModeBanner } from "@/features/layout/components/SupportModeBanner";
 import {
   ACCOUNT_NAV,
   activeEntry,
-  APP_NAV,
-  AREAS,
   areaOf,
   canSee,
   isActive,
-  manageModuleOf,
+  isSection,
   PLATFORM_NAV,
+  sidebarPages,
   SUPPORT_PROJECT_NAV,
-  visibleManageModules,
-  type Area,
+  visibleSidebar,
   type NavItem,
+  type NavSection,
 } from "@/features/layout/model/navigation";
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { PushNotificationsInvite } from "@/features/notifications/components/PushNotificationsInvite";
 import type { SessionUser, AppModule } from "@/shared/contracts/api";
 import { startNavigation } from "@/shared/lib/navigation-progress";
 import { apiRequest } from "@/shared/lib/api-client";
-import { canManageHere, canRunPlatform } from "@/shared/lib/access";
+import { canRunPlatform } from "@/shared/lib/access";
 
 // The collapsed state is a per-browser preference. It lives in localStorage
 // (read through an external store so the server render stays expanded).
@@ -258,56 +257,54 @@ export function AppShell({
     () => false,
   );
 
-  // The areas this person works in, and the menu of the one open now: the
-  // resident's app, the management (by module) or the platform.
+  // One menu by module (Início, Reservas, Eventos, Portaria, Condomínio),
+  // with what this person can open; Dora's administration in the account
+  // menu.
   const modules = user.condominium?.modules ?? NO_MODULES;
-  const areas: Area[] = [
-    AREAS.app,
-    ...(canManageHere(user) ? [AREAS.manage] : []),
-    ...(canRunPlatform(user) ? [AREAS.platform] : []),
+  const entries = visibleSidebar(user.permissions, modules);
+  const platformGroup: NavSection | null = canRunPlatform(user)
+    ? {
+        id: "platform",
+        label: "Administração do Dora",
+        icon: Globe,
+        items: PLATFORM_NAV.filter((item) =>
+          canSee(item, user.permissions, modules),
+        ),
+      }
+    : null;
+  const account = [
+    ...ACCOUNT_NAV,
+    ...(showSupportProject ? [SUPPORT_PROJECT_NAV] : []),
   ];
-  const pathArea = areaOf(pathname);
-  const area = areas.some((item) => item.id === pathArea) ? pathArea : "app";
-  const appItems = APP_NAV.filter((item) =>
-    canSee(item, user.permissions, modules),
+  const everyItem = [
+    ...sidebarPages(entries),
+    ...(platformGroup?.items ?? []),
+    ...account,
+  ];
+  // The entry of the page on the screen: the most specific match.
+  const activeItem = activeEntry(pathname, everyItem);
+  // A group is open while its page is on the screen, unless folded by hand.
+  const [folded, setFolded] = useState<Record<string, boolean>>({});
+  const isOpen = (group: NavSection) =>
+    folded[group.id] ?? group.items.some((item) => item === activeItem);
+  const toggle = (group: NavSection) =>
+    setFolded((current) => ({ ...current, [group.id]: !isOpen(group) }));
+  // The menu's entries on the screen (the tour walks them): a page, or a
+  // group by its first page.
+  const menuHrefs = entries.map((entry) =>
+    isSection(entry) ? entry.items[0].href : entry.href,
   );
-  const manageModules = areas.some((item) => item.id === "manage")
-    ? visibleManageModules(user.permissions, modules)
-    : [];
-  const pathModule = manageModuleOf(pathname);
-  const manageModule =
-    manageModules.find((item) => item.id === pathModule) ?? manageModules[0];
-  const platformItems = areas.some((item) => item.id === "platform")
-    ? PLATFORM_NAV.filter((item) => canSee(item, user.permissions, modules))
-    : [];
-  const primary =
-    area === "manage"
-      ? (manageModule?.items ?? [])
-      : area === "platform"
-        ? platformItems
-        : appItems;
-  const activePrimary = activeEntry(pathname, primary);
-  // The menu on the screen (the tour walks it).
-  const menuHrefs = primary.map((item) => item.href);
   // The platform administrator inside a condominium they don't belong to.
   const supportMode =
     user.platformAdmin &&
     !user.member &&
     user.condominium !== null &&
-    area !== "platform";
-  const homeHref = AREAS[area].href;
-  const account = [
-    ...ACCOUNT_NAV,
-    ...(showSupportProject ? [SUPPORT_PROJECT_NAV] : []),
-  ];
-  // The menu search finds every page this person can open, in any area.
-  const searchable = [
-    ...appItems,
-    ...manageModules.flatMap((item) => item.items),
-    ...platformItems,
-    ...account,
-  ];
-  const accountActive = account.some((item) => isActive(pathname, item));
+    areaOf(pathname) !== "platform";
+  // The menu search finds every page this person can open.
+  const searchable = everyItem;
+  const accountActive =
+    account.some((item) => isActive(pathname, item)) ||
+    (platformGroup?.items.some((item) => item === activeItem) ?? false);
 
   // Pin the page behind the open mobile drawer: on iOS only `position:
   // fixed` stops touch scrolling from reaching the page.
@@ -377,7 +374,7 @@ export function AppShell({
               )}
             >
               <Link
-                href={homeHref}
+                href="/inicio"
                 onClick={closeMobile}
                 className="flex min-w-0 flex-1 items-center gap-2.5"
                 aria-label="Dora, início"
@@ -404,20 +401,9 @@ export function AppShell({
               </button>
             </div>
 
-            <div
-              className={cn(
-                "flex flex-col gap-2 px-4 pb-2",
-                collapsed && "lg:px-3",
-              )}
-            >
+            <div className={cn("px-4 pb-2", collapsed && "lg:px-3")}>
               <CondominiumSwitcher
                 user={user}
-                collapsed={collapsed}
-                onNavigate={closeMobile}
-              />
-              <AreaSwitcher
-                areas={areas}
-                current={area}
                 collapsed={collapsed}
                 onNavigate={closeMobile}
               />
@@ -431,35 +417,27 @@ export function AppShell({
                 collapsed ? "px-4 lg:px-3" : "px-4",
               )}
             >
-              {area === "manage" && manageModule && (
-                <div className="pb-2">
-                  <ModuleTabs
-                    modules={manageModules}
-                    current={manageModule.id}
+              {entries.map((entry) =>
+                isSection(entry) ? (
+                  <SidebarGroup
+                    key={entry.id}
+                    group={entry}
+                    open={isOpen(entry)}
+                    onToggle={() => toggle(entry)}
+                    activeItem={activeItem}
                     collapsed={collapsed}
                     onNavigate={closeMobile}
                   />
-                </div>
+                ) : (
+                  <NavLink
+                    key={entry.href}
+                    item={entry}
+                    active={entry === activeItem}
+                    collapsed={collapsed}
+                    onNavigate={closeMobile}
+                  />
+                ),
               )}
-              <p
-                className={cn(
-                  "px-3.5 pb-1 text-[10px] font-bold tracking-[0.14em] text-chrome-subtle uppercase",
-                  collapsed && "lg:sr-only",
-                )}
-              >
-                {area === "manage" && manageModule
-                  ? manageModule.label
-                  : AREAS[area].label}
-              </p>
-              {primary.map((item) => (
-                <NavLink
-                  key={item.href}
-                  item={item}
-                  active={item === activePrimary}
-                  collapsed={collapsed}
-                  onNavigate={closeMobile}
-                />
-              ))}
             </nav>
 
             <div
@@ -475,11 +453,21 @@ export function AppShell({
                     <NavLink
                       key={item.href}
                       item={item}
-                      active={isActive(pathname, item)}
+                      active={item === activeItem}
                       collapsed
                       onNavigate={closeMobile}
                     />
                   ))}
+                  {platformGroup && (
+                    <SidebarGroup
+                      group={platformGroup}
+                      open={false}
+                      onToggle={() => undefined}
+                      activeItem={activeItem}
+                      collapsed
+                      onNavigate={closeMobile}
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={openLogout}
@@ -503,7 +491,7 @@ export function AppShell({
                       <NavLink
                         key={item.href}
                         item={item}
-                        active={isActive(pathname, item)}
+                        active={item === activeItem}
                         collapsed={false}
                         onNavigate={() => {
                           // Picking an item folds the "Conta" section back.
@@ -512,6 +500,19 @@ export function AppShell({
                         }}
                       />
                     ))}
+                    {platformGroup && (
+                      <SidebarGroup
+                        group={platformGroup}
+                        open={isOpen(platformGroup)}
+                        onToggle={() => toggle(platformGroup)}
+                        activeItem={activeItem}
+                        collapsed={false}
+                        onNavigate={() => {
+                          setAccountOpen(false);
+                          closeMobile();
+                        }}
+                      />
+                    )}
                     <button
                       type="button"
                       onClick={() => {
@@ -629,10 +630,10 @@ export function AppShell({
             className="fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
           >
             <TabLink
-              href={homeHref}
-              label={area === "app" ? "Início" : AREAS[area].label}
+              href="/inicio"
+              label="Início"
               icon={<House aria-hidden />}
-              active={pathname === homeHref}
+              active={pathname === "/inicio"}
             />
             <TabLink
               href="/notificacoes"
@@ -690,7 +691,6 @@ export function AppShell({
             permissions={user.permissions}
             showAdmin={showAdmin}
             modules={user.condominium?.modules ?? NO_MODULES}
-            area={area}
             menuHrefs={menuHrefs}
             onFinish={finishTour}
             onMobileMenu={setMobileOpen}
