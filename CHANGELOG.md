@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.1](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.9.0...v0.9.1) (2026-11-17)
+
+
+### Bug Fixes
+
+* update Next.js to 16.4.6 ([397fdfa](https://github.com/StanleyBack-dev/frontend-dora/commit/397fdfa07533afd3ceaff30c8aee77627735f728))
+* update Next.js to 16.4.6 ([55e5d4e](https://github.com/StanleyBack-dev/frontend-dora/commit/55e5d4e18d6c39bd1cb2bfc13c6732edbba32dd6))
+
 ## [0.9.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.8.1...v0.9.0) (2026-11-16)
 
 
