@@ -7,7 +7,6 @@ import {
   FilterCombobox,
   FilterField,
   FilterPanel,
-  FilterResults,
   FilterScope,
   PageHeader,
   StatCard,
@@ -103,38 +102,38 @@ export default async function CondominiumsAdminPage({
       </section>
 
       <FilterScope>
-        <FilterPanel hasActiveFilters={filtered}>
-          <AutoFilterForm className="grid gap-3 sm:grid-cols-3">
-            <FilterField
-              label="Buscar"
-              name="busca"
-              defaultValue={search}
-              placeholder="Nome ou cidade"
-            />
-            <FilterCombobox
-              label="Situação"
-              name="situacao"
-              defaultValue={status ?? ""}
-              placeholder="Todas"
-              options={[
-                { value: "ativos", label: "Ativos" },
-                { value: "suspensos", label: "Suspensos" },
-              ]}
-            />
-            <FilterActions
-              clearHref="/plataforma/condominios"
-              hasActiveFilters={filtered}
-              autoSubmit
-            />
-          </AutoFilterForm>
-        </FilterPanel>
-        <FilterResults>
-          <CondominiumsConsole
-            condominiums={condominiums}
-            currentId={user.condominium?.id ?? null}
-            filtered={filtered}
-          />
-        </FilterResults>
+        <CondominiumsConsole
+          condominiums={condominiums}
+          currentId={user.condominium?.id ?? null}
+          filtered={filtered}
+          filters={
+            <FilterPanel hasActiveFilters={filtered}>
+              <AutoFilterForm className="grid gap-3 sm:grid-cols-3">
+                <FilterField
+                  label="Buscar"
+                  name="busca"
+                  defaultValue={search}
+                  placeholder="Nome ou cidade"
+                />
+                <FilterCombobox
+                  label="Situação"
+                  name="situacao"
+                  defaultValue={status ?? ""}
+                  placeholder="Todas"
+                  options={[
+                    { value: "ativos", label: "Ativos" },
+                    { value: "suspensos", label: "Suspensos" },
+                  ]}
+                />
+                <FilterActions
+                  clearHref="/plataforma/condominios"
+                  hasActiveFilters={filtered}
+                  autoSubmit
+                />
+              </AutoFilterForm>
+            </FilterPanel>
+          }
+        />
       </FilterScope>
     </>
   );

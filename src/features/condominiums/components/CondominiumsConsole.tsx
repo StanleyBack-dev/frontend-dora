@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -16,13 +16,14 @@ import {
   Badge,
   Button,
   Card,
+  ChoiceCards,
   DataTable,
   Drawer,
   EmptyState,
   Field,
+  FilterResults,
   Modal,
   Select,
-  ChoiceCards,
   type ChoiceOption,
   type DataTableColumn,
 } from "@/design-system";
@@ -73,12 +74,15 @@ export function CondominiumsConsole({
   condominiums,
   currentId,
   filtered,
+  filters,
 }: {
   condominiums: Condominium[];
   /** The condominium the session is working in (highlighted). */
   currentId: string | null;
   /** Search or status filter applied (changes the empty message). */
   filtered: boolean;
+  /** The filter panel: below "Novo condomínio", above the list. */
+  filters?: ReactNode;
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
@@ -294,29 +298,33 @@ export function CondominiumsConsole({
         </Button>
       </div>
 
-      <Card>
-        {condominiums.length === 0 ? (
-          <EmptyState
-            icon={<Building2 className="size-5" />}
-            title={
-              filtered
-                ? "Nenhum condomínio encontrado"
-                : "Nenhum condomínio ainda"
-            }
-            description={
-              filtered
-                ? "Tente outra busca."
-                : "Cadastre o primeiro condomínio, entre nele e adicione o gestor."
-            }
-          />
-        ) : (
-          <DataTable
-            rows={condominiums}
-            columns={columns}
-            getId={(item) => item.id}
-          />
-        )}
-      </Card>
+      {filters}
+
+      <FilterResults>
+        <Card>
+          {condominiums.length === 0 ? (
+            <EmptyState
+              icon={<Building2 className="size-5" />}
+              title={
+                filtered
+                  ? "Nenhum condomínio encontrado"
+                  : "Nenhum condomínio ainda"
+              }
+              description={
+                filtered
+                  ? "Tente outra busca."
+                  : "Cadastre o primeiro condomínio, entre nele e adicione o gestor."
+              }
+            />
+          ) : (
+            <DataTable
+              rows={condominiums}
+              columns={columns}
+              getId={(item) => item.id}
+            />
+          )}
+        </Card>
+      </FilterResults>
 
       <Drawer
         open={editing !== null}
