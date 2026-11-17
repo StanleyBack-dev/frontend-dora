@@ -30,7 +30,7 @@ export function EventTicketsTable({
       label: "Pessoa",
       mobile: "title",
       render: (ticket) => <PersonName ticket={ticket} />,
-      renderMobile: (ticket) => <PersonName ticket={ticket} withAge />,
+      renderMobile: (ticket) => <PersonName ticket={ticket} phone />,
     },
     {
       key: "age",
@@ -42,17 +42,10 @@ export function EventTicketsTable({
     {
       key: "entry",
       label: "Entrada",
-      mobile: "subtitle",
+      // Phones: beside "Quem pediu", in the person's tags.
+      mobile: "hidden",
       className: "whitespace-nowrap",
-      render: (ticket) =>
-        ticket.checkedInAt ? (
-          <Badge tone="success">
-            <CircleCheck aria-hidden className="mr-1 size-3.5" />
-            Entrou às {formatTime(ticket.checkedInAt)}
-          </Badge>
-        ) : (
-          <Badge tone="neutral">Não entrou</Badge>
-        ),
+      render: (ticket) => <EntryBadge ticket={ticket} />,
     },
     {
       key: "type",
@@ -118,41 +111,74 @@ export function EventTicketsTable({
   );
 }
 
+// Whether the person came in (and when).
+function EntryBadge({ ticket }: { ticket: GateEventTicket }) {
+  return ticket.checkedInAt ? (
+    <Badge tone="success">
+      <CircleCheck aria-hidden className="mr-1 size-3.5" />
+      Entrou às {formatTime(ticket.checkedInAt)}
+    </Badge>
+  ) : (
+    <Badge tone="neutral">Não entrou</Badge>
+  );
+}
+
 // The person of a ticket: who ordered stands out (a "Quem pediu" badge
-// and the name in bold); the others say whose order they came in.
+// and the name in bold); the others say whose order they came in. On
+// phones the age goes beside the name and the tags (Quem pediu, the entry,
+// De fora) sit side by side on one line under it.
 function PersonName({
   ticket,
-  withAge = false,
+  phone = false,
 }: {
   ticket: GateEventTicket;
-  /** Phones: the age beside the name (no column there). */
-  withAge?: boolean;
+  /** The phone card: age beside the name, every tag on one line. */
+  phone?: boolean;
 }) {
   const buyer = ticket.source === "SELF";
+  const name = (
+    <span
+      className={cn(
+        "truncate",
+        buyer ? "font-bold text-fg" : "font-medium text-fg",
+      )}
+    >
+      {ticket.name}
+    </span>
+  );
+  const orderOf = !buyer && (
+    <span className="truncate text-xs text-soft">
+      No pedido de {ticket.buyerName ?? "morador"}
+    </span>
+  );
+
+  if (phone) {
+    return (
+      <span className="flex min-w-0 flex-col gap-1">
+        <span className="flex min-w-0 items-baseline gap-2">
+          {name}
+          <span className="shrink-0 text-xs font-normal text-soft">
+            {ticket.age} anos
+          </span>
+        </span>
+        <span className="flex flex-wrap items-center gap-1.5">
+          {buyer && <Badge tone="brand">Quem pediu</Badge>}
+          <EntryBadge ticket={ticket} />
+          {ticket.outside && <Badge tone="neutral">De fora</Badge>}
+        </span>
+        {orderOf}
+      </span>
+    );
+  }
+
   return (
     <span className="flex min-w-0 flex-col gap-0.5">
       <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-        <span
-          className={cn(
-            "truncate",
-            buyer ? "font-bold text-fg" : "font-medium text-fg",
-          )}
-        >
-          {ticket.name}
-        </span>
-        {withAge && (
-          <span className="text-xs font-normal text-soft">
-            {ticket.age} anos
-          </span>
-        )}
+        {name}
         {buyer && <Badge tone="brand">Quem pediu</Badge>}
         {ticket.outside && <Badge tone="neutral">De fora</Badge>}
       </span>
-      {!buyer && (
-        <span className="truncate text-xs text-soft">
-          No pedido de {ticket.buyerName ?? "morador"}
-        </span>
-      )}
+      {orderOf}
     </span>
   );
 }
