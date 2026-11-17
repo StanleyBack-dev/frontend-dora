@@ -49,6 +49,7 @@ type Documents = {
     "\n  mutation CancelBooking($id: ID!, $reason: String) {\n    cancelBooking(id: $id, reason: $reason) {\n      ...BookingFields\n    }\n  }\n": typeof types.CancelBookingDocument,
     "\n  mutation ApproveBooking($id: ID!) {\n    approveBooking(id: $id) {\n      ...BookingFields\n    }\n  }\n": typeof types.ApproveBookingDocument,
     "\n  mutation RejectBooking($id: ID!, $reason: String!) {\n    rejectBooking(id: $id, reason: $reason) {\n      ...BookingFields\n    }\n  }\n": typeof types.RejectBookingDocument,
+    "\n  query CondominiumSpaceBlocks {\n    condominiumSpaceBlocks {\n      id\n      spaceId\n      startsAt\n      endsAt\n      reason\n      createdByName\n      createdAt\n    }\n  }\n": typeof types.CondominiumSpaceBlocksDocument,
     "\n  query SpaceBlocks($spaceId: ID!) {\n    spaceBlocks(spaceId: $spaceId) {\n      id\n      spaceId\n      startsAt\n      endsAt\n      reason\n      createdByName\n      createdAt\n    }\n  }\n": typeof types.SpaceBlocksDocument,
     "\n  mutation CreateSpaceBlock($input: CreateSpaceBlockInput!) {\n    createSpaceBlock(input: $input) {\n      id\n    }\n  }\n": typeof types.CreateSpaceBlockDocument,
     "\n  mutation DeleteSpaceBlock($id: ID!) {\n    deleteSpaceBlock(id: $id)\n  }\n": typeof types.DeleteSpaceBlockDocument,
@@ -200,6 +201,7 @@ const documents: Documents = {
     "\n  mutation CancelBooking($id: ID!, $reason: String) {\n    cancelBooking(id: $id, reason: $reason) {\n      ...BookingFields\n    }\n  }\n": types.CancelBookingDocument,
     "\n  mutation ApproveBooking($id: ID!) {\n    approveBooking(id: $id) {\n      ...BookingFields\n    }\n  }\n": types.ApproveBookingDocument,
     "\n  mutation RejectBooking($id: ID!, $reason: String!) {\n    rejectBooking(id: $id, reason: $reason) {\n      ...BookingFields\n    }\n  }\n": types.RejectBookingDocument,
+    "\n  query CondominiumSpaceBlocks {\n    condominiumSpaceBlocks {\n      id\n      spaceId\n      startsAt\n      endsAt\n      reason\n      createdByName\n      createdAt\n    }\n  }\n": types.CondominiumSpaceBlocksDocument,
     "\n  query SpaceBlocks($spaceId: ID!) {\n    spaceBlocks(spaceId: $spaceId) {\n      id\n      spaceId\n      startsAt\n      endsAt\n      reason\n      createdByName\n      createdAt\n    }\n  }\n": types.SpaceBlocksDocument,
     "\n  mutation CreateSpaceBlock($input: CreateSpaceBlockInput!) {\n    createSpaceBlock(input: $input) {\n      id\n    }\n  }\n": types.CreateSpaceBlockDocument,
     "\n  mutation DeleteSpaceBlock($id: ID!) {\n    deleteSpaceBlock(id: $id)\n  }\n": types.DeleteSpaceBlockDocument,
@@ -453,6 +455,10 @@ export function graphql(source: "\n  mutation ApproveBooking($id: ID!) {\n    ap
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation RejectBooking($id: ID!, $reason: String!) {\n    rejectBooking(id: $id, reason: $reason) {\n      ...BookingFields\n    }\n  }\n"): typeof import('./graphql').RejectBookingDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CondominiumSpaceBlocks {\n    condominiumSpaceBlocks {\n      id\n      spaceId\n      startsAt\n      endsAt\n      reason\n      createdByName\n      createdAt\n    }\n  }\n"): typeof import('./graphql').CondominiumSpaceBlocksDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

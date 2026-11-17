@@ -954,6 +954,11 @@ export type RejectBookingMutationVariables = Exact<{
 
 export type RejectBookingMutation = { rejectBooking: { id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, guestsAllowed: boolean, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, feeCents: number | null, feeBilledAt: string | null, seriesId: string | null, createdAt: string } };
 
+export type CondominiumSpaceBlocksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CondominiumSpaceBlocksQuery = { condominiumSpaceBlocks: Array<{ id: string, spaceId: string, startsAt: string, endsAt: string, reason: string, createdByName: string | null, createdAt: string }> };
+
 export type SpaceBlocksQueryVariables = Exact<{
   spaceId: string | number;
 }>;
@@ -2767,6 +2772,19 @@ export const RejectBookingDocument = new TypedDocumentString(`
   seriesId
   createdAt
 }`) as unknown as TypedDocumentString<RejectBookingMutation, RejectBookingMutationVariables>;
+export const CondominiumSpaceBlocksDocument = new TypedDocumentString(`
+    query CondominiumSpaceBlocks {
+  condominiumSpaceBlocks {
+    id
+    spaceId
+    startsAt
+    endsAt
+    reason
+    createdByName
+    createdAt
+  }
+}
+    `) as unknown as TypedDocumentString<CondominiumSpaceBlocksQuery, CondominiumSpaceBlocksQueryVariables>;
 export const SpaceBlocksDocument = new TypedDocumentString(`
     query SpaceBlocks($spaceId: ID!) {
   spaceBlocks(spaceId: $spaceId) {

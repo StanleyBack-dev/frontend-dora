@@ -8,8 +8,10 @@ import { SpaceHero } from "@/features/spaces/components/SpaceHero";
 import { SpacePhotoGallery } from "@/features/spaces/components/SpacePhotoGallery";
 import { SpaceManageActions } from "@/features/spaces/components/SpaceManageActions";
 import { describeRules, WEEKDAYS } from "@/features/spaces/model/space-labels";
-import { getSessionUser } from "@/server/auth/current-user";
+import { authed, getSessionUser } from "@/server/auth/current-user";
 import { loadSpace } from "@/server/loaders/load-space";
+import { bookingsService } from "@/server/services/bookings.service";
+import { SpaceBlocksCard } from "@/features/bookings/components/SpaceBlocksCard";
 import { can } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Espaço" };
@@ -24,6 +26,9 @@ export default async function SpacePage({
   if (!can(user, "SPACES_MANAGE")) return <AccessDenied />;
   const space = await loadSpace((await params).id);
   if (!space) notFound();
+  const blocks = can(user, "BOOKINGS_MANAGE")
+    ? await authed((token) => bookingsService.blocks(token, space.id))
+    : [];
 
   const manager = can(user, "SPACES_MANAGE");
   const hours = new Map(
@@ -123,6 +128,10 @@ export default async function SpacePage({
           </p>
         </CardBody>
       </Card>
+
+      {can(user, "BOOKINGS_MANAGE") && (
+        <SpaceBlocksCard spaceId={space.id} blocks={blocks} manager />
+      )}
     </div>
   );
 }

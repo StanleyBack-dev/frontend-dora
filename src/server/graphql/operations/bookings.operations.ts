@@ -106,6 +106,20 @@ export const rejectBookingDocument = graphql(`
   }
 `);
 
+export const condominiumSpaceBlocksDocument = graphql(`
+  query CondominiumSpaceBlocks {
+    condominiumSpaceBlocks {
+      id
+      spaceId
+      startsAt
+      endsAt
+      reason
+      createdByName
+      createdAt
+    }
+  }
+`);
+
 export const spaceBlocksDocument = graphql(`
   query SpaceBlocks($spaceId: ID!) {
     spaceBlocks(spaceId: $spaceId) {

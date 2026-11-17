@@ -7,6 +7,7 @@ import {
   bookingGuestsDocument,
   cancelBookingSeriesDocument,
   checkInGuestDocument,
+  condominiumSpaceBlocksDocument,
   createBookingSeriesDocument,
   gateGuestsDocument,
   guestInviteDocument,
@@ -130,6 +131,15 @@ export const bookingsService = {
       variables: { id, reason },
     });
     return rejectBooking;
+  },
+
+  /** Every space's current and upcoming blocks (managers). */
+  async allBlocks(token: string): Promise<SpaceBlock[]> {
+    const { condominiumSpaceBlocks } = await backendGraphql(
+      condominiumSpaceBlocksDocument,
+      { token },
+    );
+    return condominiumSpaceBlocks;
   },
 
   async blocks(token: string, spaceId: string): Promise<SpaceBlock[]> {

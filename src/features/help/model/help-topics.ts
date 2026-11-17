@@ -575,6 +575,14 @@ export const HELP_TOPICS: HelpTopic[] = [
     sections: {
       howto: [
         {
+          text: "Em Bloqueios, veja os períodos fechados de todos os espaços e bloqueie um espaço para uma manutenção ou um evento; reservas no período só são canceladas depois que você confirmar. Na página de cada espaço também há os bloqueios dele.",
+          only: ["BOOKINGS_MANAGE"],
+        },
+        {
+          text: "Em Convidados, veja os convidados das reservas de um dia (passe para o dia anterior ou o seguinte), quem convidou e quem já entrou pela portaria.",
+          only: ["GUESTS_CHECKIN"],
+        },
+        {
           text: "Em Reservas, veja todas as reservas do condomínio, aprove ou recuse as pendentes (com motivo), veja os convidados e cancele quando necessário.",
           only: ["BOOKINGS_MANAGE"],
         },
