@@ -11,4 +11,4 @@ export function siteUrl(): string {
 
 export const SITE_NAME = "Dora";
 export const SITE_DESCRIPTION =
-  "Reservas de quadras e espaços do seu condomínio, direto do celular.";
+  "Reservas, eventos, portaria e comunicados do seu condomínio em um só app, direto do celular.";

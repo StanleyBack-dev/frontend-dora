@@ -1,12 +1,16 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { BellRing, CalendarCheck, Smartphone } from "lucide-react";
+import { BellRing, CalendarCheck, QrCode, Smartphone } from "lucide-react";
 import { cn } from "@/design-system";
 import { Wordmark } from "@/features/layout/components/Logo";
 import { LogoMark } from "@/features/layout/components/LogoMark";
 
 const HIGHLIGHTS = [
-  { icon: CalendarCheck, text: "Veja os horários livres e reserve na hora" },
+  {
+    icon: CalendarCheck,
+    text: "Reserve espaços e garanta seu lugar nos eventos",
+  },
+  { icon: QrCode, text: "Convidados e ingressos com QR code na portaria" },
   { icon: BellRing, text: "Avisos e comunicados do condomínio no celular" },
   { icon: Smartphone, text: "Instale como aplicativo na tela inicial" },
 ];
@@ -50,7 +54,7 @@ export function AuthLayout({
             Seu condomínio, mais simples
           </p>
           <h2 className="mt-5 text-[2.6rem] leading-[1.08] font-extrabold tracking-tight">
-            Reserve quadras e espaços em poucos toques.
+            Tudo do seu condomínio em poucos toques.
           </h2>
           <ul className="mt-9 space-y-4">
             {HIGHLIGHTS.map(({ icon: Icon, text }) => (
@@ -74,9 +78,7 @@ export function AuthLayout({
           <div className="mb-10 flex flex-col items-center text-center lg:hidden">
             <LogoMark className="size-16 drop-shadow-[0_12px_28px_rgb(255_107_26/0.35)]" />
             <Wordmark className="mt-4 text-4xl" />
-            <p className="mt-1.5 text-sm text-muted">
-              Reservas do seu condomínio
-            </p>
+            <p className="mt-1.5 text-sm text-muted">O app do seu condomínio</p>
           </div>
 
           {title && (

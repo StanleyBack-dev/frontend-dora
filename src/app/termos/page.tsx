@@ -6,7 +6,7 @@ import { Logo } from "@/features/layout/components/Logo";
 
 export const metadata: Metadata = { title: "Termos de uso e privacidade" };
 
-const UPDATED_AT = "24/10/2026";
+const UPDATED_AT = "17/11/2026";
 
 function Section({
   title,
@@ -52,9 +52,10 @@ export default function TermsPage() {
 
           <Section title="Para que serve o app">
             <p>
-              O Dora organiza as reservas de quadras e espaços, os avisos e o
-              atendimento do seu condomínio. O acesso é restrito aos moradores e
-              à administração, com conta pessoal e intransferível, criada por um
+              O Dora reúne o dia a dia do seu condomínio: reservas de espaços,
+              eventos e ingressos, portaria, avisos e atendimento, conforme os
+              módulos contratados. O acesso é restrito aos moradores e à
+              administração, com conta pessoal e intransferível, criada por um
               administrador ou aprovada a partir do cadastro pelo link.
             </p>
           </Section>
