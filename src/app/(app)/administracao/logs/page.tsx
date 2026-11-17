@@ -84,7 +84,7 @@ export default async function SystemLogsPage({
   const page = pageParam(params);
   const pageSize = pageSizeParam(params);
   const hrefWith = (overrides: Record<string, string | number | undefined>) =>
-    buildHref("/plataforma/logs", {
+    buildHref("/administracao/logs", {
       busca: search,
       de: fromDay,
       ate: toDay,
@@ -123,7 +123,7 @@ export default async function SystemLogsPage({
 
   return (
     <>
-      <BackLink href="/plataforma" label="Administração" />
+      <BackLink href="/administracao" label="Administração" />
       <PageHeader
         title="Logs e alertas"
         description="Erros, segurança, avisos não entregues e rotinas que falharam, em toda a plataforma."
@@ -203,7 +203,7 @@ export default async function SystemLogsPage({
               options={ENVIRONMENTS}
             />
             <FilterActions
-              clearHref="/plataforma/logs"
+              clearHref="/administracao/logs"
               hasActiveFilters={filtered}
               autoSubmit
             />

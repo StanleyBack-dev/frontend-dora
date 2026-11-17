@@ -5,13 +5,13 @@ import type { NavItem } from "@/features/layout/model/navigation";
 
 /** What each page of the administration is for. */
 const DESCRIPTIONS: Record<string, string> = {
-  "/plataforma/condominios":
+  "/administracao/condominios":
     "Cadastre, edite, suspenda e entre em cada condomínio para dar suporte.",
-  "/plataforma/pessoas":
+  "/administracao/pessoas":
     "Todas as contas do Dora: onde cada pessoa tem acesso e com qual papel.",
-  "/plataforma/modulos":
+  "/administracao/modulos":
     "Ligue e desligue os módulos contratados (reservas, eventos) por condomínio.",
-  "/plataforma/logs":
+  "/administracao/logs":
     "Erros, eventos de segurança e falhas das rotinas, com filtros.",
 };
 

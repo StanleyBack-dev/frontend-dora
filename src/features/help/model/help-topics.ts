@@ -464,7 +464,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "painel",
-    href: "/plataforma",
+    href: "/administracao",
     title: "Administração",
     icon: ChartColumn,
     permission: "CONDOMINIUMS_MANAGE",
@@ -497,7 +497,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "condominios",
-    href: "/plataforma/condominios",
+    href: "/administracao/condominios",
     title: "Condomínios",
     icon: Building2,
     permission: "CONDOMINIUMS_MANAGE",
@@ -642,7 +642,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "pessoas",
-    href: "/plataforma/pessoas",
+    href: "/administracao/pessoas",
     title: "Pessoas",
     icon: UsersRound,
     permission: "CONDOMINIUMS_MANAGE",
@@ -666,7 +666,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "modulos",
-    href: "/plataforma/modulos",
+    href: "/administracao/modulos",
     title: "Módulos",
     icon: Blocks,
     permission: "CONDOMINIUMS_MANAGE",
@@ -687,7 +687,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: "logs",
-    href: "/plataforma/logs",
+    href: "/administracao/logs",
     title: "Logs e alertas",
     icon: ScrollText,
     permission: "AUDIT_READ",

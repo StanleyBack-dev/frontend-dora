@@ -93,7 +93,7 @@ export function isActive(pathname: string, item: NavItem): boolean {
 export type AreaId = "app" | "manage" | "platform";
 
 export function areaOf(pathname: string): AreaId {
-  if (pathname === "/plataforma" || pathname.startsWith("/plataforma/")) {
+  if (pathname === "/administracao" || pathname.startsWith("/administracao/")) {
     return "platform";
   }
   if (pathname === "/gestao" || pathname.startsWith("/gestao/")) {
@@ -295,7 +295,7 @@ export const sidebarPages = (entries: readonly SidebarEntry[]): NavItem[] =>
 // Dora's own administration: one sidebar entry below Início, for the
 // platform administrator; its page opens the others.
 export const ADMIN_NAV: NavItem = {
-  href: "/plataforma",
+  href: "/administracao",
   label: "Administração",
   icon: Globe,
   permission: "CONDOMINIUMS_MANAGE",
@@ -304,32 +304,32 @@ export const ADMIN_NAV: NavItem = {
 // The administration's pages (its home's cards and the menu search).
 export const PLATFORM_NAV: NavItem[] = [
   {
-    href: "/plataforma",
+    href: "/administracao",
     label: "Visão geral",
     icon: ChartColumn,
     exact: true,
     permission: "CONDOMINIUMS_MANAGE",
   },
   {
-    href: "/plataforma/condominios",
+    href: "/administracao/condominios",
     label: "Condomínios",
     icon: Building2,
     permission: "CONDOMINIUMS_MANAGE",
   },
   {
-    href: "/plataforma/pessoas",
+    href: "/administracao/pessoas",
     label: "Pessoas",
     icon: UsersRound,
     permission: "CONDOMINIUMS_MANAGE",
   },
   {
-    href: "/plataforma/modulos",
+    href: "/administracao/modulos",
     label: "Módulos",
     icon: Blocks,
     permission: "CONDOMINIUMS_MANAGE",
   },
   {
-    href: "/plataforma/logs",
+    href: "/administracao/logs",
     label: "Logs e alertas",
     icon: ScrollText,
     permission: "AUDIT_READ",

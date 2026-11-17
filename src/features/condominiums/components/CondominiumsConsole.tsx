@@ -176,7 +176,7 @@ export function CondominiumsConsole({
       render: (item) => (
         <span className="flex flex-col">
           <Link
-            href={`/plataforma/condominios/${item.id}`}
+            href={`/administracao/condominios/${item.id}`}
             className="font-semibold text-fg hover:underline"
           >
             {item.name}

@@ -60,7 +60,7 @@ export default async function CondominiumsAdminPage({
 
   return (
     <>
-      <BackLink href="/plataforma" label="Administração" />
+      <BackLink href="/administracao" label="Administração" />
       <PageHeader
         title="Condomínios"
         description="Os clientes do Dora: situação, gestores, moradores e cadastros de cada condomínio."
@@ -126,7 +126,7 @@ export default async function CondominiumsAdminPage({
                   ]}
                 />
                 <FilterActions
-                  clearHref="/plataforma/condominios"
+                  clearHref="/administracao/condominios"
                   hasActiveFilters={filtered}
                   autoSubmit
                 />

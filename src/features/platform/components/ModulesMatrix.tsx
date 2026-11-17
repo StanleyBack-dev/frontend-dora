@@ -90,7 +90,7 @@ export function ModulesMatrix({
             <tr key={condominium.id}>
               <td className="px-4 py-3">
                 <Link
-                  href={`/plataforma/condominios/${condominium.id}`}
+                  href={`/administracao/condominios/${condominium.id}`}
                   className="font-semibold text-fg hover:underline"
                 >
                   {condominium.name}

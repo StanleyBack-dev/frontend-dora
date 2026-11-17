@@ -61,7 +61,7 @@ export default async function PlatformPeoplePage({
   const page = pageParam(params);
   const pageSize = pageSizeParam(params);
   const hrefWith = (overrides: Record<string, string | number | undefined>) =>
-    buildHref("/plataforma/pessoas", {
+    buildHref("/administracao/pessoas", {
       busca: search,
       papel: role,
       condominio: condominiumId,
@@ -84,7 +84,7 @@ export default async function PlatformPeoplePage({
 
   return (
     <>
-      <BackLink href="/plataforma" label="Administração" />
+      <BackLink href="/administracao" label="Administração" />
       <PageHeader
         title="Pessoas"
         description={`Todas as contas do Dora: ${people.total} ${people.total === 1 ? "pessoa" : "pessoas"}${filtered ? " com estes filtros" : ""}, e onde cada uma tem acesso.`}
@@ -125,7 +125,7 @@ export default async function PlatformPeoplePage({
               }))}
             />
             <FilterActions
-              clearHref="/plataforma/pessoas"
+              clearHref="/administracao/pessoas"
               hasActiveFilters={filtered}
               autoSubmit
             />

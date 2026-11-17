@@ -49,13 +49,16 @@ const nextConfig: NextConfig = {
   allowedDevOrigins,
   reactStrictMode: true,
   // Old addresses: the app is split in areas (Meu condomínio, /gestao,
-  // /plataforma). Temporary redirects, so they can still change.
+  // /administracao). Temporary redirects, so they can still change.
   async redirects() {
     const moved: [string, string][] = [
-      ["/painel", "/plataforma"],
-      ["/condominios", "/plataforma/condominios"],
-      ["/admin/condominios", "/plataforma/condominios"],
-      ["/admin/logs", "/plataforma/logs"],
+      ["/painel", "/administracao"],
+      // The platform's pages are Administração now.
+      ["/plataforma", "/administracao"],
+      ["/plataforma/:path*", "/administracao/:path*"],
+      ["/condominios", "/administracao/condominios"],
+      ["/admin/condominios", "/administracao/condominios"],
+      ["/admin/logs", "/administracao/logs"],
       ["/admin/cadastros", "/gestao/cadastros"],
       ["/admin/links", "/gestao/links"],
       ["/admin/dependentes", "/gestao/dependentes"],

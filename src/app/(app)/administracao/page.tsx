@@ -94,7 +94,7 @@ export default async function PlatformPanelPage({
   )?.name;
   const filtered = Boolean(from || to || condominiumId);
   const presetHref = (days: number) =>
-    buildHref("/plataforma", {
+    buildHref("/administracao", {
       de: periodStart(today, days),
       ate: today,
       condominio: condominiumId,
@@ -146,7 +146,7 @@ export default async function PlatformPanelPage({
               }))}
             />
             <FilterActions
-              clearHref="/plataforma"
+              clearHref="/administracao"
               hasActiveFilters={filtered}
               autoSubmit
             />
@@ -156,7 +156,7 @@ export default async function PlatformPanelPage({
         <PlatformShortcuts
           pages={PLATFORM_NAV.filter(
             (item) =>
-              item.href !== "/plataforma" &&
+              item.href !== "/administracao" &&
               (!item.permission || can(user, item.permission)),
           )}
         />
