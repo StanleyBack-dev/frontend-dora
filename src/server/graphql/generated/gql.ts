@@ -64,6 +64,8 @@ type Documents = {
     "\n  query GuestInvite($code: String!) {\n    guestInvite(code: $code) {\n      code\n      guestName\n      hostFirstName\n      spaceName\n      condominiumName\n      startsAt\n      endsAt\n      status\n      checkedIn\n    }\n  }\n": typeof types.GuestInviteDocument,
     "\n  fragment GateGuestFields on GateGuest {\n    id\n    bookingId\n    name\n    documentType\n    document\n    phone\n    code\n    checkedInAt\n    spaceName\n    startsAt\n    endsAt\n    hostName\n    unitLabel\n    checkInWindow\n  }\n": typeof types.GateGuestFieldsFragmentDoc,
     "\n  query GateGuests($date: String) {\n    gateGuests(date: $date) {\n      ...GateGuestFields\n    }\n  }\n": typeof types.GateGuestsDocument,
+    "\n  query DayGuests(\n    $date: String\n    $filter: DayGuestFilterInput\n    $page: PageInput\n  ) {\n    dayGuests(date: $date, filter: $filter, page: $page) {\n      items {\n        ...GateGuestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.DayGuestsDocument,
+    "\n  query DayGuestsOverview($date: String) {\n    dayGuestsOverview(date: $date) {\n      total\n      checkedIn\n      bookings\n      guests {\n        id\n        label\n      }\n      hosts {\n        id\n        label\n      }\n      units {\n        id\n        label\n      }\n      spaces {\n        id\n        label\n      }\n    }\n  }\n": typeof types.DayGuestsOverviewDocument,
     "\n  mutation CheckInGuest($input: CheckInGuestInput!) {\n    checkInGuest(input: $input) {\n      ...GateGuestFields\n    }\n  }\n": typeof types.CheckInGuestDocument,
     "\n  mutation UndoGuestCheckIn($guestId: ID!) {\n    undoGuestCheckIn(guestId: $guestId) {\n      ...GateGuestFields\n    }\n  }\n": typeof types.UndoGuestCheckInDocument,
     "\n  query BookingFees($month: String) {\n    bookingFees(month: $month) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": typeof types.BookingFeesDocument,
@@ -218,6 +220,8 @@ const documents: Documents = {
     "\n  query GuestInvite($code: String!) {\n    guestInvite(code: $code) {\n      code\n      guestName\n      hostFirstName\n      spaceName\n      condominiumName\n      startsAt\n      endsAt\n      status\n      checkedIn\n    }\n  }\n": types.GuestInviteDocument,
     "\n  fragment GateGuestFields on GateGuest {\n    id\n    bookingId\n    name\n    documentType\n    document\n    phone\n    code\n    checkedInAt\n    spaceName\n    startsAt\n    endsAt\n    hostName\n    unitLabel\n    checkInWindow\n  }\n": types.GateGuestFieldsFragmentDoc,
     "\n  query GateGuests($date: String) {\n    gateGuests(date: $date) {\n      ...GateGuestFields\n    }\n  }\n": types.GateGuestsDocument,
+    "\n  query DayGuests(\n    $date: String\n    $filter: DayGuestFilterInput\n    $page: PageInput\n  ) {\n    dayGuests(date: $date, filter: $filter, page: $page) {\n      items {\n        ...GateGuestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.DayGuestsDocument,
+    "\n  query DayGuestsOverview($date: String) {\n    dayGuestsOverview(date: $date) {\n      total\n      checkedIn\n      bookings\n      guests {\n        id\n        label\n      }\n      hosts {\n        id\n        label\n      }\n      units {\n        id\n        label\n      }\n      spaces {\n        id\n        label\n      }\n    }\n  }\n": types.DayGuestsOverviewDocument,
     "\n  mutation CheckInGuest($input: CheckInGuestInput!) {\n    checkInGuest(input: $input) {\n      ...GateGuestFields\n    }\n  }\n": types.CheckInGuestDocument,
     "\n  mutation UndoGuestCheckIn($guestId: ID!) {\n    undoGuestCheckIn(guestId: $guestId) {\n      ...GateGuestFields\n    }\n  }\n": types.UndoGuestCheckInDocument,
     "\n  query BookingFees($month: String) {\n    bookingFees(month: $month) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": types.BookingFeesDocument,
@@ -519,6 +523,14 @@ export function graphql(source: "\n  fragment GateGuestFields on GateGuest {\n  
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query GateGuests($date: String) {\n    gateGuests(date: $date) {\n      ...GateGuestFields\n    }\n  }\n"): typeof import('./graphql').GateGuestsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query DayGuests(\n    $date: String\n    $filter: DayGuestFilterInput\n    $page: PageInput\n  ) {\n    dayGuests(date: $date, filter: $filter, page: $page) {\n      items {\n        ...GateGuestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').DayGuestsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query DayGuestsOverview($date: String) {\n    dayGuestsOverview(date: $date) {\n      total\n      checkedIn\n      bookings\n      guests {\n        id\n        label\n      }\n      hosts {\n        id\n        label\n      }\n      units {\n        id\n        label\n      }\n      spaces {\n        id\n        label\n      }\n    }\n  }\n"): typeof import('./graphql').DayGuestsOverviewDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

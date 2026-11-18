@@ -176,6 +176,20 @@ export type CreateUserInput = {
   unitId?: string | number | null | undefined;
 };
 
+/** Filtros dos convidados de um dia. */
+export type DayGuestFilterInput = {
+  /** true: só quem já entrou; false: só quem ainda não entrou. */
+  checkedIn?: boolean | null | undefined;
+  /** Um convidado. */
+  guestId?: string | number | null | undefined;
+  /** Quem reservou (quem convidou). */
+  hostId?: string | number | null | undefined;
+  /** O espaço reservado. */
+  spaceId?: string | number | null | undefined;
+  /** A unidade da reserva. */
+  unitId?: string | number | null | undefined;
+};
+
 export type DependentInput = {
   /** Data de nascimento AAAA-MM-DD. */
   birthDate: string;
@@ -1080,6 +1094,22 @@ export type GateGuestsQueryVariables = Exact<{
 
 
 export type GateGuestsQuery = { gateGuests: Array<{ id: string, bookingId: string, name: string, documentType: DocumentType | null, document: string | null, phone: string | null, code: string, checkedInAt: string | null, spaceName: string, startsAt: string, endsAt: string, hostName: string, unitLabel: string | null, checkInWindow: GuestCheckInWindow }> };
+
+export type DayGuestsQueryVariables = Exact<{
+  date?: string | null | undefined;
+  filter?: DayGuestFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type DayGuestsQuery = { dayGuests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, bookingId: string, name: string, documentType: DocumentType | null, document: string | null, phone: string | null, code: string, checkedInAt: string | null, spaceName: string, startsAt: string, endsAt: string, hostName: string, unitLabel: string | null, checkInWindow: GuestCheckInWindow }> } };
+
+export type DayGuestsOverviewQueryVariables = Exact<{
+  date?: string | null | undefined;
+}>;
+
+
+export type DayGuestsOverviewQuery = { dayGuestsOverview: { total: number, checkedIn: number, bookings: number, guests: Array<{ id: string, label: string }>, hosts: Array<{ id: string, label: string }>, units: Array<{ id: string, label: string }>, spaces: Array<{ id: string, label: string }> } };
 
 export type CheckInGuestMutationVariables = Exact<{
   input: CheckInGuestInput;
@@ -2997,6 +3027,59 @@ export const GateGuestsDocument = new TypedDocumentString(`
   unitLabel
   checkInWindow
 }`) as unknown as TypedDocumentString<GateGuestsQuery, GateGuestsQueryVariables>;
+export const DayGuestsDocument = new TypedDocumentString(`
+    query DayGuests($date: String, $filter: DayGuestFilterInput, $page: PageInput) {
+  dayGuests(date: $date, filter: $filter, page: $page) {
+    items {
+      ...GateGuestFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment GateGuestFields on GateGuest {
+  id
+  bookingId
+  name
+  documentType
+  document
+  phone
+  code
+  checkedInAt
+  spaceName
+  startsAt
+  endsAt
+  hostName
+  unitLabel
+  checkInWindow
+}`) as unknown as TypedDocumentString<DayGuestsQuery, DayGuestsQueryVariables>;
+export const DayGuestsOverviewDocument = new TypedDocumentString(`
+    query DayGuestsOverview($date: String) {
+  dayGuestsOverview(date: $date) {
+    total
+    checkedIn
+    bookings
+    guests {
+      id
+      label
+    }
+    hosts {
+      id
+      label
+    }
+    units {
+      id
+      label
+    }
+    spaces {
+      id
+      label
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<DayGuestsOverviewQuery, DayGuestsOverviewQueryVariables>;
 export const CheckInGuestDocument = new TypedDocumentString(`
     mutation CheckInGuest($input: CheckInGuestInput!) {
   checkInGuest(input: $input) {

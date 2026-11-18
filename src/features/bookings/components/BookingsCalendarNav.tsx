@@ -16,7 +16,8 @@ export function BookingsCalendarNav({
   views,
   period,
 }: {
-  views: { label: string; href: string; active: boolean }[];
+  /** How to see them (absent: a single view, e.g. the day's guests). */
+  views?: { label: string; href: string; active: boolean }[];
   /** The calendar's period (absent in the list). */
   period?: {
     label: string;
@@ -32,7 +33,7 @@ export function BookingsCalendarNav({
 }) {
   return (
     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <SegmentedNav label="Visualização" items={views} />
+      {views && <SegmentedNav label="Visualização" items={views} />}
       {period && (
         <div className="flex items-center gap-2">
           <Link

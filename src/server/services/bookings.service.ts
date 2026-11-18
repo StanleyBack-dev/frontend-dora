@@ -9,6 +9,8 @@ import {
   checkInGuestDocument,
   condominiumSpaceBlocksDocument,
   createBookingSeriesDocument,
+  dayGuestsDocument,
+  dayGuestsOverviewDocument,
   gateGuestsDocument,
   guestInviteDocument,
   joinWaitlistDocument,
@@ -32,6 +34,8 @@ import type {
   BookingFees,
   BookingGuest,
   BookingSeriesResult,
+  DayGuestFilter,
+  DayGuestsOverview,
   GateGuest,
   GuestInput,
   GuestInvite,
@@ -287,6 +291,34 @@ export const bookingsService = {
       variables: { date: date ?? null },
     });
     return gateGuests;
+  },
+
+  // === the managers' guests of a day ===
+
+  /** A page of a day's guests (today when absent) matching the filter. */
+  async dayGuests(
+    token: string,
+    date: string | undefined,
+    filter: DayGuestFilter,
+    page: { page: number; limit: number },
+  ): Promise<Paginated<GateGuest>> {
+    const { dayGuests } = await backendGraphql(dayGuestsDocument, {
+      token,
+      variables: { date: date ?? null, filter, page },
+    });
+    return dayGuests;
+  },
+
+  /** A day's guests at a glance: the numbers and the filter options. */
+  async dayGuestsOverview(
+    token: string,
+    date?: string,
+  ): Promise<DayGuestsOverview> {
+    const { dayGuestsOverview } = await backendGraphql(
+      dayGuestsOverviewDocument,
+      { token, variables: { date: date ?? null } },
+    );
+    return dayGuestsOverview;
   },
 
   async checkIn(
