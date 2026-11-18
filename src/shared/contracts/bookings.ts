@@ -120,6 +120,31 @@ export type GateGuest = Omit<BookingGuest, "createdAt"> & {
   checkInWindow: GuestCheckInWindow;
 };
 
+/** What narrows a day's guests for the managers (absent: any). */
+export type DayGuestFilter = {
+  guestId?: string;
+  /** Who booked (who invited). */
+  hostId?: string;
+  unitId?: string;
+  spaceId?: string;
+  /** true: only who came in; false: only who didn't yet. */
+  checkedIn?: boolean;
+};
+
+/** Something to pick in a filter of the guests. */
+export type GuestFilterOption = { id: string; label: string };
+
+/** A day's guests at a glance: the numbers and the filter options. */
+export type DayGuestsOverview = {
+  total: number;
+  checkedIn: number;
+  bookings: number;
+  guests: GuestFilterOption[];
+  hosts: GuestFilterOption[];
+  units: GuestFilterOption[];
+  spaces: GuestFilterOption[];
+};
+
 /** The public invite page of one guest. */
 export type GuestInvite = {
   code: string;

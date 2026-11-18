@@ -271,6 +271,50 @@ export const gateGuestsDocument = graphql(`
   }
 `);
 
+export const dayGuestsDocument = graphql(`
+  query DayGuests(
+    $date: String
+    $filter: DayGuestFilterInput
+    $page: PageInput
+  ) {
+    dayGuests(date: $date, filter: $filter, page: $page) {
+      items {
+        ...GateGuestFields
+      }
+      total
+      page
+      limit
+      totalPages
+    }
+  }
+`);
+
+export const dayGuestsOverviewDocument = graphql(`
+  query DayGuestsOverview($date: String) {
+    dayGuestsOverview(date: $date) {
+      total
+      checkedIn
+      bookings
+      guests {
+        id
+        label
+      }
+      hosts {
+        id
+        label
+      }
+      units {
+        id
+        label
+      }
+      spaces {
+        id
+        label
+      }
+    }
+  }
+`);
+
 export const checkInGuestDocument = graphql(`
   mutation CheckInGuest($input: CheckInGuestInput!) {
     checkInGuest(input: $input) {
