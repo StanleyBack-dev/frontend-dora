@@ -167,6 +167,28 @@ export type BookingSeriesResult = {
 export type SeriesCancellation = { cancelled: number; kept: number };
 
 /** Usage fees of a month, for the condominium's billing. */
+/** What narrows a month's usage fees (absent: any). */
+export type FeeFilter = {
+  unitId?: string;
+  spaceId?: string;
+  /** Who booked. */
+  userId?: string;
+  /** true: only fees sent to billing; false: only the pending ones. */
+  billed?: boolean;
+};
+
+/** A month's usage fees at a glance: the numbers and the filter options. */
+export type BookingFeesOverview = {
+  /** YYYY-MM. */
+  month: string;
+  count: number;
+  totalCents: number;
+  billedCents: number;
+  units: GuestFilterOption[];
+  spaces: GuestFilterOption[];
+  users: GuestFilterOption[];
+};
+
 export type BookingFees = {
   /** YYYY-MM. */
   month: string;

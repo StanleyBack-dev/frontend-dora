@@ -11,6 +11,7 @@ export { Card, CardBody, CardHeader } from "./components/Card";
 export { Combobox, type ComboboxOption } from "./components/Combobox";
 export { DataTable, type DataTableColumn } from "./components/DataTable";
 export { Drawer } from "./components/Drawer";
+export { CardCover } from "./components/CardCover";
 export { EmptyState } from "./components/EmptyState";
 export { Field, inputClasses, labelClasses } from "./components/Field";
 export { AutoFilterForm } from "./components/AutoFilterForm";

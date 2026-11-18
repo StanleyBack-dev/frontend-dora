@@ -68,7 +68,9 @@ type Documents = {
     "\n  query DayGuestsOverview($date: String) {\n    dayGuestsOverview(date: $date) {\n      total\n      checkedIn\n      bookings\n      guests {\n        id\n        label\n      }\n      hosts {\n        id\n        label\n      }\n      units {\n        id\n        label\n      }\n      spaces {\n        id\n        label\n      }\n    }\n  }\n": typeof types.DayGuestsOverviewDocument,
     "\n  mutation CheckInGuest($input: CheckInGuestInput!) {\n    checkInGuest(input: $input) {\n      ...GateGuestFields\n    }\n  }\n": typeof types.CheckInGuestDocument,
     "\n  mutation UndoGuestCheckIn($guestId: ID!) {\n    undoGuestCheckIn(guestId: $guestId) {\n      ...GateGuestFields\n    }\n  }\n": typeof types.UndoGuestCheckInDocument,
-    "\n  query BookingFees($month: String) {\n    bookingFees(month: $month) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": typeof types.BookingFeesDocument,
+    "\n  query BookingFees($month: String, $filter: FeeFilterInput) {\n    bookingFees(month: $month, filter: $filter) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": typeof types.BookingFeesDocument,
+    "\n  query BookingFeesPage(\n    $month: String\n    $filter: FeeFilterInput\n    $page: PageInput\n  ) {\n    bookingFeesPage(month: $month, filter: $filter, page: $page) {\n      items {\n        ...BookingFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.BookingFeesPageDocument,
+    "\n  query BookingFeesOverview($month: String) {\n    bookingFeesOverview(month: $month) {\n      month\n      count\n      totalCents\n      billedCents\n      units {\n        id\n        label\n      }\n      spaces {\n        id\n        label\n      }\n      users {\n        id\n        label\n      }\n    }\n  }\n": typeof types.BookingFeesOverviewDocument,
     "\n  mutation SetBookingFeesBilled($input: SetBookingFeesBilledInput!) {\n    setBookingFeesBilled(input: $input)\n  }\n": typeof types.SetBookingFeesBilledDocument,
     "\n  fragment BroadcastFields on Broadcast {\n    id\n    title\n    body\n    audience\n    targetGroup\n    sendEmail\n    recipients\n    authorName\n    createdAt\n  }\n": typeof types.BroadcastFieldsFragmentDoc,
     "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": typeof types.BroadcastsDocument,
@@ -224,7 +226,9 @@ const documents: Documents = {
     "\n  query DayGuestsOverview($date: String) {\n    dayGuestsOverview(date: $date) {\n      total\n      checkedIn\n      bookings\n      guests {\n        id\n        label\n      }\n      hosts {\n        id\n        label\n      }\n      units {\n        id\n        label\n      }\n      spaces {\n        id\n        label\n      }\n    }\n  }\n": types.DayGuestsOverviewDocument,
     "\n  mutation CheckInGuest($input: CheckInGuestInput!) {\n    checkInGuest(input: $input) {\n      ...GateGuestFields\n    }\n  }\n": types.CheckInGuestDocument,
     "\n  mutation UndoGuestCheckIn($guestId: ID!) {\n    undoGuestCheckIn(guestId: $guestId) {\n      ...GateGuestFields\n    }\n  }\n": types.UndoGuestCheckInDocument,
-    "\n  query BookingFees($month: String) {\n    bookingFees(month: $month) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": types.BookingFeesDocument,
+    "\n  query BookingFees($month: String, $filter: FeeFilterInput) {\n    bookingFees(month: $month, filter: $filter) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n": types.BookingFeesDocument,
+    "\n  query BookingFeesPage(\n    $month: String\n    $filter: FeeFilterInput\n    $page: PageInput\n  ) {\n    bookingFeesPage(month: $month, filter: $filter, page: $page) {\n      items {\n        ...BookingFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.BookingFeesPageDocument,
+    "\n  query BookingFeesOverview($month: String) {\n    bookingFeesOverview(month: $month) {\n      month\n      count\n      totalCents\n      billedCents\n      units {\n        id\n        label\n      }\n      spaces {\n        id\n        label\n      }\n      users {\n        id\n        label\n      }\n    }\n  }\n": types.BookingFeesOverviewDocument,
     "\n  mutation SetBookingFeesBilled($input: SetBookingFeesBilledInput!) {\n    setBookingFeesBilled(input: $input)\n  }\n": types.SetBookingFeesBilledDocument,
     "\n  fragment BroadcastFields on Broadcast {\n    id\n    title\n    body\n    audience\n    targetGroup\n    sendEmail\n    recipients\n    authorName\n    createdAt\n  }\n": types.BroadcastFieldsFragmentDoc,
     "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": types.BroadcastsDocument,
@@ -542,7 +546,15 @@ export function graphql(source: "\n  mutation UndoGuestCheckIn($guestId: ID!) {\
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query BookingFees($month: String) {\n    bookingFees(month: $month) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n"): typeof import('./graphql').BookingFeesDocument;
+export function graphql(source: "\n  query BookingFees($month: String, $filter: FeeFilterInput) {\n    bookingFees(month: $month, filter: $filter) {\n      month\n      totalCents\n      billedCents\n      items {\n        ...BookingFields\n      }\n    }\n  }\n"): typeof import('./graphql').BookingFeesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query BookingFeesPage(\n    $month: String\n    $filter: FeeFilterInput\n    $page: PageInput\n  ) {\n    bookingFeesPage(month: $month, filter: $filter, page: $page) {\n      items {\n        ...BookingFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').BookingFeesPageDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query BookingFeesOverview($month: String) {\n    bookingFeesOverview(month: $month) {\n      month\n      count\n      totalCents\n      billedCents\n      units {\n        id\n        label\n      }\n      spaces {\n        id\n        label\n      }\n      users {\n        id\n        label\n      }\n    }\n  }\n"): typeof import('./graphql').BookingFeesOverviewDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

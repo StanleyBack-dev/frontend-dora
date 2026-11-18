@@ -1,33 +1,57 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
-  ChevronLeft,
-  ChevronRight,
-  CircleCheck,
-  Clock,
-  Wallet,
-} from "lucide-react";
-import { PageHeader, StatCard, buttonClasses } from "@/design-system";
+  AutoFilterForm,
+  Card,
+  FilterActions,
+  FilterCombobox,
+  FilterPanel,
+  FilterResults,
+  FilterScope,
+  PageHeader,
+  Pagination,
+} from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
-import { FeesConsole } from "@/features/bookings/components/FeesConsole";
+import { BookingsCalendarNav } from "@/features/bookings/components/BookingsCalendarNav";
+import { FeesSummary } from "@/features/bookings/components/FeesSummary";
+import { FeesTable } from "@/features/bookings/components/FeesTable";
+import {
+  FEE_SITUATIONS,
+  toFeeFilter,
+  type FeeFilterParams,
+  type FeeSituation,
+} from "@/features/bookings/model/fee-filter-params";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { requestTime } from "@/server/request-time";
 import { bookingsService } from "@/server/services/bookings.service";
 import { can } from "@/shared/lib/access";
-import { currentMonth, isMonth, shiftMonth } from "@/shared/lib/datetime";
-import { formatCents } from "@/shared/lib/format";
-import { firstParam, type RawSearchParams } from "@/shared/lib/search-params";
+import {
+  currentMonth,
+  formatMonth,
+  isMonth,
+  shiftMonth,
+} from "@/shared/lib/datetime";
+import {
+  buildHref,
+  DEFAULT_PAGE_SIZE,
+  firstParam,
+  oneOf,
+  PAGE_SIZES,
+  pageParam,
+  pageSizeParam,
+  pageSizeQuery,
+  type RawSearchParams,
+} from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Taxas de uso" };
 
-const monthName = (month: string) =>
-  new Intl.DateTimeFormat("pt-BR", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${month}-15T12:00:00Z`));
+const BASE = "/gestao/reservas/taxas";
+const ids = (options: { id: string }[]) => options.map((option) => option.id);
+const toOptions = (options: { id: string; label: string }[]) =>
+  options.map((option) => ({ value: option.id, label: option.label }));
 
-// Usage fees of a month, by unit, for the condominium's billing.
+// Usage fees of a month for the condominium's billing: the month's numbers
+// and a page of fees filtered by the API (unit, space, who booked,
+// situation), to mark as sent to billing and export as a spreadsheet.
 export default async function BookingFeesPage({
   searchParams,
 }: {
@@ -36,11 +60,46 @@ export default async function BookingFeesPage({
   const user = await getSessionUser();
   if (!can(user, "BOOKINGS_MANAGE")) return <AccessDenied />;
 
-  const params = await searchParams;
-  const asked = firstParam(params, "mes");
-  const month = isMonth(asked) ? asked : currentMonth(await requestTime());
-  const fees = await authed((token) => bookingsService.fees(token, month));
-  const pendingCents = fees.totalCents - fees.billedCents;
+  const query = await searchParams;
+  const thisMonth = currentMonth(await requestTime());
+  const asked = firstParam(query, "mes");
+  const month = isMonth(asked) ? asked : thisMonth;
+  const mes = month === thisMonth ? undefined : month;
+
+  // The numbers and what the filters offer, whatever the filters.
+  const overview = await authed((token) =>
+    bookingsService.feesOverview(token, mes),
+  );
+  const params: FeeFilterParams = {
+    unidade: oneOf(firstParam(query, "unidade"), ids(overview.units)),
+    espaco: oneOf(firstParam(query, "espaco"), ids(overview.spaces)),
+    morador: oneOf(firstParam(query, "morador"), ids(overview.users)),
+    situacao: oneOf(
+      firstParam(query, "situacao"),
+      Object.keys(FEE_SITUATIONS) as FeeSituation[],
+    ),
+  };
+  const page = pageParam(query);
+  const pageSize = pageSizeParam(query);
+  const filter = toFeeFilter(params);
+  const filtered = Object.keys(filter).length > 0;
+  const fees = await authed((token) =>
+    bookingsService.feesPage(token, mes, filter, { page, limit: pageSize }),
+  );
+
+  const hrefWith = (overrides: Record<string, string | number | undefined>) =>
+    buildHref(BASE, {
+      mes,
+      ...params,
+      "por-pagina": pageSizeQuery(pageSize),
+      ...overrides,
+    });
+  // Another month starts over: its fees and options are other ones.
+  const monthHref = (target: string) =>
+    buildHref(BASE, {
+      mes: target === thisMonth ? undefined : target,
+      "por-pagina": pageSizeQuery(pageSize),
+    });
 
   return (
     <>
@@ -49,52 +108,90 @@ export default async function BookingFeesPage({
         description="Reservas confirmadas de espaços pagos, por unidade, para lançar na cobrança do condomínio."
       />
 
-      <div className="mb-5 flex items-center justify-between gap-2">
-        <Link
-          href={`/gestao/reservas/taxas?mes=${shiftMonth(month, -1)}`}
-          className={buttonClasses("secondary", "sm")}
-          aria-label="Mês anterior"
-        >
-          <ChevronLeft aria-hidden className="size-4" />
-        </Link>
-        <p className="text-base font-bold text-fg capitalize">
-          {monthName(month)}
-        </p>
-        <Link
-          href={`/gestao/reservas/taxas?mes=${shiftMonth(month, 1)}`}
-          className={buttonClasses("secondary", "sm")}
-          aria-label="Próximo mês"
-        >
-          <ChevronRight aria-hidden className="size-4" />
-        </Link>
-      </div>
+      <BookingsCalendarNav
+        period={{
+          label: formatMonth(month),
+          prevLabel: "Mês anterior",
+          nextLabel: "Próximo mês",
+          prevHref: monthHref(shiftMonth(month, -1)),
+          nextHref: monthHref(shiftMonth(month, 1)),
+          currentLabel: "Este mês",
+          currentHref: month === thisMonth ? undefined : monthHref(thisMonth),
+        }}
+      />
 
-      <section
-        aria-label="Resumo do mês"
-        className="mb-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3"
-      >
-        <StatCard
-          label="Total do mês"
-          value={formatCents(fees.totalCents)}
-          hint={`${fees.items.length} reserva${fees.items.length === 1 ? "" : "s"}`}
-          icon={<Wallet />}
-          tone="brand"
-        />
-        <StatCard
-          label="Lançado na cobrança"
-          value={formatCents(fees.billedCents)}
-          icon={<CircleCheck />}
-          tone="neutral"
-        />
-        <StatCard
-          label="Pendente"
-          value={formatCents(pendingCents)}
-          icon={<Clock />}
-          tone={pendingCents > 0 ? "warning" : "neutral"}
-        />
-      </section>
+      <FeesSummary overview={overview} />
 
-      <FeesConsole key={month} fees={fees} />
+      <FilterScope>
+        <FilterPanel hasActiveFilters={filtered}>
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {mes && <input type="hidden" name="mes" value={mes} />}
+            {pageSize !== DEFAULT_PAGE_SIZE && (
+              <input type="hidden" name="por-pagina" value={pageSize} />
+            )}
+            <FilterCombobox
+              label="Unidade"
+              name="unidade"
+              defaultValue={params.unidade ?? ""}
+              placeholder="Todas"
+              options={toOptions(overview.units)}
+            />
+            <FilterCombobox
+              label="Espaço"
+              name="espaco"
+              defaultValue={params.espaco ?? ""}
+              placeholder="Todos"
+              options={toOptions(overview.spaces)}
+            />
+            <FilterCombobox
+              label="Morador"
+              name="morador"
+              defaultValue={params.morador ?? ""}
+              placeholder="Todos"
+              options={toOptions(overview.users)}
+            />
+            <FilterCombobox
+              label="Situação"
+              name="situacao"
+              defaultValue={params.situacao ?? ""}
+              placeholder="Todas"
+              options={[
+                { value: "pendentes", label: "Pendentes" },
+                { value: "lancadas", label: "Lançadas na cobrança" },
+              ]}
+            />
+            <FilterActions
+              clearHref={buildHref(BASE, { mes })}
+              hasActiveFilters={filtered}
+              autoSubmit
+            />
+          </AutoFilterForm>
+        </FilterPanel>
+
+        <FilterResults>
+          <Card>
+            <FeesTable
+              // A new page or filter starts with nothing selected.
+              key={hrefWith({ page })}
+              fees={fees.items}
+              filtered={filtered}
+              exportHref={buildHref("/api/bookings/fees/export", {
+                mes: month,
+                ...params,
+              })}
+            />
+            <Pagination
+              page={fees.page}
+              totalPages={fees.totalPages}
+              total={fees.total}
+              pageSize={pageSize}
+              hrefFor={(target) => hrefWith({ page: target })}
+              pageSizes={PAGE_SIZES}
+              pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+            />
+          </Card>
+        </FilterResults>
+      </FilterScope>
     </>
   );
 }

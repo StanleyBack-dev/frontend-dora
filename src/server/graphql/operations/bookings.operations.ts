@@ -334,13 +334,54 @@ export const undoGuestCheckInDocument = graphql(`
 // --- usage fees ---
 
 export const bookingFeesDocument = graphql(`
-  query BookingFees($month: String) {
-    bookingFees(month: $month) {
+  query BookingFees($month: String, $filter: FeeFilterInput) {
+    bookingFees(month: $month, filter: $filter) {
       month
       totalCents
       billedCents
       items {
         ...BookingFields
+      }
+    }
+  }
+`);
+
+export const bookingFeesPageDocument = graphql(`
+  query BookingFeesPage(
+    $month: String
+    $filter: FeeFilterInput
+    $page: PageInput
+  ) {
+    bookingFeesPage(month: $month, filter: $filter, page: $page) {
+      items {
+        ...BookingFields
+      }
+      total
+      page
+      limit
+      totalPages
+    }
+  }
+`);
+
+export const bookingFeesOverviewDocument = graphql(`
+  query BookingFeesOverview($month: String) {
+    bookingFeesOverview(month: $month) {
+      month
+      count
+      totalCents
+      billedCents
+      units {
+        id
+        label
+      }
+      spaces {
+        id
+        label
+      }
+      users {
+        id
+        label
       }
     }
   }

@@ -385,6 +385,18 @@ export type EventWhen =
   | 'PAST'
   | 'UPCOMING';
 
+/** Filtros das taxas de uso de um mês. */
+export type FeeFilterInput = {
+  /** true: só as lançadas na cobrança; false: só as pendentes. */
+  billed?: boolean | null | undefined;
+  /** O espaço reservado. */
+  spaceId?: string | number | null | undefined;
+  /** A unidade da reserva. */
+  unitId?: string | number | null | undefined;
+  /** Quem reservou. */
+  userId?: string | number | null | undefined;
+};
+
 /** Se a portaria já pode liberar a entrada do convidado. */
 export type GuestCheckInWindow =
   | 'CANCELLED'
@@ -1127,10 +1139,27 @@ export type UndoGuestCheckInMutation = { undoGuestCheckIn: { id: string, booking
 
 export type BookingFeesQueryVariables = Exact<{
   month?: string | null | undefined;
+  filter?: FeeFilterInput | null | undefined;
 }>;
 
 
 export type BookingFeesQuery = { bookingFees: { month: string, totalCents: number, billedCents: number, items: Array<{ id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, guestsAllowed: boolean, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, feeCents: number | null, feeBilledAt: string | null, seriesId: string | null, createdAt: string }> } };
+
+export type BookingFeesPageQueryVariables = Exact<{
+  month?: string | null | undefined;
+  filter?: FeeFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type BookingFeesPageQuery = { bookingFeesPage: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, spaceId: string, spaceName: string, spaceKind: SpaceKind, guestsAllowed: boolean, userId: string, userName: string, unitLabel: string | null, startsAt: string, endsAt: string, status: BookingStatus, notes: string | null, cancelUntil: string, reason: string | null, decidedAt: string | null, cancelledAt: string | null, cancelledByManager: boolean, feeCents: number | null, feeBilledAt: string | null, seriesId: string | null, createdAt: string }> } };
+
+export type BookingFeesOverviewQueryVariables = Exact<{
+  month?: string | null | undefined;
+}>;
+
+
+export type BookingFeesOverviewQuery = { bookingFeesOverview: { month: string, count: number, totalCents: number, billedCents: number, units: Array<{ id: string, label: string }>, spaces: Array<{ id: string, label: string }>, users: Array<{ id: string, label: string }> } };
 
 export type SetBookingFeesBilledMutationVariables = Exact<{
   input: SetBookingFeesBilledInput;
@@ -3125,8 +3154,8 @@ export const UndoGuestCheckInDocument = new TypedDocumentString(`
   checkInWindow
 }`) as unknown as TypedDocumentString<UndoGuestCheckInMutation, UndoGuestCheckInMutationVariables>;
 export const BookingFeesDocument = new TypedDocumentString(`
-    query BookingFees($month: String) {
-  bookingFees(month: $month) {
+    query BookingFees($month: String, $filter: FeeFilterInput) {
+  bookingFees(month: $month, filter: $filter) {
     month
     totalCents
     billedCents
@@ -3158,6 +3187,63 @@ export const BookingFeesDocument = new TypedDocumentString(`
   seriesId
   createdAt
 }`) as unknown as TypedDocumentString<BookingFeesQuery, BookingFeesQueryVariables>;
+export const BookingFeesPageDocument = new TypedDocumentString(`
+    query BookingFeesPage($month: String, $filter: FeeFilterInput, $page: PageInput) {
+  bookingFeesPage(month: $month, filter: $filter, page: $page) {
+    items {
+      ...BookingFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment BookingFields on Booking {
+  id
+  spaceId
+  spaceName
+  spaceKind
+  guestsAllowed
+  userId
+  userName
+  unitLabel
+  startsAt
+  endsAt
+  status
+  notes
+  cancelUntil
+  reason
+  decidedAt
+  cancelledAt
+  cancelledByManager
+  feeCents
+  feeBilledAt
+  seriesId
+  createdAt
+}`) as unknown as TypedDocumentString<BookingFeesPageQuery, BookingFeesPageQueryVariables>;
+export const BookingFeesOverviewDocument = new TypedDocumentString(`
+    query BookingFeesOverview($month: String) {
+  bookingFeesOverview(month: $month) {
+    month
+    count
+    totalCents
+    billedCents
+    units {
+      id
+      label
+    }
+    spaces {
+      id
+      label
+    }
+    users {
+      id
+      label
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<BookingFeesOverviewQuery, BookingFeesOverviewQueryVariables>;
 export const SetBookingFeesBilledDocument = new TypedDocumentString(`
     mutation SetBookingFeesBilled($input: SetBookingFeesBilledInput!) {
   setBookingFeesBilled(input: $input)

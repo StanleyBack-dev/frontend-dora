@@ -4,6 +4,8 @@ import {
   addBookingGuestsDocument,
   approveBookingDocument,
   bookingFeesDocument,
+  bookingFeesOverviewDocument,
+  bookingFeesPageDocument,
   bookingGuestsDocument,
   cancelBookingSeriesDocument,
   checkInGuestDocument,
@@ -32,10 +34,12 @@ import type { Paginated } from "@/shared/contracts/api";
 import type {
   Booking,
   BookingFees,
+  BookingFeesOverview,
   BookingGuest,
   BookingSeriesResult,
   DayGuestFilter,
   DayGuestsOverview,
+  FeeFilter,
   GateGuest,
   GuestInput,
   GuestInvite,
@@ -342,12 +346,43 @@ export const bookingsService = {
 
   // === usage fees ===
 
-  async fees(token: string, month?: string): Promise<BookingFees> {
+  /** Every fee of a month that matches the filter (the spreadsheet). */
+  async fees(
+    token: string,
+    month?: string,
+    filter: FeeFilter = {},
+  ): Promise<BookingFees> {
     const { bookingFees } = await backendGraphql(bookingFeesDocument, {
       token,
-      variables: { month: month ?? null },
+      variables: { month: month ?? null, filter },
     });
     return bookingFees;
+  },
+
+  /** A page of a month's fees matching the filter, by unit. */
+  async feesPage(
+    token: string,
+    month: string | undefined,
+    filter: FeeFilter,
+    page: { page: number; limit: number },
+  ): Promise<Paginated<Booking>> {
+    const { bookingFeesPage } = await backendGraphql(bookingFeesPageDocument, {
+      token,
+      variables: { month: month ?? null, filter, page },
+    });
+    return bookingFeesPage;
+  },
+
+  /** A month's fees at a glance: the numbers and the filter options. */
+  async feesOverview(
+    token: string,
+    month?: string,
+  ): Promise<BookingFeesOverview> {
+    const { bookingFeesOverview } = await backendGraphql(
+      bookingFeesOverviewDocument,
+      { token, variables: { month: month ?? null } },
+    );
+    return bookingFeesOverview;
   },
 
   async setFeesBilled(

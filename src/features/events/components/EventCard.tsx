@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowUpRight, CalendarClock, MapPin } from "lucide-react";
-import { Badge, Card, cn } from "@/design-system";
+import { ArrowUpRight, CalendarClock, MapPin, PartyPopper } from "lucide-react";
+import { Badge, Card, CardCover, cn } from "@/design-system";
 import {
   EVENT_STATUS,
   eventPeriod,
@@ -64,10 +64,18 @@ export function EventCard({
           cancelled && "opacity-75",
         )}
       >
-        {photos.length > 0 && (
+        {photos.length > 0 ? (
           <SpacePhotoCarousel
             photos={photos}
             name={event.spaceName ?? event.title}
+            className="-mx-5 -mt-5 aspect-[16/9]"
+          />
+        ) : (
+          // No photos (outside the condominium, or a space without them):
+          // the same cover size, so every card in the grid lines up.
+          <CardCover
+            icon={<PartyPopper />}
+            label={event.spaceName ? "Sem fotos do espaço" : "Evento"}
             className="-mx-5 -mt-5 aspect-[16/9]"
           />
         )}
