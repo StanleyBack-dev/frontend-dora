@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.12.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.11.0...v0.12.0) (2026-11-18)
+
+
+### Features
+
+* **bookings:** rebuild the guests page with API filters and paging ([7b3c6d6](https://github.com/StanleyBack-dev/frontend-dora/commit/7b3c6d63b0a902527aaf3b624912a439aba068c0))
+* **bookings:** rebuild the guests page with API filters and paging ([02ca2f0](https://github.com/StanleyBack-dev/frontend-dora/commit/02ca2f0cc193395448ef16f99a6ec288985f5b96))
+
 ## [0.11.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.10.0...v0.11.0) (2026-11-18)
 
 
