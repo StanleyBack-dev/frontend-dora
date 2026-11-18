@@ -41,8 +41,12 @@ export type AttendeeSource =
   | 'SELF';
 
 export type BookingFilterInput = {
+  /** Começa a partir deste instante (início do calendário). */
+  from?: string | null | undefined;
   spaceId?: string | number | null | undefined;
   status?: BookingStatus | null | undefined;
+  /** Começa antes deste instante (fim do calendário, exclusivo). */
+  to?: string | null | undefined;
   when?: BookingWhen | null | undefined;
 };
 
