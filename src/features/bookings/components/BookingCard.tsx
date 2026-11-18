@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CalendarX2, Repeat, Users, Wallet } from "lucide-react";
-import { Badge, Button, Card, Modal } from "@/design-system";
+import { CalendarClock, CalendarX2, Repeat, Users, Wallet } from "lucide-react";
+import { Badge, Button, Card, cn, Modal } from "@/design-system";
 import { bookingsClient } from "@/features/bookings/api/bookings.client";
 import { GuestsDrawer } from "@/features/bookings/components/GuestsDrawer";
 import {
@@ -12,22 +12,28 @@ import {
   canCancelOwn,
   formatBookingPeriod,
 } from "@/features/bookings/model/booking-labels";
+import { SpacePhotoCarousel } from "@/features/spaces/components/SpacePhotoCarousel";
 import { SPACE_KINDS } from "@/features/spaces/model/space-labels";
 import type { Booking } from "@/shared/contracts/bookings";
+import type { SpacePhoto } from "@/shared/contracts/spaces";
 import { ApiClientError } from "@/shared/lib/api-client";
-import { formatDateTime } from "@/shared/lib/datetime";
+import { dateParts, formatDateTime } from "@/shared/lib/datetime";
 import { formatCents } from "@/shared/lib/format";
 import { useToast } from "@/shared/toast/useToast";
 
-// One of the person's bookings, with what happened to it, the fee, the guest
-// list and, while the deadline allows, the cancel buttons (this date or the
-// remaining dates of a weekly booking).
+// One of the person's bookings, in the same shape as the Eventos and Espaços
+// cards: its space's photos, the date, the space, when, the fee, what
+// happened to it and, at the bottom, the guest list and (while the deadline
+// allows) the cancel buttons (this date or the rest of a weekly booking).
 export function BookingCard({
   booking,
   now,
+  photos = [],
 }: {
   booking: Booking;
   now: number;
+  /** The photos of its space. */
+  photos?: SpacePhoto[];
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
@@ -35,12 +41,14 @@ export function BookingCard({
   const [confirmingSeries, setConfirmingSeries] = useState(false);
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [pending, setPending] = useState(false);
-  const { icon: Icon } = SPACE_KINDS[booking.spaceKind];
+  const { label: kind } = SPACE_KINDS[booking.spaceKind];
   const status = BOOKING_STATUS[booking.status];
   const cancellable = canCancelOwn(booking, now);
   const active = booking.status === "PENDING" || booking.status === "CONFIRMED";
   const ongoing = active && new Date(booking.endsAt).getTime() > now;
+  const deadlinePassed = ongoing && !cancellable;
   const period = formatBookingPeriod(booking);
+  const date = dateParts(booking.startsAt);
 
   async function cancelSeries() {
     if (!booking.seriesId) return;
@@ -82,41 +90,116 @@ export function BookingCard({
     setPending(false);
   }
 
+  const actions = [
+    booking.guestsAllowed && active && (
+      <Button
+        key="guests"
+        size="sm"
+        variant="secondary"
+        className="w-full"
+        icon={<Users className="size-4" />}
+        onClick={() => setGuestsOpen(true)}
+      >
+        Convidados
+      </Button>
+    ),
+    cancellable && (
+      <Button
+        key="cancel"
+        size="sm"
+        variant="cancel"
+        className="w-full"
+        icon={<CalendarX2 className="size-4" />}
+        onClick={() => setConfirming(true)}
+      >
+        Cancelar
+      </Button>
+    ),
+    booking.seriesId && ongoing && (
+      <Button
+        key="series"
+        size="sm"
+        variant="cancel"
+        className="w-full"
+        icon={<Repeat className="size-4" />}
+        onClick={() => setConfirmingSeries(true)}
+      >
+        Cancelar semanal
+      </Button>
+    ),
+  ].filter(Boolean);
+
   return (
-    <Card className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
-      <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-brand text-brand-fg">
-        <Icon aria-hidden className="size-6" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
+    <Card
+      className={cn(
+        "flex h-full flex-col gap-4 overflow-hidden p-5",
+        !active && "opacity-75",
+      )}
+    >
+      {photos.length > 0 && (
+        <SpacePhotoCarousel
+          photos={photos}
+          name={booking.spaceName}
+          className="-mx-5 -mt-5 aspect-[16/9]"
+        />
+      )}
+      <div className="flex items-start justify-between gap-3">
+        <span className="grid w-14 shrink-0 place-items-center rounded-2xl bg-brand py-1.5 text-center text-brand-fg">
+          <span className="text-[10px] font-semibold uppercase">
+            {date.weekday}
+          </span>
+          <span className="text-2xl leading-none font-extrabold">
+            {date.day}
+          </span>
+          <span className="text-[10px] font-semibold uppercase">
+            {date.month}
+          </span>
+        </span>
+        <div className="flex flex-wrap justify-end gap-1.5">
+          <Badge tone={status.tone}>{status.label}</Badge>
+          {booking.seriesId && (
+            <Badge tone="info">
+              <Repeat aria-hidden className="mr-1 size-3" />
+              Semanal
+            </Badge>
+          )}
+        </div>
+      </div>
+      <div className="min-w-0">
+        <p className="text-[11px] font-bold tracking-wide text-soft uppercase">
+          {kind}
+        </p>
+        <h2 className="truncate text-lg font-bold text-fg">
           <Link
             href={`/reservas/nova/${booking.spaceId}`}
-            className="font-bold text-fg hover:underline"
+            className="hover:underline"
           >
             {booking.spaceName}
           </Link>
-          <Badge tone={status.tone}>{status.label}</Badge>
-        </div>
-        <p className="text-sm text-fg capitalize">{period}</p>
-        {(booking.feeCents !== null || booking.seriesId) && (
-          <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-muted">
-            {booking.feeCents !== null && (
-              <span className="inline-flex items-center gap-1">
-                <Wallet aria-hidden className="size-3.5" />
+        </h2>
+        <ul className="mt-1.5 space-y-1 text-[13px] text-muted">
+          <li className="flex items-start gap-2">
+            <CalendarClock
+              aria-hidden
+              className="mt-0.5 size-4 shrink-0 text-soft"
+            />
+            <span className="capitalize">{period}</span>
+          </li>
+          {booking.feeCents !== null && (
+            <li className="flex items-start gap-2">
+              <Wallet
+                aria-hidden
+                className="mt-0.5 size-4 shrink-0 text-soft"
+              />
+              <span>
                 Taxa {formatCents(booking.feeCents)}
                 {booking.feeBilledAt ? " · lançada na cobrança" : ""}
               </span>
-            )}
-            {booking.seriesId && (
-              <span className="inline-flex items-center gap-1">
-                <Repeat aria-hidden className="size-3.5" />
-                Reserva semanal
-              </span>
-            )}
-          </p>
-        )}
+            </li>
+          )}
+        </ul>
         {booking.reason && (
-          <p className="mt-1 text-[13px] text-muted">
+          <p className="mt-2 text-[13px] text-muted">
             {booking.status === "REJECTED"
               ? "Motivo da recusa: "
               : booking.cancelledByManager
@@ -125,45 +208,26 @@ export function BookingCard({
             {booking.reason}
           </p>
         )}
-        {active && !cancellable && new Date(booking.endsAt).getTime() > now && (
-          <p className="mt-1 text-[12px] text-soft">
+        {deadlinePassed && (
+          <p className="mt-2 text-[12px] text-soft">
             O prazo para cancelar terminou em{" "}
             {formatDateTime(booking.cancelUntil)}.
           </p>
         )}
       </div>
-      <div className="flex flex-wrap gap-2 sm:flex-col sm:items-stretch">
-        {booking.guestsAllowed && active && (
-          <Button
-            size="sm"
-            variant="secondary"
-            icon={<Users className="size-4" />}
-            onClick={() => setGuestsOpen(true)}
-          >
-            Convidados
-          </Button>
-        )}
-        {cancellable && (
-          <Button
-            size="sm"
-            variant="cancel"
-            icon={<CalendarX2 className="size-4" />}
-            onClick={() => setConfirming(true)}
-          >
-            Cancelar
-          </Button>
-        )}
-        {booking.seriesId && ongoing && (
-          <Button
-            size="sm"
-            variant="cancel"
-            icon={<Repeat className="size-4" />}
-            onClick={() => setConfirmingSeries(true)}
-          >
-            Cancelar semanal
-          </Button>
-        )}
-      </div>
+      {actions.length > 0 && (
+        // The booking's buttons: equal buttons under a rule at the bottom of
+        // the card, as in the event cards (a third one takes the whole row).
+        <div
+          className={cn(
+            "-mx-5 mt-auto -mb-5 grid gap-2 border-t border-border bg-surface-muted/60 p-3",
+            actions.length > 1 ? "grid-cols-2" : "grid-cols-1",
+            actions.length === 3 && "[&>*:last-child]:col-span-2",
+          )}
+        >
+          {actions}
+        </div>
+      )}
 
       {booking.guestsAllowed && (
         <GuestsDrawer

@@ -12,6 +12,8 @@ import {
 import { BookingCard } from "@/features/bookings/components/BookingCard";
 import { authed } from "@/server/auth/current-user";
 import { bookingsService } from "@/server/services/bookings.service";
+import { spacesService } from "@/server/services/spaces.service";
+import { photosBySpace } from "@/features/spaces/model/space-photos";
 import { requestTime } from "@/server/request-time";
 import {
   firstParam,
@@ -32,14 +34,19 @@ export default async function MyBookingsPage({
   const past = firstParam(params, "periodo") === "passadas";
   const page = pageParam(params);
 
-  const bookings = await authed((token) =>
-    bookingsService.mine(token, past ? "PAST" : "UPCOMING", {
-      page,
-      limit: PAGE_SIZE,
-    }),
+  const [bookings, spaces] = await authed((token) =>
+    Promise.all([
+      bookingsService.mine(token, past ? "PAST" : "UPCOMING", {
+        page,
+        limit: PAGE_SIZE,
+      }),
+      // Every space (inactive too): a past booking keeps its photos.
+      spacesService.list(token, true),
+    ]),
   );
   const href = (target: number) =>
     `/reservas?${past ? "periodo=passadas&" : ""}page=${target}`;
+  const photos = photosBySpace(spaces);
   // One clock for the whole list (this request's time).
   const now = (await requestTime()).getTime();
 
@@ -88,10 +95,17 @@ export default async function MyBookingsPage({
           />
         </Card>
       ) : (
-        <div className="space-y-3">
-          {bookings.items.map((booking) => (
-            <BookingCard key={booking.id} booking={booking} now={now} />
-          ))}
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {bookings.items.map((booking) => (
+              <BookingCard
+                key={booking.id}
+                booking={booking}
+                now={now}
+                photos={photos[booking.spaceId]}
+              />
+            ))}
+          </div>
           {bookings.totalPages > 1 && (
             <Card>
               <Pagination

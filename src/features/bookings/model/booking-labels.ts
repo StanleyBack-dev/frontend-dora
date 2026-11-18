@@ -1,15 +1,25 @@
 import type { Tone } from "@/design-system";
 import type { Booking, BookingStatus } from "@/shared/contracts/bookings";
-import { formatLongDay, formatTime } from "@/shared/lib/datetime";
+import {
+  formatLongDay,
+  formatShortDay,
+  formatTime,
+  localDay,
+} from "@/shared/lib/datetime";
 
 export const BOOKING_STATUS: Record<
   BookingStatus,
-  { label: string; tone: Tone }
+  /** `short`: where space is tight (phone cards, the calendar). */
+  { label: string; short: string; tone: Tone }
 > = {
-  PENDING: { label: "Aguardando aprovação", tone: "warning" },
-  CONFIRMED: { label: "Confirmada", tone: "success" },
-  REJECTED: { label: "Recusada", tone: "danger" },
-  CANCELLED: { label: "Cancelada", tone: "neutral" },
+  PENDING: {
+    label: "Aguardando aprovação",
+    short: "Pendente",
+    tone: "warning",
+  },
+  CONFIRMED: { label: "Confirmada", short: "Confirmada", tone: "success" },
+  REJECTED: { label: "Recusada", short: "Recusada", tone: "danger" },
+  CANCELLED: { label: "Cancelada", short: "Cancelada", tone: "neutral" },
 };
 
 export const BOOKING_STATUS_ORDER = Object.keys(
@@ -25,6 +35,16 @@ export const formatBookingPeriod = (
   booking: Pick<Booking, "startsAt" | "endsAt">,
 ) =>
   `${formatLongDay(booking.startsAt)} · ${formatSlot(booking.startsAt, booking.endsAt)}`;
+
+/** "Sáb., 15/11 · 19:00–20:00" (fits a phone card's title). */
+export const formatCompactPeriod = (
+  booking: Pick<Booking, "startsAt" | "endsAt">,
+) => {
+  const [, month, day] = localDay(booking.startsAt).split("-");
+  const weekday = formatShortDay(booking.startsAt).split(",")[0];
+  const capitalized = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+  return `${capitalized}, ${day}/${month} · ${formatTime(booking.startsAt)}–${formatTime(booking.endsAt)}`;
+};
 
 /** Whether the booker can still cancel it (the API checks again). */
 export const canCancelOwn = (

@@ -47,6 +47,9 @@ export type BookingListQuery = {
   spaceId?: string;
   status?: BookingStatus;
   when?: BookingWhen;
+  /** Starts within [from, to) (ISO instants). */
+  from?: string;
+  to?: string;
   page: number;
   limit: number;
 };
@@ -75,11 +78,34 @@ export const bookingsService = {
           spaceId: query.spaceId,
           status: query.status,
           when: query.when,
+          from: query.from,
+          to: query.to,
         },
         page: { page: query.page, limit: query.limit },
       },
     });
     return bookings;
+  },
+
+  /**
+   * Every booking that starts within [from, to) (a calendar week or month),
+   * filtered by the API and read page by page (the API caps a page at 100).
+   */
+  async inRange(
+    token: string,
+    query: Omit<BookingListQuery, "when" | "page" | "limit"> & {
+      from: string;
+      to: string;
+    },
+  ): Promise<Booking[]> {
+    const limit = 100;
+    const first = await this.all(token, { ...query, page: 1, limit });
+    const rest = await Promise.all(
+      Array.from({ length: first.totalPages - 1 }, (_, index) =>
+        this.all(token, { ...query, page: index + 2, limit }),
+      ),
+    );
+    return [first, ...rest].flatMap((page) => page.items);
   },
 
   async availability(
