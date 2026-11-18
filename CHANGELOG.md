@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.11.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.10.0...v0.11.0) (2026-11-18)
+
+
+### Features
+
+* **bookings:** add week and month calendar to bookings management ([5b36302](https://github.com/StanleyBack-dev/frontend-dora/commit/5b363029ee610ecf3ea51ffc2015bb354f3a8822))
+* **bookings:** add week and month calendar to bookings management ([cb32e49](https://github.com/StanleyBack-dev/frontend-dora/commit/cb32e49d227380b744694584a4f27a01fe321930))
+
 ## [0.10.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.9.1...v0.10.0) (2026-11-17)
 
 
