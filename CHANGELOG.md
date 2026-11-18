@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.13.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.12.0...v0.13.0) (2026-11-18)
+
+
+### Features
+
+* **bookings:** rebuild the usage fees page with API filters and paging ([ecec9b3](https://github.com/StanleyBack-dev/frontend-dora/commit/ecec9b326f1038635c099880a29342ef41feae78))
+* **bookings:** rebuild the usage fees page with API filters and paging ([24bf4da](https://github.com/StanleyBack-dev/frontend-dora/commit/24bf4dad6b67118e84f204ab289e349cb00d565a))
+
+
+### Bug Fixes
+
+* **events:** keep event cards the same size without photos ([dee896d](https://github.com/StanleyBack-dev/frontend-dora/commit/dee896dfcb0340ab427c3b822f4674b09d28e269))
+
 ## [0.12.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.11.0...v0.12.0) (2026-11-18)
 
 
