@@ -16,6 +16,7 @@ import { loadSpace } from "@/server/loaders/load-space";
 import { requestTime } from "@/server/request-time";
 import { bookingsService } from "@/server/services/bookings.service";
 import { can } from "@/shared/lib/access";
+import { firstParam, type RawSearchParams } from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Reservar" };
 
@@ -24,11 +25,19 @@ export const metadata: Metadata = { title: "Reservar" };
 // here, opening hours, house rules and the periods it is closed.
 export default async function BookSpacePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ spaceId: string }>;
+  searchParams: Promise<RawSearchParams>;
 }) {
   const user = await getSessionUser();
   const space = await loadSpace((await params).spaceId);
+  // Opened from one of the resident's bookings (Minhas reservas): "back"
+  // returns there, not to the list of spaces to book.
+  const back =
+    firstParam(await searchParams, "de") === "reservas"
+      ? { href: "/reservas", label: "Voltar para minhas reservas" }
+      : { href: "/reservas/nova", label: "Escolher outro espaço" };
   // Inactive spaces take no bookings (managers reactivate them in Espaços).
   if (!space || !space.active) notFound();
 
@@ -48,10 +57,10 @@ export default async function BookSpacePage({
     // instead of widening the page on phones.
     <div className="min-w-0 space-y-6">
       <Link
-        href="/reservas/nova"
+        href={back.href}
         className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
       >
-        <ArrowLeft className="size-4" /> Escolher outro espaço
+        <ArrowLeft className="size-4" /> {back.label}
       </Link>
 
       <SpaceHero space={space} eyebrow="Nova reserva" />

@@ -21,7 +21,8 @@ import { useToast } from "@/shared/toast/useToast";
 const CHECKBOX = "size-4 shrink-0 accent-[var(--brand)]";
 
 // A page of a month's usage fees, as the API filtered them: pick the ones
-// sent to the condominium's billing (or undo it) and export every fee of
+// sent to the condominium's billing (or undo it; each button acts only on
+// the selected fees it applies to, and says how many) and export every fee of
 // the filter as a spreadsheet. On phones each fee is a card (checkbox, who
 // and the value) whose details start with the full date and time.
 export function FeesTable({
@@ -42,6 +43,12 @@ export function FeesTable({
 
   const chosen = fees.filter((item) => selected.has(item.id));
   const allSelected = fees.length > 0 && chosen.length === fees.length;
+  // Each action only applies to the selected fees in the other state: a
+  // billed fee is never billed again (it keeps its original date).
+  const toBill = chosen.filter((item) => !item.feeBilledAt);
+  const toUnbill = chosen.filter((item) => item.feeBilledAt);
+  const withCount = (label: string, count: number) =>
+    count > 0 ? `${label} (${count})` : label;
 
   function toggle(id: string) {
     setSelected((current) => {
@@ -56,7 +63,7 @@ export function FeesTable({
     setPending(billed ? "bill" : "unbill");
     try {
       const { changed } = await bookingsClient.setFeesBilled(
-        chosen.map((item) => item.id),
+        (billed ? toBill : toUnbill).map((item) => item.id),
         billed,
       );
       showSuccess(
@@ -197,20 +204,20 @@ export function FeesTable({
             size="sm"
             variant="secondary"
             icon={<Undo2 className="size-4" />}
-            disabled={chosen.length === 0 || pending !== null}
+            disabled={toUnbill.length === 0 || pending !== null}
             loading={pending === "unbill"}
             onClick={() => mark(false)}
           >
-            Voltar para pendente
+            {withCount("Voltar para pendente", toUnbill.length)}
           </Button>
           <Button
             size="sm"
             icon={<CircleCheck className="size-4" />}
-            disabled={chosen.length === 0 || pending !== null}
+            disabled={toBill.length === 0 || pending !== null}
             loading={pending === "bill"}
             onClick={() => mark(true)}
           >
-            Marcar como lançadas
+            {withCount("Marcar como lançadas", toBill.length)}
           </Button>
         </div>
       </div>
