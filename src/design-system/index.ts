@@ -1,6 +1,7 @@
 export { Alert } from "./components/Alert";
 export { Avatar } from "./components/Avatar";
 export { Badge, type Tone } from "./components/Badge";
+export { BlockedScreen } from "./components/BlockedScreen";
 export {
   Button,
   buttonClasses,
