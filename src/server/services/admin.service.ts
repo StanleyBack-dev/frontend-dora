@@ -2,6 +2,8 @@ import "server-only";
 import { backendGraphql } from "@/server/graphql/client";
 import {
   createUserDocument,
+  memberFilterOptionsDocument,
+  memberStatsDocument,
   resetUserPasswordDocument,
   revokeUserSessionsDocument,
   setUserActiveDocument,
@@ -17,6 +19,8 @@ import type {
   Paginated,
   Permission,
   PermissionMatrix,
+  MemberFilterOption,
+  MemberStats,
   RecordStamp,
   TemporaryAccess,
   UserAccount,
@@ -28,6 +32,12 @@ import type {
 export type UserListQuery = {
   limit?: number;
   search?: string;
+  /** Exactly this person (the name filter). */
+  userId?: string;
+  /** Exactly this e-mail. */
+  email?: string;
+  /** Exactly this phone (digits). */
+  phone?: string;
   group?: UserGroup;
   /** Residents (Moradores) or employees (Equipe). */
   kind?: MemberKind;
@@ -48,6 +58,9 @@ export const adminService = {
       variables: {
         filter: {
           search: query.search || undefined,
+          userId: query.userId,
+          email: query.email,
+          phone: query.phone,
           group: query.group,
           kind: query.kind,
           unitId: query.unitId,
@@ -57,6 +70,27 @@ export const adminService = {
       },
     });
     return users;
+  },
+
+  /** The members of one tie, for the name, e-mail and phone filters. */
+  async memberFilterOptions(
+    token: string,
+    kind: MemberKind,
+  ): Promise<MemberFilterOption[]> {
+    const { memberFilterOptions } = await backendGraphql(
+      memberFilterOptionsDocument,
+      { token, variables: { kind } },
+    );
+    return memberFilterOptions;
+  },
+
+  /** The members of one tie at a glance (the list page's cards). */
+  async memberStats(token: string, kind: MemberKind): Promise<MemberStats> {
+    const { memberStats } = await backendGraphql(memberStatsDocument, {
+      token,
+      variables: { kind },
+    });
+    return memberStats;
   },
 
   async getUser(token: string, id: string): Promise<UserAccount> {

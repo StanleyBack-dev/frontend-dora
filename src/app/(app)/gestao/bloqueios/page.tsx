@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { MapPin } from "lucide-react";
-import { Card, EmptyState, PageHeader } from "@/design-system";
+import { Card, CardCover, EmptyState, PageHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { SpaceBlocksCard } from "@/features/bookings/components/SpaceBlocksCard";
+import { SpacePhotoCarousel } from "@/features/spaces/components/SpacePhotoCarousel";
+import { SPACE_KINDS } from "@/features/spaces/model/space-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { bookingsService } from "@/server/services/bookings.service";
 import { spacesService } from "@/server/services/spaces.service";
+import type { Space } from "@/shared/contracts/spaces";
 import { can } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Bloqueios" };
@@ -52,10 +55,33 @@ export default async function SpaceBlocksPage() {
               title={space.active ? space.name : `${space.name} (inativo)`}
               blocks={blocks.filter((block) => block.spaceId === space.id)}
               manager
+              cover={<SpaceCover space={space} />}
             />
           ))}
         </div>
       )}
     </>
+  );
+}
+
+/** The space's photos on top of its card, like Espaços and Eventos; without
+ * photos, the same cover size with the space's icon. */
+function SpaceCover({ space }: { space: Space }) {
+  if (space.photos.length > 0) {
+    return (
+      <SpacePhotoCarousel
+        photos={space.photos}
+        name={space.name}
+        className="aspect-[16/9]"
+      />
+    );
+  }
+  const { icon: Icon } = SPACE_KINDS[space.kind];
+  return (
+    <CardCover
+      icon={<Icon />}
+      label="Sem fotos do espaço"
+      className="aspect-[16/9]"
+    />
   );
 }

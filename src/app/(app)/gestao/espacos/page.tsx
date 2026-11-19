@@ -4,6 +4,7 @@ import { MapPin, Plus } from "lucide-react";
 import { buttonClasses, Card, EmptyState, PageHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { SpaceCard } from "@/features/spaces/components/SpaceCard";
+import { SpacesSummary } from "@/features/spaces/components/SpacesSummary";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { spacesService } from "@/server/services/spaces.service";
 import { can } from "@/shared/lib/access";
@@ -31,6 +32,7 @@ export default async function SpacesPage() {
           </Link>
         }
       />
+      {spaces.length > 0 && <SpacesSummary spaces={spaces} />}
       {spaces.length === 0 ? (
         <Card>
           <EmptyState

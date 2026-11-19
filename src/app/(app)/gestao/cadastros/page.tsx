@@ -6,7 +6,6 @@ import {
   EmptyState,
   FilterActions,
   FilterCombobox,
-  FilterField,
   FilterPanel,
   FilterResults,
   FilterScope,
@@ -49,14 +48,26 @@ export default async function EnrollmentsPage({
   if (!can(user, "USERS_MANAGE")) return <AccessDenied />;
 
   const params = await searchParams;
-  const search = firstParam(params, "busca")?.slice(0, 80) ?? "";
   const situation =
     oneOf(firstParam(params, "situacao"), STATUS_OPTIONS) ?? "PENDENTE";
   const page = pageParam(params);
   const pageSize = pageSizeParam(params);
+  // Every request: what the name and e-mail filters offer (only those).
+  const options = await authed((token) =>
+    enrollmentService.requestFilterOptions(token),
+  );
+  const requestId = oneOf(
+    firstParam(params, "cadastro"),
+    options.map((option) => option.id),
+  );
+  const email = oneOf(
+    firstParam(params, "email"),
+    options.map((option) => option.email),
+  );
   const hrefWith = (overrides: Record<string, string | number | undefined>) =>
     buildHref("/gestao/cadastros", {
-      busca: search,
+      cadastro: requestId,
+      email,
       situacao: situation === "PENDENTE" ? undefined : situation,
       "por-pagina": pageSizeQuery(pageSize),
       ...overrides,
@@ -66,14 +77,16 @@ export default async function EnrollmentsPage({
     Promise.all([
       enrollmentService.requests(token, {
         status: situation === "TODAS" ? undefined : situation,
-        search,
+        requestId,
+        email,
         page,
         limit: pageSize,
       }),
       condominiumsService.units(token),
     ]),
   );
-  const filtered = Boolean(search) || situation !== "PENDENTE";
+  const filtered = Boolean(requestId || email) || situation !== "PENDENTE";
+  const emails = [...new Set(options.map((option) => option.email))];
 
   return (
     <>
@@ -87,11 +100,22 @@ export default async function EnrollmentsPage({
             {pageSize !== DEFAULT_PAGE_SIZE && (
               <input type="hidden" name="por-pagina" value={pageSize} />
             )}
-            <FilterField
-              label="Buscar"
-              name="busca"
-              defaultValue={search}
-              placeholder="Nome ou e-mail"
+            <FilterCombobox
+              label="Nome"
+              name="cadastro"
+              defaultValue={requestId ?? ""}
+              placeholder="Todos"
+              options={options.map((option) => ({
+                value: option.id,
+                label: option.name,
+              }))}
+            />
+            <FilterCombobox
+              label="E-mail"
+              name="email"
+              defaultValue={email ?? ""}
+              placeholder="Todos"
+              options={emails.map((value) => ({ value, label: value }))}
             />
             <FilterCombobox
               label="Situação"
@@ -119,12 +143,12 @@ export default async function EnrollmentsPage({
               <EmptyState
                 icon={<UserPlus className="size-5" />}
                 title={
-                  situation === "PENDENTE" && !search
+                  situation === "PENDENTE" && !(requestId || email)
                     ? "Nenhum cadastro aguardando"
                     : "Nenhum cadastro encontrado"
                 }
                 description={
-                  situation === "PENDENTE" && !search
+                  situation === "PENDENTE" && !(requestId || email)
                     ? "Gere um código na aba Links de cadastro e envie para os moradores."
                     : "Tente outros filtros."
                 }

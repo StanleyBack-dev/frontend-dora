@@ -1,5 +1,17 @@
 import { graphql } from "@/server/graphql/generated";
 
+// What the members lists' name, e-mail and phone filters offer.
+export const memberFilterOptionsDocument = graphql(`
+  query MemberFilterOptions($kind: MemberKind!) {
+    memberFilterOptions(kind: $kind) {
+      id
+      name
+      email
+      phone
+    }
+  }
+`);
+
 export const usersDocument = graphql(`
   query Users($filter: UserFilterInput, $page: PageInput) {
     users(filter: $filter, page: $page) {
@@ -143,6 +155,18 @@ export const recordStampDocument = graphql(`
       createdByName
       updatedAt
       updatedByName
+    }
+  }
+`);
+
+// The members list pages' cards (Moradores, Equipe).
+export const memberStatsDocument = graphql(`
+  query MemberStats($kind: MemberKind!) {
+    memberStats(kind: $kind) {
+      total
+      active
+      inactive
+      neverSignedIn
     }
   }
 `);

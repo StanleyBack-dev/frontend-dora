@@ -9,10 +9,12 @@ import {
   deleteUnitDocument,
   setCondominiumModuleDocument,
   setCondominiumStatusDocument,
+  unitPageDocument,
   unitsDocument,
   updateCondominiumDocument,
   updateUnitDocument,
 } from "@/server/graphql/operations/condominiums.operations";
+import type { Paginated } from "@/shared/contracts/api";
 import type {
   AppModule,
   Condominium,
@@ -20,6 +22,8 @@ import type {
   CondominiumStatus,
   CreateUnitsInput,
   Unit,
+  UnitFilter,
+  UnitWithResidents,
   UpdateUnitInput,
 } from "@/shared/contracts/condominiums";
 
@@ -104,6 +108,19 @@ export const condominiumsService = {
   },
 
   // === units of the session's condominium ===
+
+  /** Gestão > Unidades: a page of the filtered units with their people. */
+  async unitPage(
+    token: string,
+    filter: UnitFilter,
+    page: { page: number; limit: number },
+  ): Promise<Paginated<UnitWithResidents>> {
+    const { unitPage } = await backendGraphql(unitPageDocument, {
+      token,
+      variables: { filter, page },
+    });
+    return unitPage;
+  },
 
   async units(token: string): Promise<Unit[]> {
     const { units } = await backendGraphql(unitsDocument, { token });

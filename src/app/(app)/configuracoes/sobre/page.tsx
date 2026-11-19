@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Globe, Server } from "lucide-react";
-import { Card, CardBody, CardHeader, PageHeader } from "@/design-system";
+import {
+  BackLink,
+  Card,
+  CardBody,
+  CardHeader,
+  PageHeader,
+} from "@/design-system";
 import { appInfoService } from "@/server/services/app-info.service";
 import {
   APP_BUILD,
@@ -50,6 +56,7 @@ export default async function AboutPage() {
 
   return (
     <>
+      <BackLink href="/configuracoes" label="Configurações" />
       <PageHeader
         title="Sobre o Dora"
         description="Versões em uso do aplicativo e do servidor."

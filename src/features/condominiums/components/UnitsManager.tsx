@@ -1,22 +1,37 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Building, Pencil, Plus, Trash2 } from "lucide-react";
 import {
+  Building,
+  ChevronDown,
+  Pencil,
+  Plus,
+  Trash2,
+  UserRound,
+} from "lucide-react";
+import {
+  Badge,
   Button,
   Card,
-  DataTable,
   Drawer,
   EmptyState,
   Field,
+  LinkPending,
   Modal,
   TextArea,
-  type DataTableColumn,
+  cn,
 } from "@/design-system";
+import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { condominiumsClient } from "@/features/condominiums/api/condominiums.client";
-import type { Unit } from "@/shared/contracts/condominiums";
+import type {
+  Unit,
+  UnitResident,
+  UnitWithResidents,
+} from "@/shared/contracts/condominiums";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { formatPhone } from "@/shared/lib/masks";
 import { useToast } from "@/shared/toast/useToast";
 
 type Editing = { mode: "create" } | { mode: "edit"; unit: Unit };
@@ -24,18 +39,30 @@ type Editing = { mode: "create" } | { mode: "edit"; unit: Unit };
 const plural = (count: number, one: string, many: string) =>
   `${count} ${count === 1 ? one : many}`;
 
-// Blocks and units of the condominium: created in batches ("101-104, 201"),
+// Blocks and units of the condominium (Gestão > Unidades): a page of units
+// as a folding list (closed, the unit and how many live there; open, the
+// people linked to it, inline), created in batches ("101-104, 201"),
 // renamed one by one, and deleted only while nobody is linked to them.
 export function UnitsManager({
   units,
+  total,
+  filtered,
   editable,
   house = false,
+  pagination,
 }: {
-  units: Unit[];
+  /** This page of units (filtered by the API), with their people. */
+  units: UnitWithResidents[];
+  /** Units of the condominium, whatever the filters (the empty state). */
+  total: number;
+  /** Some filter is on. */
+  filtered: boolean;
   /** UNITS_MANAGE: anyone else only sees the list. */
   editable: boolean;
   /** Houses: street, quadra (block) and lotes (numbers). */
   house?: boolean;
+  /** The page's pagination (built by the page). */
+  pagination: ReactNode;
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
@@ -45,11 +72,6 @@ export function UnitsManager({
   const [block, setBlock] = useState("");
   const [numbers, setNumbers] = useState("");
   const [pending, setPending] = useState(false);
-
-  const blocks = useMemo(
-    () => new Set(units.map((unit) => unit.block)).size,
-    [units],
-  );
 
   function openCreate() {
     setStreet("");
@@ -111,102 +133,20 @@ export function UnitsManager({
     setPending(false);
   }
 
-  const columns: DataTableColumn<Unit>[] = [
-    {
-      key: "label",
-      label: "Unidade",
-      mobile: "title",
-      render: (unit) => (
-        <span className="font-semibold text-fg">{unit.label}</span>
-      ),
-    },
-    ...(house
-      ? [
-          {
-            key: "street",
-            label: "Rua",
-            render: (unit: Unit) =>
-              unit.street || <span className="text-soft">—</span>,
-          },
-        ]
-      : []),
-    {
-      key: "block",
-      label: house ? "Quadra" : "Bloco",
-      render: (unit) => unit.block || <span className="text-soft">—</span>,
-    },
-    {
-      key: "number",
-      label: house ? "Lote" : "Número",
-      render: (unit) => unit.number,
-    },
-    {
-      key: "residents",
-      label: "Moradores",
-      mobile: "subtitle",
-      render: (unit) =>
-        unit.residents > 0 ? (
-          plural(unit.residents, "morador", "moradores")
-        ) : (
-          <span className="text-soft">Nenhum</span>
-        ),
-    },
-  ];
-  if (editable) {
-    columns.push({
-      key: "actions",
-      label: "",
-      className: "w-24 text-right",
-      mobile: "control",
-      render: (unit) => (
-        <div className="flex justify-end gap-1">
-          <button
-            type="button"
-            onClick={() => openEdit(unit)}
-            aria-label={`Editar ${unit.label}`}
-            title="Editar"
-            className="grid size-8 place-items-center rounded-md text-accent transition-colors hover:bg-accent-soft"
-          >
-            <Pencil aria-hidden className="size-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setRemoving(unit)}
-            disabled={unit.residents > 0}
-            aria-label={`Excluir ${unit.label}`}
-            title={
-              unit.residents > 0
-                ? "Tem moradores vinculados: mude a unidade deles antes"
-                : "Excluir"
-            }
-            className="grid size-8 place-items-center rounded-md text-danger transition-colors hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-35"
-          >
-            <Trash2 aria-hidden className="size-4" />
-          </button>
-        </div>
-      ),
-    });
-  }
-
   const creating = editing?.mode === "create";
 
   return (
     <>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          {units.length > 0
-            ? `${plural(units.length, house ? "casa" : "unidade", house ? "casas" : "unidades")}${blocks > 1 ? ` em ${blocks} ${house ? "quadras" : "blocos"}` : ""}`
-            : "Nenhuma unidade cadastrada"}
-        </p>
-        {editable && (
+      {editable && (
+        <div className="mb-4 flex justify-end">
           <Button onClick={openCreate} icon={<Plus className="size-4" />}>
             {house ? "Adicionar casas" : "Adicionar unidades"}
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       <Card>
-        {units.length === 0 ? (
+        {total === 0 ? (
           <EmptyState
             icon={<Building className="size-5" />}
             title={
@@ -220,9 +160,27 @@ export function UnitsManager({
                 : "Moradores ficam vinculados a uma unidade, e o link de cadastro pede que cada pessoa escolha a sua."
             }
           />
+        ) : units.length === 0 ? (
+          <EmptyState
+            icon={<Building className="size-5" />}
+            title={filtered ? "Nenhuma unidade encontrada" : "Nenhuma unidade"}
+            description={filtered ? "Tente outros filtros." : undefined}
+          />
         ) : (
-          <DataTable rows={units} columns={columns} getId={(unit) => unit.id} />
+          <ul className="divide-y divide-border">
+            {units.map((unit) => (
+              <UnitRow
+                key={unit.id}
+                unit={unit}
+                house={house}
+                editable={editable}
+                onEdit={() => openEdit(unit)}
+                onRemove={() => setRemoving(unit)}
+              />
+            ))}
+          </ul>
         )}
+        {total > 0 && pagination}
       </Card>
 
       <Drawer
@@ -347,5 +305,169 @@ export function UnitsManager({
         não pode ser desfeita.
       </Modal>
     </>
+  );
+}
+
+/** One unit: closed, where it is and how many live there; open, its people. */
+function UnitRow({
+  unit,
+  house,
+  editable,
+  onEdit,
+  onRemove,
+}: {
+  unit: UnitWithResidents;
+  house: boolean;
+  editable: boolean;
+  onEdit: () => void;
+  onRemove: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const bodyId = useId();
+  const place = house
+    ? [unit.street, unit.block && `Quadra ${unit.block}`, `Lote ${unit.number}`]
+    : [unit.block && `Bloco ${unit.block}`, `Número ${unit.number}`];
+
+  return (
+    <li>
+      <div className="flex items-center transition-colors hover:bg-surface-muted">
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          aria-controls={bodyId}
+          className="flex min-w-0 flex-1 items-center gap-3 py-3 pr-2 pl-3 text-left sm:pl-4"
+        >
+          {/* The folding arrow comes first, apart from the edit actions. */}
+          <ChevronDown
+            aria-hidden
+            className={cn(
+              "size-4 shrink-0 text-soft transition-transform",
+              open && "rotate-180",
+            )}
+          />
+          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand-ink ring-1 ring-brand-border">
+            <Building aria-hidden className="size-4" />
+          </span>
+          {/* Nothing is cut on phones: the texts wrap and the badge goes
+          below them; from sm up it sits at the end of the line. */}
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold break-words text-fg sm:truncate">
+              {unit.label}
+            </span>
+            <span className="block text-xs break-words text-soft sm:truncate">
+              {place.filter(Boolean).join(" · ")}
+            </span>
+            <span className="mt-1.5 block sm:hidden">
+              <ResidentsBadge count={unit.residents} />
+            </span>
+          </span>
+          <span className="hidden shrink-0 sm:block">
+            <ResidentsBadge count={unit.residents} />
+          </span>
+        </button>
+        {editable && (
+          <div className="flex shrink-0 gap-1 pr-3 sm:pr-4">
+            <button
+              type="button"
+              onClick={onEdit}
+              aria-label={`Editar ${unit.label}`}
+              title="Editar"
+              className="grid size-8 place-items-center rounded-md text-accent transition-colors hover:bg-accent-soft"
+            >
+              <Pencil aria-hidden className="size-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onRemove}
+              disabled={unit.residents > 0}
+              aria-label={`Excluir ${unit.label}`}
+              title={
+                unit.residents > 0
+                  ? "Tem moradores vinculados: mude a unidade deles antes"
+                  : "Excluir"
+              }
+              className="grid size-8 place-items-center rounded-md text-danger transition-colors hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-35"
+            >
+              <Trash2 aria-hidden className="size-4" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div
+        id={bodyId}
+        hidden={!open}
+        className="space-y-1.5 border-t border-border bg-surface-muted/60 px-4 py-4 sm:px-5"
+      >
+        <h3 className="text-[10px] font-medium tracking-wide text-soft uppercase">
+          Moradores ({unit.people.length})
+        </h3>
+        {unit.people.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-border-strong bg-surface px-3 py-3 text-sm text-muted">
+            Ninguém vinculado a esta unidade.
+          </p>
+        ) : (
+          <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
+            {unit.people.map((person) => (
+              <ResidentRow key={person.userId} person={person} />
+            ))}
+          </ul>
+        )}
+      </div>
+    </li>
+  );
+}
+
+/** How many live in the unit ("Vazia" when nobody). */
+function ResidentsBadge({ count }: { count: number }) {
+  return count > 0 ? (
+    <Badge tone="success">{plural(count, "morador", "moradores")}</Badge>
+  ) : (
+    <Badge tone="neutral">Vazia</Badge>
+  );
+}
+
+/** Someone linked to the unit, on one line from md up. */
+function ResidentRow({ person }: { person: UnitResident }) {
+  return (
+    <li className="flex flex-col gap-1.5 px-3 py-2.5 md:flex-row md:items-center md:gap-4">
+      <div className="flex min-w-0 items-center gap-2 md:w-56 md:shrink-0">
+        <UserRound aria-hidden className="size-4 shrink-0 text-soft" />
+        <span className="min-w-0">
+          <span
+            className={cn(
+              "block truncate text-[13px] font-medium",
+              person.active ? "text-fg" : "text-muted",
+            )}
+          >
+            {person.name}
+          </span>
+          <span className="block truncate text-xs text-soft">
+            {GROUP_LABELS[person.role]}
+          </span>
+        </span>
+      </div>
+      <span className="min-w-0 truncate text-[13px] text-muted md:w-36 md:shrink-0">
+        {person.phone ? formatPhone(person.phone) : "Sem telefone"}
+      </span>
+      <span className="min-w-0 flex-1 truncate text-[13px] text-muted">
+        {person.email}
+      </span>
+      <div className="flex items-center gap-2">
+        <Badge tone={person.active ? "success" : "neutral"}>
+          {person.active ? "Ativo" : "Desativado"}
+        </Badge>
+        {/* A spinner right away while the resident's page opens, so the
+        link is not clicked again. */}
+        <Link
+          href={`/gestao/moradores/${person.userId}`}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-ink hover:underline"
+        >
+          Ver cadastro
+          <LinkPending />
+        </Link>
+      </div>
+    </li>
   );
 }

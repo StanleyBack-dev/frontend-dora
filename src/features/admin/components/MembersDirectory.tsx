@@ -5,7 +5,6 @@ import {
   EmptyState,
   FilterActions,
   FilterCombobox,
-  FilterField,
   FilterPanel,
   FilterResults,
   FilterScope,
@@ -15,9 +14,12 @@ import {
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { CreateUserButton } from "@/features/admin/components/CreateUserButton";
 import { MembersList } from "@/features/admin/components/MembersList";
+import { MembersSummary } from "@/features/admin/components/MembersSummary";
 import { rolesFor } from "@/features/admin/model/member-kind";
 import type {
+  MemberFilterOption,
   MemberKind,
+  MemberStats,
   Paginated,
   SessionUser,
   UserAccount,
@@ -25,6 +27,7 @@ import type {
 } from "@/shared/contracts/api";
 import type { Unit } from "@/shared/contracts/condominiums";
 import { assignableGroups } from "@/shared/lib/access";
+import { formatPhone } from "@/shared/lib/masks";
 import {
   buildHref,
   DEFAULT_PAGE_SIZE,
@@ -50,8 +53,14 @@ export type MembersDirectoryConfig = {
 export type MembersDirectoryData = {
   users: Paginated<UserAccount>;
   units: Pick<Unit, "id" | "label">[];
+  /** Every member of the tie: the name, e-mail and phone options. */
+  people: MemberFilterOption[];
+  /** The page's cards, whatever the filters. */
+  stats: MemberStats;
   filters: {
-    search: string;
+    userId: string | undefined;
+    email: string | undefined;
+    phone: string | undefined;
     group: UserGroup | undefined;
     unitId: string | undefined;
     status: "ativos" | "desativados" | undefined;
@@ -72,18 +81,23 @@ export function MembersDirectory({
   config: MembersDirectoryConfig;
   data: MembersDirectoryData;
 }) {
-  const { users, units, filters } = data;
-  const { search, group, unitId, status, pageSize } = filters;
+  const { users, units, people, stats, filters } = data;
+  const { userId, email, phone, group, unitId, status, pageSize } = filters;
   const hrefWith = (overrides: Record<string, string | number | undefined>) =>
     buildHref(config.basePath, {
-      busca: search,
+      pessoa: userId,
+      email,
+      telefone: phone,
       grupo: group,
       unidade: unitId,
       status,
       "por-pagina": pageSizeQuery(pageSize),
       ...overrides,
     });
-  const filtered = Boolean(search || group || unitId || status);
+  const filtered = Boolean(
+    userId || email || phone || group || unitId || status,
+  );
+  const unique = (values: string[]) => [...new Set(values)];
   const creatable = assignableGroups(user.group);
 
   return (
@@ -101,17 +115,44 @@ export function MembersDirectory({
           ) : undefined
         }
       />
+      <MembersSummary kind={config.kind} stats={stats} />
       <FilterScope>
         <FilterPanel hasActiveFilters={filtered}>
-          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Who (name, e-mail, phone), then where and how (role, unit,
+          situation): searchable lists, like the other list pages. */}
+          <AutoFilterForm className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {pageSize !== DEFAULT_PAGE_SIZE && (
               <input type="hidden" name="por-pagina" value={pageSize} />
             )}
-            <FilterField
-              label="Buscar"
-              name="busca"
-              defaultValue={search}
-              placeholder="Nome, e-mail ou telefone"
+            <FilterCombobox
+              label="Nome"
+              name="pessoa"
+              defaultValue={userId ?? ""}
+              placeholder="Todos"
+              options={people.map((person) => ({
+                value: person.id,
+                label: person.name,
+              }))}
+            />
+            <FilterCombobox
+              label="E-mail"
+              name="email"
+              defaultValue={email ?? ""}
+              placeholder="Todos"
+              options={unique(people.map((person) => person.email)).map(
+                (value) => ({ value, label: value }),
+              )}
+            />
+            <FilterCombobox
+              label="Telefone"
+              name="telefone"
+              defaultValue={phone ?? ""}
+              placeholder="Todos"
+              options={unique(
+                people.flatMap((person) =>
+                  person.phone ? [person.phone] : [],
+                ),
+              ).map((value) => ({ value, label: formatPhone(value) }))}
             />
             {config.roles.length > 1 && (
               <FilterCombobox

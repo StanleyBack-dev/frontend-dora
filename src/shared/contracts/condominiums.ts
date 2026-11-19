@@ -2,6 +2,7 @@ import type {
   AddressFormat,
   AppModule,
   CondominiumStatus,
+  UserGroup,
 } from "@/shared/graphql/schema-enums";
 
 export type { AddressFormat, AppModule, CondominiumStatus };
@@ -52,6 +53,29 @@ export type Unit = {
   label: string;
   /** Active members linked to it. */
   residents: number;
+};
+
+/** Someone linked to a unit (Gestão > Unidades). */
+export type UnitResident = {
+  userId: string;
+  name: string;
+  role: UserGroup;
+  email: string;
+  /** Digits. */
+  phone: string | null;
+  /** Membership and account active. */
+  active: boolean;
+};
+
+/** A unit with the people linked to it. */
+export type UnitWithResidents = Unit & { people: UnitResident[] };
+
+/** What narrows the units page (absent: any). */
+export type UnitFilter = {
+  unitId?: string;
+  block?: string;
+  street?: string;
+  occupancy?: "OCCUPIED" | "EMPTY";
 };
 
 export type CreateUnitsInput = {

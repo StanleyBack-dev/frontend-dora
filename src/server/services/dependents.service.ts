@@ -3,15 +3,18 @@ import { backendGraphql } from "@/server/graphql/client";
 import {
   addDependentDocument,
   approveDependentDocument,
-  dependentsDocument,
+  dependentsPageDocument,
+  dependentsReviewOverviewDocument,
   myDependentsDocument,
   rejectDependentDocument,
   removeDependentDocument,
 } from "@/server/graphql/operations/dependents.operations";
+import type { Paginated } from "@/shared/contracts/api";
 import type {
   Dependent,
+  DependentReviewFilter,
+  DependentReviewOverview,
   DependentInput,
-  DependentStatus,
 } from "@/shared/contracts/dependents";
 
 export const dependentsService = {
@@ -37,15 +40,26 @@ export const dependentsService = {
     });
   },
 
-  async forReview(
+  /** Gestão > Dependentes: a page of the filtered dependents. */
+  async page(
     token: string,
-    status: DependentStatus | null,
-  ): Promise<Dependent[]> {
-    const { dependents } = await backendGraphql(dependentsDocument, {
+    filter: DependentReviewFilter,
+    page: { page: number; limit: number },
+  ): Promise<Paginated<Dependent>> {
+    const { dependentsPage } = await backendGraphql(dependentsPageDocument, {
       token,
-      variables: { status },
+      variables: { filter, page },
     });
-    return dependents;
+    return dependentsPage;
+  },
+
+  /** Counts by status and the filters' options, whatever the filters. */
+  async reviewOverview(token: string): Promise<DependentReviewOverview> {
+    const { dependentsReviewOverview } = await backendGraphql(
+      dependentsReviewOverviewDocument,
+      { token },
+    );
+    return dependentsReviewOverview;
   },
 
   async approve(token: string, id: string): Promise<Dependent> {

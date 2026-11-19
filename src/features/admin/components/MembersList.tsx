@@ -3,7 +3,7 @@
 import { useId, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ChevronDown, Pencil } from "lucide-react";
-import { Avatar, LinkPendingSwap, buttonClasses, cn } from "@/design-system";
+import { Avatar, LinkPendingSwap, cn } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { CopyShareValue } from "@/features/admin/components/CopyShareValue";
 import { UserStatusBadges } from "@/features/admin/components/UserStatusBadges";
@@ -26,8 +26,8 @@ function placeOf(user: UserAccount): string {
 
 // The members of a page (Moradores or Equipe) as a folding list: closed, a
 // row shows who the person is (photo, name, role, unit or job, status);
-// open, everything else in a grid. No table, so no sideways scroll, and the
-// page stays short.
+// open, the rest in titled blocks (Contato, Moradia or Trabalho, Acesso).
+// No table, so no sideways scroll, and the page stays short.
 export function MembersList({
   users,
   basePath,
@@ -116,7 +116,7 @@ function MemberRow({
         <div className="sm:hidden">
           <UserStatusBadges user={user} />
         </div>
-        <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Section title="Contato">
           <Item label="Telefone">
             {user.phone ? (
               <CopyShareValue
@@ -129,28 +129,30 @@ function MemberRow({
           <Item label="E-mail">
             <CopyShareValue value={user.email} label="E-mail" />
           </Item>
+        </Section>
+        {employee ? (
+          <Section title="Trabalho">
+            <Item label="Cargo">{employee.jobTitle}</Item>
+            <Item label="Empresa terceirizada">{employee.contractor}</Item>
+            <Item label="Admissão">{formatDay(employee.hiredOn)}</Item>
+            <Item label="Turno / jornada">{employee.workShift}</Item>
+          </Section>
+        ) : (
+          <Section title="Moradia">
+            <Item label="Unidade">{user.unitLabel}</Item>
+            <Item label="Complemento">{user.unitComplement}</Item>
+          </Section>
+        )}
+        <Section title="Acesso">
           <Item label="Usuário (login)">
             <CopyShareValue value={user.username} label="Usuário" />
           </Item>
-          {employee ? (
-            <>
-              <Item label="Cargo">{employee.jobTitle}</Item>
-              <Item label="Empresa terceirizada">{employee.contractor}</Item>
-              <Item label="Admissão">{formatDay(employee.hiredOn)}</Item>
-              <Item label="Turno / jornada">{employee.workShift}</Item>
-            </>
-          ) : (
-            <>
-              <Item label="Unidade">{user.unitLabel}</Item>
-              <Item label="Complemento">{user.unitComplement}</Item>
-            </>
-          )}
           <Item label="Papel">{GROUP_LABELS[user.group]}</Item>
           <Item label="Último acesso">
             {user.lastLoginAt ? formatDateTime(user.lastLoginAt) : "Nunca"}
           </Item>
           <Item label="Cadastrado em">{formatDateTime(user.createdAt)}</Item>
-        </dl>
+        </Section>
         <div className="flex flex-wrap items-center gap-2">
           <RecordAuditButton
             labeled
@@ -165,11 +167,26 @@ function MemberRow({
   );
 }
 
+/** A titled block of the details (same look as an event order's). */
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="space-y-1.5">
+      <h3 className="text-[10px] font-medium tracking-wide text-soft uppercase">
+        {title}
+      </h3>
+      <dl className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">{children}</dl>
+    </section>
+  );
+}
+
+/** One detail in its own box. */
 function Item({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="min-w-0">
-      <dt className="text-xs text-soft">{label}</dt>
-      <dd className="mt-0.5 text-sm break-words text-fg">
+    <div className="min-w-0 rounded-lg border border-border bg-surface px-3 py-2">
+      <dt className="text-[10px] font-medium tracking-wide text-soft uppercase">
+        {label}
+      </dt>
+      <dd className="mt-0.5 text-[13px] break-words text-fg">
         {children ?? <span className="text-soft">—</span>}
       </dd>
     </div>
