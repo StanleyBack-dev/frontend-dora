@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.15.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.14.0...v0.15.0) (2026-11-19)
+
+
+### Features
+
+* **bookings:** show the spaces' photos on the blocks cards ([1b9f7f7](https://github.com/StanleyBack-dev/frontend-dora/commit/1b9f7f708db6453a5aba6c098a3c94ae4aaf3aa8))
+* **broadcasts:** read sent broadcasts in full and show their numbers ([7a3aecb](https://github.com/StanleyBack-dev/frontend-dora/commit/7a3aecbee0b0ed63029db063dc3a93c6c0a00203))
+* **dependents:** filters, paging and numbers on Dependentes ([e97ea79](https://github.com/StanleyBack-dev/frontend-dora/commit/e97ea793abde6db5626ea99eec5a37b9075edb9d))
+* **design-system:** add StatGrid for the management pages' numbers ([750cab0](https://github.com/StanleyBack-dev/frontend-dora/commit/750cab0be202cc27b82f638f95deb3aa80217c3f))
+* **enrollment:** searchable name and e-mail filters on Cadastros ([63fedfe](https://github.com/StanleyBack-dev/frontend-dora/commit/63fedfe132aacd1a0f6665e2435887bab18518d9))
+* filters, paging and stats for the management pages ([d67265c](https://github.com/StanleyBack-dev/frontend-dora/commit/d67265cc02c3fff526b021bb97285ce02fb75830))
+* **graphql:** sync the schema and add the management queries ([c34c934](https://github.com/StanleyBack-dev/frontend-dora/commit/c34c93405786f0eddd6bf55e4a2b4deb317aeaa6))
+* **members:** searchable filters, organized details and numbers ([c3f8a00](https://github.com/StanleyBack-dev/frontend-dora/commit/c3f8a00c421c42f2645abb446c16a6e6e9fa9be5))
+* **spaces:** show the spaces' numbers on the page ([210f1ca](https://github.com/StanleyBack-dev/frontend-dora/commit/210f1cafed678b9e54ec2ed248ee1d008ed61ebd))
+* **units:** filter and page the units, with their residents and numbers ([9e06004](https://github.com/StanleyBack-dev/frontend-dora/commit/9e06004714ef497b9d4cb791365668f3adc7e035))
+
+
+### Bug Fixes
+
+* **settings:** go back to Configurações from Sobre and Termos ([b245300](https://github.com/StanleyBack-dev/frontend-dora/commit/b245300a2e1f5ca06353b0cdc14081f56df7f54b))
+
 ## [0.14.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.13.0...v0.14.0) (2026-11-19)
 
 
