@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { Ban, Plus, Trash2 } from "lucide-react";
 import {
@@ -30,6 +30,7 @@ export function SpaceBlocksCard({
   blocks,
   manager,
   title = "Bloqueios",
+  cover,
 }: {
   spaceId: string;
   blocks: SpaceBlock[];
@@ -37,6 +38,8 @@ export function SpaceBlocksCard({
   manager: boolean;
   /** The overview of every space names each card after its space. */
   title?: string;
+  /** On top of the card: the space's photos (the overview of every space). */
+  cover?: ReactNode;
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
@@ -113,8 +116,11 @@ export function SpaceBlocksCard({
     }
   }
 
+  // "group": the cover's photo arrows show on hover (desktop), like the
+  // space cards.
   return (
-    <Card>
+    <Card className={cover ? "group overflow-hidden" : undefined}>
+      {cover}
       <CardHeader
         title={title}
         description="Períodos em que o espaço não aceita reservas."
