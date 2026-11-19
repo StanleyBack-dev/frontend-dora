@@ -170,8 +170,9 @@ export function BookingCard({
           {kind}
         </p>
         <h2 className="truncate text-lg font-bold text-fg">
+          {/* "de=reservas": the space's page then goes back to this list. */}
           <Link
-            href={`/reservas/nova/${booking.spaceId}`}
+            href={`/reservas/nova/${booking.spaceId}?de=reservas`}
             className="hover:underline"
           >
             {booking.spaceName}
