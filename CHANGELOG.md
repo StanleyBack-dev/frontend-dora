@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.14.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.13.0...v0.14.0) (2026-11-19)
+
+
+### Features
+
+* **access:** give the blocked pages Dora's look ([a9bbd53](https://github.com/StanleyBack-dev/frontend-dora/commit/a9bbd5374d68cd4f4eb89d52ca1dd0c6135b7131))
+* **gate:** turn the gate into one agenda of the day ([b2bcefe](https://github.com/StanleyBack-dev/frontend-dora/commit/b2bcefe7288fded3716180e35eed0cbd54892b5d))
+
+
+### Bug Fixes
+
+* **bookings:** apply each usage fee action only to the fees it fits ([8b22b12](https://github.com/StanleyBack-dev/frontend-dora/commit/8b22b12752af737a3d9180980f9ba8fcaa35227b))
+* **bookings:** go back to the resident's bookings from a booking's space ([a3d5c7c](https://github.com/StanleyBack-dev/frontend-dora/commit/a3d5c7c5665b8e7adb31db4280e906eef5788f60))
+* **layout:** say what each page loads in its loading state ([9cf8fe2](https://github.com/StanleyBack-dev/frontend-dora/commit/9cf8fe229531e36daec8573e8c6f19f3bbe1e6a5))
+* loading labels, usage fees, booking back link, blocked pages and gate agenda ([1bee192](https://github.com/StanleyBack-dev/frontend-dora/commit/1bee19257272bf4bdfdca91d316df6ffff3a67fa))
+
 ## [0.13.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.12.0...v0.13.0) (2026-11-18)
 
 
