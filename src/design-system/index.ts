@@ -42,6 +42,7 @@ export { Select, type SelectOption } from "./components/Select";
 export { SegmentedNav, type SegmentedNavItem } from "./components/SegmentedNav";
 export { Spinner } from "./components/Spinner";
 export { StatCard } from "./components/StatCard";
+export { StatGrid } from "./components/StatGrid";
 export { TextArea } from "./components/TextArea";
 export { ToastViewport } from "./components/ToastViewport";
 export { cn } from "./utils/cn";
