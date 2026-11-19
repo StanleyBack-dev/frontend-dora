@@ -1,18 +1,11 @@
 import "server-only";
 import { authed } from "@/server/auth/current-user";
 import { dependentsService } from "@/server/services/dependents.service";
-import type { Dependent, DependentStatus } from "@/shared/contracts/dependents";
+import type { Dependent } from "@/shared/contracts/dependents";
 
 /** The caller's dependents (any status). */
 export function loadMyDependents(): Promise<Dependent[]> {
   return authed((token) => dependentsService.mine(token));
-}
-
-/** The condominium's dependents, for the managers. */
-export function loadDependentsForReview(
-  status: DependentStatus | null,
-): Promise<Dependent[]> {
-  return authed((token) => dependentsService.forReview(token, status));
 }
 
 /**
