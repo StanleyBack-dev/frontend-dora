@@ -32,7 +32,8 @@ const ITEMS = [
     description: "Escolha quais avisos também chegam no seu e-mail.",
   },
   {
-    href: "/termos",
+    // "de=configuracoes": the terms page then goes back here.
+    href: "/termos?de=configuracoes",
     icon: <ScrollText className="size-5" />,
     title: "Termos e privacidade",
     description: "Quais dados o app guarda e por quanto tempo.",

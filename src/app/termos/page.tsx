@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Card } from "@/design-system";
 import { Logo } from "@/features/layout/components/Logo";
+import { firstParam, type RawSearchParams } from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Termos de uso e privacidade" };
 
@@ -27,17 +28,27 @@ function Section({
 
 // Public (signed in or not): what the app is for, which personal data it
 // keeps and for how long (LGPD), and the copyright terms of the audio files.
-export default function TermsPage() {
+export default async function TermsPage({
+  searchParams,
+}: {
+  searchParams: Promise<RawSearchParams>;
+}) {
+  // Opened from Configurações: "back" returns there; anywhere else (sign
+  // in, sign-up), to the app.
+  const back =
+    firstParam(await searchParams, "de") === "configuracoes"
+      ? { href: "/configuracoes", label: "Voltar para configurações" }
+      : { href: "/", label: "Voltar ao app" };
   return (
     <main className="min-h-dvh bg-bg px-4 py-10">
       <div className="mx-auto w-full max-w-2xl space-y-6">
         <div className="flex items-center justify-between gap-4">
           <Logo />
           <Link
-            href="/"
+            href={back.href}
             className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
           >
-            <ArrowLeft className="size-4" /> Voltar ao app
+            <ArrowLeft className="size-4" /> {back.label}
           </Link>
         </div>
         <Card className="space-y-6 p-6 sm:p-8">
