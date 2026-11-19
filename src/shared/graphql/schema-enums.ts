@@ -110,6 +110,56 @@ export type GuestInviteStatus =
   | 'ENDED'
   | 'VALID';
 
+/** Tipo de tela do visitante. */
+export type LandingDevice =
+  | 'DESKTOP'
+  | 'MOBILE'
+  | 'TABLET';
+
+/** O que aconteceu na landing page. */
+export type LandingEventType =
+  | 'CLICK'
+  | 'DEMO_STEP'
+  | 'FORM_ERROR'
+  | 'FORM_START'
+  | 'FORM_SUBMIT'
+  | 'FORM_SUCCESS'
+  | 'PAGE_VIEW'
+  | 'SCROLL_DEPTH'
+  | 'SECTION_VIEW'
+  | 'VIDEO_COMPLETE'
+  | 'VIDEO_PLAY';
+
+/** Se o e-mail chegou à caixa do Dora. */
+export type LandingLeadMailStatus =
+  | 'FAILED'
+  | 'HELD'
+  | 'PENDING'
+  | 'SENT';
+
+/** Quem escreveu pelo site (síndico, administradora…). */
+export type LandingLeadRole =
+  | 'ADMINISTRADORA'
+  | 'CONSELHO'
+  | 'MORADOR'
+  | 'OUTRO'
+  | 'SINDICO';
+
+/** Assunto da mensagem enviada pelo site. */
+export type LandingLeadSubject =
+  | 'DEMONSTRACAO'
+  | 'DUVIDA'
+  | 'ORCAMENTO'
+  | 'PARCERIA'
+  | 'SUPORTE';
+
+/** Tamanho do condomínio, em unidades. */
+export type LandingLeadUnitsRange =
+  | 'ATE_50'
+  | 'DE_51_A_150'
+  | 'DE_151_A_400'
+  | 'MAIS_DE_400';
+
 /** Período do limite de reservas por unidade. */
 export type LimitPeriod =
   | 'DAY'
@@ -235,6 +285,11 @@ export type TicketPriceMode =
   | 'FREE'
   | 'FULL'
   | 'HALF';
+
+/** Unidade com moradores ativos (ocupada) ou sem nenhum (vazia). */
+export type UnitOccupancy =
+  | 'EMPTY'
+  | 'OCCUPIED';
 
 /** Perfil de acesso: Morador, Gestor, Portaria ou Administrador geral. */
 export type UserGroup =

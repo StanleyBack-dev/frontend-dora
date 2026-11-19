@@ -29,3 +29,15 @@ export const sendBroadcastDocument = graphql(`
     }
   }
 `);
+
+// The broadcasts page's cards.
+export const broadcastStatsDocument = graphql(`
+  query BroadcastStats {
+    broadcastStats {
+      total
+      recent
+      withEmail
+      recentRecipients
+    }
+  }
+`);

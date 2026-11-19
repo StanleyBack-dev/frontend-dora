@@ -115,3 +115,31 @@ export const condominiumDocument = graphql(`
     }
   }
 `);
+
+// Gestão > Unidades: a page of the filtered units with their people.
+export const unitPageDocument = graphql(`
+  query UnitPage($filter: UnitFilterInput, $page: PageInput) {
+    unitPage(filter: $filter, page: $page) {
+      total
+      page
+      limit
+      totalPages
+      items {
+        id
+        street
+        block
+        number
+        label
+        residents
+        people {
+          userId
+          name
+          role
+          email
+          phone
+          active
+        }
+      }
+    }
+  }
+`);

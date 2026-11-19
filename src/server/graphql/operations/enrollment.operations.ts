@@ -136,3 +136,14 @@ export const rejectEnrollmentRequestDocument = graphql(`
     }
   }
 `);
+
+// What the requests list's name and e-mail filters offer.
+export const enrollmentRequestFilterOptionsDocument = graphql(`
+  query EnrollmentRequestFilterOptions {
+    enrollmentRequestFilterOptions {
+      id
+      name
+      email
+    }
+  }
+`);

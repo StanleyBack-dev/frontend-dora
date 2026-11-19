@@ -18,6 +18,14 @@ export type Broadcast = {
   createdAt: string;
 };
 
+/** The broadcasts at a glance ("recent": the last 30 days). */
+export type BroadcastStats = {
+  total: number;
+  recent: number;
+  withEmail: number;
+  recentRecipients: number;
+};
+
 export type BroadcastInput = {
   title: string;
   body: string;

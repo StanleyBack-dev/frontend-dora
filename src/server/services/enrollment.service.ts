@@ -6,6 +6,7 @@ import {
   createEnrollmentInviteDocument,
   enrollmentFormDocument,
   enrollmentInvitesDocument,
+  enrollmentRequestFilterOptionsDocument,
   enrollmentRequestsDocument,
   rejectEnrollmentRequestDocument,
   revokeEnrollmentInviteDocument,
@@ -23,9 +24,20 @@ import type {
   EnrollmentStatus,
 } from "@/shared/contracts/enrollment";
 
+/** A request as the name and e-mail filters offer it. */
+export type EnrollmentRequestOption = {
+  id: string;
+  name: string;
+  email: string;
+};
+
 export type EnrollmentRequestQuery = {
   status?: EnrollmentStatus;
   search?: string;
+  /** Exactly this request (the name filter). */
+  requestId?: string;
+  /** Exactly this e-mail. */
+  email?: string;
   page: number;
   limit: number;
 };
@@ -113,12 +125,25 @@ export const enrollmentService = {
           filter: {
             status: query.status,
             search: query.search || undefined,
+            requestId: query.requestId,
+            email: query.email,
           },
           page: { page: query.page, limit: query.limit },
         },
       },
     );
     return { page: enrollmentRequests, pending: pendingEnrollmentCount };
+  },
+
+  /** Every request of the condominium: the name and e-mail options. */
+  async requestFilterOptions(
+    token: string,
+  ): Promise<EnrollmentRequestOption[]> {
+    const { enrollmentRequestFilterOptions } = await backendGraphql(
+      enrollmentRequestFilterOptionsDocument,
+      { token },
+    );
+    return enrollmentRequestFilterOptions;
   },
 
   async approve(

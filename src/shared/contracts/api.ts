@@ -102,6 +102,23 @@ export type SessionUser = {
   onboardingCompleted: boolean;
 };
 
+/** The members of one tie at a glance (the list page's cards). */
+export type MemberStats = {
+  total: number;
+  active: number;
+  inactive: number;
+  /** Active, but never signed in. */
+  neverSignedIn: number;
+};
+
+/** A member as the list filters offer it (name, e-mail, phone digits). */
+export type MemberFilterOption = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+};
+
 export type UserAccount = {
   id: string;
   name: string;

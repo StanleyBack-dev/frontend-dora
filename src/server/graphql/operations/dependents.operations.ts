@@ -39,14 +39,6 @@ export const removeDependentDocument = graphql(`
   }
 `);
 
-export const dependentsDocument = graphql(`
-  query Dependents($status: DependentStatus) {
-    dependents(status: $status) {
-      ...DependentFields
-    }
-  }
-`);
-
 export const approveDependentDocument = graphql(`
   mutation ApproveDependent($id: ID!) {
     approveDependent(id: $id) {
@@ -59,6 +51,44 @@ export const rejectDependentDocument = graphql(`
   mutation RejectDependent($id: ID!, $reason: String!) {
     rejectDependent(id: $id, reason: $reason) {
       ...DependentFields
+    }
+  }
+`);
+
+// Gestão > Dependentes: a page of the filtered dependents.
+export const dependentsPageDocument = graphql(`
+  query DependentsPage($filter: DependentReviewFilterInput, $page: PageInput) {
+    dependentsPage(filter: $filter, page: $page) {
+      total
+      page
+      limit
+      totalPages
+      items {
+        ...DependentFields
+      }
+    }
+  }
+`);
+
+// The counts by status and what the filters offer, whatever the filters.
+export const dependentsReviewOverviewDocument = graphql(`
+  query DependentsReviewOverview {
+    dependentsReviewOverview {
+      pending
+      approved
+      rejected
+      dependents {
+        id
+        label
+      }
+      holders {
+        id
+        label
+      }
+      units {
+        id
+        label
+      }
     }
   }
 `);

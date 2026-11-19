@@ -209,6 +209,16 @@ export type DependentRelationship =
   | 'SIBLING'
   | 'SPOUSE';
 
+/** O que filtra a lista de dependentes da gestão. */
+export type DependentReviewFilterInput = {
+  dependentId?: string | number | null | undefined;
+  /** O morador que cadastrou (id do usuário). */
+  holderId?: string | number | null | undefined;
+  relationship?: DependentRelationship | null | undefined;
+  status?: DependentStatus | null | undefined;
+  unitId?: string | number | null | undefined;
+};
+
 /** Aguardando aprovação, aprovado ou recusado. */
 export type DependentStatus =
   | 'APPROVED'
@@ -257,6 +267,10 @@ export type EnrollmentDataInput = {
 };
 
 export type EnrollmentRequestFilterInput = {
+  /** Exatamente este e-mail. */
+  email?: string | null | undefined;
+  /** Exatamente este cadastro. */
+  requestId?: string | number | null | undefined;
   search?: string | null | undefined;
   status?: EnrollmentStatus | null | undefined;
 };
@@ -709,10 +723,25 @@ export type TicketTypeInput = {
   priceMode: TicketPriceMode;
 };
 
+/** O que filtra a página de unidades. */
+export type UnitFilterInput = {
+  /** Exatamente este bloco (a quadra, em casas; "" = sem bloco). */
+  block?: string | null | undefined;
+  occupancy?: UnitOccupancy | null | undefined;
+  /** Exatamente esta rua (casas). */
+  street?: string | null | undefined;
+  unitId?: string | number | null | undefined;
+};
+
 export type UnitLimitInput = {
   count: number;
   period: LimitPeriod;
 };
+
+/** Unidade com moradores ativos (ocupada) ou sem nenhum (vazia). */
+export type UnitOccupancy =
+  | 'EMPTY'
+  | 'OCCUPIED';
 
 export type UpdateMyProfileInput = {
   /** Data de nascimento AAAA-MM-DD (ausente: mantém; vazio: remove). */
@@ -756,13 +785,19 @@ export type UpdateUserInput = {
 
 export type UserFilterInput = {
   active?: boolean | null | undefined;
+  /** Exatamente este e-mail. */
+  email?: string | null | undefined;
   group?: UserGroup | null | undefined;
   /** Qualquer um destes papéis (ex.: a equipe, ADMIN e CONCIERGE). */
   groups?: Array<UserGroup> | null | undefined;
   /** Só moradores ou só funcionários. */
   kind?: MemberKind | null | undefined;
+  /** Exatamente este telefone (dígitos). */
+  phone?: string | null | undefined;
   search?: string | null | undefined;
   unitId?: string | number | null | undefined;
+  /** Exatamente esta pessoa. */
+  userId?: string | number | null | undefined;
 };
 
 /** Perfil de acesso: Morador, Gestor, Portaria ou Administrador geral. */
@@ -786,6 +821,13 @@ export type WaitlistSlotInput = {
   /** Início do horário reservado. */
   startsAt: string;
 };
+
+export type MemberFilterOptionsQueryVariables = Exact<{
+  kind: MemberKind;
+}>;
+
+
+export type MemberFilterOptionsQuery = { memberFilterOptions: Array<{ id: string, name: string, email: string, phone: string | null }> };
 
 export type UsersQueryVariables = Exact<{
   filter?: UserFilterInput | null | undefined;
@@ -869,6 +911,13 @@ export type RecordStampQueryVariables = Exact<{
 
 
 export type RecordStampQuery = { recordStamp: { createdAt: string, createdByName: string | null, updatedAt: string, updatedByName: string | null } | null };
+
+export type MemberStatsQueryVariables = Exact<{
+  kind: MemberKind;
+}>;
+
+
+export type MemberStatsQuery = { memberStats: { total: number, active: number, inactive: number, neverSignedIn: number } };
 
 export type AppInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1182,6 +1231,11 @@ export type SendBroadcastMutationVariables = Exact<{
 
 export type SendBroadcastMutation = { sendBroadcast: { id: string, title: string, body: string, audience: BroadcastAudience, targetGroup: UserGroup | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string } };
 
+export type BroadcastStatsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BroadcastStatsQuery = { broadcastStats: { total: number, recent: number, withEmail: number, recentRecipients: number } };
+
 export type CondominiumFieldsFragment = { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string };
 
 export type CondominiumsQueryVariables = Exact<{
@@ -1259,6 +1313,14 @@ export type CondominiumQueryVariables = Exact<{
 
 export type CondominiumQuery = { condominium: { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string } };
 
+export type UnitPageQueryVariables = Exact<{
+  filter?: UnitFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type UnitPageQuery = { unitPage: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, street: string, block: string, number: string, label: string, residents: number, people: Array<{ userId: string, name: string, role: UserGroup, email: string, phone: string | null, active: boolean }> }> } };
+
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1285,13 +1347,6 @@ export type RemoveDependentMutationVariables = Exact<{
 
 export type RemoveDependentMutation = { removeDependent: boolean };
 
-export type DependentsQueryVariables = Exact<{
-  status?: DependentStatus | null | undefined;
-}>;
-
-
-export type DependentsQuery = { dependents: Array<{ id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string }> };
-
 export type ApproveDependentMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -1306,6 +1361,19 @@ export type RejectDependentMutationVariables = Exact<{
 
 
 export type RejectDependentMutation = { rejectDependent: { id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string } };
+
+export type DependentsPageQueryVariables = Exact<{
+  filter?: DependentReviewFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type DependentsPageQuery = { dependentsPage: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string }> } };
+
+export type DependentsReviewOverviewQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DependentsReviewOverviewQuery = { dependentsReviewOverview: { pending: number, approved: number, rejected: number, dependents: Array<{ id: string, label: string }>, holders: Array<{ id: string, label: string }>, units: Array<{ id: string, label: string }> } };
 
 export type VerifyEnrollmentCodeMutationVariables = Exact<{
   code: string;
@@ -1375,6 +1443,11 @@ export type RejectEnrollmentRequestMutationVariables = Exact<{
 
 
 export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, applicant: EnrollmentApplicant, fullName: string, email: string, phone: string, birthDate: string | null, unitId: string | null, unitLabel: string | null, unitComplement: string | null, typedUnitLabel: string | null, typedUnitBlock: string | null, typedUnitNumber: string | null, typedUnitStreet: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null } };
+
+export type EnrollmentRequestFilterOptionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type EnrollmentRequestFilterOptionsQuery = { enrollmentRequestFilterOptions: Array<{ id: string, name: string, email: string }> };
 
 export type EventFieldsFragment = { id: string, title: string, description: string | null, spaceId: string | null, spaceName: string | null, location: string | null, startsAt: string, endsAt: string, capacity: number, externalGuestLimit: number, ticketed: boolean, fullPriceCents: number | null, unitTicketLimit: number | null, salesClose: EventSalesClose, salesCloseHours: number, salesClosesAt: string, pixSource: EventPixSource | null, placesLeft: number, outsidePlacesLeft: number, status: EventStatus, cancelReason: string | null, publishedAt: string | null, cancelledAt: string | null, createdAt: string, address: { zip: string, street: string, number: string, complement: string | null, district: string, city: string, state: string } | null, ticketTypes: Array<{ id: string, kind: TicketKind, name: string, priceMode: TicketPriceMode, customPriceCents: number | null, priceCents: number, minAge: number | null, maxAge: number | null }>, customPix: { keyType: PixKeyType, key: string, name: string, city: string } | null };
 
@@ -2187,6 +2260,16 @@ export const SupportRequestFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"SupportRequestFields"}) as unknown as TypedDocumentString<SupportRequestFieldsFragment, unknown>;
+export const MemberFilterOptionsDocument = new TypedDocumentString(`
+    query MemberFilterOptions($kind: MemberKind!) {
+  memberFilterOptions(kind: $kind) {
+    id
+    name
+    email
+    phone
+  }
+}
+    `) as unknown as TypedDocumentString<MemberFilterOptionsQuery, MemberFilterOptionsQueryVariables>;
 export const UsersDocument = new TypedDocumentString(`
     query Users($filter: UserFilterInput, $page: PageInput) {
   users(filter: $filter, page: $page) {
@@ -2508,6 +2591,16 @@ export const RecordStampDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RecordStampQuery, RecordStampQueryVariables>;
+export const MemberStatsDocument = new TypedDocumentString(`
+    query MemberStats($kind: MemberKind!) {
+  memberStats(kind: $kind) {
+    total
+    active
+    inactive
+    neverSignedIn
+  }
+}
+    `) as unknown as TypedDocumentString<MemberStatsQuery, MemberStatsQueryVariables>;
 export const AppInfoDocument = new TypedDocumentString(`
     query AppInfo {
   appInfo {
@@ -3283,6 +3376,16 @@ export const SendBroadcastDocument = new TypedDocumentString(`
   authorName
   createdAt
 }`) as unknown as TypedDocumentString<SendBroadcastMutation, SendBroadcastMutationVariables>;
+export const BroadcastStatsDocument = new TypedDocumentString(`
+    query BroadcastStats {
+  broadcastStats {
+    total
+    recent
+    withEmail
+    recentRecipients
+  }
+}
+    `) as unknown as TypedDocumentString<BroadcastStatsQuery, BroadcastStatsQueryVariables>;
 export const CondominiumsDocument = new TypedDocumentString(`
     query Condominiums($filter: CondominiumFilterInput) {
   condominiums(filter: $filter) {
@@ -3462,6 +3565,32 @@ export const CondominiumDocument = new TypedDocumentString(`
   lastActivityAt
   createdAt
 }`) as unknown as TypedDocumentString<CondominiumQuery, CondominiumQueryVariables>;
+export const UnitPageDocument = new TypedDocumentString(`
+    query UnitPage($filter: UnitFilterInput, $page: PageInput) {
+  unitPage(filter: $filter, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      id
+      street
+      block
+      number
+      label
+      residents
+      people {
+        userId
+        name
+        role
+        email
+        phone
+        active
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<UnitPageQuery, UnitPageQueryVariables>;
 export const DashboardDocument = new TypedDocumentString(`
     query Dashboard {
   dashboard {
@@ -3521,26 +3650,6 @@ export const RemoveDependentDocument = new TypedDocumentString(`
   removeDependent(id: $id)
 }
     `) as unknown as TypedDocumentString<RemoveDependentMutation, RemoveDependentMutationVariables>;
-export const DependentsDocument = new TypedDocumentString(`
-    query Dependents($status: DependentStatus) {
-  dependents(status: $status) {
-    ...DependentFields
-  }
-}
-    fragment DependentFields on Dependent {
-  id
-  name
-  birthDate
-  relationship
-  status
-  holderName
-  unitLabel
-  rejectReason
-  reviewedAt
-  createdAt
-  documentUrl
-  documentContentType
-}`) as unknown as TypedDocumentString<DependentsQuery, DependentsQueryVariables>;
 export const ApproveDependentDocument = new TypedDocumentString(`
     mutation ApproveDependent($id: ID!) {
   approveDependent(id: $id) {
@@ -3581,6 +3690,53 @@ export const RejectDependentDocument = new TypedDocumentString(`
   documentUrl
   documentContentType
 }`) as unknown as TypedDocumentString<RejectDependentMutation, RejectDependentMutationVariables>;
+export const DependentsPageDocument = new TypedDocumentString(`
+    query DependentsPage($filter: DependentReviewFilterInput, $page: PageInput) {
+  dependentsPage(filter: $filter, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      ...DependentFields
+    }
+  }
+}
+    fragment DependentFields on Dependent {
+  id
+  name
+  birthDate
+  relationship
+  status
+  holderName
+  unitLabel
+  rejectReason
+  reviewedAt
+  createdAt
+  documentUrl
+  documentContentType
+}`) as unknown as TypedDocumentString<DependentsPageQuery, DependentsPageQueryVariables>;
+export const DependentsReviewOverviewDocument = new TypedDocumentString(`
+    query DependentsReviewOverview {
+  dependentsReviewOverview {
+    pending
+    approved
+    rejected
+    dependents {
+      id
+      label
+    }
+    holders {
+      id
+      label
+    }
+    units {
+      id
+      label
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<DependentsReviewOverviewQuery, DependentsReviewOverviewQueryVariables>;
 export const VerifyEnrollmentCodeDocument = new TypedDocumentString(`
     mutation VerifyEnrollmentCode($code: String!) {
   verifyEnrollmentCode(code: $code)
@@ -3774,6 +3930,15 @@ export const RejectEnrollmentRequestDocument = new TypedDocumentString(`
   userId
   photoUrl
 }`) as unknown as TypedDocumentString<RejectEnrollmentRequestMutation, RejectEnrollmentRequestMutationVariables>;
+export const EnrollmentRequestFilterOptionsDocument = new TypedDocumentString(`
+    query EnrollmentRequestFilterOptions {
+  enrollmentRequestFilterOptions {
+    id
+    name
+    email
+  }
+}
+    `) as unknown as TypedDocumentString<EnrollmentRequestFilterOptionsQuery, EnrollmentRequestFilterOptionsQueryVariables>;
 export const EventsDocument = new TypedDocumentString(`
     query Events($when: EventWhen) {
   events(when: $when) {
