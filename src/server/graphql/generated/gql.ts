@@ -147,10 +147,10 @@ type Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": typeof types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": typeof types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": typeof types.SendTestPushDocument,
-    "\n  fragment ParcelFields on Parcel {\n    id\n    unitId\n    unitLabel\n    recipientName\n    recipientOnly\n    carrier\n    trackingCode\n    notes\n    storageLocation\n    pickupCode\n    perishable\n    pickupDeadline\n    status\n    receivedAt\n    receivedByName\n    closedAt\n    closedByName\n    closeReason\n    signerName\n    photoUrl\n  }\n": typeof types.ParcelFieldsFragmentDoc,
+    "\n  fragment ParcelFields on Parcel {\n    id\n    unitId\n    unitLabel\n    recipientName\n    recipientOnly\n    carrier\n    trackingCode\n    notes\n    storageLocation\n    pickupCode\n    perishable\n    pickupDeadline\n    authorizedName\n    authorizedDocumentMasked\n    authorizedByName\n    authorizedAt\n    status\n    receivedAt\n    receivedByName\n    closedAt\n    closedByName\n    closeReason\n    signerName\n    photoUrl\n  }\n": typeof types.ParcelFieldsFragmentDoc,
     "\n  query Parcels($filter: ParcelFilterInput, $page: PageInput) {\n    parcels(filter: $filter, page: $page) {\n      items {\n        ...ParcelFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.ParcelsDocument,
     "\n  query ParcelOverview {\n    parcelOverview {\n      byStatus {\n        status\n        count\n      }\n      waitingLong\n      perishableWaiting\n      perishableOverdue\n      units {\n        id\n        label\n      }\n      recipientNames\n      carriers\n      trackingCodes\n    }\n  }\n": typeof types.ParcelOverviewDocument,
-    "\n  query ParcelByCode($code: String!) {\n    parcelByCode(code: $code) {\n      ...ParcelFields\n      pickupDeclaration\n    }\n  }\n": typeof types.ParcelByCodeDocument,
+    "\n  query ParcelByCode($code: String!) {\n    parcelByCode(code: $code) {\n      ...ParcelFields\n      pickupDeclaration\n      authorizedDocumentType\n      authorizedDocument\n    }\n  }\n": typeof types.ParcelByCodeDocument,
     "\n  mutation RegisterParcel($input: RegisterParcelInput!) {\n    registerParcel(input: $input) {\n      ...ParcelFields\n    }\n  }\n": typeof types.RegisterParcelDocument,
     "\n  mutation PickUpParcel($input: PickUpParcelInput!) {\n    pickUpParcel(input: $input) {\n      ...ParcelFields\n    }\n  }\n": typeof types.PickUpParcelDocument,
     "\n  mutation ReturnParcel($id: ID!, $reason: String!) {\n    returnParcel(id: $id, reason: $reason) {\n      ...ParcelFields\n    }\n  }\n": typeof types.ReturnParcelDocument,
@@ -159,6 +159,8 @@ type Documents = {
     "\n  query MyParcels($statuses: [ParcelStatus!], $page: PageInput) {\n    myParcels(statuses: $statuses, page: $page) {\n      items {\n        ...ParcelFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.MyParcelsDocument,
     "\n  query Parcel($id: ID!) {\n    parcel(id: $id) {\n      ...ParcelFields\n      signature {\n        signerName\n        signerDocumentType\n        signerDocumentMasked\n        declaration\n        imageUrl\n        imageSha256\n        strokesSha256\n        signedAt\n        clientSignedAt\n        clientTimeZone\n        ipAddress\n        userAgent\n        device\n        locationStatus\n        latitude\n        longitude\n        locationAccuracyMeters\n        collectedByName\n        collectedByRole\n        evidenceSha256\n        intact\n      }\n    }\n  }\n": typeof types.ParcelDocument,
     "\n  query ParcelReceiptPdf($id: ID!) {\n    parcelReceiptPdf(id: $id) {\n      fileName\n      mimeType\n      base64Content\n    }\n  }\n": typeof types.ParcelReceiptPdfDocument,
+    "\n  mutation AuthorizeParcelPickup($input: AuthorizeParcelPickupInput!) {\n    authorizeParcelPickup(input: $input) {\n      ...ParcelFields\n    }\n  }\n": typeof types.AuthorizeParcelPickupDocument,
+    "\n  mutation RevokeParcelPickupAuthorization($parcelId: ID!) {\n    revokeParcelPickupAuthorization(parcelId: $parcelId) {\n      ...ParcelFields\n    }\n  }\n": typeof types.RevokeParcelPickupAuthorizationDocument,
     "\n  query CondominiumPix {\n    condominiumPix {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": typeof types.CondominiumPixDocument,
     "\n  mutation SetCondominiumPix($input: PixReceiverInput!) {\n    setCondominiumPix(input: $input) {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": typeof types.SetCondominiumPixDocument,
     "\n  mutation RemoveCondominiumPix {\n    removeCondominiumPix\n  }\n": typeof types.RemoveCondominiumPixDocument,
@@ -323,10 +325,10 @@ const documents: Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": types.SendTestPushDocument,
-    "\n  fragment ParcelFields on Parcel {\n    id\n    unitId\n    unitLabel\n    recipientName\n    recipientOnly\n    carrier\n    trackingCode\n    notes\n    storageLocation\n    pickupCode\n    perishable\n    pickupDeadline\n    status\n    receivedAt\n    receivedByName\n    closedAt\n    closedByName\n    closeReason\n    signerName\n    photoUrl\n  }\n": types.ParcelFieldsFragmentDoc,
+    "\n  fragment ParcelFields on Parcel {\n    id\n    unitId\n    unitLabel\n    recipientName\n    recipientOnly\n    carrier\n    trackingCode\n    notes\n    storageLocation\n    pickupCode\n    perishable\n    pickupDeadline\n    authorizedName\n    authorizedDocumentMasked\n    authorizedByName\n    authorizedAt\n    status\n    receivedAt\n    receivedByName\n    closedAt\n    closedByName\n    closeReason\n    signerName\n    photoUrl\n  }\n": types.ParcelFieldsFragmentDoc,
     "\n  query Parcels($filter: ParcelFilterInput, $page: PageInput) {\n    parcels(filter: $filter, page: $page) {\n      items {\n        ...ParcelFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.ParcelsDocument,
     "\n  query ParcelOverview {\n    parcelOverview {\n      byStatus {\n        status\n        count\n      }\n      waitingLong\n      perishableWaiting\n      perishableOverdue\n      units {\n        id\n        label\n      }\n      recipientNames\n      carriers\n      trackingCodes\n    }\n  }\n": types.ParcelOverviewDocument,
-    "\n  query ParcelByCode($code: String!) {\n    parcelByCode(code: $code) {\n      ...ParcelFields\n      pickupDeclaration\n    }\n  }\n": types.ParcelByCodeDocument,
+    "\n  query ParcelByCode($code: String!) {\n    parcelByCode(code: $code) {\n      ...ParcelFields\n      pickupDeclaration\n      authorizedDocumentType\n      authorizedDocument\n    }\n  }\n": types.ParcelByCodeDocument,
     "\n  mutation RegisterParcel($input: RegisterParcelInput!) {\n    registerParcel(input: $input) {\n      ...ParcelFields\n    }\n  }\n": types.RegisterParcelDocument,
     "\n  mutation PickUpParcel($input: PickUpParcelInput!) {\n    pickUpParcel(input: $input) {\n      ...ParcelFields\n    }\n  }\n": types.PickUpParcelDocument,
     "\n  mutation ReturnParcel($id: ID!, $reason: String!) {\n    returnParcel(id: $id, reason: $reason) {\n      ...ParcelFields\n    }\n  }\n": types.ReturnParcelDocument,
@@ -335,6 +337,8 @@ const documents: Documents = {
     "\n  query MyParcels($statuses: [ParcelStatus!], $page: PageInput) {\n    myParcels(statuses: $statuses, page: $page) {\n      items {\n        ...ParcelFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.MyParcelsDocument,
     "\n  query Parcel($id: ID!) {\n    parcel(id: $id) {\n      ...ParcelFields\n      signature {\n        signerName\n        signerDocumentType\n        signerDocumentMasked\n        declaration\n        imageUrl\n        imageSha256\n        strokesSha256\n        signedAt\n        clientSignedAt\n        clientTimeZone\n        ipAddress\n        userAgent\n        device\n        locationStatus\n        latitude\n        longitude\n        locationAccuracyMeters\n        collectedByName\n        collectedByRole\n        evidenceSha256\n        intact\n      }\n    }\n  }\n": types.ParcelDocument,
     "\n  query ParcelReceiptPdf($id: ID!) {\n    parcelReceiptPdf(id: $id) {\n      fileName\n      mimeType\n      base64Content\n    }\n  }\n": types.ParcelReceiptPdfDocument,
+    "\n  mutation AuthorizeParcelPickup($input: AuthorizeParcelPickupInput!) {\n    authorizeParcelPickup(input: $input) {\n      ...ParcelFields\n    }\n  }\n": types.AuthorizeParcelPickupDocument,
+    "\n  mutation RevokeParcelPickupAuthorization($parcelId: ID!) {\n    revokeParcelPickupAuthorization(parcelId: $parcelId) {\n      ...ParcelFields\n    }\n  }\n": types.RevokeParcelPickupAuthorizationDocument,
     "\n  query CondominiumPix {\n    condominiumPix {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": types.CondominiumPixDocument,
     "\n  mutation SetCondominiumPix($input: PixReceiverInput!) {\n    setCondominiumPix(input: $input) {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": types.SetCondominiumPixDocument,
     "\n  mutation RemoveCondominiumPix {\n    removeCondominiumPix\n  }\n": types.RemoveCondominiumPixDocument,
@@ -898,7 +902,7 @@ export function graphql(source: "\n  mutation SendTestPush {\n    sendTestPush\n
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment ParcelFields on Parcel {\n    id\n    unitId\n    unitLabel\n    recipientName\n    recipientOnly\n    carrier\n    trackingCode\n    notes\n    storageLocation\n    pickupCode\n    perishable\n    pickupDeadline\n    status\n    receivedAt\n    receivedByName\n    closedAt\n    closedByName\n    closeReason\n    signerName\n    photoUrl\n  }\n"): typeof import('./graphql').ParcelFieldsFragmentDoc;
+export function graphql(source: "\n  fragment ParcelFields on Parcel {\n    id\n    unitId\n    unitLabel\n    recipientName\n    recipientOnly\n    carrier\n    trackingCode\n    notes\n    storageLocation\n    pickupCode\n    perishable\n    pickupDeadline\n    authorizedName\n    authorizedDocumentMasked\n    authorizedByName\n    authorizedAt\n    status\n    receivedAt\n    receivedByName\n    closedAt\n    closedByName\n    closeReason\n    signerName\n    photoUrl\n  }\n"): typeof import('./graphql').ParcelFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -910,7 +914,7 @@ export function graphql(source: "\n  query ParcelOverview {\n    parcelOverview 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query ParcelByCode($code: String!) {\n    parcelByCode(code: $code) {\n      ...ParcelFields\n      pickupDeclaration\n    }\n  }\n"): typeof import('./graphql').ParcelByCodeDocument;
+export function graphql(source: "\n  query ParcelByCode($code: String!) {\n    parcelByCode(code: $code) {\n      ...ParcelFields\n      pickupDeclaration\n      authorizedDocumentType\n      authorizedDocument\n    }\n  }\n"): typeof import('./graphql').ParcelByCodeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -943,6 +947,14 @@ export function graphql(source: "\n  query Parcel($id: ID!) {\n    parcel(id: $i
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query ParcelReceiptPdf($id: ID!) {\n    parcelReceiptPdf(id: $id) {\n      fileName\n      mimeType\n      base64Content\n    }\n  }\n"): typeof import('./graphql').ParcelReceiptPdfDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AuthorizeParcelPickup($input: AuthorizeParcelPickupInput!) {\n    authorizeParcelPickup(input: $input) {\n      ...ParcelFields\n    }\n  }\n"): typeof import('./graphql').AuthorizeParcelPickupDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RevokeParcelPickupAuthorization($parcelId: ID!) {\n    revokeParcelPickupAuthorization(parcelId: $parcelId) {\n      ...ParcelFields\n    }\n  }\n"): typeof import('./graphql').RevokeParcelPickupAuthorizationDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

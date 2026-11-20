@@ -31,6 +31,12 @@ export function ParcelDetails({
     { label: "Rastreio", value: parcel.trackingCode },
     { label: "Onde está", value: parcel.storageLocation },
     {
+      label: "Autorizado a retirar",
+      value: parcel.authorizedName
+        ? `${parcel.authorizedName}${parcel.authorizedDocumentMasked ? ` · ${parcel.authorizedDocumentMasked}` : ""}${parcel.authorizedByName ? ` (por ${parcel.authorizedByName})` : ""}`
+        : null,
+    },
+    {
       label: "Perecível",
       value: parcel.pickupDeadline
         ? `Retirar até ${formatDateTime(parcel.pickupDeadline)}`

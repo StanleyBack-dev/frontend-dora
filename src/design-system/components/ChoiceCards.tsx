@@ -48,7 +48,9 @@ export function ChoiceCards<T extends string>({
             <label
               key={option.value}
               className={cn(
-                "flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
+                // relative: the hidden radio stays inside the card (and its
+                // scroll area), so focusing it never scrolls a drawer away.
+                "relative flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
                 checked
                   ? "border-accent bg-accent-soft"
                   : "border-border hover:border-border-strong",

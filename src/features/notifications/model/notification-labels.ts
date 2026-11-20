@@ -74,6 +74,11 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Uma encomenda da sua unidade voltou ao remetente, com o motivo.",
   },
+  PARCEL_AUTHORIZED: {
+    label: "Retirada autorizada",
+    description:
+      "Alguém autorizou outra pessoa a retirar uma encomenda que você vê.",
+  },
   PARCEL_CANCELLED: {
     label: "Aviso de encomenda cancelado",
     description: "Um aviso de encomenda registrado por engano foi cancelado.",

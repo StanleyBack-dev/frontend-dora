@@ -31,6 +31,12 @@ export const registerParcelSchema = z.object({
   perishableHours: z.number().int().min(1).max(72).nullish(),
 });
 
+export const authorizePickupSchema = z.object({
+  name: z.string().trim().min(3).max(120),
+  documentType: z.enum(["CPF", "RG"]).nullish(),
+  document: optionalText(20),
+});
+
 export const closeParcelSchema = z.object({
   reason: z.string().trim().min(3).max(300),
 });
