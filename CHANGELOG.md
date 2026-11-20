@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.18.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.17.0...v0.18.0) (2026-11-20)
+
+
+### Features
+
+* **residents:** residents directory page for the gate and Combobox fix ([67610c0](https://github.com/StanleyBack-dev/frontend-dora/commit/67610c0390ea836f8f69e8325e59a85cdf27cd38))
+* **residents:** residents directory page for the gate and Combobox fix ([4f7bffd](https://github.com/StanleyBack-dev/frontend-dora/commit/4f7bffd701a77f3c015f842a69484cc0eeb518cc))
+
 ## [0.17.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.16.0...v0.17.0) (2026-11-20)
 
 
