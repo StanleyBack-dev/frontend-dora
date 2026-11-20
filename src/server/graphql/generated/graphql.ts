@@ -508,14 +508,20 @@ export type PageInput = {
 
 /** Filtros das encomendas do condomínio. */
 export type ParcelFilterInput = {
+  /** A transportadora (exata). */
+  carrier?: string | null | undefined;
   /** Recebidas a partir deste instante. */
   from?: string | null | undefined;
+  /** O destinatário (exato, sem diferenciar acentos). */
+  recipientName?: string | null | undefined;
   /** Parte do código de retirada, do rastreio, do destinatário ou da transportadora. */
   search?: string | null | undefined;
   /** Só estas situações (vazio: todas). */
   statuses?: Array<ParcelStatus> | null | undefined;
   /** Recebidas antes deste instante. */
   to?: string | null | undefined;
+  /** O código de rastreio (exato). */
+  trackingCode?: string | null | undefined;
   /** A unidade. */
   unitId?: string | number | null | undefined;
 };
@@ -1794,7 +1800,7 @@ export type ParcelsQuery = { parcels: { total: number, page: number, limit: numb
 export type ParcelOverviewQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ParcelOverviewQuery = { parcelOverview: { waitingLong: number, byStatus: Array<{ status: ParcelStatus, count: number }>, units: Array<{ id: string, label: string }> } };
+export type ParcelOverviewQuery = { parcelOverview: { waitingLong: number, recipientNames: Array<string>, carriers: Array<string>, trackingCodes: Array<string>, byStatus: Array<{ status: ParcelStatus, count: number }>, units: Array<{ id: string, label: string }> } };
 
 export type ParcelByCodeQueryVariables = Exact<{
   code: string;
@@ -5192,6 +5198,9 @@ export const ParcelOverviewDocument = new TypedDocumentString(`
       id
       label
     }
+    recipientNames
+    carriers
+    trackingCodes
   }
 }
     `) as unknown as TypedDocumentString<ParcelOverviewQuery, ParcelOverviewQueryVariables>;

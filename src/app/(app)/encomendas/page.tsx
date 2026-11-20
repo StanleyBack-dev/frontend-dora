@@ -4,7 +4,6 @@ import {
   Card,
   FilterActions,
   FilterCombobox,
-  FilterField,
   FilterPanel,
   FilterResults,
   FilterScope,
@@ -48,6 +47,9 @@ const STATUSES = {
 type StatusKey = keyof typeof STATUSES;
 const DEFAULT_STATUS: StatusKey = "aguardando";
 
+const asOptions = (values: string[]) =>
+  values.map((value) => ({ value, label: value }));
+
 // The parcels desk (gate or administration): receive what arrives, hand
 // over by the resident's code with a signature on the screen, and follow
 // every parcel of the condominium, filtered and paged by the API.
@@ -77,7 +79,16 @@ export default async function ParcelsDeskPage({
     firstParam(query, "unidade"),
     overview.units.map((unit) => unit.id),
   );
-  const search = firstParam(query, "busca")?.trim().slice(0, 60) || undefined;
+  // Recipient, carrier and tracking code: one of the values in use.
+  const recipientName = oneOf(
+    firstParam(query, "destinatario"),
+    overview.recipientNames,
+  );
+  const carrier = oneOf(firstParam(query, "transportadora"), overview.carriers);
+  const trackingCode = oneOf(
+    firstParam(query, "rastreio"),
+    overview.trackingCodes,
+  );
   const page = pageParam(query);
   const pageSize = pageSizeParam(query);
 
@@ -85,10 +96,13 @@ export default async function ParcelsDeskPage({
   const filter: ParcelFilter = {
     ...(statuses && { statuses: [...statuses] }),
     ...(unitId && { unitId }),
-    ...(search && { search }),
+    ...(recipientName && { recipientName }),
+    ...(carrier && { carrier }),
+    ...(trackingCode && { trackingCode }),
   };
   const filtered =
-    status !== DEFAULT_STATUS || Boolean(unitId) || Boolean(search);
+    status !== DEFAULT_STATUS ||
+    [unitId, recipientName, carrier, trackingCode].some(Boolean);
   const parcels = await authed((token) =>
     parcelsService.list(token, filter, { page, limit: pageSize }),
   );
@@ -97,7 +111,9 @@ export default async function ParcelsDeskPage({
     buildHref(BASE, {
       situacao: status === DEFAULT_STATUS ? undefined : status,
       unidade: unitId,
-      busca: search,
+      destinatario: recipientName,
+      transportadora: carrier,
+      rastreio: trackingCode,
       "por-pagina": pageSizeQuery(pageSize),
       ...overrides,
     });
@@ -121,12 +137,6 @@ export default async function ParcelsDeskPage({
             {pageSize !== DEFAULT_PAGE_SIZE && (
               <input type="hidden" name="por-pagina" value={pageSize} />
             )}
-            <FilterField
-              label="Busca"
-              name="busca"
-              defaultValue={search ?? ""}
-              placeholder="Destinatário, transportadora, rastreio ou código"
-            />
             <FilterCombobox
               label="Unidade"
               name="unidade"
@@ -148,6 +158,27 @@ export default async function ParcelsDeskPage({
                 { value: "canceladas", label: "Canceladas" },
                 { value: "todas", label: "Todas" },
               ]}
+            />
+            <FilterCombobox
+              label="Destinatário"
+              name="destinatario"
+              defaultValue={recipientName ?? ""}
+              placeholder="Todos"
+              options={asOptions(overview.recipientNames)}
+            />
+            <FilterCombobox
+              label="Transportadora"
+              name="transportadora"
+              defaultValue={carrier ?? ""}
+              placeholder="Todas"
+              options={asOptions(overview.carriers)}
+            />
+            <FilterCombobox
+              label="Código de rastreio"
+              name="rastreio"
+              defaultValue={trackingCode ?? ""}
+              placeholder="Todos"
+              options={asOptions(overview.trackingCodes)}
             />
             <FilterActions
               clearHref={BASE}

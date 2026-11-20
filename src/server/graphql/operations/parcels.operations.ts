@@ -49,6 +49,9 @@ export const parcelOverviewDocument = graphql(`
         id
         label
       }
+      recipientNames
+      carriers
+      trackingCodes
     }
   }
 `);

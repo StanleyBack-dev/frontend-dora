@@ -149,7 +149,7 @@ type Documents = {
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": typeof types.SendTestPushDocument,
     "\n  fragment ParcelFields on Parcel {\n    id\n    unitId\n    unitLabel\n    recipientName\n    recipientOnly\n    carrier\n    trackingCode\n    notes\n    storageLocation\n    pickupCode\n    status\n    receivedAt\n    receivedByName\n    closedAt\n    closedByName\n    closeReason\n    signerName\n    photoUrl\n  }\n": typeof types.ParcelFieldsFragmentDoc,
     "\n  query Parcels($filter: ParcelFilterInput, $page: PageInput) {\n    parcels(filter: $filter, page: $page) {\n      items {\n        ...ParcelFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.ParcelsDocument,
-    "\n  query ParcelOverview {\n    parcelOverview {\n      byStatus {\n        status\n        count\n      }\n      waitingLong\n      units {\n        id\n        label\n      }\n    }\n  }\n": typeof types.ParcelOverviewDocument,
+    "\n  query ParcelOverview {\n    parcelOverview {\n      byStatus {\n        status\n        count\n      }\n      waitingLong\n      units {\n        id\n        label\n      }\n      recipientNames\n      carriers\n      trackingCodes\n    }\n  }\n": typeof types.ParcelOverviewDocument,
     "\n  query ParcelByCode($code: String!) {\n    parcelByCode(code: $code) {\n      ...ParcelFields\n      pickupDeclaration\n    }\n  }\n": typeof types.ParcelByCodeDocument,
     "\n  mutation RegisterParcel($input: RegisterParcelInput!) {\n    registerParcel(input: $input) {\n      ...ParcelFields\n    }\n  }\n": typeof types.RegisterParcelDocument,
     "\n  mutation PickUpParcel($input: PickUpParcelInput!) {\n    pickUpParcel(input: $input) {\n      ...ParcelFields\n    }\n  }\n": typeof types.PickUpParcelDocument,
@@ -322,7 +322,7 @@ const documents: Documents = {
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": types.SendTestPushDocument,
     "\n  fragment ParcelFields on Parcel {\n    id\n    unitId\n    unitLabel\n    recipientName\n    recipientOnly\n    carrier\n    trackingCode\n    notes\n    storageLocation\n    pickupCode\n    status\n    receivedAt\n    receivedByName\n    closedAt\n    closedByName\n    closeReason\n    signerName\n    photoUrl\n  }\n": types.ParcelFieldsFragmentDoc,
     "\n  query Parcels($filter: ParcelFilterInput, $page: PageInput) {\n    parcels(filter: $filter, page: $page) {\n      items {\n        ...ParcelFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.ParcelsDocument,
-    "\n  query ParcelOverview {\n    parcelOverview {\n      byStatus {\n        status\n        count\n      }\n      waitingLong\n      units {\n        id\n        label\n      }\n    }\n  }\n": types.ParcelOverviewDocument,
+    "\n  query ParcelOverview {\n    parcelOverview {\n      byStatus {\n        status\n        count\n      }\n      waitingLong\n      units {\n        id\n        label\n      }\n      recipientNames\n      carriers\n      trackingCodes\n    }\n  }\n": types.ParcelOverviewDocument,
     "\n  query ParcelByCode($code: String!) {\n    parcelByCode(code: $code) {\n      ...ParcelFields\n      pickupDeclaration\n    }\n  }\n": types.ParcelByCodeDocument,
     "\n  mutation RegisterParcel($input: RegisterParcelInput!) {\n    registerParcel(input: $input) {\n      ...ParcelFields\n    }\n  }\n": types.RegisterParcelDocument,
     "\n  mutation PickUpParcel($input: PickUpParcelInput!) {\n    pickUpParcel(input: $input) {\n      ...ParcelFields\n    }\n  }\n": types.PickUpParcelDocument,
@@ -900,7 +900,7 @@ export function graphql(source: "\n  query Parcels($filter: ParcelFilterInput, $
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query ParcelOverview {\n    parcelOverview {\n      byStatus {\n        status\n        count\n      }\n      waitingLong\n      units {\n        id\n        label\n      }\n    }\n  }\n"): typeof import('./graphql').ParcelOverviewDocument;
+export function graphql(source: "\n  query ParcelOverview {\n    parcelOverview {\n      byStatus {\n        status\n        count\n      }\n      waitingLong\n      units {\n        id\n        label\n      }\n      recipientNames\n      carriers\n      trackingCodes\n    }\n  }\n"): typeof import('./graphql').ParcelOverviewDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

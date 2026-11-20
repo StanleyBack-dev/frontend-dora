@@ -48,6 +48,10 @@ export type ParcelFilter = {
   statuses?: ParcelStatus[];
   unitId?: string;
   search?: string;
+  /** Exactly these (from the filter lists). */
+  recipientName?: string;
+  carrier?: string;
+  trackingCode?: string;
   /** ISO instants: received on or after / before. */
   from?: string;
   to?: string;
@@ -59,6 +63,10 @@ export type ParcelOverview = {
   /** Waiting for pickup longer than the reminder (3 days). */
   waitingLong: number;
   units: { id: string; label: string }[];
+  /** The values used, for the filter lists (most recent first). */
+  recipientNames: string[];
+  carriers: string[];
+  trackingCodes: string[];
 };
 
 export type RegisterParcelInput = {
