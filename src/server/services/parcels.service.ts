@@ -7,6 +7,8 @@ import {
   parcelRecipientsDocument,
   parcelsDocument,
   pickUpParcelDocument,
+  myParcelsDocument,
+  parcelDocument,
   registerParcelDocument,
   returnParcelDocument,
 } from "@/server/graphql/operations/parcels.operations";
@@ -16,6 +18,8 @@ import type {
   ParcelFilter,
   ParcelOverview,
   ParcelRecipient,
+  ParcelStatus,
+  ParcelWithReceipt,
   ParcelToHandOver,
   PickUpParcelInput,
   RegisterParcelInput,
@@ -36,6 +40,28 @@ export const parcelsService = {
       variables: { filter, page },
     });
     return parcels;
+  },
+
+  /** The caller's unit parcels they may see (residents). */
+  async mine(
+    token: string,
+    statuses: ParcelStatus[] | null,
+    page: PageRequest,
+  ): Promise<Paginated<Parcel>> {
+    const { myParcels } = await backendGraphql(myParcelsDocument, {
+      token,
+      variables: { statuses, page },
+    });
+    return myParcels;
+  },
+
+  /** One parcel with its pickup receipt (the API checks who may see it). */
+  async get(token: string, id: string): Promise<ParcelWithReceipt> {
+    const { parcel } = await backendGraphql(parcelDocument, {
+      token,
+      variables: { id },
+    });
+    return parcel;
   },
 
   async overview(token: string): Promise<ParcelOverview> {

@@ -156,6 +156,8 @@ type Documents = {
     "\n  mutation ReturnParcel($id: ID!, $reason: String!) {\n    returnParcel(id: $id, reason: $reason) {\n      ...ParcelFields\n    }\n  }\n": typeof types.ReturnParcelDocument,
     "\n  mutation CancelParcel($id: ID!, $reason: String!) {\n    cancelParcel(id: $id, reason: $reason) {\n      ...ParcelFields\n    }\n  }\n": typeof types.CancelParcelDocument,
     "\n  query ParcelRecipients($search: String!) {\n    parcelRecipients(search: $search) {\n      userId\n      name\n      unitId\n      unitLabel\n    }\n  }\n": typeof types.ParcelRecipientsDocument,
+    "\n  query MyParcels($statuses: [ParcelStatus!], $page: PageInput) {\n    myParcels(statuses: $statuses, page: $page) {\n      items {\n        ...ParcelFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.MyParcelsDocument,
+    "\n  query Parcel($id: ID!) {\n    parcel(id: $id) {\n      ...ParcelFields\n      signature {\n        signerName\n        signerDocumentType\n        signerDocumentMasked\n        declaration\n        imageUrl\n        imageSha256\n        strokesSha256\n        signedAt\n        clientSignedAt\n        clientTimeZone\n        ipAddress\n        userAgent\n        device\n        locationStatus\n        latitude\n        longitude\n        locationAccuracyMeters\n        collectedByName\n        collectedByRole\n        evidenceSha256\n        intact\n      }\n    }\n  }\n": typeof types.ParcelDocument,
     "\n  query CondominiumPix {\n    condominiumPix {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": typeof types.CondominiumPixDocument,
     "\n  mutation SetCondominiumPix($input: PixReceiverInput!) {\n    setCondominiumPix(input: $input) {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": typeof types.SetCondominiumPixDocument,
     "\n  mutation RemoveCondominiumPix {\n    removeCondominiumPix\n  }\n": typeof types.RemoveCondominiumPixDocument,
@@ -329,6 +331,8 @@ const documents: Documents = {
     "\n  mutation ReturnParcel($id: ID!, $reason: String!) {\n    returnParcel(id: $id, reason: $reason) {\n      ...ParcelFields\n    }\n  }\n": types.ReturnParcelDocument,
     "\n  mutation CancelParcel($id: ID!, $reason: String!) {\n    cancelParcel(id: $id, reason: $reason) {\n      ...ParcelFields\n    }\n  }\n": types.CancelParcelDocument,
     "\n  query ParcelRecipients($search: String!) {\n    parcelRecipients(search: $search) {\n      userId\n      name\n      unitId\n      unitLabel\n    }\n  }\n": types.ParcelRecipientsDocument,
+    "\n  query MyParcels($statuses: [ParcelStatus!], $page: PageInput) {\n    myParcels(statuses: $statuses, page: $page) {\n      items {\n        ...ParcelFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.MyParcelsDocument,
+    "\n  query Parcel($id: ID!) {\n    parcel(id: $id) {\n      ...ParcelFields\n      signature {\n        signerName\n        signerDocumentType\n        signerDocumentMasked\n        declaration\n        imageUrl\n        imageSha256\n        strokesSha256\n        signedAt\n        clientSignedAt\n        clientTimeZone\n        ipAddress\n        userAgent\n        device\n        locationStatus\n        latitude\n        longitude\n        locationAccuracyMeters\n        collectedByName\n        collectedByRole\n        evidenceSha256\n        intact\n      }\n    }\n  }\n": types.ParcelDocument,
     "\n  query CondominiumPix {\n    condominiumPix {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": types.CondominiumPixDocument,
     "\n  mutation SetCondominiumPix($input: PixReceiverInput!) {\n    setCondominiumPix(input: $input) {\n      keyType\n      key\n      name\n      city\n    }\n  }\n": types.SetCondominiumPixDocument,
     "\n  mutation RemoveCondominiumPix {\n    removeCondominiumPix\n  }\n": types.RemoveCondominiumPixDocument,
@@ -925,6 +929,14 @@ export function graphql(source: "\n  mutation CancelParcel($id: ID!, $reason: St
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query ParcelRecipients($search: String!) {\n    parcelRecipients(search: $search) {\n      userId\n      name\n      unitId\n      unitLabel\n    }\n  }\n"): typeof import('./graphql').ParcelRecipientsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MyParcels($statuses: [ParcelStatus!], $page: PageInput) {\n    myParcels(statuses: $statuses, page: $page) {\n      items {\n        ...ParcelFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').MyParcelsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Parcel($id: ID!) {\n    parcel(id: $id) {\n      ...ParcelFields\n      signature {\n        signerName\n        signerDocumentType\n        signerDocumentMasked\n        declaration\n        imageUrl\n        imageSha256\n        strokesSha256\n        signedAt\n        clientSignedAt\n        clientTimeZone\n        ipAddress\n        userAgent\n        device\n        locationStatus\n        latitude\n        longitude\n        locationAccuracyMeters\n        collectedByName\n        collectedByRole\n        evidenceSha256\n        intact\n      }\n    }\n  }\n"): typeof import('./graphql').ParcelDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

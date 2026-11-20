@@ -6,6 +6,8 @@ import {
   CircleHelp,
   CircleUserRound,
   DoorOpen,
+  Package,
+  PackageOpen,
   House,
   LifeBuoy,
   MapPin,
@@ -422,6 +424,94 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
         {
           text: "Toque no lápis para abrir a pessoa: corrija os dados, troque o papel, redefina a senha ou desative o acesso.",
+        },
+      ],
+    },
+  },
+  {
+    id: "encomendas-minhas",
+    href: "/encomendas/minhas",
+    title: "Minhas encomendas",
+    icon: PackageOpen,
+    module: "PARCELS",
+    area: "main",
+    tour: "O que chegou para você no condomínio: o QR e o código para retirar, e o comprovante de cada retirada.",
+    sections: {
+      purpose: [
+        {
+          text: "As encomendas que a portaria ou a administração recebeu para você, com o código de retirada, e o histórico com o comprovante assinado de cada retirada.",
+        },
+      ],
+      howto: [
+        {
+          text: "Quando chega uma encomenda, você recebe um aviso no app e por e-mail com o código de retirada (6 letras e números).",
+        },
+        {
+          text: "Para retirar, abra “Aguardando retirada” e mostre o QR (ou diga o código) a quem for entregar. Quem retira confirma o nome e assina com o dedo na tela.",
+        },
+        {
+          text: "Em “Histórico”, toque em “Ver comprovante” para ver quem retirou, a assinatura, a data e hora, e as demais provas da retirada.",
+        },
+      ],
+      rules: [
+        {
+          text: "Qualquer pessoa com o código pode retirar a encomenda: não compartilhe o código com quem você não quer que retire.",
+        },
+        {
+          text: "Encomenda registrada para a unidade: todos os moradores da unidade são avisados e a veem. Registrada no seu nome: só você é avisado e a vê (bom para uma surpresa ou um presente).",
+        },
+        {
+          text: "O comprovante mostra “Registro íntegro” quando as provas guardadas conferem com o código de verificação gravado na assinatura.",
+        },
+      ],
+      notices: [
+        {
+          text: "Você é avisado quando a encomenda chega, se ela continuar esperando por 3 dias, quando é retirada (com o nome de quem retirou) e se for devolvida ou cancelada.",
+        },
+      ],
+    },
+  },
+  {
+    id: "encomendas",
+    href: "/encomendas",
+    title: "Encomendas",
+    icon: Package,
+    module: "PARCELS",
+    permission: "PARCELS_MANAGE",
+    area: "main",
+    tour: "Receba as encomendas que chegam e entregue pelo código ou QR do morador, com assinatura na tela.",
+    sections: {
+      howto: [
+        {
+          text: "Chegou uma encomenda: toque em “Receber encomenda”, escolha a unidade (ou o morador, pelo nome), a transportadora e onde ela ficou guardada e, se quiser, tire ou anexe uma foto. O morador recebe o código de retirada.",
+        },
+        {
+          text: "Para entregar, leia o QR do morador (ou digite o código) em “Entregar pelo código ou QR”, confira a encomenda, informe quem está retirando e peça a assinatura na tela.",
+        },
+        {
+          text: "Na lista, use os filtros por situação, unidade, destinatário, transportadora e código de rastreio. Nas encomendas retiradas, “Comprovante” mostra a assinatura e as provas.",
+        },
+        {
+          text: "Encomenda que volta ao remetente: “Devolver”. Registrada por engano: “Cancelar”. Os dois pedem um motivo e avisam o morador.",
+        },
+      ],
+      rules: [
+        {
+          text: "Escolhida pela unidade, todos os moradores dela são avisados; escolhida pelo morador, só ele é avisado e vê a encomenda.",
+        },
+        {
+          text: "O código de retirada não aparece na lista: a entrega é sempre pelo código ou QR que o morador mostra.",
+        },
+        {
+          text: "A assinatura guarda data e hora, IP, aparelho, localização (quando permitida) e quem entregou, com um código de verificação (SHA-256). Ela não pode ser alterada depois.",
+        },
+        {
+          text: "Fechar o formulário de recebimento guarda o que foi digitado; só “Cancelar” limpa.",
+        },
+      ],
+      access: [
+        {
+          text: "Portaria e gestores recebem e entregam encomendas (permissão “Registrar, entregar e devolver encomendas”); o gestor pode ajustar quem tem essa permissão.",
         },
       ],
     },

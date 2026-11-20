@@ -18,6 +18,7 @@ import {
   type LucideIcon,
   MapPin,
   Package,
+  PackageOpen,
   Megaphone,
   PartyPopper,
   Receipt,
@@ -179,9 +180,9 @@ export const SIDEBAR: SidebarEntry[] = [
       },
     ],
   },
-  // Parcels: their own page (not inside the Portaria) for the gate and the
-  // administration: receive and hand over with a signature. The residents'
-  // page joins this group.
+  // Parcels: the resident's own (QR, code and receipts) and, for the gate
+  // and the administration, the desk: receive and hand over with a
+  // signature (its own page, not inside the Portaria).
   {
     id: "parcels",
     label: "Encomendas",
@@ -189,8 +190,13 @@ export const SIDEBAR: SidebarEntry[] = [
     module: "PARCELS",
     items: [
       {
+        href: "/encomendas/minhas",
+        label: "Minhas encomendas",
+        icon: PackageOpen,
+      },
+      {
         href: "/encomendas",
-        label: "Encomendas",
+        label: "Todas as encomendas",
         icon: Package,
         permission: "PARCELS_MANAGE",
       },

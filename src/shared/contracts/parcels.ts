@@ -135,3 +135,39 @@ export type ParcelRecipient = {
   unitId: string;
   unitLabel: string;
 };
+
+/** The pickup receipt: the signature and the evidence that backs it. */
+export type ParcelReceipt = {
+  signerName: string;
+  signerDocumentType: "CPF" | "RG" | null;
+  /** "***.456.789-**" */
+  signerDocumentMasked: string | null;
+  /** The declaration signed, as it was shown. */
+  declaration: string;
+  /** Short-lived link to the signature image. */
+  imageUrl: string;
+  imageSha256: string;
+  strokesSha256: string;
+  /** Server time (ISO). */
+  signedAt: string;
+  /** The device's time (ISO) and time zone. */
+  clientSignedAt: string | null;
+  clientTimeZone: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  /** JSON: screen, touch/pen, language… */
+  device: string;
+  locationStatus: SignatureLocationStatus;
+  latitude: number | null;
+  longitude: number | null;
+  locationAccuracyMeters: number | null;
+  collectedByName: string;
+  /** CONCIERGE, ADMIN or ADMIN_MASTER. */
+  collectedByRole: string;
+  evidenceSha256: string;
+  /** The stored evidence still matches its digest. */
+  intact: boolean;
+};
+
+/** A parcel with its pickup receipt (null until picked up). */
+export type ParcelWithReceipt = Parcel & { signature: ParcelReceipt | null };

@@ -107,3 +107,48 @@ export const parcelRecipientsDocument = graphql(`
     }
   }
 `);
+
+export const myParcelsDocument = graphql(`
+  query MyParcels($statuses: [ParcelStatus!], $page: PageInput) {
+    myParcels(statuses: $statuses, page: $page) {
+      items {
+        ...ParcelFields
+      }
+      total
+      page
+      limit
+      totalPages
+    }
+  }
+`);
+
+export const parcelDocument = graphql(`
+  query Parcel($id: ID!) {
+    parcel(id: $id) {
+      ...ParcelFields
+      signature {
+        signerName
+        signerDocumentType
+        signerDocumentMasked
+        declaration
+        imageUrl
+        imageSha256
+        strokesSha256
+        signedAt
+        clientSignedAt
+        clientTimeZone
+        ipAddress
+        userAgent
+        device
+        locationStatus
+        latitude
+        longitude
+        locationAccuracyMeters
+        collectedByName
+        collectedByRole
+        evidenceSha256
+        intact
+      }
+    }
+  }
+`);
