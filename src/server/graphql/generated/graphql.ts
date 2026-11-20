@@ -1434,7 +1434,7 @@ export type UnitPageQuery = { unitPage: { total: number, page: number, limit: nu
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, activeSpaces: number, pendingBookings: number, bookingsToday: number, openSupportRequests: number | null, failedNotifications: number | null } };
+export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, activeSpaces: number, pendingBookings: number, bookingsToday: number, openSupportRequests: number | null, failedNotifications: number | null, parcels: { waiting: number, stuck: number, perishableOverdue: number, pickedUpLast30Days: number, averagePickupHours: number | null, monthly: Array<{ month: string, received: number, pickedUp: number }> } | null } };
 
 export type DependentFieldsFragment = { id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string };
 
@@ -1889,7 +1889,7 @@ export type PlatformMetricsQueryVariables = Exact<{
 }>;
 
 
-export type PlatformMetricsQuery = { platformMetrics: { from: string, to: string, days: number, condominiumId: string | null, bookings: { total: number, confirmed: number, pending: number, cancelled: number, rejected: number, stalePending: number, granularity: MetricsGranularity, series: Array<{ bucket: string, total: number, cancelled: number }>, byCondominium: Array<{ condominiumId: string, name: string, total: number, cancelled: number }> }, spaces: { activeSpaces: number, unusedCount: number, mostUsed: Array<{ spaceId: string, name: string, condominiumName: string, bookings: number, hours: number }>, unused: Array<{ spaceId: string, name: string, condominiumName: string, bookings: number, hours: number }>, byWeekday: Array<{ weekday: number, bookings: number }>, byHour: Array<{ hour: number, bookings: number }> }, engagement: { members: number, active7d: number, active30d: number, newMembers: number, enrollments: number, inactiveCount: number, inactiveCondominiums: Array<{ condominiumId: string, name: string, lastActivityAt: string | null }> }, health: { staleEnrollments: number, failedNotifications: number, delayedNotifications: number, withoutManager: number, withoutUnits: number, openSupport: number } } };
+export type PlatformMetricsQuery = { platformMetrics: { from: string, to: string, days: number, condominiumId: string | null, bookings: { total: number, confirmed: number, pending: number, cancelled: number, rejected: number, stalePending: number, granularity: MetricsGranularity, series: Array<{ bucket: string, total: number, cancelled: number }>, byCondominium: Array<{ condominiumId: string, name: string, total: number, cancelled: number }> }, parcels: { condominiumsWithModule: number, received: number, pickedUp: number, returned: number, cancelled: number, perishable: number, averagePickupHours: number | null, waitingNow: number, stuckNow: number, perishableOverdueNow: number, granularity: MetricsGranularity, series: Array<{ bucket: string, received: number, pickedUp: number }>, byCondominium: Array<{ condominiumId: string, name: string, received: number, pickedUp: number }> }, spaces: { activeSpaces: number, unusedCount: number, mostUsed: Array<{ spaceId: string, name: string, condominiumName: string, bookings: number, hours: number }>, unused: Array<{ spaceId: string, name: string, condominiumName: string, bookings: number, hours: number }>, byWeekday: Array<{ weekday: number, bookings: number }>, byHour: Array<{ hour: number, bookings: number }> }, engagement: { members: number, active7d: number, active30d: number, newMembers: number, enrollments: number, inactiveCount: number, inactiveCondominiums: Array<{ condominiumId: string, name: string, lastActivityAt: string | null }> }, health: { staleEnrollments: number, failedNotifications: number, delayedNotifications: number, withoutManager: number, withoutUnits: number, openSupport: number } } };
 
 export type PlatformPeopleQueryVariables = Exact<{
   filter?: PlatformPeopleFilterInput | null | undefined;
@@ -3810,6 +3810,18 @@ export const DashboardDocument = new TypedDocumentString(`
     bookingsToday
     openSupportRequests
     failedNotifications
+    parcels {
+      waiting
+      stuck
+      perishableOverdue
+      pickedUpLast30Days
+      averagePickupHours
+      monthly {
+        month
+        received
+        pickedUp
+      }
+    }
   }
 }
     `) as unknown as TypedDocumentString<DashboardQuery, DashboardQueryVariables>;
@@ -5517,6 +5529,30 @@ export const PlatformMetricsDocument = new TypedDocumentString(`
         name
         total
         cancelled
+      }
+    }
+    parcels {
+      condominiumsWithModule
+      received
+      pickedUp
+      returned
+      cancelled
+      perishable
+      averagePickupHours
+      waitingNow
+      stuckNow
+      perishableOverdueNow
+      granularity
+      series {
+        bucket
+        received
+        pickedUp
+      }
+      byCondominium {
+        condominiumId
+        name
+        received
+        pickedUp
       }
     }
     spaces {

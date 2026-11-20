@@ -27,6 +27,30 @@ export const platformMetricsDocument = graphql(`
           cancelled
         }
       }
+      parcels {
+        condominiumsWithModule
+        received
+        pickedUp
+        returned
+        cancelled
+        perishable
+        averagePickupHours
+        waitingNow
+        stuckNow
+        perishableOverdueNow
+        granularity
+        series {
+          bucket
+          received
+          pickedUp
+        }
+        byCondominium {
+          condominiumId
+          name
+          received
+          pickedUp
+        }
+      }
       spaces {
         activeSpaces
         unusedCount

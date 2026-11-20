@@ -15,4 +15,20 @@ export type Dashboard = {
   openSupportRequests: number | null;
   /** Notifications the API gave up sending (platform only, else null). */
   failedNotifications: number | null;
+  /** The parcels module's numbers (null: the module is off). */
+  parcels: ParcelIndicators | null;
+};
+
+/** Parcels at a glance (the management dashboard). */
+export type ParcelIndicators = {
+  /** At the desk now, and for more than 3 days. */
+  waiting: number;
+  stuck: number;
+  /** Perishable, past the pickup deadline. */
+  perishableOverdue: number;
+  /** Picked up in the last 30 days, and the average hours until then. */
+  pickedUpLast30Days: number;
+  averagePickupHours: number | null;
+  /** The last 6 months, oldest first ("2026-11"). */
+  monthly: { month: string; received: number; pickedUp: number }[];
 };

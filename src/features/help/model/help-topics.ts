@@ -583,6 +583,9 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "As reservas contam pelo dia do horário reservado. Uso dos espaços considera só as reservas ativas (pendentes ou confirmadas).",
         },
         {
+          text: "Encomendas contam pelo dia em que chegaram; o tempo médio até a retirada usa as retiradas no período. “Aguardando agora”, as paradas há mais de 3 dias e as perecíveis vencidas são a situação de agora.",
+        },
+        {
           text: "“Saúde da operação” mostra a situação de agora, não do período. Os avisos com problema são de toda a plataforma.",
         },
         {
@@ -632,7 +635,7 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "No menu lateral, cada módulo é um grupo (Reservas, Eventos, Condomínio) com as páginas de quem gerencia junto com as dos moradores: toque no grupo para abrir. Só aparecem os módulos contratados.",
         },
         {
-          text: "Visão geral: os números do condomínio e o que precisa de atenção.",
+          text: "Visão geral: os números do condomínio e o que precisa de atenção. Com o módulo Encomendas, também as que aguardam retirada, as paradas há mais de 3 dias, as perecíveis vencidas, o tempo médio até a retirada (últimos 30 dias) e quantas chegaram por mês.",
           only: ["DASHBOARD_READ"],
         },
         {
