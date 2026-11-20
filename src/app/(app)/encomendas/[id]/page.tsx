@@ -52,7 +52,9 @@ export default async function ParcelPage({
             showCode={!desk || parcel.status !== "RECEIVED"}
           />
         </Card>
-        {parcel.signature && <ParcelReceiptView receipt={parcel.signature} />}
+        {parcel.signature && (
+          <ParcelReceiptView parcelId={parcel.id} receipt={parcel.signature} />
+        )}
       </div>
     </>
   );

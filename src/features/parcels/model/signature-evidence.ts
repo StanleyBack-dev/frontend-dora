@@ -61,6 +61,33 @@ export function readDevice(pointerType: string | null): SignatureDevice {
 export const deviceTimeZone = () =>
   Intl.DateTimeFormat().resolvedOptions().timeZone ?? null;
 
+const POINTER_LABELS: Record<string, string> = {
+  touch: "o dedo",
+  pen: "caneta",
+  mouse: "mouse",
+};
+
+/** The device facts worth reading, from the stored JSON (the receipt). */
+export function deviceFacts(json: string): string | null {
+  try {
+    const device = JSON.parse(json) as Record<string, unknown>;
+    const parts = [
+      typeof device.platform === "string" ? device.platform : null,
+      typeof device.pointerType === "string"
+        ? `assinado com ${POINTER_LABELS[device.pointerType] ?? device.pointerType}`
+        : null,
+      typeof device.screenWidth === "number" &&
+      typeof device.screenHeight === "number"
+        ? `tela ${device.screenWidth}×${device.screenHeight}`
+        : null,
+      typeof device.language === "string" ? device.language : null,
+    ].filter(Boolean);
+    return parts.length > 0 ? parts.join(" · ") : null;
+  } catch {
+    return null;
+  }
+}
+
 export const LOCATION_LABELS: Record<SignatureLocation["status"], string> = {
   GRANTED: "Localização registrada",
   DENIED: "Localização recusada no aparelho",

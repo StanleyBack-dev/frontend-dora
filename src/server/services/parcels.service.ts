@@ -9,6 +9,7 @@ import {
   pickUpParcelDocument,
   myParcelsDocument,
   parcelDocument,
+  parcelReceiptPdfDocument,
   registerParcelDocument,
   returnParcelDocument,
 } from "@/server/graphql/operations/parcels.operations";
@@ -53,6 +54,22 @@ export const parcelsService = {
       variables: { statuses, page },
     });
     return myParcels;
+  },
+
+  /** The pickup receipt as a PDF file (the API checks who may see it). */
+  async receiptPdf(
+    token: string,
+    id: string,
+  ): Promise<{ fileName: string; mimeType: string; content: Buffer }> {
+    const { parcelReceiptPdf } = await backendGraphql(
+      parcelReceiptPdfDocument,
+      { token, variables: { id } },
+    );
+    return {
+      fileName: parcelReceiptPdf.fileName,
+      mimeType: parcelReceiptPdf.mimeType,
+      content: Buffer.from(parcelReceiptPdf.base64Content, "base64"),
+    };
   },
 
   /** One parcel with its pickup receipt (the API checks who may see it). */

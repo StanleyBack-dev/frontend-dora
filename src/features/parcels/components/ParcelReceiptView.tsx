@@ -1,42 +1,25 @@
 import { MapPin, ShieldAlert, ShieldCheck } from "lucide-react";
 import { Alert, Card } from "@/design-system";
+import { ReceiptPdfButton } from "@/features/parcels/components/ReceiptPdfButton";
 import { COLLECTED_BY_ROLE_LABELS } from "@/features/parcels/model/parcel-labels";
-import { LOCATION_LABELS } from "@/features/parcels/model/signature-evidence";
+import {
+  deviceFacts,
+  LOCATION_LABELS,
+} from "@/features/parcels/model/signature-evidence";
 import type { ParcelReceipt } from "@/shared/contracts/parcels";
 import { formatDateTime } from "@/shared/lib/datetime";
-
-/** The device facts worth reading, from the stored JSON. */
-function deviceFacts(json: string): string | null {
-  try {
-    const device = JSON.parse(json) as Record<string, unknown>;
-    const parts = [
-      typeof device.platform === "string" ? device.platform : null,
-      typeof device.pointerType === "string"
-        ? `assinado com ${POINTER_LABELS[device.pointerType] ?? device.pointerType}`
-        : null,
-      typeof device.screenWidth === "number" &&
-      typeof device.screenHeight === "number"
-        ? `tela ${device.screenWidth}×${device.screenHeight}`
-        : null,
-      typeof device.language === "string" ? device.language : null,
-    ].filter(Boolean);
-    return parts.length > 0 ? parts.join(" · ") : null;
-  } catch {
-    return null;
-  }
-}
-
-const POINTER_LABELS: Record<string, string> = {
-  touch: "o dedo",
-  pen: "caneta",
-  mouse: "mouse",
-};
 
 // The pickup receipt: who signed, the declaration and the signature as
 // drawn on the screen, and the evidence recorded with it (times, IP,
 // device, location, who handed it over) with its SHA-256 digest. "Íntegro"
 // means the stored evidence still matches the digest written at signing.
-export function ParcelReceiptView({ receipt }: { receipt: ParcelReceipt }) {
+export function ParcelReceiptView({
+  parcelId,
+  receipt,
+}: {
+  parcelId: string;
+  receipt: ParcelReceipt;
+}) {
   const location =
     receipt.locationStatus === "GRANTED" &&
     receipt.latitude !== null &&
@@ -87,6 +70,8 @@ export function ParcelReceiptView({ receipt }: { receipt: ParcelReceipt }) {
           </span>
         )}
       </div>
+
+      <ReceiptPdfButton parcelId={parcelId} />
 
       {!receipt.intact && (
         <Alert tone="danger">
