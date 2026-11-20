@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.17.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.16.0...v0.17.0) (2026-11-20)
+
+
+### Features
+
+* **forms:** keep drafts of create forms and restyle the QR scan button ([eb2d4dc](https://github.com/StanleyBack-dev/frontend-dora/commit/eb2d4dc50c71707d5ed2cb22e616b946dae73d9f))
+* **forms:** keep drafts of create forms and restyle the QR scan button ([34a543b](https://github.com/StanleyBack-dev/frontend-dora/commit/34a543b5ae7c6b656eb8bb52ad9795cb9c5cfb1a))
+
 ## [0.16.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.15.0...v0.16.0) (2026-11-20)
 
 
