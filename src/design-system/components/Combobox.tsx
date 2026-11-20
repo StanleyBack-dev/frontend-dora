@@ -40,8 +40,24 @@ type ComboboxProps = {
   disabled?: boolean;
   /** Marks the field with "*" (and aria-required). */
   required?: boolean;
+  /**
+   * Also accepts what was typed when it is not in the list (a carrier, a
+   * place…): it shows first as an option, Enter or leaving the field keeps
+   * it, and the value is that text.
+   */
+  freeText?: boolean;
+  /**
+   * With `freeText`: a last option (e.g. "Outro local (digitar)") that
+   * clears the field for typing a value not in the list.
+   */
+  freeTextLabel?: string;
+  /** Longest text typed (default 64). */
+  maxLength?: number;
   className?: string;
 };
+
+/** The value of the "type another one" option (never selected as such). */
+const FREE_TEXT = "__free_text__";
 
 // Lowercase without accents, so "torre" finds "Tórre" and "bloco a" "Bloco A".
 const normalize = (value: string) =>
@@ -68,6 +84,9 @@ export function Combobox({
   footer,
   disabled = false,
   required = false,
+  freeText = false,
+  freeTextLabel,
+  maxLength = 64,
   className,
 }: ComboboxProps) {
   const id = useId();
@@ -77,8 +96,11 @@ export function Combobox({
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [activeIndex, setActiveIndex] = useState(-1);
+  // "Outro (digitar)" was chosen: the field waits for the typed value.
+  const [typingFree, setTypingFree] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   // The parent filters (remote search) or, without onInputChange, we do.
-  const options =
+  const filtered =
     onInputChange || !text.trim()
       ? allOptions
       : allOptions.filter((option) =>
@@ -86,15 +108,42 @@ export function Combobox({
             normalize(text),
           ),
         );
+  // Free text: what was typed comes first, unless it is a listed option.
+  const typed = text.trim();
+  const options =
+    freeText &&
+    typed &&
+    !allOptions.some((option) => normalize(option.label) === normalize(typed))
+      ? [
+          {
+            value: typed,
+            label: typed,
+            description: "Usar o que foi digitado",
+          },
+          ...filtered,
+        ]
+      : typingFree
+        ? []
+        : freeText && freeTextLabel && !typed
+          ? [...filtered, { value: FREE_TEXT, label: freeTextLabel }]
+          : filtered;
   const selectedLabel =
     selectedLabelProp ??
-    allOptions.find((option) => option.value === value)?.label;
+    allOptions.find((option) => option.value === value)?.label ??
+    (freeText && value ? value : undefined);
+  /** What was typed: the listed option it names, or the text itself. */
+  const typedValue = () =>
+    allOptions.find((option) => normalize(option.label) === normalize(typed))
+      ?.value ?? typed;
 
   // Close when clicking anywhere else.
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) close();
+      if (rootRef.current?.contains(event.target as Node)) return;
+      // Leaving with a typed text keeps it (free text).
+      if (freeText && typed) choose(typedValue());
+      else close();
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
@@ -116,6 +165,7 @@ export function Combobox({
   function close() {
     setOpen(false);
     setActiveIndex(-1);
+    setTypingFree(false);
     if (text) {
       setText("");
       onInputChange?.("");
@@ -123,6 +173,13 @@ export function Combobox({
   }
 
   function choose(next: string | null) {
+    // "Outro (digitar)": nothing is chosen yet; the field takes the typing.
+    if (next === FREE_TEXT) {
+      setActiveIndex(-1);
+      setTypingFree(true);
+      inputRef.current?.focus();
+      return;
+    }
     close();
     if (next !== value) onSelect(next);
   }
@@ -142,6 +199,9 @@ export function Combobox({
         if (open && activeIndex >= 0 && options[activeIndex]) {
           event.preventDefault();
           choose(options[activeIndex].value);
+        } else if (open && freeText && typed) {
+          event.preventDefault();
+          choose(typedValue());
         }
         break;
       case "Escape":
@@ -169,6 +229,7 @@ export function Combobox({
           aria-hidden
         />
         <input
+          ref={inputRef}
           id={id}
           type="text"
           role="combobox"
@@ -179,9 +240,15 @@ export function Combobox({
           aria-activedescendant={activeId}
           autoComplete="off"
           spellCheck={false}
-          maxLength={64}
+          maxLength={maxLength}
           disabled={disabled}
-          placeholder={value ? selectedLabel : placeholder}
+          placeholder={
+            typingFree
+              ? "Digite e tecle Enter"
+              : value
+                ? selectedLabel
+                : placeholder
+          }
           value={inputValue}
           onFocus={openList}
           onClick={openList}
@@ -228,7 +295,11 @@ export function Combobox({
           >
             {options.length === 0 ? (
               <li className="px-3 py-6 text-center text-sm text-muted">
-                {loading ? "Buscando…" : emptyText}
+                {loading
+                  ? "Buscando…"
+                  : typingFree
+                    ? "Digite e tecle Enter (ou clique fora)"
+                    : emptyText}
               </li>
             ) : (
               options.map((option, index) => {

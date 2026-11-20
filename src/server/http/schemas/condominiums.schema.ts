@@ -21,6 +21,7 @@ export const condominiumStatusSchema = z.object({
 const APP_MODULES = [
   "BOOKINGS",
   "EVENTS",
+  "PARCELS",
 ] as const satisfies readonly AppModule[];
 type MissingModule = Exclude<AppModule, (typeof APP_MODULES)[number]>;
 const everyModule: MissingModule extends never ? true : false = true;
