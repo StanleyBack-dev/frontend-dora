@@ -18,6 +18,7 @@ import {
   Button,
   ChoiceCards,
   CollapsibleSection,
+  DraftNotice,
   Field,
   Modal,
   TextArea,
@@ -29,6 +30,8 @@ import { AUDIENCE_LABELS } from "@/features/broadcasts/model/broadcast-labels";
 import type { UserGroup } from "@/shared/contracts/api";
 import type { BroadcastAudience } from "@/shared/contracts/broadcasts";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { sameShape } from "@/shared/lib/form-draft";
+import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
 
 const AUDIENCE_OPTIONS: ChoiceOption<BroadcastAudience>[] = [
@@ -76,15 +79,43 @@ const GROUP_AUDIENCE: Record<UserGroup, string> = {
   ADMIN_MASTER: "os administradores gerais",
 };
 
+type BroadcastDraft = {
+  title: string;
+  body: string;
+  audience: BroadcastAudience;
+  targetGroup: UserGroup | "";
+  sendEmail: boolean;
+};
+
+const EMPTY_BROADCAST: BroadcastDraft = {
+  title: "",
+  body: "",
+  audience: "TODOS",
+  targetGroup: "",
+  sendEmail: true,
+};
+
 // New announcement: who receives it, the message, and whether it also goes
 // by e-mail. Sending can't be undone, so it asks for confirmation.
 export function BroadcastForm() {
   const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [audience, setAudience] = useState<BroadcastAudience>("TODOS");
-  const [targetGroup, setTargetGroup] = useState<UserGroup | "">("");
-  const [sendEmail, setSendEmail] = useState(true);
+  // A draft until sent: leaving the page or a reload keeps the message.
+  const draft = useFormDraft<BroadcastDraft>(
+    "broadcast",
+    EMPTY_BROADCAST,
+    (raw) => sameShape(EMPTY_BROADCAST, raw),
+    { restoreOnMount: true },
+  );
+  const { title, body, audience, targetGroup, sendEmail } = draft.value;
+  const setField =
+    <K extends keyof BroadcastDraft>(key: K) =>
+    (value: BroadcastDraft[K]) =>
+      draft.set((current) => ({ ...current, [key]: value }));
+  const setTitle = setField("title");
+  const setBody = setField("body");
+  const setAudience = setField("audience");
+  const setTargetGroup = setField("targetGroup");
+  const setSendEmail = setField("sendEmail");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const { showError } = useToast();
@@ -112,8 +143,7 @@ export function BroadcastForm() {
       setSent(
         `Comunicado enviado para ${result.recipients} pessoa${result.recipients === 1 ? "" : "s"}.`,
       );
-      setTitle("");
-      setBody("");
+      draft.discard();
       router.refresh();
     } catch (cause) {
       showError(
@@ -129,6 +159,7 @@ export function BroadcastForm() {
   return (
     <div className="space-y-4">
       {sent && <Alert tone="success">{sent}</Alert>}
+      {draft.restored && <DraftNotice onDiscard={draft.discard} />}
       <CollapsibleSection
         icon={<Users />}
         title="Para quem"

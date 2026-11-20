@@ -7,6 +7,7 @@ import {
   Badge,
   Button,
   Card,
+  DraftNotice,
   Drawer,
   EmptyState,
   Field,
@@ -34,6 +35,8 @@ import {
   formatBirthDate,
   todayIso,
 } from "@/shared/lib/birth-date";
+import { sameShape } from "@/shared/lib/form-draft";
+import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
 
 const RELATIONSHIPS = Object.entries(RELATIONSHIP_LABELS).map(
@@ -165,6 +168,18 @@ export function MyDependents({ dependents }: { dependents: Dependent[] }) {
   );
 }
 
+type DependentDraft = {
+  name: string;
+  birthDate: string;
+  relationship: DependentRelationship | "";
+};
+
+const EMPTY_DEPENDENT: DependentDraft = {
+  name: "",
+  birthDate: "",
+  relationship: "",
+};
+
 function AddDependentDrawer({
   open,
   onClose,
@@ -174,11 +189,27 @@ function AddDependentDrawer({
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
-  const [name, setName] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [relationship, setRelationship] = useState<DependentRelationship | "">(
-    "",
+  // The texts are a draft (kept when the drawer closes, back after a
+  // reload); the document file stays only while the page is open.
+  const {
+    value: fields,
+    set: setFields,
+    discard,
+    restored,
+  } = useFormDraft<DependentDraft>(
+    "add-dependent",
+    EMPTY_DEPENDENT,
+    (raw) => sameShape(EMPTY_DEPENDENT, raw),
+    { open },
   );
+  const { name, birthDate, relationship } = fields;
+  const setField =
+    <K extends keyof DependentDraft>(key: K) =>
+    (value: DependentDraft[K]) =>
+      setFields((current) => ({ ...current, [key]: value }));
+  const setName = setField("name");
+  const setBirthDate = setField("birthDate");
+  const setRelationship = setField("relationship");
   const [document, setDocument] = useState<PickedDocument | null>(null);
   const [pending, setPending] = useState(false);
   const [tried, setTried] = useState(false);
@@ -192,10 +223,9 @@ function AddDependentDrawer({
     !document && "O documento com a data de nascimento.",
   ].filter((item): item is string => Boolean(item));
 
+  // "Cancelar", or after sending: the form starts over.
   function reset() {
-    setName("");
-    setBirthDate("");
-    setRelationship("");
+    discard();
     setDocument(null);
     setTried(false);
     setError(null);
@@ -234,16 +264,23 @@ function AddDependentDrawer({
   return (
     <Drawer
       open={open}
+      // X, Esc or a tap outside: hides it, what was typed stays.
       onClose={() => {
         if (pending) return;
-        reset();
         onClose();
       }}
       busy={pending}
       title="Adicionar dependente"
       footer={
         <>
-          <Button variant="cancel" onClick={onClose} disabled={pending}>
+          <Button
+            variant="cancel"
+            onClick={() => {
+              reset();
+              onClose();
+            }}
+            disabled={pending}
+          >
             Cancelar
           </Button>
           <Button onClick={submit} loading={pending}>
@@ -253,6 +290,7 @@ function AddDependentDrawer({
       }
     >
       <div className="space-y-4">
+        {restored && <DraftNotice onDiscard={reset} />}
         <FormIssues missing={tried ? missing : []} error={error} />
         <p className="text-sm text-muted">
           Para quem mora com você e não usa o app. A administração confere o

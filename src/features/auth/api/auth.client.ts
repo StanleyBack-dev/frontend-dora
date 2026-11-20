@@ -1,3 +1,4 @@
+import { clearFormDrafts } from "@/shared/lib/form-draft";
 import { apiRequest } from "@/shared/lib/api-client";
 import type { SessionUser } from "@/shared/contracts/api";
 
@@ -13,7 +14,11 @@ export const authClient = {
       post({ login, password }),
     ),
 
-  logout: () => apiRequest<{ ok: true }>("/auth/logout", { method: "POST" }),
+  // The drafts belong to this account: forgotten on the way out.
+  logout: () => {
+    clearFormDrafts();
+    return apiRequest<{ ok: true }>("/auth/logout", { method: "POST" });
+  },
 
   changePassword: (currentPassword: string, newPassword: string) =>
     apiRequest<{ ok: true }>(

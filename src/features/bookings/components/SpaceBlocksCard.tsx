@@ -9,6 +9,7 @@ import {
   Card,
   CardBody,
   CardHeader,
+  DraftNotice,
   Drawer,
   Field,
 } from "@/design-system";
@@ -16,6 +17,8 @@ import { bookingsClient } from "@/features/bookings/api/bookings.client";
 import type { SpaceBlock } from "@/shared/contracts/bookings";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { formatDateTime, fromLocalInput } from "@/shared/lib/datetime";
+import { sameShape } from "@/shared/lib/form-draft";
+import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
 
 type Draft = { startsAt: string; endsAt: string; reason: string };
@@ -44,7 +47,18 @@ export function SpaceBlocksCard({
   const router = useRouter();
   const { showError, showSuccess } = useToast();
   const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<Draft>(EMPTY);
+  // Kept when the drawer closes, per space (only "Cancelar" clears it).
+  const {
+    value: draft,
+    set: setDraft,
+    discard,
+    restored,
+  } = useFormDraft<Draft>(
+    `space-block:${spaceId}`,
+    EMPTY,
+    (raw) => sameShape(EMPTY, raw),
+    { open },
+  );
   // Set when the API reports bookings in the period: confirm to cancel them.
   const [overlaps, setOverlaps] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -56,10 +70,16 @@ export function SpaceBlocksCard({
     setOverlaps(null);
   };
 
-  function close() {
+  // X, Esc or a tap outside: hides it, what was typed stays.
+  function hide() {
     setOpen(false);
-    setDraft(EMPTY);
     setOverlaps(null);
+  }
+
+  // "Cancelar", or after blocking: the form starts over.
+  function close() {
+    discard();
+    hide();
   }
 
   async function save(cancelOverlapping: boolean) {
@@ -175,7 +195,7 @@ export function SpaceBlocksCard({
 
       <Drawer
         open={open}
-        onClose={close}
+        onClose={hide}
         title="Bloquear período"
         busy={pending}
         footer={
@@ -204,6 +224,7 @@ export function SpaceBlocksCard({
         }
       >
         <div className="space-y-4">
+          {restored && <DraftNotice onDiscard={discard} />}
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               label="Início"
