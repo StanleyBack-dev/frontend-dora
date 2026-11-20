@@ -37,7 +37,11 @@ async function toBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-export async function prepareSpacePhoto(file: File): Promise<PreparedPhoto> {
+/** `maxBytes`: what the receiving API accepts (other uploads, e.g. parcels). */
+export async function prepareSpacePhoto(
+  file: File,
+  maxBytes = SEND_MAX_BYTES,
+): Promise<PreparedPhoto> {
   if (!ACCEPTED_TYPES.has(file.type)) {
     throw new PhotoError("Use uma foto JPEG, PNG ou WebP.");
   }
@@ -66,7 +70,7 @@ export async function prepareSpacePhoto(file: File): Promise<PreparedPhoto> {
       (await toBlob(canvas, "image/webp", quality)) ??
       (await toBlob(canvas, "image/jpeg", quality));
     if (!blob) break;
-    if (blob.size <= SEND_MAX_BYTES) {
+    if (blob.size <= maxBytes) {
       return {
         base64: await toBase64(blob),
         previewUrl: URL.createObjectURL(blob),

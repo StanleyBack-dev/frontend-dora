@@ -15,6 +15,11 @@ import { ticketCodeFrom } from "@/features/events/model/ticket-pass";
 import { GateCodeForm } from "@/features/gate/components/GateCodeForm";
 import { GateFilters } from "@/features/gate/components/GateFilters";
 import { GateOccasionCard } from "@/features/gate/components/GateOccasionCard";
+import { ParcelPickupDrawer } from "@/features/parcels/components/ParcelPickupDrawer";
+import {
+  PARCEL_CODE_LENGTH,
+  parcelCodeFrom,
+} from "@/features/parcels/model/parcel-labels";
 import {
   buildAgenda,
   filterAgenda,
@@ -30,28 +35,42 @@ import { useToast } from "@/shared/toast/useToast";
 
 const REFRESH_MS = 60_000;
 
+/** What the code field takes, by the modules on. */
+function codeLabel(events: boolean, parcels: boolean): string {
+  if (events && parcels) return "Código do convite, ingresso ou encomenda";
+  if (events) return "Código do convite ou ingresso";
+  if (parcels) return "Código do convite ou encomenda";
+  return "Código do convite";
+}
+
 const errorMessage = (cause: unknown, fallback: string) =>
   cause instanceof ApiClientError ? cause.message : fallback;
 
 // The gate's desk (Portaria and its full screen). One code field and QR
-// reader for both booking invites (8 characters) and event tickets (10, or a
-// ticket link); the day's numbers; the filters; and one agenda of the day
-// where every booking and event is a card that opens to its people, the
-// ones with the entry open first. Both lists refresh every minute.
+// reader for booking invites (8 characters), event tickets (10, or a
+// ticket link) and, with the parcels module, pickup codes (6), which open
+// the handover with the signature; the day's numbers; the filters; and
+// one agenda of the day where every booking and event is a card that
+// opens to its people, the ones with the entry open first. Both lists
+// refresh every minute.
 export function GateDesk({
   guests: initialGuests,
   tickets: initialTickets,
   events,
+  parcels = false,
 }: {
   guests: GateGuest[];
   tickets: GateEventTicket[];
   /** The condominium has the events module. */
   events: boolean;
+  /** Parcels module on and the person hands them over. */
+  parcels?: boolean;
 }) {
   const { showError, showSuccess } = useToast();
   const [guests, setGuests] = useState(initialGuests);
   const [tickets, setTickets] = useState(initialTickets);
   const [busy, setBusy] = useState<string | null>(null);
+  const [parcelCode, setParcelCode] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   // Cards the person opened or closed by hand (the rest follow the default).
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
@@ -164,9 +183,14 @@ export function GateDesk({
     setBusy(null);
   }
 
-  // A typed or scanned code: an event ticket (10 characters or its link)
-  // or a booking invite.
-  const takeCode = (text: string) => {
+  // A typed or scanned code: a parcel's pickup code (6 characters), an
+  // event ticket (10 characters or its link) or a booking invite.
+  const takeCode = async (text: string): Promise<boolean> => {
+    const pickup = parcels ? parcelCodeFrom(text) : null;
+    if (pickup) {
+      setParcelCode(pickup);
+      return true;
+    }
     const ticketCode = events ? ticketCodeFrom(text) : null;
     return ticketCode
       ? letIn({ kind: "ticket", code: ticketCode })
@@ -176,7 +200,8 @@ export function GateDesk({
   return (
     <div className="space-y-6">
       <GateCodeForm
-        label={events ? "Código do convite ou ingresso" : "Código do convite"}
+        label={codeLabel(events, parcels)}
+        minLength={parcels ? PARCEL_CODE_LENGTH : 8}
         busy={busy === "code"}
         disabled={busy !== null}
         onCode={takeCode}
@@ -280,6 +305,15 @@ export function GateDesk({
             />
           ))}
         </section>
+      )}
+
+      {parcels && (
+        <ParcelPickupDrawer
+          key={parcelCode ?? "closed"}
+          code={parcelCode}
+          onClose={() => setParcelCode(null)}
+          onDone={() => setParcelCode(null)}
+        />
       )}
     </div>
   );

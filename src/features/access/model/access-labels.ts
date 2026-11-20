@@ -12,7 +12,7 @@ export const GROUP_DESCRIPTIONS: Record<UserGroup, string> = {
   ADMIN:
     "Administra este condomínio (síndico, administração): moradores, cadastros, unidades, espaços, comunicados e painel.",
   CONCIERGE:
-    "Trabalha na portaria: vê os convidados das reservas do dia e libera a entrada. Não reserva espaços.",
+    "Trabalha na portaria: libera a entrada dos convidados do dia e registra e entrega as encomendas. Não reserva espaços.",
   ADMIN_MASTER:
     "Administra a plataforma Dora: todos os condomínios, suporte e histórico dos registros.",
 };
@@ -56,6 +56,10 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
   GUESTS_CHECKIN: {
     label: "Liberar a entrada de convidados (portaria)",
     area: "Reservas",
+  },
+  PARCELS_MANAGE: {
+    label: "Registrar, entregar (com assinatura) e devolver encomendas",
+    area: "Gestão",
   },
   EVENTS_MANAGE: {
     label: "Criar, publicar e cancelar eventos",

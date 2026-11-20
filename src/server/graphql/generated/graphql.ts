@@ -17,7 +17,8 @@ export type AddressFormat =
 /** Módulos contratados à parte pelo condomínio. */
 export type AppModule =
   | 'BOOKINGS'
-  | 'EVENTS';
+  | 'EVENTS'
+  | 'PARCELS';
 
 export type AttendeeInput = {
   /** Com GUEST: idade. */
@@ -481,6 +482,11 @@ export type NotificationType =
   | 'EVENT_ORDER_RECEIPT'
   | 'EVENT_ORDER_REJECTED'
   | 'EVENT_PUBLISHED'
+  | 'PARCEL_CANCELLED'
+  | 'PARCEL_PICKED_UP'
+  | 'PARCEL_RECEIVED'
+  | 'PARCEL_REMINDER'
+  | 'PARCEL_RETURNED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
   | 'SUPPORT_REQUESTED'
@@ -500,6 +506,33 @@ export type PageInput = {
   page?: number;
 };
 
+/** Filtros das encomendas do condomínio. */
+export type ParcelFilterInput = {
+  /** A transportadora (exata). */
+  carrier?: string | null | undefined;
+  /** Recebidas a partir deste instante. */
+  from?: string | null | undefined;
+  /** O destinatário (exato, sem diferenciar acentos). */
+  recipientName?: string | null | undefined;
+  /** Parte do código de retirada, do rastreio, do destinatário ou da transportadora. */
+  search?: string | null | undefined;
+  /** Só estas situações (vazio: todas). */
+  statuses?: Array<ParcelStatus> | null | undefined;
+  /** Recebidas antes deste instante. */
+  to?: string | null | undefined;
+  /** O código de rastreio (exato). */
+  trackingCode?: string | null | undefined;
+  /** A unidade. */
+  unitId?: string | number | null | undefined;
+};
+
+/** Na portaria, retirada, devolvida ao remetente ou cancelada (registrada por engano). */
+export type ParcelStatus =
+  | 'CANCELLED'
+  | 'PICKED_UP'
+  | 'RECEIVED'
+  | 'RETURNED';
+
 /** Capacidade verificada pela API. */
 export type Permission =
   | 'AUDIT_READ'
@@ -510,6 +543,7 @@ export type Permission =
   | 'EVENTS_MANAGE'
   | 'GUESTS_CHECKIN'
   | 'NOTIFICATIONS_BROADCAST'
+  | 'PARCELS_MANAGE'
   | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
   | 'SPACES_MANAGE'
@@ -517,6 +551,29 @@ export type Permission =
   | 'SUPPORT_MANAGE'
   | 'UNITS_MANAGE'
   | 'USERS_MANAGE';
+
+/** Entrega da encomenda pelo código de retirada, com a assinatura de quem retira. */
+export type PickUpParcelInput = {
+  /** Hora do aparelho ao assinar. */
+  clientSignedAt?: string | null | undefined;
+  /** Fuso do aparelho (ex.: America/Sao_Paulo). */
+  clientTimeZone?: string | null | undefined;
+  /** Código de retirada (digitado ou do QR). */
+  code: string;
+  /** A declaração exibida a quem assinou. */
+  declarationShown: string;
+  device?: SignatureDeviceInput | null | undefined;
+  location: SignatureLocationInput;
+  /** Traços da assinatura em JSON: { width, height, strokes: [[x, y, t, pressão]…] }. */
+  signatureDrawing: string;
+  /** Imagem da assinatura (PNG ou WebP em base64). */
+  signatureImage: string;
+  /** CPF ou RG (opcional). */
+  signerDocument?: string | null | undefined;
+  signerDocumentType?: DocumentType | null | undefined;
+  /** Nome completo de quem retira. */
+  signerName: string;
+};
 
 /** Tipo da chave PIX: CPF, CNPJ, celular, e-mail ou aleatória. */
 export type PixKeyType =
@@ -576,6 +633,26 @@ export type RecordSupportContributionInput = {
   showName: boolean;
 };
 
+/** Encomenda recebida na portaria. */
+export type RegisterParcelInput = {
+  /** Transportadora ou loja (Correios, Mercado Livre… ou digitada). Obrigatório. */
+  carrier?: string | null | undefined;
+  /** Observação. */
+  notes?: string | null | undefined;
+  /** Foto da encomenda (JPEG, PNG ou WebP em base64, até 1 MB). */
+  photo?: string | null | undefined;
+  /** Nome na etiqueta. */
+  recipientName?: string | null | undefined;
+  /** Escolhido pelo nome: só este morador (da unidade) é avisado e vê a encomenda (surpresa, presente). Nulo: todos da unidade. */
+  recipientUserId?: string | number | null | undefined;
+  /** Onde ficou guardada (prateleira, armário, administração…). Obrigatório. */
+  storageLocation?: string | null | undefined;
+  /** Código de rastreio. */
+  trackingCode?: string | null | undefined;
+  /** A unidade de destino. */
+  unitId: string | number;
+};
+
 export type ResetPasswordInput = {
   newPassword: string;
   resetToken: string;
@@ -594,6 +671,33 @@ export type SetUserPermissionsInput = {
   useGroupDefaults: boolean;
   userId: string | number;
 };
+
+/** O aparelho em que a assinatura foi feita. */
+export type SignatureDeviceInput = {
+  language?: string | null | undefined;
+  maxTouchPoints?: number | null | undefined;
+  pixelRatio?: number | null | undefined;
+  platform?: string | null | undefined;
+  /** touch, pen ou mouse: como a assinatura foi feita. */
+  pointerType?: string | null | undefined;
+  screenHeight?: number | null | undefined;
+  screenWidth?: number | null | undefined;
+};
+
+/** Localização do aparelho no momento da assinatura. */
+export type SignatureLocationInput = {
+  /** Precisão em metros. */
+  accuracyMeters?: number | null | undefined;
+  latitude?: number | null | undefined;
+  longitude?: number | null | undefined;
+  status: SignatureLocationStatus;
+};
+
+/** Localização do aparelho na assinatura: obtida, recusada ou indisponível. */
+export type SignatureLocationStatus =
+  | 'DENIED'
+  | 'GRANTED'
+  | 'UNAVAILABLE';
 
 /** Situação de um horário na grade do dia. */
 export type SlotState =
@@ -1683,6 +1787,65 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type SendTestPushMutation = { sendTestPush: number };
 
+export type ParcelFieldsFragment = { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null };
+
+export type ParcelsQueryVariables = Exact<{
+  filter?: ParcelFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type ParcelsQuery = { parcels: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null }> } };
+
+export type ParcelOverviewQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ParcelOverviewQuery = { parcelOverview: { waitingLong: number, recipientNames: Array<string>, carriers: Array<string>, trackingCodes: Array<string>, byStatus: Array<{ status: ParcelStatus, count: number }>, units: Array<{ id: string, label: string }> } };
+
+export type ParcelByCodeQueryVariables = Exact<{
+  code: string;
+}>;
+
+
+export type ParcelByCodeQuery = { parcelByCode: { pickupDeclaration: string | null, id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+
+export type RegisterParcelMutationVariables = Exact<{
+  input: RegisterParcelInput;
+}>;
+
+
+export type RegisterParcelMutation = { registerParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+
+export type PickUpParcelMutationVariables = Exact<{
+  input: PickUpParcelInput;
+}>;
+
+
+export type PickUpParcelMutation = { pickUpParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+
+export type ReturnParcelMutationVariables = Exact<{
+  id: string | number;
+  reason: string;
+}>;
+
+
+export type ReturnParcelMutation = { returnParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+
+export type CancelParcelMutationVariables = Exact<{
+  id: string | number;
+  reason: string;
+}>;
+
+
+export type CancelParcelMutation = { cancelParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+
+export type ParcelRecipientsQueryVariables = Exact<{
+  search: string;
+}>;
+
+
+export type ParcelRecipientsQuery = { parcelRecipients: Array<{ userId: string, name: string, unitId: string, unitLabel: string }> };
+
 export type CondominiumPixQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2201,6 +2364,28 @@ export const GateEventTicketFieldsFragmentDoc = new TypedDocumentString(`
   unitLabel
 }
     `, {"fragmentName":"GateEventTicketFields"}) as unknown as TypedDocumentString<GateEventTicketFieldsFragment, unknown>;
+export const ParcelFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ParcelFields on Parcel {
+  id
+  unitId
+  unitLabel
+  recipientName
+  recipientOnly
+  carrier
+  trackingCode
+  notes
+  storageLocation
+  pickupCode
+  status
+  receivedAt
+  receivedByName
+  closedAt
+  closedByName
+  closeReason
+  signerName
+  photoUrl
+}
+    `, {"fragmentName":"ParcelFields"}) as unknown as TypedDocumentString<ParcelFieldsFragment, unknown>;
 export const SpaceFieldsFragmentDoc = new TypedDocumentString(`
     fragment SpaceFields on Space {
   id
@@ -4969,6 +5154,197 @@ export const SendTestPushDocument = new TypedDocumentString(`
   sendTestPush
 }
     `) as unknown as TypedDocumentString<SendTestPushMutation, SendTestPushMutationVariables>;
+export const ParcelsDocument = new TypedDocumentString(`
+    query Parcels($filter: ParcelFilterInput, $page: PageInput) {
+  parcels(filter: $filter, page: $page) {
+    items {
+      ...ParcelFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment ParcelFields on Parcel {
+  id
+  unitId
+  unitLabel
+  recipientName
+  recipientOnly
+  carrier
+  trackingCode
+  notes
+  storageLocation
+  pickupCode
+  status
+  receivedAt
+  receivedByName
+  closedAt
+  closedByName
+  closeReason
+  signerName
+  photoUrl
+}`) as unknown as TypedDocumentString<ParcelsQuery, ParcelsQueryVariables>;
+export const ParcelOverviewDocument = new TypedDocumentString(`
+    query ParcelOverview {
+  parcelOverview {
+    byStatus {
+      status
+      count
+    }
+    waitingLong
+    units {
+      id
+      label
+    }
+    recipientNames
+    carriers
+    trackingCodes
+  }
+}
+    `) as unknown as TypedDocumentString<ParcelOverviewQuery, ParcelOverviewQueryVariables>;
+export const ParcelByCodeDocument = new TypedDocumentString(`
+    query ParcelByCode($code: String!) {
+  parcelByCode(code: $code) {
+    ...ParcelFields
+    pickupDeclaration
+  }
+}
+    fragment ParcelFields on Parcel {
+  id
+  unitId
+  unitLabel
+  recipientName
+  recipientOnly
+  carrier
+  trackingCode
+  notes
+  storageLocation
+  pickupCode
+  status
+  receivedAt
+  receivedByName
+  closedAt
+  closedByName
+  closeReason
+  signerName
+  photoUrl
+}`) as unknown as TypedDocumentString<ParcelByCodeQuery, ParcelByCodeQueryVariables>;
+export const RegisterParcelDocument = new TypedDocumentString(`
+    mutation RegisterParcel($input: RegisterParcelInput!) {
+  registerParcel(input: $input) {
+    ...ParcelFields
+  }
+}
+    fragment ParcelFields on Parcel {
+  id
+  unitId
+  unitLabel
+  recipientName
+  recipientOnly
+  carrier
+  trackingCode
+  notes
+  storageLocation
+  pickupCode
+  status
+  receivedAt
+  receivedByName
+  closedAt
+  closedByName
+  closeReason
+  signerName
+  photoUrl
+}`) as unknown as TypedDocumentString<RegisterParcelMutation, RegisterParcelMutationVariables>;
+export const PickUpParcelDocument = new TypedDocumentString(`
+    mutation PickUpParcel($input: PickUpParcelInput!) {
+  pickUpParcel(input: $input) {
+    ...ParcelFields
+  }
+}
+    fragment ParcelFields on Parcel {
+  id
+  unitId
+  unitLabel
+  recipientName
+  recipientOnly
+  carrier
+  trackingCode
+  notes
+  storageLocation
+  pickupCode
+  status
+  receivedAt
+  receivedByName
+  closedAt
+  closedByName
+  closeReason
+  signerName
+  photoUrl
+}`) as unknown as TypedDocumentString<PickUpParcelMutation, PickUpParcelMutationVariables>;
+export const ReturnParcelDocument = new TypedDocumentString(`
+    mutation ReturnParcel($id: ID!, $reason: String!) {
+  returnParcel(id: $id, reason: $reason) {
+    ...ParcelFields
+  }
+}
+    fragment ParcelFields on Parcel {
+  id
+  unitId
+  unitLabel
+  recipientName
+  recipientOnly
+  carrier
+  trackingCode
+  notes
+  storageLocation
+  pickupCode
+  status
+  receivedAt
+  receivedByName
+  closedAt
+  closedByName
+  closeReason
+  signerName
+  photoUrl
+}`) as unknown as TypedDocumentString<ReturnParcelMutation, ReturnParcelMutationVariables>;
+export const CancelParcelDocument = new TypedDocumentString(`
+    mutation CancelParcel($id: ID!, $reason: String!) {
+  cancelParcel(id: $id, reason: $reason) {
+    ...ParcelFields
+  }
+}
+    fragment ParcelFields on Parcel {
+  id
+  unitId
+  unitLabel
+  recipientName
+  recipientOnly
+  carrier
+  trackingCode
+  notes
+  storageLocation
+  pickupCode
+  status
+  receivedAt
+  receivedByName
+  closedAt
+  closedByName
+  closeReason
+  signerName
+  photoUrl
+}`) as unknown as TypedDocumentString<CancelParcelMutation, CancelParcelMutationVariables>;
+export const ParcelRecipientsDocument = new TypedDocumentString(`
+    query ParcelRecipients($search: String!) {
+  parcelRecipients(search: $search) {
+    userId
+    name
+    unitId
+    unitLabel
+  }
+}
+    `) as unknown as TypedDocumentString<ParcelRecipientsQuery, ParcelRecipientsQueryVariables>;
 export const CondominiumPixDocument = new TypedDocumentString(`
     query CondominiumPix {
   condominiumPix {

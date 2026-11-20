@@ -17,6 +17,7 @@ import {
   Link2,
   type LucideIcon,
   MapPin,
+  Package,
   Megaphone,
   PartyPopper,
   Receipt,
@@ -82,9 +83,9 @@ export function isActive(pathname: string, item: NavItem): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// One sidebar for everyone, by module: Início, then Reservas and Eventos
-// (each a folding group with the resident's pages and, for managers, the
-// management's), the Portaria, and Condomínio (the common administration:
+// One sidebar for everyone, by module: Início, then Reservas, Eventos and
+// Encomendas (each a folding group with the resident's pages and, for
+// staff, the management's), the Portaria, and Condomínio (the common administration:
 // residents, team, units, sign-ups…). Each person sees only what they can
 // open; a group left with one page shows as that page. Dora's own
 // administration is a group of the account menu.
@@ -175,6 +176,23 @@ export const SIDEBAR: SidebarEntry[] = [
         label: "Eventos",
         icon: PartyPopper,
         anyPermission: ["EVENTS_MANAGE", "PAYMENTS_MANAGE"],
+      },
+    ],
+  },
+  // Parcels: their own page (not inside the Portaria) for the gate and the
+  // administration: receive and hand over with a signature. The residents'
+  // page joins this group.
+  {
+    id: "parcels",
+    label: "Encomendas",
+    icon: Package,
+    module: "PARCELS",
+    items: [
+      {
+        href: "/encomendas",
+        label: "Encomendas",
+        icon: Package,
+        permission: "PARCELS_MANAGE",
       },
     ],
   },

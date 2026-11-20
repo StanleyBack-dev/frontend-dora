@@ -22,8 +22,9 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
-    // The gate reads invites' QR codes with the camera (this site only).
-    value: "camera=(self), microphone=(), geolocation=()",
+    // The gate reads invites' QR codes with the camera, and a parcel's
+    // pickup signature records the device's location (this site only).
+    value: "camera=(self), microphone=(), geolocation=(self)",
   },
   {
     key: "Strict-Transport-Security",
