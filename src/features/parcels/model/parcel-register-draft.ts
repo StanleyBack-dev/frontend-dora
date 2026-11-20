@@ -3,7 +3,9 @@
 // The "receive parcel" form is saved just before (in this tab only) so it
 // reopens with what was typed. Only the texts: the photo is picked again.
 
-const KEY = "dora:parcel-register-draft";
+// Same prefix as the other form drafts: cleared on logout and when the
+// condominium changes (shared/lib/form-draft).
+const KEY = "dora:draft:parcel-register";
 
 // What was stored when this page loaded (read once: a draft saved later, in
 // the same page, is not a reload to recover from).

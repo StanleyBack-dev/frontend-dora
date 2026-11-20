@@ -24,6 +24,7 @@ export { FilterResults } from "./components/FilterResults";
 export { FilterScope } from "./components/FilterScope";
 export { FilterPanel } from "./components/FilterPanel";
 export { ChoiceCards, type ChoiceOption } from "./components/ChoiceCards";
+export { DraftNotice } from "./components/DraftNotice";
 export { CollapsibleSection } from "./components/CollapsibleSection";
 export { FormActions } from "./components/FormActions";
 export { FormIssues } from "./components/FormIssues";

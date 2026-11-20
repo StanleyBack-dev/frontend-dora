@@ -1,3 +1,4 @@
+import { clearFormDrafts } from "@/shared/lib/form-draft";
 import { apiRequest } from "@/shared/lib/api-client";
 import type {
   AppModule,
@@ -11,11 +12,14 @@ import type {
 
 export const condominiumsClient = {
   /** null: leaves every condominium (platform view). */
-  switchTo: (condominiumId: string | null) =>
-    apiRequest<{ ok: true }>("/me/condominium", {
+  switchTo: (condominiumId: string | null) => {
+    // Drafts belong to the condominium being left.
+    clearFormDrafts();
+    return apiRequest<{ ok: true }>("/me/condominium", {
       method: "PUT",
       body: JSON.stringify({ condominiumId }),
-    }),
+    });
+  },
 
   create: (input: CondominiumInput) =>
     apiRequest<Condominium>("/platform/condominiums", {

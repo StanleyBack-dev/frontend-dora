@@ -18,6 +18,7 @@ import {
   Card,
   ChoiceCards,
   DataTable,
+  DraftNotice,
   Drawer,
   EmptyState,
   Field,
@@ -39,6 +40,8 @@ import { formatNumber, formatRelative } from "@/shared/lib/format";
 import { maskCnpj } from "@/shared/lib/masks";
 import { startNavigation } from "@/shared/lib/navigation-progress";
 import { BRAZILIAN_STATES } from "@/shared/lib/brazilian-states";
+import { sameShape } from "@/shared/lib/form-draft";
+import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
 
 const STATES = BRAZILIAN_STATES;
@@ -87,7 +90,18 @@ export function CondominiumsConsole({
   const router = useRouter();
   const { showError, showSuccess } = useToast();
   const [editing, setEditing] = useState<Editing | null>(null);
-  const [form, setForm] = useState<CondominiumInput>(EMPTY);
+  // Creating: a draft (kept when the drawer closes, back after a reload).
+  // Editing: the condominium's data, as always.
+  const creatingNow = editing?.mode === "create";
+  const createDraft = useFormDraft<CondominiumInput>(
+    "new-condominium",
+    EMPTY,
+    (raw) => sameShape(EMPTY, raw),
+    { open: creatingNow },
+  );
+  const [editForm, setEditForm] = useState<CondominiumInput>(EMPTY);
+  const form = creatingNow ? createDraft.value : editForm;
+  const setForm = creatingNow ? createDraft.set : setEditForm;
   const [toggling, setToggling] = useState<Condominium | null>(null);
   const [entering, setEntering] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -100,12 +114,17 @@ export function CondominiumsConsole({
   ) => setForm((current) => ({ ...current, [key]: value }));
 
   function openCreate() {
-    setForm(EMPTY);
     setEditing({ mode: "create" });
   }
 
+  // "Cancelar" (or saved): a new condominium's draft is forgotten.
+  function close() {
+    if (creatingNow) createDraft.discard();
+    setEditing(null);
+  }
+
   function openEdit(condominium: Condominium) {
-    setForm({
+    setEditForm({
       name: condominium.name,
       document: condominium.document ? maskCnpj(condominium.document) : "",
       city: condominium.city,
@@ -123,6 +142,7 @@ export function CondominiumsConsole({
       if (editing.mode === "create") {
         const created = await condominiumsClient.create(input);
         showSuccess(`${created.name} cadastrado.`);
+        createDraft.discard();
       } else {
         await condominiumsClient.update(editing.condominium.id, input);
         showSuccess("Dados salvos.");
@@ -333,11 +353,7 @@ export function CondominiumsConsole({
         busy={pending}
         footer={
           <>
-            <Button
-              variant="cancel"
-              onClick={() => setEditing(null)}
-              disabled={pending}
-            >
+            <Button variant="cancel" onClick={close} disabled={pending}>
               Cancelar
             </Button>
             <Button onClick={save} loading={pending} disabled={!complete}>
@@ -347,6 +363,9 @@ export function CondominiumsConsole({
         }
       >
         <div className="space-y-4">
+          {creating && createDraft.restored && (
+            <DraftNotice onDiscard={createDraft.discard} />
+          )}
           <Field
             label="Nome"
             required

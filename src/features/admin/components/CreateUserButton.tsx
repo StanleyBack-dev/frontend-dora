@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
-import { Button, Drawer } from "@/design-system";
+import { Button, DraftNotice, Drawer } from "@/design-system";
 import { adminClient } from "@/features/admin/api/admin.client";
 import { TemporaryAccessPanel } from "@/features/admin/components/TemporaryAccessPanel";
 import { UserFormFields } from "@/features/admin/components/UserFormFields";
@@ -16,6 +16,8 @@ import type {
 } from "@/shared/contracts/api";
 import type { Unit } from "@/shared/contracts/condominiums";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { sameShape } from "@/shared/lib/form-draft";
+import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
 
 export function CreateUserButton({
@@ -42,14 +44,36 @@ export function CreateUserButton({
     phone: "",
     birthDate: "",
   };
-  const [form, setForm] = useState<UserInput>(empty);
+  // A draft per page (residents or team): kept when the drawer closes.
+  const {
+    value: form,
+    set: setForm,
+    discard,
+    restored,
+  } = useFormDraft<UserInput>(
+    `create-user:${kind}`,
+    empty,
+    (raw) => sameShape(empty, raw),
+    { open },
+  );
   const [created, setCreated] = useState<TemporaryAccess | null>(null);
   const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
-  function close() {
+  // X, Esc or a tap outside: the drawer hides and what was typed stays.
+  function hide() {
     setOpen(false);
-    setForm(empty);
+    if (created) finish();
+  }
+
+  // "Cancelar": the form starts over.
+  function cancel() {
+    discard();
+    setOpen(false);
+  }
+
+  function finish() {
+    setOpen(false);
     setCreated(null);
   }
 
@@ -57,6 +81,7 @@ export function CreateUserButton({
     setPending(true);
     try {
       setCreated(await adminClient.createUser(form));
+      discard();
       router.refresh();
     } catch (cause) {
       showError(
@@ -81,7 +106,7 @@ export function CreateUserButton({
       </Button>
       <Drawer
         open={open}
-        onClose={close}
+        onClose={hide}
         title={
           created
             ? created.temporaryPassword
@@ -92,10 +117,10 @@ export function CreateUserButton({
         busy={pending}
         footer={
           created ? (
-            <Button onClick={close}>Concluir</Button>
+            <Button onClick={finish}>Concluir</Button>
           ) : (
             <>
-              <Button variant="cancel" onClick={close} disabled={pending}>
+              <Button variant="cancel" onClick={cancel} disabled={pending}>
                 Cancelar
               </Button>
               <Button onClick={submit} loading={pending} disabled={!complete}>
@@ -109,6 +134,7 @@ export function CreateUserButton({
           <TemporaryAccessPanel access={created} />
         ) : (
           <div className="space-y-4">
+            {restored && <DraftNotice onDiscard={discard} />}
             <UserFormFields
               value={form}
               onChange={setForm}

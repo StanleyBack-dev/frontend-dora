@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Clock, LifeBuoy, Send } from "lucide-react";
-import { Button, Field, Select, TextArea } from "@/design-system";
+import { Button, DraftNotice, Field, Select, TextArea } from "@/design-system";
 import { supportClient } from "@/features/support/api/support.client";
 import {
   SUPPORT_CATEGORIES,
@@ -12,6 +12,8 @@ import {
 } from "@/features/support/model/support-labels";
 import type { SupportCategory, SupportQuota } from "@/shared/contracts/support";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { sameShape } from "@/shared/lib/form-draft";
+import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
 
 const MESSAGE_MAX = 2000;
@@ -23,15 +25,39 @@ function formatRemaining(ms: number): string {
   return `${pad(Math.floor(total / 3600))}:${pad(Math.floor((total % 3600) / 60))}:${pad(total % 60)}`;
 }
 
+type SupportDraft = {
+  category: SupportCategory;
+  subject: string;
+  message: string;
+};
+
+const EMPTY_SUPPORT: SupportDraft = {
+  category: "DUVIDA",
+  subject: "",
+  message: "",
+};
+
 // "Falar com o suporte": category, subject and message, up to
 // three a day. With the day's requests used, a countdown to the next day
 // replaces the button (the API checks the limit again).
 export function SupportRequestForm({ quota }: { quota: SupportQuota }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
-  const [category, setCategory] = useState<SupportCategory>("DUVIDA");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
+  // A draft until sent (also while the day's limit is used up).
+  const draft = useFormDraft<SupportDraft>(
+    "support-request",
+    EMPTY_SUPPORT,
+    (raw) => sameShape(EMPTY_SUPPORT, raw),
+    { restoreOnMount: true },
+  );
+  const { category, subject, message } = draft.value;
+  const setField =
+    <K extends keyof SupportDraft>(key: K) =>
+    (value: SupportDraft[K]) =>
+      draft.set((current) => ({ ...current, [key]: value }));
+  const setCategory = setField("category");
+  const setSubject = setField("subject");
+  const setMessage = setField("message");
   const [pending, setPending] = useState(false);
   const blocked = quota.remaining === 0;
   const valid = subject.trim().length >= 3 && message.trim().length >= 10;
@@ -44,9 +70,7 @@ export function SupportRequestForm({ quota }: { quota: SupportQuota }) {
         `Solicitação ${protocolLabel(sent.protocol)} enviada.`,
         "O suporte foi avisado e a resposta chega aqui e no seu e-mail.",
       );
-      setSubject("");
-      setMessage("");
-      setCategory("DUVIDA");
+      draft.discard();
       router.refresh();
     } catch (cause) {
       showError(
@@ -84,6 +108,8 @@ export function SupportRequestForm({ quota }: { quota: SupportQuota }) {
           )}
         </p>
       </div>
+
+      {draft.restored && <DraftNotice onDiscard={draft.discard} />}
 
       {blocked && quota.nextAllowedAt && (
         <Cooldown until={quota.nextAllowedAt} onEnd={() => router.refresh()} />

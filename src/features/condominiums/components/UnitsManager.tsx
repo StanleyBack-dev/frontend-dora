@@ -15,6 +15,7 @@ import {
   Badge,
   Button,
   Card,
+  DraftNotice,
   Drawer,
   EmptyState,
   Field,
@@ -32,12 +33,18 @@ import type {
 } from "@/shared/contracts/condominiums";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { formatPhone } from "@/shared/lib/masks";
+import { sameShape } from "@/shared/lib/form-draft";
+import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
 
 type Editing = { mode: "create" } | { mode: "edit"; unit: Unit };
 
 const plural = (count: number, one: string, many: string) =>
   `${count} ${count === 1 ? one : many}`;
+
+type UnitsDraft = { street: string; block: string; numbers: string };
+
+const EMPTY_UNITS: UnitsDraft = { street: "", block: "", numbers: "" };
 
 // Blocks and units of the condominium (Gestão > Unidades): a page of units
 // as a folding list (closed, the unit and how many live there; open, the
@@ -68,23 +75,43 @@ export function UnitsManager({
   const { showError, showSuccess } = useToast();
   const [editing, setEditing] = useState<Editing | null>(null);
   const [removing, setRemoving] = useState<Unit | null>(null);
-  const [street, setStreet] = useState("");
-  const [block, setBlock] = useState("");
-  const [numbers, setNumbers] = useState("");
   const [pending, setPending] = useState(false);
+  // Creating: a draft (kept when the drawer closes, back after a reload).
+  // Editing: the unit's data, as always.
+  const creatingNow = editing?.mode === "create";
+  const createDraft = useFormDraft<UnitsDraft>(
+    house ? "new-houses" : "new-units",
+    EMPTY_UNITS,
+    (raw) => sameShape(EMPTY_UNITS, raw),
+    { open: creatingNow },
+  );
+  const [editFields, setEditFields] = useState<UnitsDraft>(EMPTY_UNITS);
+  const fields = creatingNow ? createDraft.value : editFields;
+  const setFields = creatingNow ? createDraft.set : setEditFields;
+  const { street, block, numbers } = fields;
+  const setField = (key: keyof UnitsDraft) => (value: string) =>
+    setFields((current) => ({ ...current, [key]: value }));
+  const setStreet = setField("street");
+  const setBlock = setField("block");
+  const setNumbers = setField("numbers");
 
   function openCreate() {
-    setStreet("");
-    setBlock("");
-    setNumbers("");
     setEditing({ mode: "create" });
   }
 
   function openEdit(unit: Unit) {
-    setStreet(unit.street);
-    setBlock(unit.block);
-    setNumbers(unit.number);
+    setEditFields({
+      street: unit.street,
+      block: unit.block,
+      numbers: unit.number,
+    });
     setEditing({ mode: "edit", unit });
+  }
+
+  // "Cancelar" (or saved): new units' draft is forgotten.
+  function close() {
+    if (creatingNow) createDraft.discard();
+    setEditing(null);
   }
 
   const fail = (cause: unknown, fallback: string) =>
@@ -103,6 +130,7 @@ export function UnitsManager({
         showSuccess(
           `${plural(created.length, "unidade criada", "unidades criadas")}.`,
         );
+        createDraft.discard();
       } else {
         await condominiumsClient.updateUnit(editing.unit.id, {
           street: house ? street : null,
@@ -198,11 +226,7 @@ export function UnitsManager({
         busy={pending}
         footer={
           <>
-            <Button
-              variant="cancel"
-              onClick={() => setEditing(null)}
-              disabled={pending}
-            >
+            <Button variant="cancel" onClick={close} disabled={pending}>
               Cancelar
             </Button>
             <Button
@@ -218,6 +242,9 @@ export function UnitsManager({
         }
       >
         <div className="space-y-4">
+          {creating && createDraft.restored && (
+            <DraftNotice onDiscard={createDraft.discard} />
+          )}
           {house && (
             <Field
               label="Rua"
