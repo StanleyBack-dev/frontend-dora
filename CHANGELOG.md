@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.16.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.15.0...v0.16.0) (2026-11-20)
+
+
+### Features
+
+* **parcels:** add parcels desk page with register and on-screen pickup ([ec653ca](https://github.com/StanleyBack-dev/frontend-dora/commit/ec653ca2b3d8d7c58adfa1aafd62ba985c562992))
+* **parcels:** add resident parcels page, pickup receipt and QR fallback ([24e8b50](https://github.com/StanleyBack-dev/frontend-dora/commit/24e8b5074c4e78dce14d804ea18aca3778557743))
+* **parcels:** authorize someone else to pick up a parcel ([7389ba2](https://github.com/StanleyBack-dev/frontend-dora/commit/7389ba253bfe772acbb8c6fefed4a6be4ce4e984))
+* **parcels:** authorize someone else to pick up a parcel ([2519f42](https://github.com/StanleyBack-dev/frontend-dora/commit/2519f4238facd8452346d8a97d7d98df63de03ac))
+* **parcels:** download the pickup receipt as a PDF ([0bfca22](https://github.com/StanleyBack-dev/frontend-dora/commit/0bfca2252d53a39b6af1ef9541e845daa48504a4))
+* **parcels:** download the pickup receipt as a PDF ([74a8d8b](https://github.com/StanleyBack-dev/frontend-dora/commit/74a8d8b5227fb9ba70e0f214a5a06f7f0066e6ee))
+* **parcels:** Encomendas module ([5209973](https://github.com/StanleyBack-dev/frontend-dora/commit/5209973c789963ca274a9e072c104fdf4bcbc3ce))
+* **parcels:** filter the desk list by recipient, carrier and tracking code ([fc17a94](https://github.com/StanleyBack-dev/frontend-dora/commit/fc17a9487dce6c920ff662cf1aa640563af4304c))
+* **parcels:** parcel indicators on the management and platform panels ([7adc606](https://github.com/StanleyBack-dev/frontend-dora/commit/7adc606e713d8e2795fe5d8f4de3eed59460d25d))
+* **parcels:** parcel indicators on the management and platform panels ([1121b43](https://github.com/StanleyBack-dev/frontend-dora/commit/1121b43030611e85c16f21aff1972434596ff29b))
+* **parcels:** parcels desk page, register drawer and on-screen pickup ([631cc48](https://github.com/StanleyBack-dev/frontend-dora/commit/631cc48423f3c4dd2c8023ba0cfe716d0da1d294))
+* **parcels:** perishable parcels in the register drawer, desk and resident pages ([32f14b0](https://github.com/StanleyBack-dev/frontend-dora/commit/32f14b015434c5d4106b41269c70317c8900cbe4))
+* **parcels:** register perishable parcels and show their deadline ([3b0794e](https://github.com/StanleyBack-dev/frontend-dora/commit/3b0794e5584f0b409b13a1b2985eedc03b5faeb4))
+* **parcels:** resident parcels page, pickup receipt and QR fallback ([735efa0](https://github.com/StanleyBack-dev/frontend-dora/commit/735efa0de2af2b6953f5f8d2551acd566547d93f))
+
 ## [0.15.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.14.0...v0.15.0) (2026-11-19)
 
 
