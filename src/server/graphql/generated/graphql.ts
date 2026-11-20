@@ -1867,6 +1867,13 @@ export type ParcelQueryVariables = Exact<{
 
 export type ParcelQuery = { parcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null, signature: { signerName: string, signerDocumentType: DocumentType | null, signerDocumentMasked: string | null, declaration: string, imageUrl: string, imageSha256: string, strokesSha256: string, signedAt: string, clientSignedAt: string | null, clientTimeZone: string | null, ipAddress: string | null, userAgent: string | null, device: string, locationStatus: SignatureLocationStatus, latitude: number | null, longitude: number | null, locationAccuracyMeters: number | null, collectedByName: string, collectedByRole: string, evidenceSha256: string, intact: boolean } | null } };
 
+export type ParcelReceiptPdfQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ParcelReceiptPdfQuery = { parcelReceiptPdf: { fileName: string, mimeType: string, base64Content: string } };
+
 export type CondominiumPixQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5479,6 +5486,15 @@ export const ParcelDocument = new TypedDocumentString(`
   signerName
   photoUrl
 }`) as unknown as TypedDocumentString<ParcelQuery, ParcelQueryVariables>;
+export const ParcelReceiptPdfDocument = new TypedDocumentString(`
+    query ParcelReceiptPdf($id: ID!) {
+  parcelReceiptPdf(id: $id) {
+    fileName
+    mimeType
+    base64Content
+  }
+}
+    `) as unknown as TypedDocumentString<ParcelReceiptPdfQuery, ParcelReceiptPdfQueryVariables>;
 export const CondominiumPixDocument = new TypedDocumentString(`
     query CondominiumPix {
   condominiumPix {

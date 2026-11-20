@@ -156,3 +156,13 @@ export const parcelDocument = graphql(`
     }
   }
 `);
+
+export const parcelReceiptPdfDocument = graphql(`
+  query ParcelReceiptPdf($id: ID!) {
+    parcelReceiptPdf(id: $id) {
+      fileName
+      mimeType
+      base64Content
+    }
+  }
+`);

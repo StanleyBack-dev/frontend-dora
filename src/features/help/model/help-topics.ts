@@ -450,7 +450,7 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Para retirar, abra “Aguardando retirada” e mostre o QR (ou diga o código) a quem for entregar. Quem retira confirma o nome e assina com o dedo na tela.",
         },
         {
-          text: "Em “Histórico”, toque em “Ver comprovante” para ver quem retirou, a assinatura, a data e hora, e as demais provas da retirada.",
+          text: "Em “Histórico”, toque em “Ver comprovante” para ver quem retirou, a assinatura, a data e hora, e as demais provas da retirada; “Baixar comprovante em PDF” gera o documento para guardar, imprimir ou enviar.",
         },
       ],
       rules: [
@@ -492,7 +492,7 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Para entregar, leia o QR do morador (ou digite o código) em “Entregar pelo código ou QR”, confira a encomenda, informe quem está retirando e peça a assinatura na tela.",
         },
         {
-          text: "Na lista, use os filtros por situação, unidade, destinatário, transportadora e código de rastreio. Nas encomendas retiradas, “Comprovante” mostra a assinatura e as provas.",
+          text: "Na lista, use os filtros por situação, unidade, destinatário, transportadora e código de rastreio. Nas encomendas retiradas, “Comprovante” mostra a assinatura e as provas, com o botão para baixar o PDF.",
         },
         {
           text: "Encomenda que volta ao remetente: “Devolver”. Registrada por engano: “Cancelar”. Os dois pedem um motivo e avisam o morador.",
