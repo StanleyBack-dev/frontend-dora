@@ -31,6 +31,12 @@ export function ParcelDetails({
     { label: "Rastreio", value: parcel.trackingCode },
     { label: "Onde está", value: parcel.storageLocation },
     {
+      label: "Perecível",
+      value: parcel.pickupDeadline
+        ? `Retirar até ${formatDateTime(parcel.pickupDeadline)}`
+        : null,
+    },
+    {
       label: "Recebida",
       value: `${formatDateTime(parcel.receivedAt)}${parcel.receivedByName ? ` por ${parcel.receivedByName}` : ""}`,
     },

@@ -17,6 +17,9 @@ export type Parcel = {
   recipientName: string | null;
   /** Registered for one resident by name: only they are told and see it. */
   recipientOnly: boolean;
+  /** Perishable: picked up by `pickupDeadline` (ISO). */
+  perishable: boolean;
+  pickupDeadline: string | null;
   carrier: string | null;
   trackingCode: string | null;
   notes: string | null;
@@ -52,6 +55,8 @@ export type ParcelFilter = {
   recipientName?: string;
   carrier?: string;
   trackingCode?: string;
+  /** Only the perishable ones. */
+  perishable?: boolean;
   /** ISO instants: received on or after / before. */
   from?: string;
   to?: string;
@@ -62,6 +67,9 @@ export type ParcelOverview = {
   byStatus: { status: ParcelStatus; count: number }[];
   /** Waiting for pickup longer than the reminder (3 days). */
   waitingLong: number;
+  /** Perishable parcels waiting, and those past their deadline. */
+  perishableWaiting: number;
+  perishableOverdue: number;
   units: { id: string; label: string }[];
   /** The values used, for the filter lists (most recent first). */
   recipientNames: string[];
@@ -80,6 +88,9 @@ export type RegisterParcelInput = {
   storageLocation?: string | null;
   /** Base64 (no data: prefix). */
   photo?: string | null;
+  /** Food, medicine, flowers…: picked up within `perishableHours`. */
+  perishable?: boolean | null;
+  perishableHours?: number | null;
 };
 
 /** One point of a drawn signature: x, y, ms since the start, pressure. */

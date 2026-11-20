@@ -1,13 +1,21 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import { Camera, ImagePlus, PackagePlus, Trash2 } from "lucide-react";
+import {
+  Camera,
+  ImagePlus,
+  PackagePlus,
+  Snowflake,
+  Trash2,
+} from "lucide-react";
 import {
   Button,
   Drawer,
   Field,
   FormSection,
+  cn,
   Combobox,
+  Select,
   TextArea,
 } from "@/design-system";
 import { parcelsClient } from "@/features/parcels/api/parcels.client";
@@ -16,6 +24,8 @@ import {
   COMMON_CARRIERS,
   COMMON_STORAGE_PLACES,
   formatParcelCode,
+  PERISHABLE_DEFAULT_HOURS,
+  PERISHABLE_HOURS,
 } from "@/features/parcels/model/parcel-labels";
 import {
   clearParcelDraft,
@@ -40,7 +50,10 @@ const asOptions = (values: readonly string[]) =>
 const PHOTO_MAX_BYTES = 1_000_000;
 
 /** The fields typed as text (the unit and the resident are picked). */
-type TextField = Exclude<keyof ParcelRegisterDraft, "unitId" | "recipient">;
+type TextField = Exclude<
+  keyof ParcelRegisterDraft,
+  "unitId" | "recipient" | "perishable" | "perishableHours"
+>;
 
 const EMPTY: ParcelRegisterDraft = {
   unitId: null,
@@ -50,6 +63,8 @@ const EMPTY: ParcelRegisterDraft = {
   trackingCode: "",
   storageLocation: "",
   notes: "",
+  perishable: false,
+  perishableHours: PERISHABLE_DEFAULT_HOURS,
 };
 
 // Registers a parcel that arrived (gate or administration): the unit (or
@@ -166,6 +181,8 @@ export function ParcelRegisterDrawer({
         storageLocation: form.storageLocation || null,
         notes: form.notes || null,
         photo: photo?.base64 ?? null,
+        perishable: form.perishable,
+        perishableHours: form.perishable ? form.perishableHours : null,
       });
       showSuccess(
         `Encomenda registrada: código ${formatParcelCode(parcel.pickupCode)}`,
@@ -276,6 +293,55 @@ export function ParcelRegisterDrawer({
             value={form.storageLocation || null}
             onSelect={(value) => set("storageLocation")(value ?? "")}
           />
+          <div
+            className={cn(
+              "rounded-xl border p-3 transition-colors",
+              form.perishable
+                ? "border-warning-border bg-warning-soft"
+                : "border-border",
+            )}
+          >
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                className="mt-0.5 size-4 accent-[var(--accent)]"
+                checked={form.perishable}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    perishable: event.target.checked,
+                  }))
+                }
+              />
+              <span>
+                <span className="flex items-center gap-1.5 text-sm font-semibold text-fg">
+                  <Snowflake aria-hidden className="size-4 text-info" />
+                  Perecível
+                </span>
+                <span className="block text-[13px] text-muted">
+                  Alimento, remédio, flores… O morador recebe o prazo e é
+                  lembrado a cada 2 horas até retirar.
+                </span>
+              </span>
+            </label>
+            {form.perishable && (
+              <Select
+                label="Retirar em até"
+                className="mt-3"
+                value={String(form.perishableHours)}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    perishableHours: Number(event.target.value),
+                  }))
+                }
+                options={PERISHABLE_HOURS.map((hours) => ({
+                  value: String(hours),
+                  label: `${hours} horas`,
+                }))}
+              />
+            )}
+          </div>
           <TextArea
             label="Observação"
             maxLength={300}

@@ -1,4 +1,4 @@
-import { Clock, Package, PackageCheck, Undo2 } from "lucide-react";
+import { Clock, Package, PackageCheck, Snowflake, Undo2 } from "lucide-react";
 import { StatCard, StatGrid } from "@/design-system";
 import type { ParcelOverview, ParcelStatus } from "@/shared/contracts/parcels";
 
@@ -22,6 +22,19 @@ export function ParcelsSummary({ overview }: { overview: ParcelOverview }) {
         icon={<Clock className="size-4" />}
         tone={overview.waitingLong > 0 ? "danger" : "neutral"}
       />
+      {overview.perishableWaiting > 0 && (
+        <StatCard
+          label="Perecíveis aguardando"
+          value={String(overview.perishableWaiting)}
+          hint={
+            overview.perishableOverdue > 0
+              ? `${overview.perishableOverdue} com o prazo vencido`
+              : "Todas dentro do prazo."
+          }
+          icon={<Snowflake className="size-4" />}
+          tone={overview.perishableOverdue > 0 ? "danger" : "info"}
+        />
+      )}
       <StatCard
         label="Retiradas"
         value={String(count("PICKED_UP"))}

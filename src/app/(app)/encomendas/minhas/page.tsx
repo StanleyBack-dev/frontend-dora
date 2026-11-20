@@ -12,6 +12,7 @@ import { NoCondominium } from "@/features/condominiums/components/NoCondominium"
 import { MyParcelCard } from "@/features/parcels/components/MyParcelCard";
 import { parcelQrSvg } from "@/features/parcels/model/parcel-qr";
 import { authed, getSessionUser } from "@/server/auth/current-user";
+import { requestTime } from "@/server/request-time";
 import { parcelsService } from "@/server/services/parcels.service";
 import type { ParcelStatus } from "@/shared/contracts/parcels";
 import {
@@ -55,6 +56,8 @@ export default async function MyParcelsPage({
       parcel.status === "RECEIVED" ? parcelQrSvg(parcel.pickupCode) : null,
     ),
   );
+  // One clock for the whole list (this request's time).
+  const now = (await requestTime()).getTime();
   const href = (target: number) =>
     `${BASE}?${history ? "periodo=historico&" : ""}page=${target}`;
 
@@ -99,6 +102,7 @@ export default async function MyParcelsPage({
                 key={parcel.id}
                 parcel={parcel}
                 qrSvg={qrs[index]}
+                now={now}
               />
             ))}
           </div>

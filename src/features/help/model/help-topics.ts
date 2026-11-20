@@ -461,6 +461,9 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Encomenda registrada para a unidade: todos os moradores da unidade são avisados e a veem. Registrada no seu nome: só você é avisado e a vê (bom para uma surpresa ou um presente).",
         },
         {
+          text: "Encomenda perecível (alimento, remédio, flores…) vem com um prazo de retirada: você é lembrado a cada 2 horas até retirar e avisado se o prazo vencer.",
+        },
+        {
           text: "O comprovante mostra “Registro íntegro” quando as provas guardadas conferem com o código de verificação gravado na assinatura.",
         },
       ],
@@ -496,6 +499,9 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
       ],
       rules: [
+        {
+          text: "Perecível (alimento, remédio, flores…): marque “Perecível” e escolha o prazo (2 a 48 horas). O morador recebe o prazo e é lembrado a cada 2 horas; quando vence, ele é avisado e a encomenda aparece com “Prazo vencido” no topo da lista. A situação “Perecíveis aguardando” mostra só elas.",
+        },
         {
           text: "Escolhida pela unidade, todos os moradores dela são avisados; escolhida pelo morador, só ele é avisado e vê a encomenda.",
         },

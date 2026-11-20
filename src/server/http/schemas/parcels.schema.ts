@@ -27,6 +27,8 @@ export const registerParcelSchema = z.object({
   notes: optionalText(300),
   storageLocation: optionalText(60),
   photo: base64(1_400_000).nullish(),
+  perishable: z.boolean().nullish(),
+  perishableHours: z.number().int().min(1).max(72).nullish(),
 });
 
 export const closeParcelSchema = z.object({

@@ -84,3 +84,26 @@ export const COLLECTED_BY_ROLE_LABELS: Record<string, string> = {
   ADMIN: "Administração",
   ADMIN_MASTER: "Administração",
 };
+
+/** Perishable: the deadlines offered (hours after arrival; the API checks). */
+export const PERISHABLE_HOURS = [2, 4, 8, 12, 24, 48] as const;
+export const PERISHABLE_DEFAULT_HOURS = 4;
+
+/** "Perecível · retire até 20/11 às 14:30" (null: not perishable). */
+export function perishableNote(
+  parcel: Pick<Parcel, "perishable" | "pickupDeadline" | "status">,
+  now: number,
+): { text: string; when: string; overdue: boolean } | null {
+  if (!parcel.perishable || !parcel.pickupDeadline) return null;
+  const overdue =
+    parcel.status === "RECEIVED" &&
+    new Date(parcel.pickupDeadline).getTime() <= now;
+  const when = formatDateTime(parcel.pickupDeadline);
+  return {
+    overdue,
+    when,
+    text: overdue
+      ? `Perecível · prazo venceu em ${when}`
+      : `Perecível · retirar até ${when}`,
+  };
+}
