@@ -450,6 +450,9 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Para retirar, abra “Aguardando retirada” e mostre o QR (ou diga o código) a quem for entregar. Quem retira confirma o nome e assina com o dedo na tela.",
         },
         {
+          text: "Não vai retirar? Em “Aguardando retirada”, toque em “Autorizar outra pessoa”, informe o nome (e, se quiser, o CPF ou RG) e use “Enviar o código” para mandar o código pelo WhatsApp. A portaria vê quem foi autorizado ao ler o código; você pode trocar ou remover a autorização enquanto a encomenda aguarda.",
+        },
+        {
           text: "Em “Histórico”, toque em “Ver comprovante” para ver quem retirou, a assinatura, a data e hora, e as demais provas da retirada; “Baixar comprovante em PDF” gera o documento para guardar, imprimir ou enviar.",
         },
       ],
@@ -468,6 +471,9 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
       ],
       notices: [
+        {
+          text: "Se outro morador autorizar alguém a retirar uma encomenda que você também vê, você é avisado.",
+        },
         {
           text: "Você é avisado quando a encomenda chega, se ela continuar esperando por 3 dias, quando é retirada (com o nome de quem retirou) e se for devolvida ou cancelada.",
         },
@@ -501,6 +507,9 @@ export const HELP_TOPICS: HelpTopic[] = [
       rules: [
         {
           text: "Perecível (alimento, remédio, flores…): marque “Perecível” e escolha o prazo (2 a 48 horas). O morador recebe o prazo e é lembrado a cada 2 horas; quando vence, ele é avisado e a encomenda aparece com “Prazo vencido” no topo da lista. A situação “Perecíveis aguardando” mostra só elas.",
+        },
+        {
+          text: "Retirada por terceiro: quando o morador autoriza outra pessoa, ela aparece como opção em “Quem está retirando” ao ler o código; escolhida, o nome e o documento são preenchidos sozinhos. Para outra pessoa, toque em “Outra pessoa” e preencha como sempre. Confira o documento antes de entregar. A autorização fica no comprovante.",
         },
         {
           text: "Escolhida pela unidade, todos os moradores dela são avisados; escolhida pelo morador, só ele é avisado e vê a encomenda.",

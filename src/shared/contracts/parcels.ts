@@ -17,6 +17,12 @@ export type Parcel = {
   recipientName: string | null;
   /** Registered for one resident by name: only they are told and see it. */
   recipientOnly: boolean;
+  /** Someone a resident authorized to pick it up (null: none). */
+  authorizedName: string | null;
+  /** "CPF ***.456.789-**" */
+  authorizedDocumentMasked: string | null;
+  authorizedByName: string | null;
+  authorizedAt: string | null;
   /** Perishable: picked up by `pickupDeadline` (ISO). */
   perishable: boolean;
   pickupDeadline: string | null;
@@ -44,6 +50,9 @@ export type Parcel = {
 export type ParcelToHandOver = Parcel & {
   /** The text after "Eu, <nome>, " (null: no longer waiting). */
   pickupDeclaration: string | null;
+  /** The authorized person's full document (desk only), to fill the form. */
+  authorizedDocumentType: "CPF" | "RG" | null;
+  authorizedDocument: string | null;
 };
 
 /** Filters of the condominium's parcels (absent: any). */
@@ -182,3 +191,10 @@ export type ParcelReceipt = {
 
 /** A parcel with its pickup receipt (null until picked up). */
 export type ParcelWithReceipt = Parcel & { signature: ParcelReceipt | null };
+
+/** Someone else allowed to pick up a parcel. */
+export type AuthorizePickupInput = {
+  name: string;
+  documentType?: "CPF" | "RG" | null;
+  document?: string | null;
+};

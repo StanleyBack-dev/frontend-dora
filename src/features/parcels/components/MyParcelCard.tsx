@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRight, Lock, Package } from "lucide-react";
 import { Alert, Badge, Card } from "@/design-system";
 import { InviteCode } from "@/features/bookings/components/InviteCode";
+import { ParcelPickupAuthorization } from "@/features/parcels/components/ParcelPickupAuthorization";
 import {
   formatParcelCode,
   PARCEL_STATUS_LABELS,
@@ -101,6 +102,8 @@ export function MyParcelCard({
           </p>
         </div>
       )}
+
+      {waiting && <ParcelPickupAuthorization parcel={parcel} />}
 
       <dl className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
         {facts.map((fact) => (

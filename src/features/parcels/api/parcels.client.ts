@@ -1,5 +1,6 @@
 import { apiDownload, apiRequest } from "@/shared/lib/api-client";
 import type {
+  AuthorizePickupInput,
   Parcel,
   ParcelRecipient,
   ParcelToHandOver,
@@ -32,6 +33,15 @@ export const parcelsClient = {
       method: "POST",
       body: JSON.stringify(input),
     }),
+
+  authorize: (id: string, input: AuthorizePickupInput) =>
+    apiRequest<Parcel>(`/parcels/${id}/authorization`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+
+  revokeAuthorization: (id: string) =>
+    apiRequest<Parcel>(`/parcels/${id}/authorization`, { method: "DELETE" }),
 
   returnToSender: (id: string, reason: string) =>
     apiRequest<Parcel>(`/parcels/${id}/return`, {

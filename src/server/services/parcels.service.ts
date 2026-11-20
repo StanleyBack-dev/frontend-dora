@@ -7,14 +7,17 @@ import {
   parcelRecipientsDocument,
   parcelsDocument,
   pickUpParcelDocument,
+  authorizeParcelPickupDocument,
   myParcelsDocument,
   parcelDocument,
   parcelReceiptPdfDocument,
   registerParcelDocument,
+  revokeParcelPickupAuthorizationDocument,
   returnParcelDocument,
 } from "@/server/graphql/operations/parcels.operations";
 import type { Paginated } from "@/shared/contracts/api";
 import type {
+  AuthorizePickupInput,
   Parcel,
   ParcelFilter,
   ParcelOverview,
@@ -120,6 +123,27 @@ export const parcelsService = {
       variables: { input },
     });
     return pickUpParcel;
+  },
+
+  /** Lets someone else pick it up (replaces any previous one). */
+  async authorize(
+    token: string,
+    parcelId: string,
+    input: AuthorizePickupInput,
+  ): Promise<Parcel> {
+    const { authorizeParcelPickup } = await backendGraphql(
+      authorizeParcelPickupDocument,
+      { token, variables: { input: { parcelId, ...input } } },
+    );
+    return authorizeParcelPickup;
+  },
+
+  async revokeAuthorization(token: string, parcelId: string): Promise<Parcel> {
+    const { revokeParcelPickupAuthorization } = await backendGraphql(
+      revokeParcelPickupAuthorizationDocument,
+      { token, variables: { parcelId } },
+    );
+    return revokeParcelPickupAuthorization;
   },
 
   async returnToSender(

@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { MapPin, PackageCheck } from "lucide-react";
+import { MapPin, PackageCheck, UserCheck, UserRound } from "lucide-react";
 import {
   Alert,
   Button,
+  ChoiceCards,
   Drawer,
   Field,
   FormSection,
@@ -39,6 +40,8 @@ import { useToast } from "@/shared/toast/useToast";
 
 const FORM_ID = "parcel-pickup-form";
 
+type Who = "authorized" | "other";
+
 const errorMessage = (cause: unknown, fallback: string) =>
   cause instanceof ApiClientError ? cause.message : fallback;
 
@@ -63,12 +66,34 @@ export function ParcelPickupDrawer({
   const [name, setName] = useState("");
   const [documentType, setDocumentType] = useState<DocumentType>("CPF");
   const [document, setDocument] = useState("");
+  // Someone the resident authorized, or anyone else (a resident).
+  const [who, setWho] = useState<Who>("other");
   const [signature, setSignature] = useState<SignatureCapture | null>(null);
   const [location, setLocation] = useState<SignatureLocation | null>(null);
   const [sending, setSending] = useState(false);
   const locating = useRef<Promise<SignatureLocation> | null>(null);
 
   const open = code !== null;
+
+  /** The authorized person's name and document in the fields. */
+  function fillAuthorized(found: ParcelToHandOver) {
+    setWho("authorized");
+    setName(found.authorizedName ?? "");
+    setDocumentType(found.authorizedDocumentType ?? "CPF");
+    setDocument(found.authorizedDocument ?? "");
+  }
+
+  function choose(next: Who) {
+    if (!parcel || next === who) return;
+    if (next === "authorized") {
+      fillAuthorized(parcel);
+      return;
+    }
+    setWho("other");
+    setName(parcel.recipientName ?? "");
+    setDocumentType("CPF");
+    setDocument("");
+  }
 
   // Callers key the drawer by the code: each code starts from a blank
   // state, and this only loads it.
@@ -84,7 +109,11 @@ export function ParcelPickupDrawer({
       .then((found) => {
         if (cancelled) return;
         setParcel(found);
-        setName(found.recipientName ?? "");
+        if (found.authorizedName) {
+          fillAuthorized(found);
+        } else {
+          setName(found.recipientName ?? "");
+        }
       })
       .catch((cause: unknown) => {
         if (!cancelled) {
@@ -185,6 +214,38 @@ export function ParcelPickupDrawer({
           ) : (
             <>
               <FormSection title="Quem está retirando">
+                {/* A person the resident authorized: pick them and the
+                    fields fill in; otherwise, as always, typed here. */}
+                {parcel.authorizedName && (
+                  <>
+                    <ChoiceCards<Who>
+                      name="parcel-pickup-who"
+                      legend="Quem está retirando"
+                      value={who}
+                      onChange={choose}
+                      options={[
+                        {
+                          value: "authorized",
+                          title: parcel.authorizedName,
+                          hint: `Autorizada${parcel.authorizedByName ? ` por ${parcel.authorizedByName}` : " pelo morador"}${parcel.authorizedDocumentMasked ? ` · ${parcel.authorizedDocumentMasked}` : ""}`,
+                          icon: <UserCheck />,
+                        },
+                        {
+                          value: "other",
+                          title: "Outra pessoa",
+                          hint: "O morador ou alguém da unidade",
+                          icon: <UserRound />,
+                        },
+                      ]}
+                    />
+                    {who === "authorized" && (
+                      <Alert tone="info">
+                        Confira o documento da pessoa autorizada antes de
+                        entregar.
+                      </Alert>
+                    )}
+                  </>
+                )}
                 <div className="grid gap-3 sm:grid-cols-[1fr_auto_1fr]">
                   <Field
                     label="Nome completo"

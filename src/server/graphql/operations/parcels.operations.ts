@@ -14,6 +14,10 @@ export const parcelFieldsFragment = graphql(`
     pickupCode
     perishable
     pickupDeadline
+    authorizedName
+    authorizedDocumentMasked
+    authorizedByName
+    authorizedAt
     status
     receivedAt
     receivedByName
@@ -65,6 +69,8 @@ export const parcelByCodeDocument = graphql(`
     parcelByCode(code: $code) {
       ...ParcelFields
       pickupDeclaration
+      authorizedDocumentType
+      authorizedDocument
     }
   }
 `);
@@ -163,6 +169,22 @@ export const parcelReceiptPdfDocument = graphql(`
       fileName
       mimeType
       base64Content
+    }
+  }
+`);
+
+export const authorizeParcelPickupDocument = graphql(`
+  mutation AuthorizeParcelPickup($input: AuthorizeParcelPickupInput!) {
+    authorizeParcelPickup(input: $input) {
+      ...ParcelFields
+    }
+  }
+`);
+
+export const revokeParcelPickupAuthorizationDocument = graphql(`
+  mutation RevokeParcelPickupAuthorization($parcelId: ID!) {
+    revokeParcelPickupAuthorization(parcelId: $parcelId) {
+      ...ParcelFields
     }
   }
 `);
