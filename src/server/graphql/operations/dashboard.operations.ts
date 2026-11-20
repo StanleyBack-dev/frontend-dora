@@ -11,6 +11,18 @@ export const dashboardDocument = graphql(`
       bookingsToday
       openSupportRequests
       failedNotifications
+      parcels {
+        waiting
+        stuck
+        perishableOverdue
+        pickedUpLast30Days
+        averagePickupHours
+        monthly {
+          month
+          received
+          pickedUp
+        }
+      }
     }
   }
 `);

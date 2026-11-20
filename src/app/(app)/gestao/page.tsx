@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/design-system";
 import { DashboardPanel } from "@/features/dashboard/components/DashboardPanel";
+import { ParcelIndicatorsPanel } from "@/features/dashboard/components/ParcelIndicatorsPanel";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { dashboardService } from "@/server/services/dashboard.service";
 import { can } from "@/shared/lib/access";
@@ -31,6 +32,12 @@ export default async function ManagementPage() {
           canManageSupport={can(user, "SUPPORT_MANAGE")}
           canManageBookings={can(user, "BOOKINGS_MANAGE")}
           canManageSpaces={can(user, "SPACES_MANAGE")}
+        />
+      )}
+      {dashboard?.parcels && (
+        <ParcelIndicatorsPanel
+          indicators={dashboard.parcels}
+          canOpenDesk={can(user, "PARCELS_MANAGE")}
         />
       )}
     </div>

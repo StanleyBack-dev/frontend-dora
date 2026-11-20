@@ -17,6 +17,7 @@ import { PlatformShortcuts } from "@/features/platform/components/PlatformShortc
 import { BookingsSection } from "@/features/platform-metrics/components/BookingsSection";
 import { EngagementSection } from "@/features/platform-metrics/components/EngagementSection";
 import { HealthSection } from "@/features/platform-metrics/components/HealthSection";
+import { ParcelsSection } from "@/features/platform-metrics/components/ParcelsSection";
 import { SpacesSection } from "@/features/platform-metrics/components/SpacesSection";
 import {
   PERIOD_PRESETS,
@@ -39,8 +40,9 @@ import {
 
 export const metadata: Metadata = { title: "Administração" };
 
-// The platform administrator's panel: bookings, use of the spaces, residents
-// and what needs attention, across every condominium or one of them.
+// The platform administrator's panel: bookings, parcels, use of the spaces,
+// residents and what needs attention, across every condominium or one of
+// them.
 export default async function PlatformPanelPage({
   searchParams,
 }: {
@@ -176,6 +178,10 @@ export default async function PlatformPanelPage({
             />
             <BookingsSection
               bookings={metrics.bookings}
+              allCondominiums={allCondominiums}
+            />
+            <ParcelsSection
+              parcels={metrics.parcels}
               allCondominiums={allCondominiums}
             />
             <SpacesSection
