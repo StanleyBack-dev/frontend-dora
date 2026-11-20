@@ -559,6 +559,7 @@ export type Permission =
   | 'PARCELS_MANAGE'
   | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
+  | 'RESIDENTS_READ'
   | 'SPACES_MANAGE'
   | 'SUPPORTERS_MANAGE'
   | 'SUPPORT_MANAGE'
@@ -673,6 +674,14 @@ export type RegisterParcelInput = {
 export type ResetPasswordInput = {
   newPassword: string;
   resetToken: string;
+};
+
+/** Filtros da consulta de moradores. */
+export type ResidentsFilterInput = {
+  /** A unidade. */
+  unitId?: string | number | null | undefined;
+  /** Um morador (pelo nome). */
+  userId?: string | number | null | undefined;
 };
 
 export type SetBookingFeesBilledInput = {
@@ -1937,6 +1946,19 @@ export type CondominiumMembersQueryVariables = Exact<{
 
 
 export type CondominiumMembersQuery = { condominiumMembers: Array<{ userId: string, name: string, email: string, username: string, phone: string | null, role: UserGroup, kind: MemberKind, active: boolean, unitLabel: string | null, jobTitle: string | null, lastLoginAt: string | null, since: string }> };
+
+export type ResidentsDirectoryQueryVariables = Exact<{
+  filter?: ResidentsFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type ResidentsDirectoryQuery = { residentsDirectory: { total: number, page: number, limit: number, totalPages: number, items: Array<{ userId: string, name: string, photoUrl: string | null, unitId: string | null, unitLabel: string | null, unitComplement: string | null, phone: string | null, dependents: Array<{ id: string, name: string, relationship: DependentRelationship }> }> } };
+
+export type ResidentNamesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ResidentNamesQuery = { residentNames: Array<{ id: string, name: string }> };
 
 export type SpaceFieldsFragment = { id: string, name: string, kind: SpaceKind, description: string | null, capacity: number | null, usageRules: string | null, active: boolean, createdAt: string, updatedAt: string, photos: Array<{ id: string, url: string }>, rules: { slotMinutes: number, minAdvanceHours: number, maxAdvanceDays: number, requiresApproval: boolean, cancelUntilHours: number, feeCents: number | null, recurringAllowed: boolean, openingHours: Array<{ weekday: number, opensAt: string, closesAt: string }>, unitLimit: { count: number, period: LimitPeriod } | null, guests: { allowed: boolean, max: number | null, documentRequired: boolean } } };
 
@@ -5795,6 +5817,38 @@ export const CondominiumMembersDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<CondominiumMembersQuery, CondominiumMembersQueryVariables>;
+export const ResidentsDirectoryDocument = new TypedDocumentString(`
+    query ResidentsDirectory($filter: ResidentsFilterInput, $page: PageInput) {
+  residentsDirectory(filter: $filter, page: $page) {
+    items {
+      userId
+      name
+      photoUrl
+      unitId
+      unitLabel
+      unitComplement
+      phone
+      dependents {
+        id
+        name
+        relationship
+      }
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    `) as unknown as TypedDocumentString<ResidentsDirectoryQuery, ResidentsDirectoryQueryVariables>;
+export const ResidentNamesDocument = new TypedDocumentString(`
+    query ResidentNames {
+  residentNames {
+    id
+    name
+  }
+}
+    `) as unknown as TypedDocumentString<ResidentNamesQuery, ResidentNamesQueryVariables>;
 export const SpacesDocument = new TypedDocumentString(`
     query Spaces($includeInactive: Boolean!) {
   spaces(includeInactive: $includeInactive) {

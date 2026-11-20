@@ -65,7 +65,8 @@ const normalize = (value: string) =>
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
-    .replace(/s+/g, " ")
+    // Runs of spaces become one (\s: a stray "s" used to turn into a space).
+    .replace(/\s+/g, " ")
     .trim();
 
 // Searchable select following the WAI-ARIA combobox pattern: type to narrow

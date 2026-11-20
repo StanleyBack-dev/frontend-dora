@@ -57,6 +57,11 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Liberar a entrada de convidados (portaria)",
     area: "Reservas",
   },
+  RESIDENTS_READ: {
+    label:
+      "Consultar moradores (somente leitura: unidade, telefone e dependentes)",
+    area: "Gestão",
+  },
   PARCELS_MANAGE: {
     label: "Registrar, entregar (com assinatura) e devolver encomendas",
     area: "Gestão",

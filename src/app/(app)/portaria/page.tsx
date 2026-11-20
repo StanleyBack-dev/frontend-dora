@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Maximize2, Package } from "lucide-react";
+import { Maximize2, Package, UsersRound } from "lucide-react";
 import { buttonClasses, PageHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { NoCondominium } from "@/features/condominiums/components/NoCondominium";
@@ -38,6 +38,12 @@ export default async function GatePage() {
               <Link href="/encomendas" className={buttonClasses("secondary")}>
                 <Package aria-hidden className="size-4" />
                 Encomendas
+              </Link>
+            )}
+            {can(user, "RESIDENTS_READ") && (
+              <Link href="/moradores" className={buttonClasses("secondary")}>
+                <UsersRound aria-hidden className="size-4" />
+                Moradores
               </Link>
             )}
             <Link href="/guarita" className={buttonClasses("secondary")}>
