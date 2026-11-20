@@ -4,20 +4,16 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ScanLine } from "lucide-react";
 import { Alert, Button, Modal } from "@/design-system";
 import { codeFromScan } from "@/features/bookings/model/invite-qr";
+import {
+  canOpenCamera,
+  createQrReader,
+  type QrReader,
+} from "@/features/bookings/model/qr-reader";
 
-// The browser's own QR reader (Chrome on Android, Edge…). Where it doesn't
-// exist (Safari on iPhone, Firefox) the button is not shown and the gate
-// types the code.
-type Detector = {
-  detect(source: HTMLVideoElement): Promise<{ rawValue: string }[]>;
-};
-type DetectorClass = new (options: { formats: string[] }) => Detector;
-
-const detectorClass = (): DetectorClass | null =>
-  (globalThis as { BarcodeDetector?: DetectorClass }).BarcodeDetector ?? null;
-
-const supported = () =>
-  detectorClass() !== null && Boolean(navigator.mediaDevices?.getUserMedia);
+// Reads a QR code with the phone's camera (invites, event tickets, parcel
+// pickup codes) on any browser that can open the camera: its own reader or
+// jsQR (Safari on iPhone, Firefox). Without a camera the button is not
+// shown and the code is typed.
 
 /** Checks a few times per second, not on every frame. */
 const SCAN_EVERY_MS = 250;
@@ -32,7 +28,7 @@ export function QrScanButton({
 }) {
   const canScan = useSyncExternalStore(
     () => () => {},
-    supported,
+    canOpenCamera,
     () => false,
   );
   const [open, setOpen] = useState(false);
@@ -41,12 +37,10 @@ export function QrScanButton({
 
   useEffect(() => {
     if (!open) return;
-    const Detector = detectorClass();
-    if (!Detector) return;
     let stream: MediaStream | null = null;
     let timer: ReturnType<typeof setTimeout> | null = null;
     let stopped = false;
-    const detector = new Detector({ formats: ["qr_code"] });
+    let read: QrReader | null = null;
 
     const stop = () => {
       stopped = true;
@@ -55,13 +49,13 @@ export function QrScanButton({
     };
 
     const scan = async () => {
-      if (stopped || !video.current) return;
+      if (stopped || !video.current || !read) return;
       try {
-        const [found] = await detector.detect(video.current);
-        if (found?.rawValue) {
+        const text = await read(video.current);
+        if (text) {
           stop();
           setOpen(false);
-          onCode(codeFromScan(found.rawValue));
+          onCode(codeFromScan(text));
           return;
         }
       } catch {
@@ -78,6 +72,7 @@ export function QrScanButton({
           return;
         }
         stream = media;
+        read = await createQrReader();
         if (video.current) {
           video.current.srcObject = media;
           await video.current.play();
@@ -107,17 +102,13 @@ export function QrScanButton({
       >
         Ler QR code
       </Button>
-      <Modal
-        open={open}
-        onClose={() => setOpen(false)}
-        title="Ler o QR code do convite"
-      >
+      <Modal open={open} onClose={() => setOpen(false)} title="Ler o QR code">
         <div className="space-y-3">
           {error ? (
             <Alert tone="warning">{error}</Alert>
           ) : (
             <p className="text-sm text-muted">
-              Aponte a câmera para o QR code no celular do convidado.
+              Aponte a câmera para o QR code no celular da pessoa.
             </p>
           )}
           <video

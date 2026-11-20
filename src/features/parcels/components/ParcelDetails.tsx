@@ -11,13 +11,20 @@ import { formatDateTime } from "@/shared/lib/datetime";
 
 // A parcel at a glance: its photo, the unit, who it is for and where it is
 // kept, so whoever hands it over finds the right package.
-export function ParcelDetails({ parcel }: { parcel: Parcel }) {
+export function ParcelDetails({
+  parcel,
+  showCode = true,
+}: {
+  parcel: Parcel;
+  /** The pickup code (hidden from the desk's list of waiting parcels). */
+  showCode?: boolean;
+}) {
   const facts = [
     { label: "Unidade", value: parcel.unitLabel ?? "Unidade removida" },
     {
       label: "Destinatário",
       value: parcel.recipientOnly
-        ? `${parcel.recipientName ?? "Morador escolhido"} (só ele foi avisado)`
+        ? `${parcel.recipientName ?? "Morador escolhido"} (só para este morador)`
         : parcel.recipientName,
     },
     { label: "Transportadora", value: parcel.carrier },
@@ -46,9 +53,11 @@ export function ParcelDetails({ parcel }: { parcel: Parcel }) {
       )}
       <div className="min-w-0 flex-1 space-y-3">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-mono text-lg font-semibold tracking-wider text-fg">
-            {formatParcelCode(parcel.pickupCode)}
-          </span>
+          {showCode && (
+            <span className="font-mono text-lg font-semibold tracking-wider text-fg">
+              {formatParcelCode(parcel.pickupCode)}
+            </span>
+          )}
           <Badge tone={PARCEL_STATUS_TONES[parcel.status]}>
             {PARCEL_STATUS_LABELS[parcel.status]}
           </Badge>

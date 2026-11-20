@@ -1,9 +1,12 @@
 "use client";
 
-import { Package, Undo2, XCircle } from "lucide-react";
+import Link from "next/link";
+import { FileCheck2, Package, Undo2, XCircle } from "lucide-react";
 import {
   Badge,
   Button,
+  buttonClasses,
+  cn,
   DataTable,
   EmptyState,
   type DataTableColumn,
@@ -11,21 +14,13 @@ import {
 import {
   PARCEL_STATUS_LABELS,
   PARCEL_STATUS_TONES,
+  parcelOutcome,
   parcelSummary,
 } from "@/features/parcels/model/parcel-labels";
 import type { Parcel } from "@/shared/contracts/parcels";
 import { formatDateTime } from "@/shared/lib/datetime";
 
 /** What happened to a parcel that left: picked up, returned, cancelled. */
-function outcome(parcel: Parcel): string | null {
-  if (!parcel.closedAt) return null;
-  const when = formatDateTime(parcel.closedAt);
-  if (parcel.status === "PICKED_UP") {
-    return `Retirada por ${parcel.signerName ?? "—"} em ${when}${parcel.closedByName ? ` (entregue por ${parcel.closedByName})` : ""}`;
-  }
-  return `${PARCEL_STATUS_LABELS[parcel.status]} em ${when}${parcel.closeReason ? `: ${parcel.closeReason}` : ""}`;
-}
-
 // The condominium's parcels for the gate and the administration. The
 // pickup code is not listed: whoever picks up shows it (the QR, or typed).
 // A waiting parcel can be returned or cancelled from here.
@@ -137,7 +132,8 @@ export function ParcelsTable({
       key: "outcome",
       label: "Saída",
       desktop: "detail",
-      render: (parcel) => outcome(parcel) ?? "Ainda na guarda do condomínio",
+      render: (parcel) =>
+        parcelOutcome(parcel) ?? "Ainda na guarda do condomínio",
     },
     {
       key: "actions",
@@ -165,6 +161,14 @@ export function ParcelsTable({
               Cancelar
             </Button>
           </span>
+        ) : parcel.status === "PICKED_UP" ? (
+          <Link
+            href={`/encomendas/${parcel.id}`}
+            className={buttonClasses("ghost", "sm")}
+          >
+            <FileCheck2 aria-hidden className="mr-1.5 size-4" />
+            Comprovante
+          </Link>
         ) : null,
     },
   ];
@@ -175,27 +179,39 @@ export function ParcelsTable({
       columns={columns}
       getId={(parcel) => parcel.id}
       renderExpanded={(parcel) =>
-        parcel.status === "RECEIVED" && (
-          <div className="grid grid-cols-2 gap-2 border-t border-border bg-surface-muted/40 p-3">
-            <Button
-              size="sm"
-              variant="secondary"
-              className="w-full justify-center"
-              icon={<Undo2 className="size-4" />}
-              onClick={() => onReturn(parcel)}
+        parcel.status === "PICKED_UP" ? (
+          <div className="border-t border-border bg-surface-muted/40 p-3">
+            <Link
+              href={`/encomendas/${parcel.id}`}
+              className={cn(buttonClasses("secondary", "sm"), "w-full")}
             >
-              Devolver
-            </Button>
-            <Button
-              size="sm"
-              variant="danger"
-              className="w-full justify-center"
-              icon={<XCircle className="size-4" />}
-              onClick={() => onCancel(parcel)}
-            >
-              Cancelar
-            </Button>
+              <FileCheck2 aria-hidden className="mr-1.5 size-4" />
+              Ver comprovante
+            </Link>
           </div>
+        ) : (
+          parcel.status === "RECEIVED" && (
+            <div className="grid grid-cols-2 gap-2 border-t border-border bg-surface-muted/40 p-3">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="w-full justify-center"
+                icon={<Undo2 className="size-4" />}
+                onClick={() => onReturn(parcel)}
+              >
+                Devolver
+              </Button>
+              <Button
+                size="sm"
+                variant="danger"
+                className="w-full justify-center"
+                icon={<XCircle className="size-4" />}
+                onClick={() => onCancel(parcel)}
+              >
+                Cancelar
+              </Button>
+            </div>
+          )
         )
       }
     />

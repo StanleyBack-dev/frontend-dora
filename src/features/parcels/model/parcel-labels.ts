@@ -1,5 +1,6 @@
 import type { Tone } from "@/design-system";
 import type { Parcel, ParcelStatus } from "@/shared/contracts/parcels";
+import { formatDateTime } from "@/shared/lib/datetime";
 
 export const PARCEL_STATUS_LABELS: Record<ParcelStatus, string> = {
   RECEIVED: "Aguardando retirada",
@@ -66,3 +67,20 @@ export const COMMON_STORAGE_PLACES = [
   "Administração",
   "Geladeira (perecíveis)",
 ] as const;
+
+/** How a parcel left the condominium's care (null: still waiting). */
+export function parcelOutcome(parcel: Parcel): string | null {
+  if (!parcel.closedAt) return null;
+  const when = formatDateTime(parcel.closedAt);
+  if (parcel.status === "PICKED_UP") {
+    return `Retirada por ${parcel.signerName ?? "—"} em ${when}${parcel.closedByName ? ` (entregue por ${parcel.closedByName})` : ""}`;
+  }
+  return `${PARCEL_STATUS_LABELS[parcel.status]} em ${when}${parcel.closeReason ? `: ${parcel.closeReason}` : ""}`;
+}
+
+/** Who handed it over, by their profile (the receipt). */
+export const COLLECTED_BY_ROLE_LABELS: Record<string, string> = {
+  CONCIERGE: "Portaria",
+  ADMIN: "Administração",
+  ADMIN_MASTER: "Administração",
+};

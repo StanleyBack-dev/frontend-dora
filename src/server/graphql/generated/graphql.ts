@@ -1846,6 +1846,21 @@ export type ParcelRecipientsQueryVariables = Exact<{
 
 export type ParcelRecipientsQuery = { parcelRecipients: Array<{ userId: string, name: string, unitId: string, unitLabel: string }> };
 
+export type MyParcelsQueryVariables = Exact<{
+  statuses?: Array<ParcelStatus> | ParcelStatus | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type MyParcelsQuery = { myParcels: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null }> } };
+
+export type ParcelQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ParcelQuery = { parcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null, signature: { signerName: string, signerDocumentType: DocumentType | null, signerDocumentMasked: string | null, declaration: string, imageUrl: string, imageSha256: string, strokesSha256: string, signedAt: string, clientSignedAt: string | null, clientTimeZone: string | null, ipAddress: string | null, userAgent: string | null, device: string, locationStatus: SignatureLocationStatus, latitude: number | null, longitude: number | null, locationAccuracyMeters: number | null, collectedByName: string, collectedByRole: string, evidenceSha256: string, intact: boolean } | null } };
+
 export type CondominiumPixQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5345,6 +5360,87 @@ export const ParcelRecipientsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<ParcelRecipientsQuery, ParcelRecipientsQueryVariables>;
+export const MyParcelsDocument = new TypedDocumentString(`
+    query MyParcels($statuses: [ParcelStatus!], $page: PageInput) {
+  myParcels(statuses: $statuses, page: $page) {
+    items {
+      ...ParcelFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment ParcelFields on Parcel {
+  id
+  unitId
+  unitLabel
+  recipientName
+  recipientOnly
+  carrier
+  trackingCode
+  notes
+  storageLocation
+  pickupCode
+  status
+  receivedAt
+  receivedByName
+  closedAt
+  closedByName
+  closeReason
+  signerName
+  photoUrl
+}`) as unknown as TypedDocumentString<MyParcelsQuery, MyParcelsQueryVariables>;
+export const ParcelDocument = new TypedDocumentString(`
+    query Parcel($id: ID!) {
+  parcel(id: $id) {
+    ...ParcelFields
+    signature {
+      signerName
+      signerDocumentType
+      signerDocumentMasked
+      declaration
+      imageUrl
+      imageSha256
+      strokesSha256
+      signedAt
+      clientSignedAt
+      clientTimeZone
+      ipAddress
+      userAgent
+      device
+      locationStatus
+      latitude
+      longitude
+      locationAccuracyMeters
+      collectedByName
+      collectedByRole
+      evidenceSha256
+      intact
+    }
+  }
+}
+    fragment ParcelFields on Parcel {
+  id
+  unitId
+  unitLabel
+  recipientName
+  recipientOnly
+  carrier
+  trackingCode
+  notes
+  storageLocation
+  pickupCode
+  status
+  receivedAt
+  receivedByName
+  closedAt
+  closedByName
+  closeReason
+  signerName
+  photoUrl
+}`) as unknown as TypedDocumentString<ParcelQuery, ParcelQueryVariables>;
 export const CondominiumPixDocument = new TypedDocumentString(`
     query CondominiumPix {
   condominiumPix {

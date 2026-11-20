@@ -12,6 +12,7 @@ import {
   DoorOpen,
   LifeBuoy,
   Megaphone,
+  Package,
   Globe,
   ShieldCheck,
 } from "lucide-react";
@@ -179,6 +180,22 @@ export default async function HomePage() {
                 </span>
               </span>
             </Card>
+          )}
+          {condominium?.modules.includes("PARCELS") && (
+            <Shortcut
+              href={
+                can(user, "PARCELS_MANAGE")
+                  ? "/encomendas"
+                  : "/encomendas/minhas"
+              }
+              icon={<Package aria-hidden />}
+              title="Encomendas"
+              description={
+                can(user, "PARCELS_MANAGE")
+                  ? "Receba o que chega e entregue pelo código ou QR, com assinatura."
+                  : "O que chegou para você e o código para retirar."
+              }
+            />
           )}
           <Shortcut
             href="/notificacoes"
