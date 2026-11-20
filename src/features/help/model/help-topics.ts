@@ -532,6 +532,40 @@ export const HELP_TOPICS: HelpTopic[] = [
     },
   },
   {
+    id: "moradores-consulta",
+    href: "/moradores",
+    title: "Moradores (consulta)",
+    icon: UsersRound,
+    permission: "RESIDENTS_READ",
+    area: "main",
+    tour: "Quem mora em cada unidade, o telefone para contato e os dependentes aprovados.",
+    sections: {
+      purpose: [
+        {
+          text: "A consulta dos moradores para a portaria: nome, foto, unidade, telefone e dependentes aprovados. Somente leitura.",
+        },
+      ],
+      howto: [
+        {
+          text: "Filtre pelo nome do morador ou pela unidade. Toque no telefone para ligar ou em “WhatsApp” para mandar mensagem.",
+        },
+      ],
+      rules: [
+        {
+          text: "Por privacidade (LGPD), e-mail, documentos e datas de nascimento não aparecem aqui: ficam só com a gestão.",
+        },
+        {
+          text: "Aparecem só os moradores com acesso ativo ao app.",
+        },
+      ],
+      access: [
+        {
+          text: "A portaria e os gestores têm esta consulta por padrão (permissão “Consultar moradores”); o gestor pode tirá-la de um porteiro específico.",
+        },
+      ],
+    },
+  },
+  {
     id: "portaria",
     href: "/portaria",
     title: "Portaria",

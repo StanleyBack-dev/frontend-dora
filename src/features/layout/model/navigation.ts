@@ -233,6 +233,14 @@ export const SIDEBAR: SidebarEntry[] = [
         icon: UsersRound,
         permission: "USERS_MANAGE",
       },
+      // The gate's read-only directory; managers have the full page above.
+      {
+        href: "/moradores",
+        label: "Moradores",
+        icon: UsersRound,
+        permission: "RESIDENTS_READ",
+        unless: ["USERS_MANAGE"],
+      },
       {
         href: "/gestao/equipe",
         label: "Equipe",
