@@ -6,6 +6,8 @@ import {
   CircleHelp,
   CircleUserRound,
   DoorOpen,
+  Package,
+  PackageOpen,
   House,
   LifeBuoy,
   MapPin,
@@ -427,6 +429,109 @@ export const HELP_TOPICS: HelpTopic[] = [
     },
   },
   {
+    id: "encomendas-minhas",
+    href: "/encomendas/minhas",
+    title: "Minhas encomendas",
+    icon: PackageOpen,
+    module: "PARCELS",
+    area: "main",
+    tour: "O que chegou para você no condomínio: o QR e o código para retirar, e o comprovante de cada retirada.",
+    sections: {
+      purpose: [
+        {
+          text: "As encomendas que a portaria ou a administração recebeu para você, com o código de retirada, e o histórico com o comprovante assinado de cada retirada.",
+        },
+      ],
+      howto: [
+        {
+          text: "Quando chega uma encomenda, você recebe um aviso no app e por e-mail com o código de retirada (6 letras e números).",
+        },
+        {
+          text: "Para retirar, abra “Aguardando retirada” e mostre o QR (ou diga o código) a quem for entregar. Quem retira confirma o nome e assina com o dedo na tela.",
+        },
+        {
+          text: "Não vai retirar? Em “Aguardando retirada”, toque em “Autorizar outra pessoa”, informe o nome (e, se quiser, o CPF ou RG) e use “Enviar o código” para mandar o código pelo WhatsApp. A portaria vê quem foi autorizado ao ler o código; você pode trocar ou remover a autorização enquanto a encomenda aguarda.",
+        },
+        {
+          text: "Em “Histórico”, toque em “Ver comprovante” para ver quem retirou, a assinatura, a data e hora, e as demais provas da retirada; “Baixar comprovante em PDF” gera o documento para guardar, imprimir ou enviar.",
+        },
+      ],
+      rules: [
+        {
+          text: "Qualquer pessoa com o código pode retirar a encomenda: não compartilhe o código com quem você não quer que retire.",
+        },
+        {
+          text: "Encomenda registrada para a unidade: todos os moradores da unidade são avisados e a veem. Registrada no seu nome: só você é avisado e a vê (bom para uma surpresa ou um presente).",
+        },
+        {
+          text: "Encomenda perecível (alimento, remédio, flores…) vem com um prazo de retirada: você é lembrado a cada 2 horas até retirar e avisado se o prazo vencer.",
+        },
+        {
+          text: "O comprovante mostra “Registro íntegro” quando as provas guardadas conferem com o código de verificação gravado na assinatura.",
+        },
+      ],
+      notices: [
+        {
+          text: "Se outro morador autorizar alguém a retirar uma encomenda que você também vê, você é avisado.",
+        },
+        {
+          text: "Você é avisado quando a encomenda chega, se ela continuar esperando por 3 dias, quando é retirada (com o nome de quem retirou) e se for devolvida ou cancelada.",
+        },
+      ],
+    },
+  },
+  {
+    id: "encomendas",
+    href: "/encomendas",
+    title: "Encomendas",
+    icon: Package,
+    module: "PARCELS",
+    permission: "PARCELS_MANAGE",
+    area: "main",
+    tour: "Receba as encomendas que chegam e entregue pelo código ou QR do morador, com assinatura na tela.",
+    sections: {
+      howto: [
+        {
+          text: "Chegou uma encomenda: toque em “Receber encomenda”, escolha a unidade (ou o morador, pelo nome), a transportadora e onde ela ficou guardada e, se quiser, tire ou anexe uma foto. O morador recebe o código de retirada.",
+        },
+        {
+          text: "Para entregar, leia o QR do morador (ou digite o código) em “Entregar pelo código ou QR”, confira a encomenda, informe quem está retirando e peça a assinatura na tela.",
+        },
+        {
+          text: "Na lista, use os filtros por situação, unidade, destinatário, transportadora e código de rastreio. Nas encomendas retiradas, “Comprovante” mostra a assinatura e as provas, com o botão para baixar o PDF.",
+        },
+        {
+          text: "Encomenda que volta ao remetente: “Devolver”. Registrada por engano: “Cancelar”. Os dois pedem um motivo e avisam o morador.",
+        },
+      ],
+      rules: [
+        {
+          text: "Perecível (alimento, remédio, flores…): marque “Perecível” e escolha o prazo (2 a 48 horas). O morador recebe o prazo e é lembrado a cada 2 horas; quando vence, ele é avisado e a encomenda aparece com “Prazo vencido” no topo da lista. A situação “Perecíveis aguardando” mostra só elas.",
+        },
+        {
+          text: "Retirada por terceiro: quando o morador autoriza outra pessoa, ela aparece como opção em “Quem está retirando” ao ler o código; escolhida, o nome e o documento são preenchidos sozinhos. Para outra pessoa, toque em “Outra pessoa” e preencha como sempre. Confira o documento antes de entregar. A autorização fica no comprovante.",
+        },
+        {
+          text: "Escolhida pela unidade, todos os moradores dela são avisados; escolhida pelo morador, só ele é avisado e vê a encomenda.",
+        },
+        {
+          text: "O código de retirada não aparece na lista: a entrega é sempre pelo código ou QR que o morador mostra.",
+        },
+        {
+          text: "A assinatura guarda data e hora, IP, aparelho, localização (quando permitida) e quem entregou, com um código de verificação (SHA-256). Ela não pode ser alterada depois.",
+        },
+        {
+          text: "Fechar o formulário de recebimento guarda o que foi digitado; só “Cancelar” limpa.",
+        },
+      ],
+      access: [
+        {
+          text: "Portaria e gestores recebem e entregam encomendas (permissão “Registrar, entregar e devolver encomendas”); o gestor pode ajustar quem tem essa permissão.",
+        },
+      ],
+    },
+  },
+  {
     id: "portaria",
     href: "/portaria",
     title: "Portaria",
@@ -487,6 +592,9 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "As reservas contam pelo dia do horário reservado. Uso dos espaços considera só as reservas ativas (pendentes ou confirmadas).",
         },
         {
+          text: "Encomendas contam pelo dia em que chegaram; o tempo médio até a retirada usa as retiradas no período. “Aguardando agora”, as paradas há mais de 3 dias e as perecíveis vencidas são a situação de agora.",
+        },
+        {
           text: "“Saúde da operação” mostra a situação de agora, não do período. Os avisos com problema são de toda a plataforma.",
         },
         {
@@ -536,7 +644,7 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "No menu lateral, cada módulo é um grupo (Reservas, Eventos, Condomínio) com as páginas de quem gerencia junto com as dos moradores: toque no grupo para abrir. Só aparecem os módulos contratados.",
         },
         {
-          text: "Visão geral: os números do condomínio e o que precisa de atenção.",
+          text: "Visão geral: os números do condomínio e o que precisa de atenção. Com o módulo Encomendas, também as que aguardam retirada, as paradas há mais de 3 dias, as perecíveis vencidas, o tempo médio até a retirada (últimos 30 dias) e quantas chegaram por mês.",
           only: ["DASHBOARD_READ"],
         },
         {

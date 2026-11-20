@@ -27,7 +27,15 @@ export default async function GateFullScreenPage() {
   else {
     const day = await loadGateDay(user.condominium);
     body = (
-      <GateDesk guests={day.guests} tickets={day.tickets} events={day.events} />
+      <GateDesk
+        guests={day.guests}
+        tickets={day.tickets}
+        events={day.events}
+        parcels={
+          user.condominium.modules.includes("PARCELS") &&
+          can(user, "PARCELS_MANAGE")
+        }
+      />
     );
   }
 

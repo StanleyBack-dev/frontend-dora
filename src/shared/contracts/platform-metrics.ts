@@ -39,6 +39,30 @@ export type PlatformMetrics = {
       cancelled: number;
     }[];
   };
+  parcels: {
+    /** Condominiums with the module on (in the scope). */
+    condominiumsWithModule: number;
+    /** Received in the period, and how those ended so far. */
+    received: number;
+    pickedUp: number;
+    returned: number;
+    cancelled: number;
+    perishable: number;
+    /** Average hours until pickup, of those picked up in the period. */
+    averagePickupHours: number | null;
+    /** Now, not in the period. */
+    waitingNow: number;
+    stuckNow: number;
+    perishableOverdueNow: number;
+    granularity: MetricsGranularity;
+    series: { bucket: string; received: number; pickedUp: number }[];
+    byCondominium: {
+      condominiumId: string;
+      name: string;
+      received: number;
+      pickedUp: number;
+    }[];
+  };
   spaces: {
     activeSpaces: number;
     mostUsed: SpaceUsage[];

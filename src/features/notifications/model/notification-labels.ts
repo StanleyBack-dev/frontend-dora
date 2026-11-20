@@ -56,6 +56,33 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     label: "Dependente recusado",
     description: "Seu dependente não foi aprovado, com o motivo.",
   },
+  PARCEL_RECEIVED: {
+    label: "Encomenda recebida",
+    description:
+      "Chegou uma encomenda para a sua unidade, com o código de retirada.",
+  },
+  PARCEL_REMINDER: {
+    label: "Encomenda aguardando retirada",
+    description: "Lembrete de uma encomenda da sua unidade parada há dias.",
+  },
+  PARCEL_PICKED_UP: {
+    label: "Encomenda retirada",
+    description: "Uma encomenda da sua unidade foi retirada, e por quem.",
+  },
+  PARCEL_RETURNED: {
+    label: "Encomenda devolvida",
+    description:
+      "Uma encomenda da sua unidade voltou ao remetente, com o motivo.",
+  },
+  PARCEL_AUTHORIZED: {
+    label: "Retirada autorizada",
+    description:
+      "Alguém autorizou outra pessoa a retirar uma encomenda que você vê.",
+  },
+  PARCEL_CANCELLED: {
+    label: "Aviso de encomenda cancelado",
+    description: "Um aviso de encomenda registrado por engano foi cancelado.",
+  },
   EVENT_ORDER_CONFIRMED: {
     label: "Ingressos confirmados",
     description:

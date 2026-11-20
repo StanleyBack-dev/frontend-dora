@@ -45,3 +45,38 @@ export async function apiRequest<T>(
   }
   return payload as T;
 }
+
+/**
+ * A file from the BFF (a PDF, a spreadsheet…), with the name it suggests;
+ * errors come as JSON, like apiRequest.
+ */
+export async function apiDownload(
+  path: string,
+): Promise<{ blob: Blob; fileName: string | null }> {
+  let response: Response;
+  try {
+    response = await fetch(`/api${path}`, {
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+  } catch {
+    throw new ApiClientError(
+      0,
+      "NETWORK_ERROR",
+      "Sem conexão. Verifique sua internet.",
+    );
+  }
+  if (!response.ok) {
+    const error = ((await response.json().catch(() => null)) ??
+      {}) as Partial<ApiError>;
+    throw new ApiClientError(
+      response.status,
+      error.code ?? `HTTP_${response.status}`,
+      error.message ?? "Erro inesperado.",
+      error.details,
+    );
+  }
+  const disposition = response.headers.get("content-disposition") ?? "";
+  const fileName = /filename="([^"]+)"/.exec(disposition)?.[1] ?? null;
+  return { blob: await response.blob(), fileName };
+}

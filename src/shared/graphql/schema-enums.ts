@@ -6,7 +6,8 @@ export type AddressFormat =
 /** Módulos contratados à parte pelo condomínio. */
 export type AppModule =
   | 'BOOKINGS'
-  | 'EVENTS';
+  | 'EVENTS'
+  | 'PARCELS';
 
 /** Quem é a pessoa do pedido: eu, um dependente ou outra pessoa. */
 export type AttendeeSource =
@@ -193,10 +194,23 @@ export type NotificationType =
   | 'EVENT_ORDER_RECEIPT'
   | 'EVENT_ORDER_REJECTED'
   | 'EVENT_PUBLISHED'
+  | 'PARCEL_AUTHORIZED'
+  | 'PARCEL_CANCELLED'
+  | 'PARCEL_PICKED_UP'
+  | 'PARCEL_RECEIVED'
+  | 'PARCEL_REMINDER'
+  | 'PARCEL_RETURNED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
   | 'SUPPORT_REQUESTED'
   | 'SYSTEM_ALERT';
+
+/** Na portaria, retirada, devolvida ao remetente ou cancelada (registrada por engano). */
+export type ParcelStatus =
+  | 'CANCELLED'
+  | 'PICKED_UP'
+  | 'RECEIVED'
+  | 'RETURNED';
 
 /** Capacidade verificada pela API. */
 export type Permission =
@@ -208,6 +222,7 @@ export type Permission =
   | 'EVENTS_MANAGE'
   | 'GUESTS_CHECKIN'
   | 'NOTIFICATIONS_BROADCAST'
+  | 'PARCELS_MANAGE'
   | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
   | 'SPACES_MANAGE'
@@ -223,6 +238,12 @@ export type PixKeyType =
   | 'EMAIL'
   | 'PHONE'
   | 'RANDOM';
+
+/** Localização do aparelho na assinatura: obtida, recusada ou indisponível. */
+export type SignatureLocationStatus =
+  | 'DENIED'
+  | 'GRANTED'
+  | 'UNAVAILABLE';
 
 /** Situação de um horário na grade do dia. */
 export type SlotState =
