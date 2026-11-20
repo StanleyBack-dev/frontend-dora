@@ -18,6 +18,7 @@ import { ParcelsList } from "@/features/parcels/components/ParcelsList";
 import { ParcelsSummary } from "@/features/parcels/components/ParcelsSummary";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { condominiumsService } from "@/server/services/condominiums.service";
+import { requestTime } from "@/server/request-time";
 import { parcelsService } from "@/server/services/parcels.service";
 import type { ParcelFilter, ParcelStatus } from "@/shared/contracts/parcels";
 import { can } from "@/shared/lib/access";
@@ -39,6 +40,7 @@ const BASE = "/encomendas";
 /** The status filter in the address (Portuguese words → API statuses). */
 const STATUSES = {
   aguardando: ["RECEIVED"],
+  pereciveis: ["RECEIVED"],
   retiradas: ["PICKED_UP"],
   devolvidas: ["RETURNED"],
   canceladas: ["CANCELLED"],
@@ -95,6 +97,7 @@ export default async function ParcelsDeskPage({
   const statuses = STATUSES[status];
   const filter: ParcelFilter = {
     ...(statuses && { statuses: [...statuses] }),
+    ...(status === "pereciveis" && { perishable: true }),
     ...(unitId && { unitId }),
     ...(recipientName && { recipientName }),
     ...(carrier && { carrier }),
@@ -103,6 +106,8 @@ export default async function ParcelsDeskPage({
   const filtered =
     status !== DEFAULT_STATUS ||
     [unitId, recipientName, carrier, trackingCode].some(Boolean);
+  // One clock for the whole list (this request's time).
+  const now = (await requestTime()).getTime();
   const parcels = await authed((token) =>
     parcelsService.list(token, filter, { page, limit: pageSize }),
   );
@@ -153,6 +158,7 @@ export default async function ParcelsDeskPage({
               defaultValue={status === DEFAULT_STATUS ? "" : status}
               placeholder="Aguardando retirada"
               options={[
+                { value: "pereciveis", label: "Perecíveis aguardando" },
                 { value: "retiradas", label: "Retiradas" },
                 { value: "devolvidas", label: "Devolvidas" },
                 { value: "canceladas", label: "Canceladas" },
@@ -190,7 +196,11 @@ export default async function ParcelsDeskPage({
 
         <FilterResults>
           <Card>
-            <ParcelsList parcels={parcels.items} filtered={filtered} />
+            <ParcelsList
+              parcels={parcels.items}
+              filtered={filtered}
+              now={now}
+            />
             <Pagination
               page={parcels.page}
               totalPages={parcels.totalPages}

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronRight, Lock, Package } from "lucide-react";
-import { Badge, Card } from "@/design-system";
+import { Alert, Badge, Card } from "@/design-system";
 import { InviteCode } from "@/features/bookings/components/InviteCode";
 import {
   formatParcelCode,
@@ -8,6 +8,7 @@ import {
   PARCEL_STATUS_TONES,
   parcelOutcome,
   parcelSummary,
+  perishableNote,
 } from "@/features/parcels/model/parcel-labels";
 import type { Parcel } from "@/shared/contracts/parcels";
 import { formatDateTime } from "@/shared/lib/datetime";
@@ -18,12 +19,16 @@ import { formatDateTime } from "@/shared/lib/datetime";
 export function MyParcelCard({
   parcel,
   qrSvg,
+  now,
 }: {
   parcel: Parcel;
+  /** This request's time (perishable deadline). */
+  now: number;
   /** SVG of the pickup code (only while it waits). */
   qrSvg: string | null;
 }) {
   const waiting = parcel.status === "RECEIVED";
+  const perishable = waiting ? perishableNote(parcel, now) : null;
   const facts = [
     { label: "Unidade", value: parcel.unitLabel },
     { label: "Destinatário", value: parcel.recipientName },
@@ -73,6 +78,14 @@ export function MyParcelCard({
           </div>
         </div>
       </div>
+
+      {perishable && (
+        <Alert tone={perishable.overdue ? "danger" : "warning"}>
+          {perishable.overdue
+            ? `Encomenda perecível: o prazo venceu em ${perishable.when}. Retire o quanto antes ou fale com a portaria.`
+            : `Encomenda perecível: retire até ${perishable.when}.`}
+        </Alert>
+      )}
 
       {waiting && qrSvg && (
         <div className="space-y-2">

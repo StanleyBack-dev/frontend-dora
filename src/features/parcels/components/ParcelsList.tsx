@@ -14,9 +14,11 @@ import type { Parcel } from "@/shared/contracts/parcels";
 export function ParcelsList({
   parcels,
   filtered,
+  now,
 }: {
   parcels: Parcel[];
   filtered: boolean;
+  now: number;
 }) {
   const router = useRouter();
   const [closing, setClosing] = useState<{
@@ -29,6 +31,7 @@ export function ParcelsList({
       <ParcelsTable
         parcels={parcels}
         filtered={filtered}
+        now={now}
         onReturn={(parcel) => setClosing({ parcel, kind: "return" })}
         onCancel={(parcel) => setClosing({ parcel, kind: "cancel" })}
       />

@@ -512,6 +512,8 @@ export type ParcelFilterInput = {
   carrier?: string | null | undefined;
   /** Recebidas a partir deste instante. */
   from?: string | null | undefined;
+  /** Só as perecíveis. */
+  perishable?: boolean | null | undefined;
   /** O destinatário (exato, sem diferenciar acentos). */
   recipientName?: string | null | undefined;
   /** Parte do código de retirada, do rastreio, do destinatário ou da transportadora. */
@@ -639,6 +641,10 @@ export type RegisterParcelInput = {
   carrier?: string | null | undefined;
   /** Observação. */
   notes?: string | null | undefined;
+  /** Perecível (alimento, remédio, flores…): retirar dentro do prazo, com lembretes a cada 2 horas. */
+  perishable?: boolean | null | undefined;
+  /** Perecível: prazo em horas (2, 4, 8, 12, 24 ou 48; padrão 4). */
+  perishableHours?: number | null | undefined;
   /** Foto da encomenda (JPEG, PNG ou WebP em base64, até 1 MB). */
   photo?: string | null | undefined;
   /** Nome na etiqueta. */
@@ -1787,7 +1793,7 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type SendTestPushMutation = { sendTestPush: number };
 
-export type ParcelFieldsFragment = { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null };
+export type ParcelFieldsFragment = { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null };
 
 export type ParcelsQueryVariables = Exact<{
   filter?: ParcelFilterInput | null | undefined;
@@ -1795,33 +1801,33 @@ export type ParcelsQueryVariables = Exact<{
 }>;
 
 
-export type ParcelsQuery = { parcels: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null }> } };
+export type ParcelsQuery = { parcels: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null }> } };
 
 export type ParcelOverviewQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ParcelOverviewQuery = { parcelOverview: { waitingLong: number, recipientNames: Array<string>, carriers: Array<string>, trackingCodes: Array<string>, byStatus: Array<{ status: ParcelStatus, count: number }>, units: Array<{ id: string, label: string }> } };
+export type ParcelOverviewQuery = { parcelOverview: { waitingLong: number, perishableWaiting: number, perishableOverdue: number, recipientNames: Array<string>, carriers: Array<string>, trackingCodes: Array<string>, byStatus: Array<{ status: ParcelStatus, count: number }>, units: Array<{ id: string, label: string }> } };
 
 export type ParcelByCodeQueryVariables = Exact<{
   code: string;
 }>;
 
 
-export type ParcelByCodeQuery = { parcelByCode: { pickupDeclaration: string | null, id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+export type ParcelByCodeQuery = { parcelByCode: { pickupDeclaration: string | null, id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
 
 export type RegisterParcelMutationVariables = Exact<{
   input: RegisterParcelInput;
 }>;
 
 
-export type RegisterParcelMutation = { registerParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+export type RegisterParcelMutation = { registerParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
 
 export type PickUpParcelMutationVariables = Exact<{
   input: PickUpParcelInput;
 }>;
 
 
-export type PickUpParcelMutation = { pickUpParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+export type PickUpParcelMutation = { pickUpParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
 
 export type ReturnParcelMutationVariables = Exact<{
   id: string | number;
@@ -1829,7 +1835,7 @@ export type ReturnParcelMutationVariables = Exact<{
 }>;
 
 
-export type ReturnParcelMutation = { returnParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+export type ReturnParcelMutation = { returnParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
 
 export type CancelParcelMutationVariables = Exact<{
   id: string | number;
@@ -1837,7 +1843,7 @@ export type CancelParcelMutationVariables = Exact<{
 }>;
 
 
-export type CancelParcelMutation = { cancelParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
+export type CancelParcelMutation = { cancelParcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null } };
 
 export type ParcelRecipientsQueryVariables = Exact<{
   search: string;
@@ -1852,14 +1858,14 @@ export type MyParcelsQueryVariables = Exact<{
 }>;
 
 
-export type MyParcelsQuery = { myParcels: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null }> } };
+export type MyParcelsQuery = { myParcels: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null }> } };
 
 export type ParcelQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type ParcelQuery = { parcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null, signature: { signerName: string, signerDocumentType: DocumentType | null, signerDocumentMasked: string | null, declaration: string, imageUrl: string, imageSha256: string, strokesSha256: string, signedAt: string, clientSignedAt: string | null, clientTimeZone: string | null, ipAddress: string | null, userAgent: string | null, device: string, locationStatus: SignatureLocationStatus, latitude: number | null, longitude: number | null, locationAccuracyMeters: number | null, collectedByName: string, collectedByRole: string, evidenceSha256: string, intact: boolean } | null } };
+export type ParcelQuery = { parcel: { id: string, unitId: string | null, unitLabel: string | null, recipientName: string | null, recipientOnly: boolean, carrier: string | null, trackingCode: string | null, notes: string | null, storageLocation: string | null, pickupCode: string, perishable: boolean, pickupDeadline: string | null, status: ParcelStatus, receivedAt: string, receivedByName: string | null, closedAt: string | null, closedByName: string | null, closeReason: string | null, signerName: string | null, photoUrl: string | null, signature: { signerName: string, signerDocumentType: DocumentType | null, signerDocumentMasked: string | null, declaration: string, imageUrl: string, imageSha256: string, strokesSha256: string, signedAt: string, clientSignedAt: string | null, clientTimeZone: string | null, ipAddress: string | null, userAgent: string | null, device: string, locationStatus: SignatureLocationStatus, latitude: number | null, longitude: number | null, locationAccuracyMeters: number | null, collectedByName: string, collectedByRole: string, evidenceSha256: string, intact: boolean } | null } };
 
 export type CondominiumPixQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2391,6 +2397,8 @@ export const ParcelFieldsFragmentDoc = new TypedDocumentString(`
   notes
   storageLocation
   pickupCode
+  perishable
+  pickupDeadline
   status
   receivedAt
   receivedByName
@@ -5192,6 +5200,8 @@ export const ParcelsDocument = new TypedDocumentString(`
   notes
   storageLocation
   pickupCode
+  perishable
+  pickupDeadline
   status
   receivedAt
   receivedByName
@@ -5209,6 +5219,8 @@ export const ParcelOverviewDocument = new TypedDocumentString(`
       count
     }
     waitingLong
+    perishableWaiting
+    perishableOverdue
     units {
       id
       label
@@ -5237,6 +5249,8 @@ export const ParcelByCodeDocument = new TypedDocumentString(`
   notes
   storageLocation
   pickupCode
+  perishable
+  pickupDeadline
   status
   receivedAt
   receivedByName
@@ -5263,6 +5277,8 @@ export const RegisterParcelDocument = new TypedDocumentString(`
   notes
   storageLocation
   pickupCode
+  perishable
+  pickupDeadline
   status
   receivedAt
   receivedByName
@@ -5289,6 +5305,8 @@ export const PickUpParcelDocument = new TypedDocumentString(`
   notes
   storageLocation
   pickupCode
+  perishable
+  pickupDeadline
   status
   receivedAt
   receivedByName
@@ -5315,6 +5333,8 @@ export const ReturnParcelDocument = new TypedDocumentString(`
   notes
   storageLocation
   pickupCode
+  perishable
+  pickupDeadline
   status
   receivedAt
   receivedByName
@@ -5341,6 +5361,8 @@ export const CancelParcelDocument = new TypedDocumentString(`
   notes
   storageLocation
   pickupCode
+  perishable
+  pickupDeadline
   status
   receivedAt
   receivedByName
@@ -5383,6 +5405,8 @@ export const MyParcelsDocument = new TypedDocumentString(`
   notes
   storageLocation
   pickupCode
+  perishable
+  pickupDeadline
   status
   receivedAt
   receivedByName
@@ -5432,6 +5456,8 @@ export const ParcelDocument = new TypedDocumentString(`
   notes
   storageLocation
   pickupCode
+  perishable
+  pickupDeadline
   status
   receivedAt
   receivedByName

@@ -9,6 +9,7 @@ const KEY = "dora:parcel-register-draft";
 // the same page, is not a reload to recover from).
 let atLoad: string | null | undefined;
 
+import { PERISHABLE_DEFAULT_HOURS } from "@/features/parcels/model/parcel-labels";
 import type { ParcelRecipient } from "@/shared/contracts/parcels";
 
 export type ParcelRegisterDraft = {
@@ -20,6 +21,9 @@ export type ParcelRegisterDraft = {
   trackingCode: string;
   storageLocation: string;
   notes: string;
+  /** Perishable, picked up within these hours. */
+  perishable: boolean;
+  perishableHours: number;
 };
 
 /** Saves the form before leaving for the camera or the gallery. */
@@ -93,6 +97,11 @@ export function parseParcelDraft(
       trackingCode: text(raw.trackingCode),
       storageLocation: text(raw.storageLocation),
       notes: text(raw.notes),
+      perishable: raw.perishable === true,
+      perishableHours:
+        typeof raw.perishableHours === "number"
+          ? raw.perishableHours
+          : PERISHABLE_DEFAULT_HOURS,
     };
   } catch {
     return null;

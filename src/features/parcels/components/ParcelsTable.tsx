@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileCheck2, Package, Undo2, XCircle } from "lucide-react";
+import { FileCheck2, Package, Snowflake, Undo2, XCircle } from "lucide-react";
 import {
   Badge,
   Button,
@@ -16,6 +16,7 @@ import {
   PARCEL_STATUS_TONES,
   parcelOutcome,
   parcelSummary,
+  perishableNote,
 } from "@/features/parcels/model/parcel-labels";
 import type { Parcel } from "@/shared/contracts/parcels";
 import { formatDateTime } from "@/shared/lib/datetime";
@@ -27,11 +28,14 @@ import { formatDateTime } from "@/shared/lib/datetime";
 export function ParcelsTable({
   parcels,
   filtered,
+  now,
   onReturn,
   onCancel,
 }: {
   parcels: Parcel[];
   filtered: boolean;
+  /** This request's time (perishable deadlines). */
+  now: number;
   onReturn: (parcel: Parcel) => void;
   onCancel: (parcel: Parcel) => void;
 }) {
@@ -92,11 +96,24 @@ export function ParcelsTable({
     {
       key: "status",
       label: "Situação",
-      render: (parcel) => (
-        <Badge tone={PARCEL_STATUS_TONES[parcel.status]}>
-          {PARCEL_STATUS_LABELS[parcel.status]}
-        </Badge>
-      ),
+      render: (parcel) => {
+        const perishable = perishableNote(parcel, now);
+        return (
+          <span className="flex flex-col items-start gap-1">
+            <Badge tone={PARCEL_STATUS_TONES[parcel.status]}>
+              {PARCEL_STATUS_LABELS[parcel.status]}
+            </Badge>
+            {perishable && parcel.status === "RECEIVED" && (
+              <Badge tone={perishable.overdue ? "danger" : "info"}>
+                <Snowflake aria-hidden className="mr-1 size-3" />
+                {perishable.overdue
+                  ? "Prazo vencido"
+                  : `Até ${perishable.when}`}
+              </Badge>
+            )}
+          </span>
+        );
+      },
     },
     {
       key: "tracking",

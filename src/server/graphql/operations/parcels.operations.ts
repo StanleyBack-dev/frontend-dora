@@ -12,6 +12,8 @@ export const parcelFieldsFragment = graphql(`
     notes
     storageLocation
     pickupCode
+    perishable
+    pickupDeadline
     status
     receivedAt
     receivedByName
@@ -45,6 +47,8 @@ export const parcelOverviewDocument = graphql(`
         count
       }
       waitingLong
+      perishableWaiting
+      perishableOverdue
       units {
         id
         label
