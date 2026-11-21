@@ -5,12 +5,34 @@ import type {
   RegisterFoundItemInput,
   ReturnFoundItemInput,
 } from "@/shared/contracts/lost-and-found";
+import type { ResidentOption } from "@/shared/contracts/residents-search";
 
 export const lostAndFoundClient = {
   register: (input: RegisterFoundItemInput) =>
     apiRequest<FoundItem>("/lost-and-found", {
       method: "POST",
       body: JSON.stringify(input),
+    }),
+
+  claim: (itemId: string, message: string | null) =>
+    apiRequest<FoundItemClaim>(`/lost-and-found/${itemId}/claim`, {
+      method: "POST",
+      body: JSON.stringify({ message }),
+    }),
+
+  withdraw: (claimId: string) =>
+    apiRequest<FoundItemClaim>(`/lost-and-found/claims/${claimId}/withdraw`, {
+      method: "POST",
+    }),
+
+  owners: (search: string) =>
+    apiRequest<ResidentOption[]>(
+      `/lost-and-found/owners?search=${encodeURIComponent(search)}`,
+    ),
+
+  release: (id: string) =>
+    apiRequest<FoundItem>(`/lost-and-found/${id}/release`, {
+      method: "POST",
     }),
 
   decide: (claimId: string, accept: boolean, note: string | null) =>

@@ -64,7 +64,7 @@ export function ParcelDeskActions({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="mb-5 space-y-3">
       <div className="flex justify-end">
         <Button
           icon={<PackagePlus className="size-4" />}

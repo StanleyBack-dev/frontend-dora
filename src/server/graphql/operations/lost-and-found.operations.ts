@@ -19,7 +19,10 @@ export const foundItemFieldsFragment = graphql(`
     returnedToName
     signerName
     pendingClaims
+    awaitedByName
     photoUrl
+    ownerUnitLabel
+    ownerName
   }
 `);
 
@@ -65,6 +68,13 @@ export const foundItemOverviewDocument = graphql(`
       }
       pendingClaims
       expiringSoon
+      titles
+      foundLocations
+      storageLocations
+      residents {
+        id
+        name
+      }
     }
   }
 `);
@@ -75,6 +85,9 @@ export const foundItemDocument = graphql(`
       ...FoundItemFields
       privateDetails
       claims {
+        ...FoundItemClaimFields
+      }
+      myClaim {
         ...FoundItemClaimFields
       }
       returnDeclaration
@@ -101,6 +114,53 @@ export const foundItemDocument = graphql(`
         evidenceSha256
         intact
       }
+    }
+  }
+`);
+
+export const keptFoundItemsDocument = graphql(`
+  query KeptFoundItems($category: FoundItemCategory, $page: PageInput) {
+    keptFoundItems(category: $category, page: $page) {
+      items {
+        ...FoundItemFields
+        myClaim {
+          ...FoundItemClaimFields
+        }
+      }
+      total
+      page
+      limit
+      totalPages
+    }
+  }
+`);
+
+export const myFoundItemClaimsDocument = graphql(`
+  query MyFoundItemClaims($page: PageInput) {
+    myFoundItemClaims(page: $page) {
+      items {
+        ...FoundItemClaimFields
+      }
+      total
+      page
+      limit
+      totalPages
+    }
+  }
+`);
+
+export const claimFoundItemDocument = graphql(`
+  mutation ClaimFoundItem($itemId: ID!, $message: String) {
+    claimFoundItem(itemId: $itemId, message: $message) {
+      ...FoundItemClaimFields
+    }
+  }
+`);
+
+export const withdrawFoundItemClaimDocument = graphql(`
+  mutation WithdrawFoundItemClaim($claimId: ID!) {
+    withdrawFoundItemClaim(claimId: $claimId) {
+      ...FoundItemClaimFields
     }
   }
 `);
@@ -145,6 +205,43 @@ export const discardFoundItemDocument = graphql(`
   mutation DiscardFoundItem($id: ID!, $reason: String!) {
     discardFoundItem(id: $id, reason: $reason) {
       ...FoundItemFields
+    }
+  }
+`);
+
+export const foundItemOwnersDocument = graphql(`
+  query FoundItemOwners($search: String!) {
+    foundItemOwners(search: $search) {
+      userId
+      name
+      unitId
+      unitLabel
+    }
+  }
+`);
+
+export const releaseFoundItemDocument = graphql(`
+  mutation ReleaseFoundItem($id: ID!) {
+    releaseFoundItem(id: $id) {
+      ...FoundItemFields
+    }
+  }
+`);
+
+export const foundItemClaimsDocument = graphql(`
+  query FoundItemClaims($open: Boolean, $page: PageInput) {
+    foundItemClaims(open: $open, page: $page) {
+      items {
+        ...FoundItemClaimFields
+        item {
+          ...FoundItemFields
+          privateDetails
+        }
+      }
+      total
+      page
+      limit
+      totalPages
     }
   }
 `);

@@ -2,10 +2,11 @@ import type { Tone } from "@/design-system";
 import type {
   FoundItem,
   FoundItemCategory,
+  FoundItemClaim,
   FoundItemClaimStatus,
   FoundItemStatus,
 } from "@/shared/contracts/lost-and-found";
-import { formatDateTime, formatShortDay } from "@/shared/lib/datetime";
+import { formatDateTime, formatLongDay } from "@/shared/lib/datetime";
 
 export const FOUND_ITEM_STATUS_LABELS: Record<FoundItemStatus, string> = {
   FOUND: "Guardado",
@@ -51,6 +52,93 @@ export const CLAIM_STATUS_TONES: Record<FoundItemClaimStatus, Tone> = {
   WITHDRAWN: "neutral",
 };
 
+/** A resident's own claim, as they read it. */
+export const MY_CLAIM_LABELS: Record<
+  FoundItemClaimStatus,
+  { label: string; tone: Tone; hint: string }
+> = {
+  PENDING: {
+    label: "Você pediu",
+    tone: "info",
+    hint: "Retire na portaria com um documento: o porteiro confere se o item é seu e você assina na tela.",
+  },
+  ACCEPTED: {
+    label: "Pode retirar",
+    tone: "success",
+    hint: "A portaria confirmou: retire lá com um documento e assine na tela.",
+  },
+  REJECTED: {
+    label: "Pedido recusado",
+    tone: "danger",
+    hint: "A portaria recusou o pedido.",
+  },
+  WITHDRAWN: {
+    label: "Pedido cancelado",
+    tone: "neutral",
+    hint: "Você cancelou este pedido.",
+  },
+};
+
+/**
+ * A resident's claim as they read it, given what happened to the item: an
+ * item that left shows how (returned to them, to someone else, donated,
+ * discarded) instead of the claim's own state.
+ */
+export function myClaimView(
+  claim: Pick<FoundItemClaim, "status" | "itemStatus" | "decisionNote">,
+): { label: string; tone: Tone; hint: string } {
+  switch (claim.itemStatus) {
+    case "RETURNED":
+      return claim.status === "ACCEPTED"
+        ? {
+            label: "Devolvido a você",
+            tone: "success",
+            hint: "Você retirou este item. O comprovante está na página do item.",
+          }
+        : {
+            label: "Entregue a outra pessoa",
+            tone: "neutral",
+            hint: "A portaria conferiu e entregou este item a outra pessoa.",
+          };
+    case "DONATED":
+      return {
+        label: "Item doado",
+        tone: "neutral",
+        hint: "Este item foi doado.",
+      };
+    case "DISCARDED":
+      return {
+        label: "Item descartado",
+        tone: "neutral",
+        hint: "Este item foi descartado.",
+      };
+    default: {
+      const view = MY_CLAIM_LABELS[claim.status];
+      const note = claim.decisionNote
+        ? ` ${claim.status === "REJECTED" ? "Motivo" : "Observação"}: ${claim.decisionNote}`
+        : "";
+      return { ...view, hint: view.hint + note };
+    }
+  }
+}
+
+/** "Sonia · Bloco A · 101" or "Bloco A · 101" (null: not reserved). */
+export const reservedFor = (
+  item: Pick<FoundItem, "ownerName" | "ownerUnitLabel">,
+) =>
+  item.ownerUnitLabel
+    ? item.ownerName
+      ? `${item.ownerName} · ${item.ownerUnitLabel}`
+      : item.ownerUnitLabel
+    : null;
+
+/** A claim can be made again after it was rejected or withdrawn. */
+export const canClaimAgain = (status: FoundItemClaimStatus | undefined) =>
+  status === undefined || status === "REJECTED" || status === "WITHDRAWN";
+
+/** A claim's optional note (characters; the API checks). */
+export const CLAIM_MESSAGE_MAX = 500;
+
 /** A document's photo is hidden from the residents by default (privacy). */
 export const hidesPhotoByDefault = (category: FoundItemCategory) =>
   category === "DOCUMENT";
@@ -85,7 +173,7 @@ export function keepNote(
 ): { text: string; tone: Tone } | null {
   if (item.status !== "FOUND") return null;
   const left = Math.ceil((new Date(item.keepUntil).getTime() - now) / DAY_MS);
-  const until = formatShortDay(item.keepUntil);
+  const until = formatLongDay(item.keepUntil);
   if (left <= 0) return { text: `Guarda venceu em ${until}`, tone: "danger" };
   if (left <= 7) {
     return {

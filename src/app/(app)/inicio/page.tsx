@@ -198,15 +198,18 @@ export default async function HomePage() {
               }
             />
           )}
-          {condominium?.modules.includes("LOST_AND_FOUND") &&
-            can(user, "LOST_FOUND_MANAGE") && (
-              <Shortcut
-                href="/achados-e-perdidos"
-                icon={<SearchCheck aria-hidden />}
-                title="Achados e perdidos"
-                description="Registre o que foi achado, confira os pedidos e devolva com assinatura."
-              />
-            )}
+          {condominium?.modules.includes("LOST_AND_FOUND") && (
+            <Shortcut
+              href="/achados-e-perdidos"
+              icon={<SearchCheck aria-hidden />}
+              title="Achados e perdidos"
+              description={
+                can(user, "LOST_FOUND_MANAGE")
+                  ? "Registre o que foi achado, confira os pedidos e devolva com assinatura."
+                  : "O que foi achado no condomínio: perdeu algo? Veja se está aqui."
+              }
+            />
+          )}
           <Shortcut
             href="/notificacoes"
             icon={<Bell aria-hidden />}

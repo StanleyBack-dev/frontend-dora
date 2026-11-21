@@ -533,6 +533,47 @@ export const HELP_TOPICS: HelpTopic[] = [
     },
   },
   {
+    id: "achados-e-perdidos-morador",
+    href: "/achados-e-perdidos/meus",
+    title: "Itens achados e meus pedidos",
+    icon: SearchCheck,
+    module: "LOST_AND_FOUND",
+    area: "main",
+    tour: "Veja o que foi achado no condomínio e peça o que é seu.",
+    sections: {
+      howto: [
+        {
+          text: "Em “Itens achados” aparecem os itens guardados pela portaria, com foto (quando houver), onde e quando foram achados. Filtre pela categoria.",
+        },
+        {
+          text: "Reconheceu algo seu? Toque em “É meu” e confirme (se quiser, acrescente um detalhe). A portaria é avisada.",
+        },
+        {
+          text: "Em “Meus pedidos” você acompanha a resposta da portaria e pode cancelar um pedido que ainda aguarda.",
+        },
+        {
+          text: "Para retirar, vá à portaria com um documento: o porteiro confere se o item é seu e você assina na tela. O comprovante fica no item, em “Meus pedidos”.",
+        },
+      ],
+      rules: [
+        {
+          text: "Documentos aparecem sem foto, para proteger os dados pessoais.",
+        },
+        {
+          text: "Pedido recusado ou cancelado? Você pode pedir de novo.",
+        },
+        {
+          text: "Os itens ficam guardados por 90 dias; depois, podem ser doados ou descartados.",
+        },
+      ],
+      access: [
+        {
+          text: "Qualquer morador do condomínio vê os itens guardados e pode pedir os seus.",
+        },
+      ],
+    },
+  },
+  {
     id: "achados-e-perdidos",
     href: "/achados-e-perdidos",
     title: "Achados e perdidos",
@@ -547,16 +588,19 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Achou algo: toque em “Registrar item achado”, escolha a categoria, diga o que é, onde e quando foi achado e onde ficou guardado e, se quiser, tire ou anexe uma foto.",
         },
         {
+          text: "Sabe de quem é? Em “De quem é?”, escolha a unidade (os moradores dela são avisados e só eles veem o item) ou o morador (só essa pessoa é avisada, já liberada para retirar). Se a pessoa disser “Não é meu”, você é avisado e o item passa a aparecer para todos; “Liberar para todos” faz o mesmo pela portaria.",
+        },
+        {
           text: "Escreva na descrição o que os moradores podem ver (cor, marca) e guarde em “Detalhes para conferir o dono” o que só o dono saberia (o que tem dentro, o nome no documento): só a portaria e a gestão veem.",
         },
         {
-          text: "Quando um morador disser que o item é seu, você é avisado. Abra o item, compare o que ele escreveu com os detalhes e toque em “Aceitar” (ele é avisado para vir buscar) ou “Recusar” (com o motivo).",
+          text: "Quando um morador disser que um item é seu, você é avisado e o pedido aparece em “Pedidos para conferir”, com o que perguntar (os detalhes que só a portaria vê). Quando ele vier, toque em “Devolver com assinatura”, confira pessoalmente e peça a assinatura.",
         },
         {
-          text: "Para devolver, toque em “Devolver para…” no pedido aceito (ou em “Devolver com assinatura”, para outra pessoa que comprovou ser o dono), informe quem está retirando e peça a assinatura na tela.",
+          text: "Se quiser responder antes de ele vir, use “Aceitar” (ele é avisado para vir buscar) ou “Recusar” (com o motivo). Para alguém sem pedido que comprovou ser o dono, use “Devolver com assinatura”.",
         },
         {
-          text: "Ninguém pediu? Use “Doar” ou “Descartar”, com o motivo.",
+          text: "Ninguém pediu? Na página do item, em “Mais ações”, use “Doar” ou “Descartar”, com o motivo.",
         },
       ],
       rules: [

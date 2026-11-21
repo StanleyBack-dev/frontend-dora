@@ -12,6 +12,7 @@ import {
   Select,
   TextArea,
   cn,
+  DrawerActions,
 } from "@/design-system";
 import { lostAndFoundClient } from "@/features/lost-and-found/api/lost-and-found.client";
 import {
@@ -32,7 +33,11 @@ import type {
   FoundItemCategory,
 } from "@/shared/contracts/lost-and-found";
 import { ApiClientError } from "@/shared/lib/api-client";
-import { fromLocalInput } from "@/shared/lib/datetime";
+import { fromLocalInput, toLocalInput } from "@/shared/lib/datetime";
+import {
+  UnitOrResidentPicker,
+  type ResidentOption,
+} from "@/features/residents/components/UnitOrResidentPicker";
 import { sameShape } from "@/shared/lib/form-draft";
 import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
@@ -55,6 +60,9 @@ type RegisterDraft = {
   storageLocation: string;
   /** null: the category's default (hidden only for documents). */
   photoHidden: boolean | null;
+  /** Whose the desk knows it is (null: unknown). */
+  ownerUnitId: string | null;
+  ownerResident: ResidentOption | null;
 };
 
 const EMPTY: RegisterDraft = {
@@ -66,6 +74,8 @@ const EMPTY: RegisterDraft = {
   foundAt: "",
   storageLocation: "",
   photoHidden: null,
+  ownerUnitId: null,
+  ownerResident: null,
 };
 
 const parseDraft = (raw: unknown) => {
@@ -87,10 +97,13 @@ const parseDraft = (raw: unknown) => {
 // texts are kept as a draft until registered or cancelled.
 export function FoundItemRegisterDrawer({
   open,
+  units,
   onClose,
   onDone,
 }: {
   open: boolean;
+  /** The condominium's units, to say whose the item is. */
+  units: { id: string; label: string }[];
   onClose: () => void;
   onDone: (item: FoundItem) => void;
 }) {
@@ -105,6 +118,12 @@ export function FoundItemRegisterDrawer({
   const [photo, setPhoto] = useState<PreparedPhoto | null>(null);
   const [preparing, setPreparing] = useState(false);
   const [sending, setSending] = useState(false);
+  // The latest moment the date field accepts (now), refreshed whenever the
+  // field is used: read on events, never while rendering.
+  const [latest, setLatest] = useState("");
+  const refreshLatest = () => setLatest(toLocalInput(new Date().toISOString()));
+  // Remounts the owner picker after a reset or a restored draft.
+  const [resets, setResets] = useState(0);
   const cameraInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -117,7 +136,11 @@ export function FoundItemRegisterDrawer({
     form.photoHidden ??
     (form.category ? hidesPhotoByDefault(form.category) : false);
 
+  const futureDate =
+    form.foundAt !== "" && latest !== "" && form.foundAt > latest;
+
   const complete =
+    !futureDate &&
     form.category !== "" &&
     form.title.trim().length >= 2 &&
     form.foundLocation.trim().length >= 2 &&
@@ -132,6 +155,7 @@ export function FoundItemRegisterDrawer({
 
   function cancel() {
     draft.discard();
+    setResets((count) => count + 1);
     dropPhoto();
     onClose();
   }
@@ -178,12 +202,19 @@ export function FoundItemRegisterDrawer({
         storageLocation: form.storageLocation.trim(),
         photo: photo?.base64 ?? null,
         photoHidden: photo ? photoHidden : null,
+        ownerUnitId: form.ownerUnitId,
+        ownerUserId: form.ownerResident?.userId ?? null,
       });
       showSuccess(
         "Item registrado.",
-        "Ele aparece para os moradores, que podem pedir se for deles.",
+        form.ownerResident
+          ? `Só ${form.ownerResident.name} foi avisado e vê o item.`
+          : form.ownerUnitId
+            ? "Os moradores da unidade foram avisados e veem o item."
+            : "Ele aparece para os moradores, que podem pedir se for deles.",
       );
       draft.discard();
+      setResets((count) => count + 1);
       dropPhoto();
       onDone(item);
     } catch (cause) {
@@ -203,9 +234,9 @@ export function FoundItemRegisterDrawer({
       onClose={onClose}
       busy={sending}
       title="Registrar item achado"
-      subtitle="Fica guardado por 90 dias. Os moradores veem o item e pedem se for deles."
+      subtitle="Fica guardado por 90 dias. Sabe de quem é? Indique e só a pessoa é avisada."
       footer={
-        <div className="flex justify-end gap-2">
+        <DrawerActions>
           <Button variant="cancel" onClick={cancel} disabled={sending}>
             Cancelar
           </Button>
@@ -218,11 +249,39 @@ export function FoundItemRegisterDrawer({
           >
             Registrar item
           </Button>
-        </div>
+        </DrawerActions>
       }
     >
       <form id={FORM_ID} onSubmit={submit} className="space-y-6">
         {draft.restored && <DraftNotice onDiscard={draft.discard} />}
+
+        <FormSection
+          title="De quem é? (opcional)"
+          description="Se a portaria sabe de quem é, só a unidade ou o morador é avisado e vê o item."
+        >
+          <UnitOrResidentPicker
+            key={`${resets}-${draft.restored ? "restored" : "blank"}`}
+            name="found-item-owner-mode"
+            optional
+            units={units}
+            value={form.ownerUnitId}
+            initialResident={form.ownerResident}
+            notes={{
+              none: "O item aparece para todos os moradores, que pedem se for deles.",
+              unit: "Os moradores da unidade são avisados e só eles veem o item.",
+              resident:
+                "Só o morador escolhido é avisado e vê o item, já liberado para retirar.",
+            }}
+            search={lostAndFoundClient.owners}
+            onChange={(pick) =>
+              draft.set((current) => ({
+                ...current,
+                ownerUnitId: pick?.unitId ?? null,
+                ownerResident: pick?.resident ?? null,
+              }))
+            }
+          />
+        </FormSection>
 
         <FormSection title="O item">
           <div className="grid items-start gap-3 sm:grid-cols-2">
@@ -285,8 +344,15 @@ export function FoundItemRegisterDrawer({
             <Field
               label="Quando (vazio: agora)"
               type="datetime-local"
+              max={latest || undefined}
               value={form.foundAt}
-              onChange={(event) => set("foundAt")(event.target.value)}
+              error={futureDate ? "Não pode ser depois de agora." : undefined}
+              onFocus={refreshLatest}
+              onPointerDown={refreshLatest}
+              onChange={(event) => {
+                refreshLatest();
+                set("foundAt")(event.target.value);
+              }}
             />
           </div>
           <Combobox

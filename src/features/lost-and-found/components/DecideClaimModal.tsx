@@ -8,8 +8,10 @@ import type { FoundItemClaim } from "@/shared/contracts/lost-and-found";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
-// Answers a resident's claim: accepting tells them to come for the item
-// (an optional note, e.g. when); rejecting needs the reason, sent to them.
+// Answers a resident's claim before they come (optional: the desk can
+// also check them in person and hand over directly). Accepting tells them
+// to come for the item (an optional note, e.g. when); rejecting needs the
+// reason, sent to them.
 export function DecideClaimModal({
   claim,
   accept,
@@ -26,9 +28,8 @@ export function DecideClaimModal({
   const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
   const text = note.trim();
-  const valid = accept
-    ? text.length === 0 || text.length >= 3
-    : text.length >= 3;
+  // Accepting: any note (or none); rejecting: a reason of 3+ characters.
+  const valid = accept || text.length >= 3;
 
   function close() {
     setNote("");
@@ -95,12 +96,19 @@ export function DecideClaimModal({
             {claim.userName}
             {claim.unitLabel ? ` · ${claim.unitLabel}` : ""}
           </p>
-          <blockquote className="rounded-xl border border-border bg-surface-muted p-3 text-[13px] text-fg">
-            {claim.message}
-          </blockquote>
+          {claim.message && (
+            <blockquote className="rounded-xl border border-border bg-surface-muted p-3 text-[13px] text-fg">
+              {claim.message}
+            </blockquote>
+          )}
           <TextArea
             label={accept ? "Observação (opcional)" : "Motivo"}
             required={!accept}
+            hint={
+              accept
+                ? "O morador recebe esta observação junto com o aviso."
+                : "Pelo menos 3 caracteres. O morador recebe o motivo."
+            }
             rows={3}
             maxLength={300}
             placeholder={

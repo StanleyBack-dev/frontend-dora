@@ -98,6 +98,16 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Um item achado que você pediu foi devolvido, com o comprovante (ou entregue a outra pessoa).",
   },
+  FOUND_ITEM_FOR_YOU: {
+    label: "Item achado para você",
+    description:
+      "A portaria achou um item e indicou que é seu (ou da sua unidade): retire lá com um documento.",
+  },
+  FOUND_ITEM_NOT_OWNER: {
+    label: "Item achado não é do morador",
+    description:
+      "Para a portaria e a gestão: o morador indicado disse que o item não é seu, e ele passou a aparecer para todos.",
+  },
   FOUND_ITEM_EXPIRING: {
     label: "Item achado perto do fim da guarda",
     description:
