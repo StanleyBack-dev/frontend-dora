@@ -7,6 +7,7 @@ export type AddressFormat =
 export type AppModule =
   | 'BOOKINGS'
   | 'EVENTS'
+  | 'LOST_AND_FOUND'
   | 'PARCELS';
 
 /** Quem é a pessoa do pedido: eu, um dependente ou outra pessoa. */
@@ -97,6 +98,31 @@ export type EventStatus =
 export type EventWhen =
   | 'PAST'
   | 'UPCOMING';
+
+/** O tipo do item achado. */
+export type FoundItemCategory =
+  | 'ACCESSORY'
+  | 'BAG'
+  | 'CLOTHING'
+  | 'DOCUMENT'
+  | 'ELECTRONICS'
+  | 'KEYS'
+  | 'OTHER'
+  | 'TOY';
+
+/** Pedido aguardando, aceito, recusado ou cancelado pelo morador. */
+export type FoundItemClaimStatus =
+  | 'ACCEPTED'
+  | 'PENDING'
+  | 'REJECTED'
+  | 'WITHDRAWN';
+
+/** Guardado, devolvido ao dono, doado ou descartado. */
+export type FoundItemStatus =
+  | 'DISCARDED'
+  | 'DONATED'
+  | 'FOUND'
+  | 'RETURNED';
 
 /** Se a portaria já pode liberar a entrada do convidado. */
 export type GuestCheckInWindow =
@@ -194,6 +220,10 @@ export type NotificationType =
   | 'EVENT_ORDER_RECEIPT'
   | 'EVENT_ORDER_REJECTED'
   | 'EVENT_PUBLISHED'
+  | 'FOUND_ITEM_CLAIMED'
+  | 'FOUND_ITEM_CLAIM_DECIDED'
+  | 'FOUND_ITEM_EXPIRING'
+  | 'FOUND_ITEM_RETURNED'
   | 'PARCEL_AUTHORIZED'
   | 'PARCEL_CANCELLED'
   | 'PARCEL_PICKED_UP'
@@ -221,6 +251,7 @@ export type Permission =
   | 'DASHBOARD_READ'
   | 'EVENTS_MANAGE'
   | 'GUESTS_CHECKIN'
+  | 'LOST_FOUND_MANAGE'
   | 'NOTIFICATIONS_BROADCAST'
   | 'PARCELS_MANAGE'
   | 'PAYMENTS_MANAGE'

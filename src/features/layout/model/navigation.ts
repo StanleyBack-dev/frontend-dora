@@ -23,6 +23,7 @@ import {
   PartyPopper,
   Receipt,
   ScrollText,
+  SearchCheck,
   Settings,
   UserCheck,
   UserCog,
@@ -199,6 +200,22 @@ export const SIDEBAR: SidebarEntry[] = [
         label: "Todas as encomendas",
         icon: Package,
         permission: "PARCELS_MANAGE",
+      },
+    ],
+  },
+  // Lost and found: the desk (gate and administration) registers what is
+  // found, checks the claims and hands items back with a signature.
+  {
+    id: "lost-and-found",
+    label: "Achados e perdidos",
+    icon: SearchCheck,
+    module: "LOST_AND_FOUND",
+    items: [
+      {
+        href: "/achados-e-perdidos",
+        label: "Itens achados",
+        icon: SearchCheck,
+        permission: "LOST_FOUND_MANAGE",
       },
     ],
   },
