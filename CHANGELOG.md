@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.19.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.18.0...v0.19.0) (2026-11-21)
+
+
+### Features
+
+* **design-system:** centre drawer actions on phones and tidy the gate header ([53e24e6](https://github.com/StanleyBack-dev/frontend-dora/commit/53e24e6edc25a065865b9e72b3ae0799544379ca))
+* **lost-and-found:** "Perdi algo", neighbours' board, receipt PDF and indicators ([2e4a516](https://github.com/StanleyBack-dev/frontend-dora/commit/2e4a51635f7147c0026e2861f0e98b0e39eecf86))
+* **lost-and-found:** "Perdi algo", the neighbours' board, receipt PDF and indicators ([7d1d57b](https://github.com/StanleyBack-dev/frontend-dora/commit/7d1d57b9bc1b08838efaa7251b9fd3a3ef06c7b8))
+* **lost-and-found:** lost and found module ([35761c4](https://github.com/StanleyBack-dev/frontend-dora/commit/35761c4387bf38c3e1b035fc669af76d7827c4ce))
+* **lost-and-found:** resident pages, named owners and the desk queue ([81dbd7d](https://github.com/StanleyBack-dev/frontend-dora/commit/81dbd7dda738b57bfeed44e60f64e14f7a08b36c))
+* **lost-and-found:** resident pages, named owners and the desk queue ([756dd50](https://github.com/StanleyBack-dev/frontend-dora/commit/756dd504378a0f314befad800d6e275cd2886c98))
+* **lost-and-found:** the desk pages ([4cfb2cc](https://github.com/StanleyBack-dev/frontend-dora/commit/4cfb2ccb9c50d5b5fda2e04a6f029f61c38fc6f0))
+* **lost-and-found:** the desk pages ([39317ca](https://github.com/StanleyBack-dev/frontend-dora/commit/39317cac4a07d7dedf77112d4d8e88b358766b2d))
+
 ## [0.18.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.17.0...v0.18.0) (2026-11-20)
 
 
