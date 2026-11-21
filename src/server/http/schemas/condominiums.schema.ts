@@ -22,6 +22,7 @@ const APP_MODULES = [
   "BOOKINGS",
   "EVENTS",
   "PARCELS",
+  "LOST_AND_FOUND",
 ] as const satisfies readonly AppModule[];
 type MissingModule = Exclude<AppModule, (typeof APP_MODULES)[number]>;
 const everyModule: MissingModule extends never ? true : false = true;

@@ -1,4 +1,4 @@
-import { CalendarDays, Package, PartyPopper } from "lucide-react";
+import { CalendarDays, Package, PartyPopper, SearchCheck } from "lucide-react";
 import type { AppModule } from "@/shared/contracts/condominiums";
 
 /** A module a condominium contracts apart (Plataforma turns it on). */
@@ -31,5 +31,12 @@ export const APP_MODULES: AppModuleInfo[] = [
     description:
       "Encomendas recebidas para os moradores: aviso com código, retirada com QR code e assinatura na tela.",
     icon: <Package aria-hidden className="size-4" />,
+  },
+  {
+    module: "LOST_AND_FOUND",
+    label: "Achados e perdidos",
+    description:
+      "Itens achados no condomínio: os moradores pedem o que é seu e a devolução é feita com assinatura na tela.",
+    icon: <SearchCheck aria-hidden className="size-4" />,
   },
 ];

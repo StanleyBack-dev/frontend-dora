@@ -280,7 +280,36 @@ export function Combobox({
               <X className="size-3.5" />
             </button>
           ) : (
-            <ChevronDown className="mr-1 size-4 text-soft" aria-hidden />
+            // The arrow opens and closes the list (the field itself only
+            // opens it: clicking it again keeps the typing going).
+            <button
+              type="button"
+              tabIndex={-1}
+              disabled={disabled}
+              aria-label={open ? "Fechar a lista" : "Abrir a lista"}
+              aria-controls={listId}
+              aria-expanded={open}
+              // Keep the focus where it is: focusing the field reopens it.
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                if (open) {
+                  close();
+                  inputRef.current?.blur();
+                } else {
+                  inputRef.current?.focus();
+                  openList();
+                }
+              }}
+              className="grid size-6 place-items-center rounded-sm text-soft hover:bg-surface-muted hover:text-fg disabled:pointer-events-none"
+            >
+              <ChevronDown
+                className={cn(
+                  "size-4 transition-transform",
+                  open && "rotate-180",
+                )}
+                aria-hidden
+              />
+            </button>
           )}
         </div>
       </div>

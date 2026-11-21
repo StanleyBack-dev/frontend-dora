@@ -83,6 +83,51 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     label: "Aviso de encomenda cancelado",
     description: "Um aviso de encomenda registrado por engano foi cancelado.",
   },
+  FOUND_ITEM_CLAIMED: {
+    label: "Pedido de item achado",
+    description:
+      "Para a portaria e a gestão: um morador disse que um item achado é seu.",
+  },
+  FOUND_ITEM_CLAIM_DECIDED: {
+    label: "Resposta ao seu pedido de item achado",
+    description:
+      "A portaria aceitou (venha buscar) ou recusou, com o motivo, o seu pedido.",
+  },
+  FOUND_ITEM_RETURNED: {
+    label: "Item achado devolvido",
+    description:
+      "Um item achado que você pediu foi devolvido, com o comprovante (ou entregue a outra pessoa).",
+  },
+  FOUND_ITEM_FOR_YOU: {
+    label: "Item achado para você",
+    description:
+      "A portaria achou um item e indicou que é seu (ou da sua unidade): retire lá com um documento.",
+  },
+  FOUND_ITEM_NOT_OWNER: {
+    label: "Item achado não é do morador",
+    description:
+      "Para a portaria e a gestão: o morador indicado disse que o item não é seu, e ele passou a aparecer para todos.",
+  },
+  LOST_REPORT_MATCH: {
+    label: "Pode ser o que você perdeu",
+    description:
+      "Você avisou em “Perdi algo” e a portaria registrou um item da mesma categoria.",
+  },
+  LOST_REPORT_EXPIRED: {
+    label: "Aviso de item perdido encerrado",
+    description:
+      "Um aviso de “Perdi algo” ficou 90 dias sem notícias e foi encerrado.",
+  },
+  LOST_REPORT_SPOTTED: {
+    label: "Um vizinho achou o que foi perdido",
+    description:
+      "Um vizinho viu o aviso no mural e diz que achou o item: quem perdeu e a portaria são avisados.",
+  },
+  FOUND_ITEM_EXPIRING: {
+    label: "Item achado perto do fim da guarda",
+    description:
+      "Para a portaria e a gestão: um item achado completa o prazo de guarda em 7 dias.",
+  },
   EVENT_ORDER_CONFIRMED: {
     label: "Ingressos confirmados",
     description:

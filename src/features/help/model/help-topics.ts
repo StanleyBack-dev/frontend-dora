@@ -12,6 +12,7 @@ import {
   LifeBuoy,
   MapPin,
   PartyPopper,
+  SearchCheck,
   Megaphone,
   Settings,
   ShieldCheck,
@@ -527,6 +528,122 @@ export const HELP_TOPICS: HelpTopic[] = [
       access: [
         {
           text: "Portaria e gestores recebem e entregam encomendas (permissão “Registrar, entregar e devolver encomendas”); o gestor pode ajustar quem tem essa permissão.",
+        },
+      ],
+    },
+  },
+  {
+    id: "achados-e-perdidos-morador",
+    href: "/achados-e-perdidos/meus",
+    title: "Itens achados e meus pedidos",
+    icon: SearchCheck,
+    module: "LOST_AND_FOUND",
+    area: "main",
+    tour: "Veja o que foi achado no condomínio e peça o que é seu.",
+    sections: {
+      howto: [
+        {
+          text: "Em “Itens achados” aparecem os itens guardados pela portaria, com foto (quando houver), onde e quando foram achados. Filtre pela categoria.",
+        },
+        {
+          text: "Reconheceu algo seu? Toque em “É meu” e confirme (se quiser, acrescente um detalhe). A portaria é avisada.",
+        },
+        {
+          text: "Em “Meus pedidos” você acompanha a resposta da portaria e pode cancelar um pedido que ainda aguarda.",
+        },
+        {
+          text: "Para retirar, vá à portaria com um documento: o porteiro confere se o item é seu e você assina na tela. O comprovante fica no item, em “Meus pedidos”, e pode ser baixado em PDF.",
+        },
+        {
+          text: "Perdeu algo e não está entre os achados? Em “Perdi algo”, toque em “Avisar que perdi” e diga a categoria e o que é. Quando a portaria registrar um item da mesma categoria, você recebe um aviso.",
+        },
+        {
+          text: "Encontrou ou desistiu? Encerre o aviso com “Encontrei” ou “Não procuro mais”. Se a portaria devolver o item a você, o aviso se encerra sozinho.",
+        },
+        {
+          text: "Com “Mostrar para os vizinhos” marcado, o aviso aparece em “Itens procurados”, sem o seu nome, a sua unidade e os detalhes. Quem achar toca em “Achei isso”: você e a portaria são avisados, e o item é deixado na portaria.",
+        },
+      ],
+      rules: [
+        {
+          text: "Documentos aparecem sem foto, para proteger os dados pessoais.",
+        },
+        {
+          text: "Pedido recusado ou cancelado? Você pode pedir de novo.",
+        },
+        {
+          text: "Os itens ficam guardados por 90 dias; depois, podem ser doados ou descartados.",
+        },
+        {
+          text: "Um aviso de “Perdi algo” sem notícias se encerra depois de 90 dias.",
+        },
+      ],
+      access: [
+        {
+          text: "Qualquer morador do condomínio vê os itens guardados e pode pedir os seus.",
+        },
+      ],
+    },
+  },
+  {
+    id: "achados-e-perdidos",
+    href: "/achados-e-perdidos",
+    title: "Achados e perdidos",
+    icon: SearchCheck,
+    module: "LOST_AND_FOUND",
+    permission: "LOST_FOUND_MANAGE",
+    area: "main",
+    tour: "Registre o que foi achado no condomínio, confira os pedidos dos moradores e devolva com assinatura na tela.",
+    sections: {
+      howto: [
+        {
+          text: "Achou algo: toque em “Registrar item achado”, escolha a categoria, diga o que é, onde e quando foi achado e onde ficou guardado e, se quiser, tire ou anexe uma foto.",
+        },
+        {
+          text: "Sabe de quem é? Em “De quem é?”, escolha a unidade (os moradores dela são avisados e só eles veem o item) o morador (só essa pessoa é avisada, já liberada para retirar) ou um funcionário da portaria ou da gestão (também só ele é avisado; outra pessoa da equipe faz a entrega). Se a pessoa disser “Não é meu”, você é avisado e o item passa a aparecer para todos; “Liberar para todos” faz o mesmo pela portaria.",
+        },
+        {
+          text: "Escreva na descrição o que os moradores podem ver (cor, marca) e guarde em “Detalhes para conferir o dono” o que só o dono saberia (o que tem dentro, o nome no documento): só a portaria e a gestão veem.",
+        },
+        {
+          text: "Quando um morador disser que um item é seu, você é avisado e o pedido aparece em “Pedidos para conferir”, com o que perguntar (os detalhes que só a portaria vê). Quando ele vier, toque em “Devolver com assinatura”, confira pessoalmente e peça a assinatura.",
+        },
+        {
+          text: "Se quiser responder antes de ele vir, use “Aceitar” (ele é avisado para vir buscar) ou “Recusar” (com o motivo). Para alguém sem pedido que comprovou ser o dono, use “Devolver com assinatura”.",
+        },
+        {
+          text: "Ninguém pediu? Na página do item, em “Mais ações”, use “Doar” ou “Descartar”, com o motivo.",
+        },
+        {
+          text: "Em “Itens procurados” você vê o que os moradores avisaram que perderam. Ao registrar um item da mesma categoria, eles são avisados automaticamente. Se um vizinho tocar em “Achei isso”, você é avisado de quem achou.",
+        },
+        {
+          text: "O item procurado chegou à portaria? Em “Itens procurados”, toque em “Registrar item achado”: o formulário vem preenchido e quem perdeu já fica indicado como dono, é avisado e pode retirar. Ao devolver, o aviso se encerra sozinho.",
+        },
+        {
+          text: "Depois da devolução, o comprovante fica na página do item e pode ser baixado em PDF, com a assinatura e as provas.",
+        },
+      ],
+      rules: [
+        {
+          text: "Cada item fica guardado por 90 dias a partir de quando foi achado. A portaria e a gestão são avisadas 7 dias antes de o prazo acabar.",
+        },
+        {
+          text: "A foto de documentos já vem escondida dos moradores; nos outros itens, dá para esconder ao registrar.",
+        },
+        {
+          text: "Ao devolver, doar ou descartar, os outros pedidos abertos do item são recusados e os moradores, avisados.",
+        },
+        {
+          text: "A assinatura guarda data e hora, IP, aparelho, localização (quando permitida) e quem entregou, com um código de verificação (SHA-256). Ela não pode ser alterada depois.",
+        },
+        {
+          text: "Fechar o formulário de registro guarda o que foi digitado; só “Cancelar” limpa.",
+        },
+      ],
+      access: [
+        {
+          text: "Portaria e gestores cuidam dos achados e perdidos (permissão “Registrar itens achados, conferir pedidos e devolver”); o gestor pode ajustar quem tem essa permissão.",
         },
       ],
     },

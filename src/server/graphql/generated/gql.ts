@@ -91,7 +91,7 @@ type Documents = {
     "\n  mutation DeleteUnit($id: ID!) {\n    deleteUnit(id: $id)\n  }\n": typeof types.DeleteUnitDocument,
     "\n  query Condominium($id: ID!) {\n    condominium(id: $id) {\n      ...CondominiumFields\n    }\n  }\n": typeof types.CondominiumDocument,
     "\n  query UnitPage($filter: UnitFilterInput, $page: PageInput) {\n    unitPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        street\n        block\n        number\n        label\n        residents\n        people {\n          userId\n          name\n          role\n          email\n          phone\n          active\n        }\n      }\n    }\n  }\n": typeof types.UnitPageDocument,
-    "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      pendingBookings\n      bookingsToday\n      openSupportRequests\n      failedNotifications\n      parcels {\n        waiting\n        stuck\n        perishableOverdue\n        pickedUpLast30Days\n        averagePickupHours\n        monthly {\n          month\n          received\n          pickedUp\n        }\n      }\n    }\n  }\n": typeof types.DashboardDocument,
+    "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      pendingBookings\n      bookingsToday\n      openSupportRequests\n      failedNotifications\n      parcels {\n        waiting\n        stuck\n        perishableOverdue\n        pickedUpLast30Days\n        averagePickupHours\n        monthly {\n          month\n          received\n          pickedUp\n        }\n      }\n      lostAndFound {\n        kept\n        pendingClaims\n        expiringSoon\n        openLostReports\n        returnedLast90Days\n        returnRate\n        monthly {\n          month\n          found\n          returned\n        }\n      }\n    }\n  }\n": typeof types.DashboardDocument,
     "\n  fragment DependentFields on Dependent {\n    id\n    name\n    birthDate\n    relationship\n    status\n    holderName\n    unitLabel\n    rejectReason\n    reviewedAt\n    createdAt\n    documentUrl\n    documentContentType\n  }\n": typeof types.DependentFieldsFragmentDoc,
     "\n  query MyDependents {\n    myDependents {\n      ...DependentFields\n    }\n  }\n": typeof types.MyDependentsDocument,
     "\n  mutation AddDependent($input: DependentInput!) {\n    addDependent(input: $input) {\n      ...DependentFields\n    }\n  }\n": typeof types.AddDependentDocument,
@@ -137,6 +137,32 @@ type Documents = {
     "\n  query EventTickets(\n    $eventId: ID!\n    $filter: EventTicketFilterInput\n    $page: PageInput\n  ) {\n    eventTickets(eventId: $eventId, filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...GateEventTicketFields\n      }\n    }\n  }\n": typeof types.EventTicketsDocument,
     "\n  query EventTicketOverview($eventId: ID!) {\n    eventTicketOverview(eventId: $eventId) {\n      total\n      checkedIn\n      outside\n      byType {\n        name\n        count\n      }\n      people {\n        id\n        name\n        ticketCode\n      }\n      units {\n        id\n        label\n      }\n    }\n  }\n": typeof types.EventTicketOverviewDocument,
     "\n  query EventOrderOverview($eventId: ID!) {\n    eventOrderOverview(eventId: $eventId) {\n      byStatus {\n        status\n        count\n      }\n      receivedCents\n      confirmedPeople\n      buyers {\n        id\n        name\n      }\n      units {\n        id\n        label\n      }\n      codes {\n        code\n        buyerName\n      }\n    }\n  }\n": typeof types.EventOrderOverviewDocument,
+    "\n  fragment FoundItemFields on FoundItem {\n    id\n    category\n    title\n    description\n    foundLocation\n    foundAt\n    storageLocation\n    photoHidden\n    status\n    registeredByName\n    keepUntil\n    closedAt\n    closedByName\n    closeReason\n    returnedToName\n    signerName\n    pendingClaims\n    awaitedByName\n    photoUrl\n    ownerUnitLabel\n    ownerName\n  }\n": typeof types.FoundItemFieldsFragmentDoc,
+    "\n  fragment FoundItemClaimFields on FoundItemClaim {\n    id\n    itemId\n    itemTitle\n    itemStatus\n    itemCategory\n    userId\n    userName\n    unitLabel\n    message\n    status\n    createdAt\n    decidedAt\n    decidedByName\n    decisionNote\n  }\n": typeof types.FoundItemClaimFieldsFragmentDoc,
+    "\n  query FoundItems($filter: FoundItemFilterInput, $page: PageInput) {\n    foundItems(filter: $filter, page: $page) {\n      items {\n        ...FoundItemFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.FoundItemsDocument,
+    "\n  query FoundItemOverview {\n    foundItemOverview {\n      byStatus {\n        status\n        count\n      }\n      pendingClaims\n      expiringSoon\n      titles\n      foundLocations\n      storageLocations\n      residents {\n        id\n        name\n      }\n    }\n  }\n": typeof types.FoundItemOverviewDocument,
+    "\n  query FoundItem($id: ID!) {\n    foundItem(id: $id) {\n      ...FoundItemFields\n      privateDetails\n      claims {\n        ...FoundItemClaimFields\n      }\n      myClaim {\n        ...FoundItemClaimFields\n      }\n      returnDeclaration\n      soleStaffMember\n      returnReceipt {\n        signerName\n        signerDocumentType\n        signerDocumentMasked\n        declaration\n        imageUrl\n        imageSha256\n        strokesSha256\n        signedAt\n        clientSignedAt\n        clientTimeZone\n        ipAddress\n        userAgent\n        device\n        locationStatus\n        latitude\n        longitude\n        locationAccuracyMeters\n        collectedByName\n        collectedByRole\n        evidenceSha256\n        intact\n        selfHandover\n      }\n    }\n  }\n": typeof types.FoundItemDocument,
+    "\n  query KeptFoundItems($category: FoundItemCategory, $page: PageInput) {\n    keptFoundItems(category: $category, page: $page) {\n      items {\n        ...FoundItemFields\n        myClaim {\n          ...FoundItemClaimFields\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.KeptFoundItemsDocument,
+    "\n  query MyFoundItemClaims($page: PageInput) {\n    myFoundItemClaims(page: $page) {\n      items {\n        ...FoundItemClaimFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.MyFoundItemClaimsDocument,
+    "\n  mutation ClaimFoundItem($itemId: ID!, $message: String) {\n    claimFoundItem(itemId: $itemId, message: $message) {\n      ...FoundItemClaimFields\n    }\n  }\n": typeof types.ClaimFoundItemDocument,
+    "\n  mutation WithdrawFoundItemClaim($claimId: ID!) {\n    withdrawFoundItemClaim(claimId: $claimId) {\n      ...FoundItemClaimFields\n    }\n  }\n": typeof types.WithdrawFoundItemClaimDocument,
+    "\n  mutation RegisterFoundItem($input: RegisterFoundItemInput!) {\n    registerFoundItem(input: $input) {\n      ...FoundItemFields\n    }\n  }\n": typeof types.RegisterFoundItemDocument,
+    "\n  mutation DecideFoundItemClaim(\n    $claimId: ID!\n    $accept: Boolean!\n    $note: String\n  ) {\n    decideFoundItemClaim(claimId: $claimId, accept: $accept, note: $note) {\n      ...FoundItemClaimFields\n    }\n  }\n": typeof types.DecideFoundItemClaimDocument,
+    "\n  mutation ReturnFoundItem($input: ReturnFoundItemInput!) {\n    returnFoundItem(input: $input) {\n      ...FoundItemFields\n    }\n  }\n": typeof types.ReturnFoundItemDocument,
+    "\n  mutation DonateFoundItem($id: ID!, $reason: String!) {\n    donateFoundItem(id: $id, reason: $reason) {\n      ...FoundItemFields\n    }\n  }\n": typeof types.DonateFoundItemDocument,
+    "\n  mutation DiscardFoundItem($id: ID!, $reason: String!) {\n    discardFoundItem(id: $id, reason: $reason) {\n      ...FoundItemFields\n    }\n  }\n": typeof types.DiscardFoundItemDocument,
+    "\n  query FoundItemOwners($search: String!) {\n    foundItemOwners(search: $search) {\n      userId\n      name\n      unitId\n      unitLabel\n    }\n  }\n": typeof types.FoundItemOwnersDocument,
+    "\n  mutation ReleaseFoundItem($id: ID!) {\n    releaseFoundItem(id: $id) {\n      ...FoundItemFields\n    }\n  }\n": typeof types.ReleaseFoundItemDocument,
+    "\n  query FoundItemClaims($open: Boolean, $page: PageInput) {\n    foundItemClaims(open: $open, page: $page) {\n      items {\n        ...FoundItemClaimFields\n        item {\n          ...FoundItemFields\n          privateDetails\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.FoundItemClaimsDocument,
+    "\n  query FoundItemReceiptPdf($id: ID!) {\n    foundItemReceiptPdf(id: $id) {\n      fileName\n      mimeType\n      base64Content\n    }\n  }\n": typeof types.FoundItemReceiptPdfDocument,
+    "\n  query FoundItemStaff {\n    foundItemStaff {\n      userId\n      name\n      roleLabel\n    }\n  }\n": typeof types.FoundItemStaffDocument,
+    "\n  fragment LostReportFields on LostReport {\n    id\n    userId\n    userName\n    unitId\n    unitLabel\n    category\n    title\n    description\n    lostLocation\n    lostOn\n    photoUrl\n    shared\n    spotCount\n    status\n    foundItemId\n    closedAt\n    createdAt\n  }\n": typeof types.LostReportFieldsFragmentDoc,
+    "\n  query MyLostReports($page: PageInput) {\n    myLostReports(page: $page) {\n      items {\n        ...LostReportFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.MyLostReportsDocument,
+    "\n  query LostReports($open: Boolean, $page: PageInput) {\n    lostReports(open: $open, page: $page) {\n      items {\n        ...LostReportFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.LostReportsDocument,
+    "\n  mutation ReportLostItem($input: ReportLostItemInput!) {\n    reportLostItem(input: $input) {\n      ...LostReportFields\n    }\n  }\n": typeof types.ReportLostItemDocument,
+    "\n  mutation CloseLostReport($id: ID!, $found: Boolean!) {\n    closeLostReport(id: $id, found: $found) {\n      ...LostReportFields\n    }\n  }\n": typeof types.CloseLostReportDocument,
+    "\n  query LostReportBoard($page: PageInput) {\n    lostReportBoard(page: $page) {\n      items {\n        id\n        category\n        title\n        lostLocation\n        lostOn\n        photoUrl\n        mine\n        spottedByMe\n        createdAt\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.LostReportBoardDocument,
+    "\n  mutation SpotLostReport($id: ID!, $note: String) {\n    spotLostReport(id: $id, note: $note)\n  }\n": typeof types.SpotLostReportDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": typeof types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": typeof types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": typeof types.MarkNotificationReadDocument,
@@ -271,7 +297,7 @@ const documents: Documents = {
     "\n  mutation DeleteUnit($id: ID!) {\n    deleteUnit(id: $id)\n  }\n": types.DeleteUnitDocument,
     "\n  query Condominium($id: ID!) {\n    condominium(id: $id) {\n      ...CondominiumFields\n    }\n  }\n": types.CondominiumDocument,
     "\n  query UnitPage($filter: UnitFilterInput, $page: PageInput) {\n    unitPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        street\n        block\n        number\n        label\n        residents\n        people {\n          userId\n          name\n          role\n          email\n          phone\n          active\n        }\n      }\n    }\n  }\n": types.UnitPageDocument,
-    "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      pendingBookings\n      bookingsToday\n      openSupportRequests\n      failedNotifications\n      parcels {\n        waiting\n        stuck\n        perishableOverdue\n        pickedUpLast30Days\n        averagePickupHours\n        monthly {\n          month\n          received\n          pickedUp\n        }\n      }\n    }\n  }\n": types.DashboardDocument,
+    "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      pendingBookings\n      bookingsToday\n      openSupportRequests\n      failedNotifications\n      parcels {\n        waiting\n        stuck\n        perishableOverdue\n        pickedUpLast30Days\n        averagePickupHours\n        monthly {\n          month\n          received\n          pickedUp\n        }\n      }\n      lostAndFound {\n        kept\n        pendingClaims\n        expiringSoon\n        openLostReports\n        returnedLast90Days\n        returnRate\n        monthly {\n          month\n          found\n          returned\n        }\n      }\n    }\n  }\n": types.DashboardDocument,
     "\n  fragment DependentFields on Dependent {\n    id\n    name\n    birthDate\n    relationship\n    status\n    holderName\n    unitLabel\n    rejectReason\n    reviewedAt\n    createdAt\n    documentUrl\n    documentContentType\n  }\n": types.DependentFieldsFragmentDoc,
     "\n  query MyDependents {\n    myDependents {\n      ...DependentFields\n    }\n  }\n": types.MyDependentsDocument,
     "\n  mutation AddDependent($input: DependentInput!) {\n    addDependent(input: $input) {\n      ...DependentFields\n    }\n  }\n": types.AddDependentDocument,
@@ -317,6 +343,32 @@ const documents: Documents = {
     "\n  query EventTickets(\n    $eventId: ID!\n    $filter: EventTicketFilterInput\n    $page: PageInput\n  ) {\n    eventTickets(eventId: $eventId, filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...GateEventTicketFields\n      }\n    }\n  }\n": types.EventTicketsDocument,
     "\n  query EventTicketOverview($eventId: ID!) {\n    eventTicketOverview(eventId: $eventId) {\n      total\n      checkedIn\n      outside\n      byType {\n        name\n        count\n      }\n      people {\n        id\n        name\n        ticketCode\n      }\n      units {\n        id\n        label\n      }\n    }\n  }\n": types.EventTicketOverviewDocument,
     "\n  query EventOrderOverview($eventId: ID!) {\n    eventOrderOverview(eventId: $eventId) {\n      byStatus {\n        status\n        count\n      }\n      receivedCents\n      confirmedPeople\n      buyers {\n        id\n        name\n      }\n      units {\n        id\n        label\n      }\n      codes {\n        code\n        buyerName\n      }\n    }\n  }\n": types.EventOrderOverviewDocument,
+    "\n  fragment FoundItemFields on FoundItem {\n    id\n    category\n    title\n    description\n    foundLocation\n    foundAt\n    storageLocation\n    photoHidden\n    status\n    registeredByName\n    keepUntil\n    closedAt\n    closedByName\n    closeReason\n    returnedToName\n    signerName\n    pendingClaims\n    awaitedByName\n    photoUrl\n    ownerUnitLabel\n    ownerName\n  }\n": types.FoundItemFieldsFragmentDoc,
+    "\n  fragment FoundItemClaimFields on FoundItemClaim {\n    id\n    itemId\n    itemTitle\n    itemStatus\n    itemCategory\n    userId\n    userName\n    unitLabel\n    message\n    status\n    createdAt\n    decidedAt\n    decidedByName\n    decisionNote\n  }\n": types.FoundItemClaimFieldsFragmentDoc,
+    "\n  query FoundItems($filter: FoundItemFilterInput, $page: PageInput) {\n    foundItems(filter: $filter, page: $page) {\n      items {\n        ...FoundItemFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.FoundItemsDocument,
+    "\n  query FoundItemOverview {\n    foundItemOverview {\n      byStatus {\n        status\n        count\n      }\n      pendingClaims\n      expiringSoon\n      titles\n      foundLocations\n      storageLocations\n      residents {\n        id\n        name\n      }\n    }\n  }\n": types.FoundItemOverviewDocument,
+    "\n  query FoundItem($id: ID!) {\n    foundItem(id: $id) {\n      ...FoundItemFields\n      privateDetails\n      claims {\n        ...FoundItemClaimFields\n      }\n      myClaim {\n        ...FoundItemClaimFields\n      }\n      returnDeclaration\n      soleStaffMember\n      returnReceipt {\n        signerName\n        signerDocumentType\n        signerDocumentMasked\n        declaration\n        imageUrl\n        imageSha256\n        strokesSha256\n        signedAt\n        clientSignedAt\n        clientTimeZone\n        ipAddress\n        userAgent\n        device\n        locationStatus\n        latitude\n        longitude\n        locationAccuracyMeters\n        collectedByName\n        collectedByRole\n        evidenceSha256\n        intact\n        selfHandover\n      }\n    }\n  }\n": types.FoundItemDocument,
+    "\n  query KeptFoundItems($category: FoundItemCategory, $page: PageInput) {\n    keptFoundItems(category: $category, page: $page) {\n      items {\n        ...FoundItemFields\n        myClaim {\n          ...FoundItemClaimFields\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.KeptFoundItemsDocument,
+    "\n  query MyFoundItemClaims($page: PageInput) {\n    myFoundItemClaims(page: $page) {\n      items {\n        ...FoundItemClaimFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.MyFoundItemClaimsDocument,
+    "\n  mutation ClaimFoundItem($itemId: ID!, $message: String) {\n    claimFoundItem(itemId: $itemId, message: $message) {\n      ...FoundItemClaimFields\n    }\n  }\n": types.ClaimFoundItemDocument,
+    "\n  mutation WithdrawFoundItemClaim($claimId: ID!) {\n    withdrawFoundItemClaim(claimId: $claimId) {\n      ...FoundItemClaimFields\n    }\n  }\n": types.WithdrawFoundItemClaimDocument,
+    "\n  mutation RegisterFoundItem($input: RegisterFoundItemInput!) {\n    registerFoundItem(input: $input) {\n      ...FoundItemFields\n    }\n  }\n": types.RegisterFoundItemDocument,
+    "\n  mutation DecideFoundItemClaim(\n    $claimId: ID!\n    $accept: Boolean!\n    $note: String\n  ) {\n    decideFoundItemClaim(claimId: $claimId, accept: $accept, note: $note) {\n      ...FoundItemClaimFields\n    }\n  }\n": types.DecideFoundItemClaimDocument,
+    "\n  mutation ReturnFoundItem($input: ReturnFoundItemInput!) {\n    returnFoundItem(input: $input) {\n      ...FoundItemFields\n    }\n  }\n": types.ReturnFoundItemDocument,
+    "\n  mutation DonateFoundItem($id: ID!, $reason: String!) {\n    donateFoundItem(id: $id, reason: $reason) {\n      ...FoundItemFields\n    }\n  }\n": types.DonateFoundItemDocument,
+    "\n  mutation DiscardFoundItem($id: ID!, $reason: String!) {\n    discardFoundItem(id: $id, reason: $reason) {\n      ...FoundItemFields\n    }\n  }\n": types.DiscardFoundItemDocument,
+    "\n  query FoundItemOwners($search: String!) {\n    foundItemOwners(search: $search) {\n      userId\n      name\n      unitId\n      unitLabel\n    }\n  }\n": types.FoundItemOwnersDocument,
+    "\n  mutation ReleaseFoundItem($id: ID!) {\n    releaseFoundItem(id: $id) {\n      ...FoundItemFields\n    }\n  }\n": types.ReleaseFoundItemDocument,
+    "\n  query FoundItemClaims($open: Boolean, $page: PageInput) {\n    foundItemClaims(open: $open, page: $page) {\n      items {\n        ...FoundItemClaimFields\n        item {\n          ...FoundItemFields\n          privateDetails\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.FoundItemClaimsDocument,
+    "\n  query FoundItemReceiptPdf($id: ID!) {\n    foundItemReceiptPdf(id: $id) {\n      fileName\n      mimeType\n      base64Content\n    }\n  }\n": types.FoundItemReceiptPdfDocument,
+    "\n  query FoundItemStaff {\n    foundItemStaff {\n      userId\n      name\n      roleLabel\n    }\n  }\n": types.FoundItemStaffDocument,
+    "\n  fragment LostReportFields on LostReport {\n    id\n    userId\n    userName\n    unitId\n    unitLabel\n    category\n    title\n    description\n    lostLocation\n    lostOn\n    photoUrl\n    shared\n    spotCount\n    status\n    foundItemId\n    closedAt\n    createdAt\n  }\n": types.LostReportFieldsFragmentDoc,
+    "\n  query MyLostReports($page: PageInput) {\n    myLostReports(page: $page) {\n      items {\n        ...LostReportFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.MyLostReportsDocument,
+    "\n  query LostReports($open: Boolean, $page: PageInput) {\n    lostReports(open: $open, page: $page) {\n      items {\n        ...LostReportFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.LostReportsDocument,
+    "\n  mutation ReportLostItem($input: ReportLostItemInput!) {\n    reportLostItem(input: $input) {\n      ...LostReportFields\n    }\n  }\n": types.ReportLostItemDocument,
+    "\n  mutation CloseLostReport($id: ID!, $found: Boolean!) {\n    closeLostReport(id: $id, found: $found) {\n      ...LostReportFields\n    }\n  }\n": types.CloseLostReportDocument,
+    "\n  query LostReportBoard($page: PageInput) {\n    lostReportBoard(page: $page) {\n      items {\n        id\n        category\n        title\n        lostLocation\n        lostOn\n        photoUrl\n        mine\n        spottedByMe\n        createdAt\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.LostReportBoardDocument,
+    "\n  mutation SpotLostReport($id: ID!, $note: String) {\n    spotLostReport(id: $id, note: $note)\n  }\n": types.SpotLostReportDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": types.MarkNotificationReadDocument,
@@ -682,7 +734,7 @@ export function graphql(source: "\n  query UnitPage($filter: UnitFilterInput, $p
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      pendingBookings\n      bookingsToday\n      openSupportRequests\n      failedNotifications\n      parcels {\n        waiting\n        stuck\n        perishableOverdue\n        pickedUpLast30Days\n        averagePickupHours\n        monthly {\n          month\n          received\n          pickedUp\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').DashboardDocument;
+export function graphql(source: "\n  query Dashboard {\n    dashboard {\n      activeUsers\n      pendingEnrollments\n      units\n      activeSpaces\n      pendingBookings\n      bookingsToday\n      openSupportRequests\n      failedNotifications\n      parcels {\n        waiting\n        stuck\n        perishableOverdue\n        pickedUpLast30Days\n        averagePickupHours\n        monthly {\n          month\n          received\n          pickedUp\n        }\n      }\n      lostAndFound {\n        kept\n        pendingClaims\n        expiringSoon\n        openLostReports\n        returnedLast90Days\n        returnRate\n        monthly {\n          month\n          found\n          returned\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').DashboardDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -863,6 +915,110 @@ export function graphql(source: "\n  query EventTicketOverview($eventId: ID!) {\
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query EventOrderOverview($eventId: ID!) {\n    eventOrderOverview(eventId: $eventId) {\n      byStatus {\n        status\n        count\n      }\n      receivedCents\n      confirmedPeople\n      buyers {\n        id\n        name\n      }\n      units {\n        id\n        label\n      }\n      codes {\n        code\n        buyerName\n      }\n    }\n  }\n"): typeof import('./graphql').EventOrderOverviewDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment FoundItemFields on FoundItem {\n    id\n    category\n    title\n    description\n    foundLocation\n    foundAt\n    storageLocation\n    photoHidden\n    status\n    registeredByName\n    keepUntil\n    closedAt\n    closedByName\n    closeReason\n    returnedToName\n    signerName\n    pendingClaims\n    awaitedByName\n    photoUrl\n    ownerUnitLabel\n    ownerName\n  }\n"): typeof import('./graphql').FoundItemFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment FoundItemClaimFields on FoundItemClaim {\n    id\n    itemId\n    itemTitle\n    itemStatus\n    itemCategory\n    userId\n    userName\n    unitLabel\n    message\n    status\n    createdAt\n    decidedAt\n    decidedByName\n    decisionNote\n  }\n"): typeof import('./graphql').FoundItemClaimFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query FoundItems($filter: FoundItemFilterInput, $page: PageInput) {\n    foundItems(filter: $filter, page: $page) {\n      items {\n        ...FoundItemFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').FoundItemsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query FoundItemOverview {\n    foundItemOverview {\n      byStatus {\n        status\n        count\n      }\n      pendingClaims\n      expiringSoon\n      titles\n      foundLocations\n      storageLocations\n      residents {\n        id\n        name\n      }\n    }\n  }\n"): typeof import('./graphql').FoundItemOverviewDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query FoundItem($id: ID!) {\n    foundItem(id: $id) {\n      ...FoundItemFields\n      privateDetails\n      claims {\n        ...FoundItemClaimFields\n      }\n      myClaim {\n        ...FoundItemClaimFields\n      }\n      returnDeclaration\n      soleStaffMember\n      returnReceipt {\n        signerName\n        signerDocumentType\n        signerDocumentMasked\n        declaration\n        imageUrl\n        imageSha256\n        strokesSha256\n        signedAt\n        clientSignedAt\n        clientTimeZone\n        ipAddress\n        userAgent\n        device\n        locationStatus\n        latitude\n        longitude\n        locationAccuracyMeters\n        collectedByName\n        collectedByRole\n        evidenceSha256\n        intact\n        selfHandover\n      }\n    }\n  }\n"): typeof import('./graphql').FoundItemDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query KeptFoundItems($category: FoundItemCategory, $page: PageInput) {\n    keptFoundItems(category: $category, page: $page) {\n      items {\n        ...FoundItemFields\n        myClaim {\n          ...FoundItemClaimFields\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').KeptFoundItemsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MyFoundItemClaims($page: PageInput) {\n    myFoundItemClaims(page: $page) {\n      items {\n        ...FoundItemClaimFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').MyFoundItemClaimsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ClaimFoundItem($itemId: ID!, $message: String) {\n    claimFoundItem(itemId: $itemId, message: $message) {\n      ...FoundItemClaimFields\n    }\n  }\n"): typeof import('./graphql').ClaimFoundItemDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation WithdrawFoundItemClaim($claimId: ID!) {\n    withdrawFoundItemClaim(claimId: $claimId) {\n      ...FoundItemClaimFields\n    }\n  }\n"): typeof import('./graphql').WithdrawFoundItemClaimDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RegisterFoundItem($input: RegisterFoundItemInput!) {\n    registerFoundItem(input: $input) {\n      ...FoundItemFields\n    }\n  }\n"): typeof import('./graphql').RegisterFoundItemDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DecideFoundItemClaim(\n    $claimId: ID!\n    $accept: Boolean!\n    $note: String\n  ) {\n    decideFoundItemClaim(claimId: $claimId, accept: $accept, note: $note) {\n      ...FoundItemClaimFields\n    }\n  }\n"): typeof import('./graphql').DecideFoundItemClaimDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ReturnFoundItem($input: ReturnFoundItemInput!) {\n    returnFoundItem(input: $input) {\n      ...FoundItemFields\n    }\n  }\n"): typeof import('./graphql').ReturnFoundItemDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DonateFoundItem($id: ID!, $reason: String!) {\n    donateFoundItem(id: $id, reason: $reason) {\n      ...FoundItemFields\n    }\n  }\n"): typeof import('./graphql').DonateFoundItemDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DiscardFoundItem($id: ID!, $reason: String!) {\n    discardFoundItem(id: $id, reason: $reason) {\n      ...FoundItemFields\n    }\n  }\n"): typeof import('./graphql').DiscardFoundItemDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query FoundItemOwners($search: String!) {\n    foundItemOwners(search: $search) {\n      userId\n      name\n      unitId\n      unitLabel\n    }\n  }\n"): typeof import('./graphql').FoundItemOwnersDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ReleaseFoundItem($id: ID!) {\n    releaseFoundItem(id: $id) {\n      ...FoundItemFields\n    }\n  }\n"): typeof import('./graphql').ReleaseFoundItemDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query FoundItemClaims($open: Boolean, $page: PageInput) {\n    foundItemClaims(open: $open, page: $page) {\n      items {\n        ...FoundItemClaimFields\n        item {\n          ...FoundItemFields\n          privateDetails\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').FoundItemClaimsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query FoundItemReceiptPdf($id: ID!) {\n    foundItemReceiptPdf(id: $id) {\n      fileName\n      mimeType\n      base64Content\n    }\n  }\n"): typeof import('./graphql').FoundItemReceiptPdfDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query FoundItemStaff {\n    foundItemStaff {\n      userId\n      name\n      roleLabel\n    }\n  }\n"): typeof import('./graphql').FoundItemStaffDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment LostReportFields on LostReport {\n    id\n    userId\n    userName\n    unitId\n    unitLabel\n    category\n    title\n    description\n    lostLocation\n    lostOn\n    photoUrl\n    shared\n    spotCount\n    status\n    foundItemId\n    closedAt\n    createdAt\n  }\n"): typeof import('./graphql').LostReportFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MyLostReports($page: PageInput) {\n    myLostReports(page: $page) {\n      items {\n        ...LostReportFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').MyLostReportsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query LostReports($open: Boolean, $page: PageInput) {\n    lostReports(open: $open, page: $page) {\n      items {\n        ...LostReportFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').LostReportsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ReportLostItem($input: ReportLostItemInput!) {\n    reportLostItem(input: $input) {\n      ...LostReportFields\n    }\n  }\n"): typeof import('./graphql').ReportLostItemDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CloseLostReport($id: ID!, $found: Boolean!) {\n    closeLostReport(id: $id, found: $found) {\n      ...LostReportFields\n    }\n  }\n"): typeof import('./graphql').CloseLostReportDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query LostReportBoard($page: PageInput) {\n    lostReportBoard(page: $page) {\n      items {\n        id\n        category\n        title\n        lostLocation\n        lostOn\n        photoUrl\n        mine\n        spottedByMe\n        createdAt\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').LostReportBoardDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SpotLostReport($id: ID!, $note: String) {\n    spotLostReport(id: $id, note: $note)\n  }\n"): typeof import('./graphql').SpotLostReportDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

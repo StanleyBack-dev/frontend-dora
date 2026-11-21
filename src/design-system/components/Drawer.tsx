@@ -83,7 +83,7 @@ export function Drawer({
               {title}
             </h2>
             {subtitle && (
-              <p className="mt-0.5 truncate text-[12px] text-chrome-muted">
+              <p className="mt-0.5 text-[12px] leading-snug break-words text-chrome-muted">
                 {subtitle}
               </p>
             )}
@@ -104,7 +104,7 @@ export function Drawer({
         </div>
 
         {footer && (
-          <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border bg-surface-muted px-5 py-3.5">
+          <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 border-t border-border bg-surface-muted px-5 py-3.5 sm:justify-end">
             {footer}
           </div>
         )}

@@ -11,6 +11,7 @@ import {
   ClipboardList,
   DoorOpen,
   Globe,
+  HandHelping,
   HeartHandshake,
   House,
   LifeBuoy,
@@ -23,6 +24,9 @@ import {
   PartyPopper,
   Receipt,
   ScrollText,
+  ScanSearch,
+  SearchCheck,
+  SearchX,
   Settings,
   UserCheck,
   UserCog,
@@ -199,6 +203,45 @@ export const SIDEBAR: SidebarEntry[] = [
         label: "Todas as encomendas",
         icon: Package,
         permission: "PARCELS_MANAGE",
+      },
+    ],
+  },
+  // Lost and found: residents browse what is kept and claim theirs; the
+  // desk (gate and administration) registers what is found, checks the
+  // claims and hands items back with a signature (same address, its view).
+  {
+    id: "lost-and-found",
+    label: "Achados e perdidos",
+    icon: SearchCheck,
+    module: "LOST_AND_FOUND",
+    items: [
+      {
+        href: "/achados-e-perdidos/meus",
+        label: "Meus pedidos",
+        icon: HandHelping,
+      },
+      {
+        href: "/achados-e-perdidos/perdi",
+        label: "Perdi algo",
+        icon: SearchX,
+      },
+      {
+        href: "/achados-e-perdidos/pedidos",
+        label: "Pedidos para conferir",
+        icon: ClipboardList,
+        permission: "LOST_FOUND_MANAGE",
+      },
+      // Everyone: residents get the neighbours' board, the desk every report.
+      {
+        href: "/achados-e-perdidos/procurados",
+        label: "Itens procurados",
+        icon: ScanSearch,
+      },
+      // Everyone: residents browse the kept items, the desk gets its view.
+      {
+        href: "/achados-e-perdidos",
+        label: "Todos os achados",
+        icon: SearchCheck,
       },
     ],
   },

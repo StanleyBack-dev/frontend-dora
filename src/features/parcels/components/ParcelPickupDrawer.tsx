@@ -11,20 +11,21 @@ import {
   FormSection,
   Select,
   Spinner,
+  DrawerActions,
 } from "@/design-system";
 import { parcelsClient } from "@/features/parcels/api/parcels.client";
 import { ParcelDetails } from "@/features/parcels/components/ParcelDetails";
 import {
   SignaturePad,
   type SignatureCapture,
-} from "@/features/parcels/components/SignaturePad";
+} from "@/features/signature/components/SignaturePad";
 import { formatParcelCode } from "@/features/parcels/model/parcel-labels";
 import {
   deviceTimeZone,
   LOCATION_LABELS,
   readDevice,
   readLocation,
-} from "@/features/parcels/model/signature-evidence";
+} from "@/features/signature/model/signature-evidence";
 import type {
   Parcel,
   ParcelToHandOver,
@@ -180,7 +181,7 @@ export function ParcelPickupDrawer({
       subtitle={code ? `Código ${formatParcelCode(code)}` : undefined}
       footer={
         declaration ? (
-          <div className="flex justify-end gap-2">
+          <DrawerActions>
             <Button variant="cancel" onClick={onClose} disabled={sending}>
               Cancelar
             </Button>
@@ -193,7 +194,7 @@ export function ParcelPickupDrawer({
             >
               Confirmar entrega
             </Button>
-          </div>
+          </DrawerActions>
         ) : undefined
       }
     >

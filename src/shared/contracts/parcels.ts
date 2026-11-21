@@ -5,8 +5,19 @@ import type {
   ParcelStatus,
   SignatureLocationStatus,
 } from "@/shared/graphql/schema-enums";
+import type {
+  SignatureDevice,
+  SignatureLocation,
+  SignatureReceipt,
+} from "@/shared/contracts/signature";
 
 export type { ParcelStatus, SignatureLocationStatus };
+export type {
+  SignatureDevice,
+  SignatureDrawing,
+  SignatureLocation,
+  SignaturePoint,
+} from "@/shared/contracts/signature";
 
 /** A parcel received for a unit. */
 export type Parcel = {
@@ -102,34 +113,6 @@ export type RegisterParcelInput = {
   perishableHours?: number | null;
 };
 
-/** One point of a drawn signature: x, y, ms since the start, pressure. */
-export type SignaturePoint = [number, number, number, number];
-
-/** The signature as drawn on a canvas of this size (CSS pixels). */
-export type SignatureDrawing = {
-  width: number;
-  height: number;
-  strokes: SignaturePoint[][];
-};
-
-export type SignatureLocation = {
-  status: SignatureLocationStatus;
-  latitude?: number | null;
-  longitude?: number | null;
-  accuracyMeters?: number | null;
-};
-
-export type SignatureDevice = {
-  platform?: string | null;
-  language?: string | null;
-  screenWidth?: number | null;
-  screenHeight?: number | null;
-  pixelRatio?: number | null;
-  /** "touch", "pen" or "mouse". */
-  pointerType?: string | null;
-  maxTouchPoints?: number | null;
-};
-
 /** The handover: the code, who picks it up and the signature's evidence. */
 export type PickUpParcelInput = {
   code: string;
@@ -157,37 +140,7 @@ export type ParcelRecipient = {
 };
 
 /** The pickup receipt: the signature and the evidence that backs it. */
-export type ParcelReceipt = {
-  signerName: string;
-  signerDocumentType: "CPF" | "RG" | null;
-  /** "***.456.789-**" */
-  signerDocumentMasked: string | null;
-  /** The declaration signed, as it was shown. */
-  declaration: string;
-  /** Short-lived link to the signature image. */
-  imageUrl: string;
-  imageSha256: string;
-  strokesSha256: string;
-  /** Server time (ISO). */
-  signedAt: string;
-  /** The device's time (ISO) and time zone. */
-  clientSignedAt: string | null;
-  clientTimeZone: string | null;
-  ipAddress: string | null;
-  userAgent: string | null;
-  /** JSON: screen, touch/pen, language… */
-  device: string;
-  locationStatus: SignatureLocationStatus;
-  latitude: number | null;
-  longitude: number | null;
-  locationAccuracyMeters: number | null;
-  collectedByName: string;
-  /** CONCIERGE, ADMIN or ADMIN_MASTER. */
-  collectedByRole: string;
-  evidenceSha256: string;
-  /** The stored evidence still matches its digest. */
-  intact: boolean;
-};
+export type ParcelReceipt = SignatureReceipt;
 
 /** A parcel with its pickup receipt (null until picked up). */
 export type ParcelWithReceipt = Parcel & { signature: ParcelReceipt | null };

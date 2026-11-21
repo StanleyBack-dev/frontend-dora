@@ -144,7 +144,7 @@ export function BookingManageActions({
       <div
         className={cn(
           layout === "row"
-            ? "flex flex-wrap justify-end gap-2"
+            ? "flex flex-wrap justify-center gap-2 sm:justify-end"
             : "grid grid-cols-2 gap-2 [&>*]:w-full [&>*:last-child:nth-child(odd)]:col-span-2",
         )}
       >

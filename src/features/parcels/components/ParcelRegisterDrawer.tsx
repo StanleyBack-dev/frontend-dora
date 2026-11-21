@@ -17,6 +17,7 @@ import {
   Combobox,
   Select,
   TextArea,
+  DrawerActions,
 } from "@/design-system";
 import { parcelsClient } from "@/features/parcels/api/parcels.client";
 import { ParcelRecipientPicker } from "@/features/parcels/components/ParcelRecipientPicker";
@@ -215,7 +216,7 @@ export function ParcelRegisterDrawer({
       title="Receber encomenda"
       subtitle="Os moradores da unidade recebem um aviso com o código de retirada."
       footer={
-        <div className="flex justify-end gap-2">
+        <DrawerActions>
           <Button variant="cancel" onClick={cancel} disabled={sending}>
             Cancelar
           </Button>
@@ -228,7 +229,7 @@ export function ParcelRegisterDrawer({
           >
             Registrar e avisar
           </Button>
-        </div>
+        </DrawerActions>
       }
     >
       <form key={formKey} id={FORM_ID} onSubmit={submit} className="space-y-6">

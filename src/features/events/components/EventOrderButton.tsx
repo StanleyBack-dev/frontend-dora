@@ -284,7 +284,7 @@ export function EventOrderButton({
         subtitle={event.title}
         footer={
           <>
-            <span className="mr-auto text-sm text-muted">
+            <span className="w-full text-center text-sm text-muted sm:mr-auto sm:w-auto sm:text-left">
               {event.ticketed ? (
                 <>
                   Total{" "}

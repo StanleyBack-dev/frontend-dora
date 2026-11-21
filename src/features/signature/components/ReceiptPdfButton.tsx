@@ -3,24 +3,32 @@
 import { useState } from "react";
 import { FileDown } from "lucide-react";
 import { Button } from "@/design-system";
-import { parcelsClient } from "@/features/parcels/api/parcels.client";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { ApiClientError, apiDownload } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
-// Downloads the pickup receipt as a PDF: the API builds it (a few seconds),
-// so the button shows it is working until the file arrives.
-export function ReceiptPdfButton({ parcelId }: { parcelId: string }) {
+// Downloads a signed receipt as a PDF (parcel pickup, found item return):
+// the API builds it (a few seconds), so the button shows it is working
+// until the file arrives.
+export function ReceiptPdfButton({
+  path,
+  fallbackName,
+}: {
+  /** The BFF path of the file (e.g. /parcels/<id>/receipt). */
+  path: string;
+  /** The file name when the response has none. */
+  fallbackName: string;
+}) {
   const { showError } = useToast();
   const [loading, setLoading] = useState(false);
 
-  async function download() {
+  async function run() {
     setLoading(true);
     try {
-      const { blob, fileName } = await parcelsClient.receiptPdf(parcelId);
+      const { blob, fileName } = await apiDownload(path);
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = fileName ?? "comprovante-encomenda.pdf";
+      link.download = fileName ?? fallbackName;
       document.body.append(link);
       link.click();
       link.remove();
@@ -42,7 +50,7 @@ export function ReceiptPdfButton({ parcelId }: { parcelId: string }) {
       variant="brand"
       loading={loading}
       icon={<FileDown className="size-4" />}
-      onClick={() => void download()}
+      onClick={() => void run()}
     >
       {loading ? "Gerando o PDF…" : "Baixar comprovante em PDF"}
     </Button>

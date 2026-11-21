@@ -78,13 +78,6 @@ export function parcelOutcome(parcel: Parcel): string | null {
   return `${PARCEL_STATUS_LABELS[parcel.status]} em ${when}${parcel.closeReason ? `: ${parcel.closeReason}` : ""}`;
 }
 
-/** Who handed it over, by their profile (the receipt). */
-export const COLLECTED_BY_ROLE_LABELS: Record<string, string> = {
-  CONCIERGE: "Portaria",
-  ADMIN: "Administração",
-  ADMIN_MASTER: "Administração",
-};
-
 /** Perishable: the deadlines offered (hours after arrival; the API checks). */
 export const PERISHABLE_HOURS = [2, 4, 8, 12, 24, 48] as const;
 export const PERISHABLE_DEFAULT_HOURS = 4;

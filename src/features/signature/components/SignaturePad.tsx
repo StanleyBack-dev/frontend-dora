@@ -6,7 +6,7 @@ import { Button, cn } from "@/design-system";
 import type {
   SignatureDrawing,
   SignaturePoint,
-} from "@/shared/contracts/parcels";
+} from "@/shared/contracts/signature";
 
 /** What the pad hands over once something is drawn. */
 export type SignatureCapture = {

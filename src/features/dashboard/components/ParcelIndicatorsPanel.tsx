@@ -5,22 +5,12 @@ import {
   pickedUpNote,
   pickupTime,
 } from "@/features/parcels/model/parcel-metrics";
+import {
+  monthLabel,
+  monthTitle,
+} from "@/features/dashboard/model/month-labels";
 import { ColumnChart } from "@/features/platform-metrics/components/ColumnChart";
 import type { ParcelIndicators } from "@/shared/contracts/dashboard";
-
-/** "nov" from "2026-11" (the month's short name). */
-const monthLabel = (month: string) =>
-  new Intl.DateTimeFormat("pt-BR", { month: "short", timeZone: "UTC" })
-    .format(new Date(`${month}-01T12:00:00Z`))
-    .replace(".", "");
-
-/** "novembro de 2026" from "2026-11". */
-const monthTitle = (month: string) =>
-  new Intl.DateTimeFormat("pt-BR", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${month}-01T12:00:00Z`));
 
 // The parcels block of the management overview: what waits now, how long
 // residents take to pick up, and the monthly volume (the shared column
