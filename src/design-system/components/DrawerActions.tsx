@@ -13,7 +13,7 @@ export function DrawerActions({
   return (
     <div
       className={cn(
-        "flex flex-wrap justify-center gap-2 sm:justify-end",
+        "flex w-full flex-wrap justify-center gap-2 sm:justify-end",
         className,
       )}
     >
