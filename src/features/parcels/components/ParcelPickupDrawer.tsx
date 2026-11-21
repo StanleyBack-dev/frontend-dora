@@ -17,14 +17,14 @@ import { ParcelDetails } from "@/features/parcels/components/ParcelDetails";
 import {
   SignaturePad,
   type SignatureCapture,
-} from "@/features/parcels/components/SignaturePad";
+} from "@/features/signature/components/SignaturePad";
 import { formatParcelCode } from "@/features/parcels/model/parcel-labels";
 import {
   deviceTimeZone,
   LOCATION_LABELS,
   readDevice,
   readLocation,
-} from "@/features/parcels/model/signature-evidence";
+} from "@/features/signature/model/signature-evidence";
 import type {
   Parcel,
   ParcelToHandOver,

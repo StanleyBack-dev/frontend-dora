@@ -66,6 +66,11 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Registrar, entregar (com assinatura) e devolver encomendas",
     area: "Gestão",
   },
+  LOST_FOUND_MANAGE: {
+    label:
+      "Registrar itens achados, conferir pedidos e devolver (com assinatura)",
+    area: "Gestão",
+  },
   EVENTS_MANAGE: {
     label: "Criar, publicar e cancelar eventos",
     area: "Gestão",

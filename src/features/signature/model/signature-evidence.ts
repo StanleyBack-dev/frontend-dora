@@ -1,7 +1,7 @@
 import type {
   SignatureDevice,
   SignatureLocation,
-} from "@/shared/contracts/parcels";
+} from "@/shared/contracts/signature";
 
 // What the device tells about the moment of a signature: where it was
 // (when the browser allows), its clock and time zone, and the device. The
@@ -87,6 +87,13 @@ export function deviceFacts(json: string): string | null {
     return null;
   }
 }
+
+/** Who handed it over, by their profile (the receipt). */
+export const COLLECTED_BY_ROLE_LABELS: Record<string, string> = {
+  CONCIERGE: "Portaria",
+  ADMIN: "Administração",
+  ADMIN_MASTER: "Administração",
+};
 
 export const LOCATION_LABELS: Record<SignatureLocation["status"], string> = {
   GRANTED: "Localização registrada",

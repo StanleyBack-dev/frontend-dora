@@ -13,6 +13,7 @@ import {
   LifeBuoy,
   Megaphone,
   Package,
+  SearchCheck,
   Globe,
   ShieldCheck,
 } from "lucide-react";
@@ -197,6 +198,15 @@ export default async function HomePage() {
               }
             />
           )}
+          {condominium?.modules.includes("LOST_AND_FOUND") &&
+            can(user, "LOST_FOUND_MANAGE") && (
+              <Shortcut
+                href="/achados-e-perdidos"
+                icon={<SearchCheck aria-hidden />}
+                title="Achados e perdidos"
+                description="Registre o que foi achado, confira os pedidos e devolva com assinatura."
+              />
+            )}
           <Shortcut
             href="/notificacoes"
             icon={<Bell aria-hidden />}

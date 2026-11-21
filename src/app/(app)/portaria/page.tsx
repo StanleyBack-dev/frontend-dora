@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Maximize2, Package, UsersRound } from "lucide-react";
+import { Maximize2, Package, SearchCheck, UsersRound } from "lucide-react";
 import { buttonClasses, PageHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { NoCondominium } from "@/features/condominiums/components/NoCondominium";
@@ -22,6 +22,9 @@ export default async function GatePage() {
   const day = await loadGateDay(user.condominium);
   const parcels =
     user.condominium.modules.includes("PARCELS") && can(user, "PARCELS_MANAGE");
+  const lostAndFound =
+    user.condominium.modules.includes("LOST_AND_FOUND") &&
+    can(user, "LOST_FOUND_MANAGE");
 
   return (
     <>
@@ -38,6 +41,15 @@ export default async function GatePage() {
               <Link href="/encomendas" className={buttonClasses("secondary")}>
                 <Package aria-hidden className="size-4" />
                 Encomendas
+              </Link>
+            )}
+            {lostAndFound && (
+              <Link
+                href="/achados-e-perdidos"
+                className={buttonClasses("secondary")}
+              >
+                <SearchCheck aria-hidden className="size-4" />
+                Achados e perdidos
               </Link>
             )}
             {can(user, "RESIDENTS_READ") && (

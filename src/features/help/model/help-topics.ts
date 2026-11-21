@@ -12,6 +12,7 @@ import {
   LifeBuoy,
   MapPin,
   PartyPopper,
+  SearchCheck,
   Megaphone,
   Settings,
   ShieldCheck,
@@ -527,6 +528,57 @@ export const HELP_TOPICS: HelpTopic[] = [
       access: [
         {
           text: "Portaria e gestores recebem e entregam encomendas (permissão “Registrar, entregar e devolver encomendas”); o gestor pode ajustar quem tem essa permissão.",
+        },
+      ],
+    },
+  },
+  {
+    id: "achados-e-perdidos",
+    href: "/achados-e-perdidos",
+    title: "Achados e perdidos",
+    icon: SearchCheck,
+    module: "LOST_AND_FOUND",
+    permission: "LOST_FOUND_MANAGE",
+    area: "main",
+    tour: "Registre o que foi achado no condomínio, confira os pedidos dos moradores e devolva com assinatura na tela.",
+    sections: {
+      howto: [
+        {
+          text: "Achou algo: toque em “Registrar item achado”, escolha a categoria, diga o que é, onde e quando foi achado e onde ficou guardado e, se quiser, tire ou anexe uma foto.",
+        },
+        {
+          text: "Escreva na descrição o que os moradores podem ver (cor, marca) e guarde em “Detalhes para conferir o dono” o que só o dono saberia (o que tem dentro, o nome no documento): só a portaria e a gestão veem.",
+        },
+        {
+          text: "Quando um morador disser que o item é seu, você é avisado. Abra o item, compare o que ele escreveu com os detalhes e toque em “Aceitar” (ele é avisado para vir buscar) ou “Recusar” (com o motivo).",
+        },
+        {
+          text: "Para devolver, toque em “Devolver para…” no pedido aceito (ou em “Devolver com assinatura”, para outra pessoa que comprovou ser o dono), informe quem está retirando e peça a assinatura na tela.",
+        },
+        {
+          text: "Ninguém pediu? Use “Doar” ou “Descartar”, com o motivo.",
+        },
+      ],
+      rules: [
+        {
+          text: "Cada item fica guardado por 90 dias a partir de quando foi achado. A portaria e a gestão são avisadas 7 dias antes de o prazo acabar.",
+        },
+        {
+          text: "A foto de documentos já vem escondida dos moradores; nos outros itens, dá para esconder ao registrar.",
+        },
+        {
+          text: "Ao devolver, doar ou descartar, os outros pedidos abertos do item são recusados e os moradores, avisados.",
+        },
+        {
+          text: "A assinatura guarda data e hora, IP, aparelho, localização (quando permitida) e quem entregou, com um código de verificação (SHA-256). Ela não pode ser alterada depois.",
+        },
+        {
+          text: "Fechar o formulário de registro guarda o que foi digitado; só “Cancelar” limpa.",
+        },
+      ],
+      access: [
+        {
+          text: "Portaria e gestores cuidam dos achados e perdidos (permissão “Registrar itens achados, conferir pedidos e devolver”); o gestor pode ajustar quem tem essa permissão.",
         },
       ],
     },
