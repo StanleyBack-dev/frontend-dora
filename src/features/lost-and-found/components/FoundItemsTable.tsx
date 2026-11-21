@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, HandHelping, SearchCheck } from "lucide-react";
+import {
+  ChevronRight,
+  HandHelping,
+  PackageCheck,
+  SearchCheck,
+} from "lucide-react";
 import {
   Badge,
   buttonClasses,
@@ -16,6 +21,7 @@ import {
   FOUND_ITEM_STATUS_TONES,
   foundItemOutcome,
   keepNote,
+  reservedFor,
 } from "@/features/lost-and-found/model/found-item-labels";
 import type { FoundItem } from "@/shared/contracts/lost-and-found";
 import { formatDateTime } from "@/shared/lib/datetime";
@@ -85,6 +91,15 @@ export function FoundItemsTable({
       key: "found",
       label: "Achado",
       mobile: "subtitle",
+      // Phones: who it waits for, when someone may come for it.
+      renderMobile: (item) =>
+        item.awaitedByName ? (
+          <span className="font-medium text-success">
+            Aguardando retirada: {item.awaitedByName}
+          </span>
+        ) : (
+          item.foundLocation
+        ),
       render: (item) => (
         <span className="flex min-w-0 flex-col">
           <span className="truncate">{item.foundLocation}</span>
@@ -116,6 +131,14 @@ export function FoundItemsTable({
                   ? "1 pedido"
                   : `${item.pendingClaims} pedidos`}
               </Badge>
+            )}
+            {item.awaitedByName && (
+              <Badge tone="success">
+                Aguardando retirada: {item.awaitedByName.split(" ")[0]}
+              </Badge>
+            )}
+            {reservedFor(item) && (
+              <Badge tone="brand">Reservado: {reservedFor(item)}</Badge>
             )}
             {keep && keep.tone !== "neutral" && (
               <Badge tone={keep.tone}>{keep.text}</Badge>
@@ -162,17 +185,34 @@ export function FoundItemsTable({
       rows={items}
       columns={columns}
       getId={(item) => item.id}
-      renderExpanded={(item) => (
-        <div className="border-t border-border bg-surface-muted/40 p-3">
+      // Phones: the item's page and, while kept, the return, without
+      // opening the card.
+      renderFooter={(item) => (
+        <div
+          className={cn(
+            "grid gap-2 border-t border-border bg-surface-muted/40 p-3",
+            item.status === "FOUND" && "grid-cols-2",
+          )}
+        >
           <Link
             href={itemHref(item)}
             className={cn(buttonClasses("secondary", "sm"), "w-full")}
           >
             {item.status === "FOUND"
-              ? "Ver pedidos e devolver"
+              ? item.pendingClaims > 0
+                ? `Ver pedidos (${item.pendingClaims})`
+                : "Ver item"
               : "Ver detalhes"}
-            <ChevronRight aria-hidden className="ml-1 size-4" />
           </Link>
+          {item.status === "FOUND" && (
+            <Link
+              href={`${itemHref(item)}?devolver=1`}
+              className={cn(buttonClasses("primary", "sm"), "w-full")}
+            >
+              <PackageCheck aria-hidden className="mr-1.5 size-4" />
+              Devolver
+            </Link>
+          )}
         </div>
       )}
     />

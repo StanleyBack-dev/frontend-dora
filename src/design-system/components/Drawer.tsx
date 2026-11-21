@@ -83,7 +83,7 @@ export function Drawer({
               {title}
             </h2>
             {subtitle && (
-              <p className="mt-0.5 truncate text-[12px] text-chrome-muted">
+              <p className="mt-0.5 text-[12px] leading-snug break-words text-chrome-muted">
                 {subtitle}
               </p>
             )}

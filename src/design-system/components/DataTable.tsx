@@ -41,6 +41,7 @@ export function DataTable<T>({
   columns,
   getId,
   renderExpanded,
+  renderFooter,
   renderDesktopExpanded,
   initiallyOpen,
   className,
@@ -50,6 +51,11 @@ export function DataTable<T>({
   getId: (row: T) => string;
   /** Extra content at the end of an expanded phone card (e.g. actions). */
   renderExpanded?: (row: T) => ReactNode;
+  /**
+   * Phones: a bar always shown at the bottom of the card, open or not (the
+   * row's main actions, one tap away).
+   */
+  renderFooter?: (row: T) => ReactNode;
   /**
    * Larger screens: content of the row revealed by the chevron, after the
    * "detail" columns (e.g. the record organized in sections).
@@ -82,6 +88,7 @@ export function DataTable<T>({
             controls={controls}
             details={details}
             renderExpanded={renderExpanded}
+            renderFooter={renderFooter}
             initiallyOpen={initiallyOpen?.(row) ?? false}
           />
         ))}
@@ -221,6 +228,7 @@ function MobileCard<T>({
   controls,
   details,
   renderExpanded,
+  renderFooter,
   initiallyOpen,
 }: {
   row: T;
@@ -229,6 +237,7 @@ function MobileCard<T>({
   controls: DataTableColumn<T>[];
   details: DataTableColumn<T>[];
   renderExpanded?: (row: T) => ReactNode;
+  renderFooter?: (row: T) => ReactNode;
   initiallyOpen: boolean;
 }) {
   const expandable = details.length > 0 || Boolean(renderExpanded);
@@ -289,6 +298,7 @@ function MobileCard<T>({
         </dl>
       )}
       {open && renderExpanded?.(row)}
+      {renderFooter?.(row)}
     </li>
   );
 }

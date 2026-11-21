@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { MapPin, PackageCheck, UserCheck, UserRound } from "lucide-react";
+import {
+  MapPin,
+  PackageCheck,
+  ShieldQuestion,
+  UserCheck,
+  UserRound,
+} from "lucide-react";
 import {
   Alert,
   Button,
@@ -10,6 +16,7 @@ import {
   Field,
   FormSection,
   Select,
+  DrawerActions,
 } from "@/design-system";
 import { lostAndFoundClient } from "@/features/lost-and-found/api/lost-and-found.client";
 import {
@@ -47,12 +54,15 @@ const OTHER = "other";
 // Callers mount it per opening (key), so each one starts blank.
 export function FoundItemReturnDrawer({
   item,
+  viewerId,
   open,
   claimId,
   onClose,
   onDone,
 }: {
   item: FoundItemDetails;
+  /** Who hands it over: their own claim is left to a colleague. */
+  viewerId: string;
   open: boolean;
   /** The accepted claim to start from (null: someone else). */
   claimId: string | null;
@@ -60,7 +70,12 @@ export function FoundItemReturnDrawer({
   onDone: (item: FoundItem) => void;
 }) {
   const { showError, showSuccess } = useToast();
-  const accepted = item.claims.filter((claim) => claim.status === "ACCEPTED");
+  // The open claims (accepted or pending) of others: the return answers one.
+  const accepted = item.claims.filter(
+    (claim) =>
+      (claim.status === "ACCEPTED" || claim.status === "PENDING") &&
+      claim.userId !== viewerId,
+  );
   const initial = accepted.find((claim) => claim.id === claimId) ?? null;
   const [choice, setChoice] = useState<string>(initial?.id ?? OTHER);
   const [name, setName] = useState(initial?.userName ?? "");
@@ -157,7 +172,7 @@ export function FoundItemReturnDrawer({
       subtitle={item.title}
       footer={
         declaration ? (
-          <div className="flex justify-end gap-2">
+          <DrawerActions>
             <Button variant="cancel" onClick={onClose} disabled={sending}>
               Cancelar
             </Button>
@@ -170,7 +185,7 @@ export function FoundItemReturnDrawer({
             >
               Confirmar devolução
             </Button>
-          </div>
+          </DrawerActions>
         ) : undefined
       }
     >
@@ -178,6 +193,18 @@ export function FoundItemReturnDrawer({
         <Alert tone="warning">Este item não está mais guardado.</Alert>
       ) : (
         <form id={FORM_ID} onSubmit={submit} className="space-y-6">
+          <div className="rounded-xl border border-warning-border bg-warning-soft p-3">
+            <p className="flex items-center gap-1.5 text-sm font-semibold text-fg">
+              <ShieldQuestion aria-hidden className="size-4" />
+              Confira antes de entregar
+            </p>
+            <p className="mt-1 text-[13px] text-fg">
+              {item.privateDetails
+                ? `Pergunte o que só o dono saberia e compare: ${item.privateDetails}`
+                : "Peça para a pessoa descrever o item (cor, marca, o que tem dentro) e confira um documento."}
+            </p>
+          </div>
+
           <FormSection title="Quem está retirando">
             {accepted.length > 0 && (
               <ChoiceCards<string>
@@ -189,7 +216,7 @@ export function FoundItemReturnDrawer({
                   ...accepted.map((claim) => ({
                     value: claim.id,
                     title: claim.userName,
-                    hint: `Pedido aceito${claim.unitLabel ? ` · ${claim.unitLabel}` : ""}`,
+                    hint: `${claim.status === "ACCEPTED" ? "Pedido aceito" : "Pediu o item"}${claim.unitLabel ? ` · ${claim.unitLabel}` : ""}`,
                     icon: <UserCheck />,
                   })),
                   {

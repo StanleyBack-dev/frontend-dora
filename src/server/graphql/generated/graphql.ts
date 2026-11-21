@@ -444,10 +444,18 @@ export type FoundItemClaimStatus =
 /** Filtros dos itens achados. */
 export type FoundItemFilterInput = {
   category?: FoundItemCategory | null | undefined;
+  /** Exatamente este local onde foi achado. */
+  foundLocation?: string | null | undefined;
   from?: string | null | undefined;
+  /** Itens reservados para este morador ou que ele pediu. */
+  residentId?: string | number | null | undefined;
   /** Parte do que é, da descrição ou de onde foi achado. */
   search?: string | null | undefined;
   statuses?: Array<FoundItemStatus> | null | undefined;
+  /** Exatamente este local de guarda. */
+  storageLocation?: string | null | undefined;
+  /** Exatamente este item (o que é). */
+  title?: string | null | undefined;
   to?: string | null | undefined;
   /** Só os itens com pedidos aguardando. */
   withPendingClaims?: boolean | null | undefined;
@@ -533,6 +541,8 @@ export type NotificationType =
   | 'FOUND_ITEM_CLAIMED'
   | 'FOUND_ITEM_CLAIM_DECIDED'
   | 'FOUND_ITEM_EXPIRING'
+  | 'FOUND_ITEM_FOR_YOU'
+  | 'FOUND_ITEM_NOT_OWNER'
   | 'FOUND_ITEM_RETURNED'
   | 'PARCEL_AUTHORIZED'
   | 'PARCEL_CANCELLED'
@@ -699,6 +709,10 @@ export type RegisterFoundItemInput = {
   foundAt?: string | null | undefined;
   /** Onde foi achado. */
   foundLocation: string;
+  /** De quem é, se a portaria sabe: a unidade (os moradores dela são avisados e veem o item). */
+  ownerUnitId?: string | number | null | undefined;
+  /** Ou um morador da unidade: só ele é avisado e vê o item, com o pedido já aceito. */
+  ownerUserId?: string | number | null | undefined;
   /** Foto (JPEG, PNG ou WebP em base64, até 1 MB). */
   photo?: string | null | undefined;
   /** Esconder a foto dos moradores (padrão: só documentos). */
@@ -1838,9 +1852,9 @@ export type EventOrderOverviewQueryVariables = Exact<{
 
 export type EventOrderOverviewQuery = { eventOrderOverview: { receivedCents: number, confirmedPeople: number, byStatus: Array<{ status: EventOrderStatus, count: number }>, buyers: Array<{ id: string, name: string }>, units: Array<{ id: string, label: string }>, codes: Array<{ code: string, buyerName: string | null }> } };
 
-export type FoundItemFieldsFragment = { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, photoUrl: string | null };
+export type FoundItemFieldsFragment = { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null };
 
-export type FoundItemClaimFieldsFragment = { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null };
+export type FoundItemClaimFieldsFragment = { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null };
 
 export type FoundItemsQueryVariables = Exact<{
   filter?: FoundItemFilterInput | null | undefined;
@@ -1848,26 +1862,56 @@ export type FoundItemsQueryVariables = Exact<{
 }>;
 
 
-export type FoundItemsQuery = { foundItems: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, photoUrl: string | null }> } };
+export type FoundItemsQuery = { foundItems: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null }> } };
 
 export type FoundItemOverviewQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FoundItemOverviewQuery = { foundItemOverview: { pendingClaims: number, expiringSoon: number, byStatus: Array<{ status: FoundItemStatus, count: number }> } };
+export type FoundItemOverviewQuery = { foundItemOverview: { pendingClaims: number, expiringSoon: number, titles: Array<string>, foundLocations: Array<string>, storageLocations: Array<string>, byStatus: Array<{ status: FoundItemStatus, count: number }>, residents: Array<{ id: string, name: string }> } };
 
 export type FoundItemQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type FoundItemQuery = { foundItem: { privateDetails: string | null, returnDeclaration: string | null, id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, photoUrl: string | null, claims: Array<{ id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null }>, returnReceipt: { signerName: string, signerDocumentType: DocumentType | null, signerDocumentMasked: string | null, declaration: string, imageUrl: string, imageSha256: string, strokesSha256: string, signedAt: string, clientSignedAt: string | null, clientTimeZone: string | null, ipAddress: string | null, userAgent: string | null, device: string, locationStatus: SignatureLocationStatus, latitude: number | null, longitude: number | null, locationAccuracyMeters: number | null, collectedByName: string, collectedByRole: string, evidenceSha256: string, intact: boolean } | null } };
+export type FoundItemQuery = { foundItem: { privateDetails: string | null, returnDeclaration: string | null, id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null, claims: Array<{ id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null }>, myClaim: { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null } | null, returnReceipt: { signerName: string, signerDocumentType: DocumentType | null, signerDocumentMasked: string | null, declaration: string, imageUrl: string, imageSha256: string, strokesSha256: string, signedAt: string, clientSignedAt: string | null, clientTimeZone: string | null, ipAddress: string | null, userAgent: string | null, device: string, locationStatus: SignatureLocationStatus, latitude: number | null, longitude: number | null, locationAccuracyMeters: number | null, collectedByName: string, collectedByRole: string, evidenceSha256: string, intact: boolean } | null } };
+
+export type KeptFoundItemsQueryVariables = Exact<{
+  category?: FoundItemCategory | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type KeptFoundItemsQuery = { keptFoundItems: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null, myClaim: { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null } | null }> } };
+
+export type MyFoundItemClaimsQueryVariables = Exact<{
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type MyFoundItemClaimsQuery = { myFoundItemClaims: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null }> } };
+
+export type ClaimFoundItemMutationVariables = Exact<{
+  itemId: string | number;
+  message?: string | null | undefined;
+}>;
+
+
+export type ClaimFoundItemMutation = { claimFoundItem: { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null } };
+
+export type WithdrawFoundItemClaimMutationVariables = Exact<{
+  claimId: string | number;
+}>;
+
+
+export type WithdrawFoundItemClaimMutation = { withdrawFoundItemClaim: { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null } };
 
 export type RegisterFoundItemMutationVariables = Exact<{
   input: RegisterFoundItemInput;
 }>;
 
 
-export type RegisterFoundItemMutation = { registerFoundItem: { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, photoUrl: string | null } };
+export type RegisterFoundItemMutation = { registerFoundItem: { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null } };
 
 export type DecideFoundItemClaimMutationVariables = Exact<{
   claimId: string | number;
@@ -1876,14 +1920,14 @@ export type DecideFoundItemClaimMutationVariables = Exact<{
 }>;
 
 
-export type DecideFoundItemClaimMutation = { decideFoundItemClaim: { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null } };
+export type DecideFoundItemClaimMutation = { decideFoundItemClaim: { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null } };
 
 export type ReturnFoundItemMutationVariables = Exact<{
   input: ReturnFoundItemInput;
 }>;
 
 
-export type ReturnFoundItemMutation = { returnFoundItem: { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, photoUrl: string | null } };
+export type ReturnFoundItemMutation = { returnFoundItem: { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null } };
 
 export type DonateFoundItemMutationVariables = Exact<{
   id: string | number;
@@ -1891,7 +1935,7 @@ export type DonateFoundItemMutationVariables = Exact<{
 }>;
 
 
-export type DonateFoundItemMutation = { donateFoundItem: { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, photoUrl: string | null } };
+export type DonateFoundItemMutation = { donateFoundItem: { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null } };
 
 export type DiscardFoundItemMutationVariables = Exact<{
   id: string | number;
@@ -1899,7 +1943,29 @@ export type DiscardFoundItemMutationVariables = Exact<{
 }>;
 
 
-export type DiscardFoundItemMutation = { discardFoundItem: { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, photoUrl: string | null } };
+export type DiscardFoundItemMutation = { discardFoundItem: { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null } };
+
+export type FoundItemOwnersQueryVariables = Exact<{
+  search: string;
+}>;
+
+
+export type FoundItemOwnersQuery = { foundItemOwners: Array<{ userId: string, name: string, unitId: string, unitLabel: string }> };
+
+export type ReleaseFoundItemMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ReleaseFoundItemMutation = { releaseFoundItem: { id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null } };
+
+export type FoundItemClaimsQueryVariables = Exact<{
+  open?: boolean | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type FoundItemClaimsQuery = { foundItemClaims: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null, item: { privateDetails: string | null, id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null } }> } };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -2608,7 +2674,10 @@ export const FoundItemFieldsFragmentDoc = new TypedDocumentString(`
   returnedToName
   signerName
   pendingClaims
+  awaitedByName
   photoUrl
+  ownerUnitLabel
+  ownerName
 }
     `, {"fragmentName":"FoundItemFields"}) as unknown as TypedDocumentString<FoundItemFieldsFragment, unknown>;
 export const FoundItemClaimFieldsFragmentDoc = new TypedDocumentString(`
@@ -5398,7 +5467,10 @@ export const FoundItemsDocument = new TypedDocumentString(`
   returnedToName
   signerName
   pendingClaims
+  awaitedByName
   photoUrl
+  ownerUnitLabel
+  ownerName
 }`) as unknown as TypedDocumentString<FoundItemsQuery, FoundItemsQueryVariables>;
 export const FoundItemOverviewDocument = new TypedDocumentString(`
     query FoundItemOverview {
@@ -5409,6 +5481,13 @@ export const FoundItemOverviewDocument = new TypedDocumentString(`
     }
     pendingClaims
     expiringSoon
+    titles
+    foundLocations
+    storageLocations
+    residents {
+      id
+      name
+    }
   }
 }
     `) as unknown as TypedDocumentString<FoundItemOverviewQuery, FoundItemOverviewQueryVariables>;
@@ -5418,6 +5497,9 @@ export const FoundItemDocument = new TypedDocumentString(`
     ...FoundItemFields
     privateDetails
     claims {
+      ...FoundItemClaimFields
+    }
+    myClaim {
       ...FoundItemClaimFields
     }
     returnDeclaration
@@ -5464,7 +5546,10 @@ export const FoundItemDocument = new TypedDocumentString(`
   returnedToName
   signerName
   pendingClaims
+  awaitedByName
   photoUrl
+  ownerUnitLabel
+  ownerName
 }
 fragment FoundItemClaimFields on FoundItemClaim {
   id
@@ -5482,6 +5567,132 @@ fragment FoundItemClaimFields on FoundItemClaim {
   decidedByName
   decisionNote
 }`) as unknown as TypedDocumentString<FoundItemQuery, FoundItemQueryVariables>;
+export const KeptFoundItemsDocument = new TypedDocumentString(`
+    query KeptFoundItems($category: FoundItemCategory, $page: PageInput) {
+  keptFoundItems(category: $category, page: $page) {
+    items {
+      ...FoundItemFields
+      myClaim {
+        ...FoundItemClaimFields
+      }
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment FoundItemFields on FoundItem {
+  id
+  category
+  title
+  description
+  foundLocation
+  foundAt
+  storageLocation
+  photoHidden
+  status
+  registeredByName
+  keepUntil
+  closedAt
+  closedByName
+  closeReason
+  returnedToName
+  signerName
+  pendingClaims
+  awaitedByName
+  photoUrl
+  ownerUnitLabel
+  ownerName
+}
+fragment FoundItemClaimFields on FoundItemClaim {
+  id
+  itemId
+  itemTitle
+  itemStatus
+  itemCategory
+  userId
+  userName
+  unitLabel
+  message
+  status
+  createdAt
+  decidedAt
+  decidedByName
+  decisionNote
+}`) as unknown as TypedDocumentString<KeptFoundItemsQuery, KeptFoundItemsQueryVariables>;
+export const MyFoundItemClaimsDocument = new TypedDocumentString(`
+    query MyFoundItemClaims($page: PageInput) {
+  myFoundItemClaims(page: $page) {
+    items {
+      ...FoundItemClaimFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment FoundItemClaimFields on FoundItemClaim {
+  id
+  itemId
+  itemTitle
+  itemStatus
+  itemCategory
+  userId
+  userName
+  unitLabel
+  message
+  status
+  createdAt
+  decidedAt
+  decidedByName
+  decisionNote
+}`) as unknown as TypedDocumentString<MyFoundItemClaimsQuery, MyFoundItemClaimsQueryVariables>;
+export const ClaimFoundItemDocument = new TypedDocumentString(`
+    mutation ClaimFoundItem($itemId: ID!, $message: String) {
+  claimFoundItem(itemId: $itemId, message: $message) {
+    ...FoundItemClaimFields
+  }
+}
+    fragment FoundItemClaimFields on FoundItemClaim {
+  id
+  itemId
+  itemTitle
+  itemStatus
+  itemCategory
+  userId
+  userName
+  unitLabel
+  message
+  status
+  createdAt
+  decidedAt
+  decidedByName
+  decisionNote
+}`) as unknown as TypedDocumentString<ClaimFoundItemMutation, ClaimFoundItemMutationVariables>;
+export const WithdrawFoundItemClaimDocument = new TypedDocumentString(`
+    mutation WithdrawFoundItemClaim($claimId: ID!) {
+  withdrawFoundItemClaim(claimId: $claimId) {
+    ...FoundItemClaimFields
+  }
+}
+    fragment FoundItemClaimFields on FoundItemClaim {
+  id
+  itemId
+  itemTitle
+  itemStatus
+  itemCategory
+  userId
+  userName
+  unitLabel
+  message
+  status
+  createdAt
+  decidedAt
+  decidedByName
+  decisionNote
+}`) as unknown as TypedDocumentString<WithdrawFoundItemClaimMutation, WithdrawFoundItemClaimMutationVariables>;
 export const RegisterFoundItemDocument = new TypedDocumentString(`
     mutation RegisterFoundItem($input: RegisterFoundItemInput!) {
   registerFoundItem(input: $input) {
@@ -5506,7 +5717,10 @@ export const RegisterFoundItemDocument = new TypedDocumentString(`
   returnedToName
   signerName
   pendingClaims
+  awaitedByName
   photoUrl
+  ownerUnitLabel
+  ownerName
 }`) as unknown as TypedDocumentString<RegisterFoundItemMutation, RegisterFoundItemMutationVariables>;
 export const DecideFoundItemClaimDocument = new TypedDocumentString(`
     mutation DecideFoundItemClaim($claimId: ID!, $accept: Boolean!, $note: String) {
@@ -5554,7 +5768,10 @@ export const ReturnFoundItemDocument = new TypedDocumentString(`
   returnedToName
   signerName
   pendingClaims
+  awaitedByName
   photoUrl
+  ownerUnitLabel
+  ownerName
 }`) as unknown as TypedDocumentString<ReturnFoundItemMutation, ReturnFoundItemMutationVariables>;
 export const DonateFoundItemDocument = new TypedDocumentString(`
     mutation DonateFoundItem($id: ID!, $reason: String!) {
@@ -5580,7 +5797,10 @@ export const DonateFoundItemDocument = new TypedDocumentString(`
   returnedToName
   signerName
   pendingClaims
+  awaitedByName
   photoUrl
+  ownerUnitLabel
+  ownerName
 }`) as unknown as TypedDocumentString<DonateFoundItemMutation, DonateFoundItemMutationVariables>;
 export const DiscardFoundItemDocument = new TypedDocumentString(`
     mutation DiscardFoundItem($id: ID!, $reason: String!) {
@@ -5606,8 +5826,105 @@ export const DiscardFoundItemDocument = new TypedDocumentString(`
   returnedToName
   signerName
   pendingClaims
+  awaitedByName
   photoUrl
+  ownerUnitLabel
+  ownerName
 }`) as unknown as TypedDocumentString<DiscardFoundItemMutation, DiscardFoundItemMutationVariables>;
+export const FoundItemOwnersDocument = new TypedDocumentString(`
+    query FoundItemOwners($search: String!) {
+  foundItemOwners(search: $search) {
+    userId
+    name
+    unitId
+    unitLabel
+  }
+}
+    `) as unknown as TypedDocumentString<FoundItemOwnersQuery, FoundItemOwnersQueryVariables>;
+export const ReleaseFoundItemDocument = new TypedDocumentString(`
+    mutation ReleaseFoundItem($id: ID!) {
+  releaseFoundItem(id: $id) {
+    ...FoundItemFields
+  }
+}
+    fragment FoundItemFields on FoundItem {
+  id
+  category
+  title
+  description
+  foundLocation
+  foundAt
+  storageLocation
+  photoHidden
+  status
+  registeredByName
+  keepUntil
+  closedAt
+  closedByName
+  closeReason
+  returnedToName
+  signerName
+  pendingClaims
+  awaitedByName
+  photoUrl
+  ownerUnitLabel
+  ownerName
+}`) as unknown as TypedDocumentString<ReleaseFoundItemMutation, ReleaseFoundItemMutationVariables>;
+export const FoundItemClaimsDocument = new TypedDocumentString(`
+    query FoundItemClaims($open: Boolean, $page: PageInput) {
+  foundItemClaims(open: $open, page: $page) {
+    items {
+      ...FoundItemClaimFields
+      item {
+        ...FoundItemFields
+        privateDetails
+      }
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment FoundItemFields on FoundItem {
+  id
+  category
+  title
+  description
+  foundLocation
+  foundAt
+  storageLocation
+  photoHidden
+  status
+  registeredByName
+  keepUntil
+  closedAt
+  closedByName
+  closeReason
+  returnedToName
+  signerName
+  pendingClaims
+  awaitedByName
+  photoUrl
+  ownerUnitLabel
+  ownerName
+}
+fragment FoundItemClaimFields on FoundItemClaim {
+  id
+  itemId
+  itemTitle
+  itemStatus
+  itemCategory
+  userId
+  userName
+  unitLabel
+  message
+  status
+  createdAt
+  decidedAt
+  decidedByName
+  decisionNote
+}`) as unknown as TypedDocumentString<FoundItemClaimsQuery, FoundItemClaimsQueryVariables>;
 export const MyNotificationsDocument = new TypedDocumentString(`
     query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {
   myNotifications(unreadOnly: $unreadOnly, page: $page) {

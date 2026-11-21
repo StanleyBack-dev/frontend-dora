@@ -11,6 +11,7 @@ import {
   ClipboardList,
   DoorOpen,
   Globe,
+  HandHelping,
   HeartHandshake,
   House,
   LifeBuoy,
@@ -203,8 +204,9 @@ export const SIDEBAR: SidebarEntry[] = [
       },
     ],
   },
-  // Lost and found: the desk (gate and administration) registers what is
-  // found, checks the claims and hands items back with a signature.
+  // Lost and found: residents browse what is kept and claim theirs; the
+  // desk (gate and administration) registers what is found, checks the
+  // claims and hands items back with a signature (same address, its view).
   {
     id: "lost-and-found",
     label: "Achados e perdidos",
@@ -212,10 +214,21 @@ export const SIDEBAR: SidebarEntry[] = [
     module: "LOST_AND_FOUND",
     items: [
       {
-        href: "/achados-e-perdidos",
-        label: "Itens achados",
-        icon: SearchCheck,
+        href: "/achados-e-perdidos/meus",
+        label: "Meus pedidos",
+        icon: HandHelping,
+      },
+      {
+        href: "/achados-e-perdidos/pedidos",
+        label: "Pedidos para conferir",
+        icon: ClipboardList,
         permission: "LOST_FOUND_MANAGE",
+      },
+      // Everyone: residents browse the kept items, the desk gets its view.
+      {
+        href: "/achados-e-perdidos",
+        label: "Todos os achados",
+        icon: SearchCheck,
       },
     ],
   },

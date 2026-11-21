@@ -34,7 +34,11 @@ export const registerFoundItemSchema = z.object({
     .regex(/^[A-Za-z0-9+/]+={0,2}$/)
     .nullish(),
   photoHidden: z.boolean().nullish(),
+  ownerUnitId: idSchema.nullish(),
+  ownerUserId: idSchema.nullish(),
 });
+
+export const ownerSearchSchema = z.string().trim().max(60);
 
 export const returnFoundItemSchema = signatureSchema.extend({
   claimId: idSchema.nullish(),
@@ -42,6 +46,10 @@ export const returnFoundItemSchema = signatureSchema.extend({
 
 export const closeFoundItemSchema = z.object({
   reason: z.string().trim().min(3).max(300),
+});
+
+export const claimFoundItemSchema = z.object({
+  message: optionalText(500),
 });
 
 export const decideClaimSchema = z.object({

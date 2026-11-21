@@ -1,5 +1,5 @@
-import { CircleCheck, CircleX, HandHelping, PackageCheck } from "lucide-react";
-import { Badge, Button, EmptyState } from "@/design-system";
+import { CircleCheck, CircleX } from "lucide-react";
+import { Badge, Button } from "@/design-system";
 import {
   CLAIM_STATUS_LABELS,
   CLAIM_STATUS_TONES,
@@ -7,107 +7,117 @@ import {
 import type { FoundItemClaim } from "@/shared/contracts/lost-and-found";
 import { formatDateTime } from "@/shared/lib/datetime";
 
-// The residents' claims for one item, newest first: the desk compares what
-// they wrote with the item (and its private details) and answers; an
-// accepted claim is handed over from here.
+/** "Sônia Barbosa" → "SB". */
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+
+// The residents' claims for one item, newest first: who asked, when, what
+// they added and the desk's answer. A claim still waiting can be answered
+// here (accept: "come for it"; reject, with the reason); handing the item
+// over is the page's main action.
 export function FoundItemClaimsList({
   claims,
   kept,
+  viewerId,
   onAccept,
   onReject,
-  onReturn,
 }: {
   claims: FoundItemClaim[];
-  /** Still kept: claims can be answered and handed over. */
+  /** Still kept: waiting claims can be answered. */
   kept: boolean;
+  /** Who is looking: their own claim is answered by a colleague. */
+  viewerId: string;
   onAccept: (claim: FoundItemClaim) => void;
   onReject: (claim: FoundItemClaim) => void;
-  onReturn: (claim: FoundItemClaim) => void;
 }) {
-  if (claims.length === 0) {
-    return (
-      <EmptyState
-        icon={<HandHelping className="size-5" />}
-        title="Nenhum pedido"
-        description={
-          kept
-            ? "Quando um morador disser que o item é seu, o pedido aparece aqui e você é avisado."
-            : "Ninguém pediu este item."
-        }
-      />
-    );
-  }
-
   return (
-    <ul className="divide-y divide-border">
-      {claims.map((claim) => (
-        <li key={claim.id} className="space-y-2 py-3 first:pt-0 last:pb-0">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="min-w-0">
-              <p className="font-semibold text-fg">
-                {claim.userName}
-                {claim.unitLabel && (
-                  <span className="font-normal text-muted">
-                    {" "}
-                    · {claim.unitLabel}
-                  </span>
-                )}
+    <ul className="space-y-3">
+      {claims.map((claim) => {
+        const mine = claim.userId === viewerId;
+        const open =
+          kept && (claim.status === "PENDING" || claim.status === "ACCEPTED");
+        return (
+          <li
+            key={claim.id}
+            className="space-y-3 rounded-xl border border-border p-3 sm:p-4"
+          >
+            <div className="flex items-start gap-3">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-soft text-sm font-bold text-brand-ink">
+                {initials(claim.userName)}
+              </span>
+              {/* Phones: the state below the name (a long label would
+                  squeeze it); wider screens: at the right. */}
+              <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5 sm:flex-row sm:justify-between sm:gap-3">
+                <div className="min-w-0">
+                  <p className="leading-snug font-semibold break-words text-fg">
+                    {claim.userName}
+                  </p>
+                  <p className="text-xs text-soft">
+                    {claim.unitLabel ? `${claim.unitLabel} · ` : ""}pediu em{" "}
+                    {formatDateTime(claim.createdAt)}
+                  </p>
+                </div>
+                <Badge
+                  tone={CLAIM_STATUS_TONES[claim.status]}
+                  className="shrink-0"
+                >
+                  {CLAIM_STATUS_LABELS[claim.status]}
+                </Badge>
+              </div>
+            </div>
+
+            {claim.message && (
+              <p className="rounded-lg bg-surface-muted/70 px-3 py-2 text-[13px] break-words text-fg">
+                {claim.message}
               </p>
-              <p className="text-xs text-soft">
-                Pedido em {formatDateTime(claim.createdAt)}
+            )}
+
+            {claim.decidedAt && (
+              <p className="text-xs text-muted">
+                {CLAIM_STATUS_LABELS[claim.status]} em{" "}
+                {formatDateTime(claim.decidedAt)}
+                {claim.decidedByName ? ` por ${claim.decidedByName}` : ""}
+                {claim.decisionNote ? ` · ${claim.decisionNote}` : ""}
               </p>
-            </div>
-            <Badge tone={CLAIM_STATUS_TONES[claim.status]}>
-              {CLAIM_STATUS_LABELS[claim.status]}
-            </Badge>
-          </div>
-          <blockquote className="rounded-xl border border-border bg-surface-muted p-3 text-[13px] break-words text-fg">
-            {claim.message}
-          </blockquote>
-          {claim.decidedAt && (
-            <p className="text-xs text-muted">
-              {CLAIM_STATUS_LABELS[claim.status]} em{" "}
-              {formatDateTime(claim.decidedAt)}
-              {claim.decidedByName ? ` por ${claim.decidedByName}` : ""}
-              {claim.decisionNote ? `: ${claim.decisionNote}` : ""}
-            </p>
-          )}
-          {kept && claim.status === "PENDING" && (
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
-              <Button
-                size="sm"
-                variant="cancel"
-                className="justify-center"
-                icon={<CircleX className="size-4" />}
-                onClick={() => onReject(claim)}
-              >
-                Recusar
-              </Button>
-              <Button
-                size="sm"
-                variant="brand"
-                className="justify-center"
-                icon={<CircleCheck className="size-4" />}
-                onClick={() => onAccept(claim)}
-              >
-                Aceitar
-              </Button>
-            </div>
-          )}
-          {kept && claim.status === "ACCEPTED" && (
-            <div className="flex sm:justify-end">
-              <Button
-                size="sm"
-                className="w-full justify-center sm:w-auto"
-                icon={<PackageCheck className="size-4" />}
-                onClick={() => onReturn(claim)}
-              >
-                Devolver para {claim.userName.split(" ")[0]}
-              </Button>
-            </div>
-          )}
-        </li>
-      ))}
+            )}
+
+            {open && mine && (
+              <p className="text-xs text-muted">
+                Este pedido é seu: outra pessoa da portaria ou da gestão confere
+                e entrega.
+              </p>
+            )}
+
+            {open && !mine && claim.status === "PENDING" && (
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
+                <Button
+                  size="sm"
+                  variant="cancel"
+                  className="justify-center"
+                  icon={<CircleX className="size-4" />}
+                  onClick={() => onReject(claim)}
+                >
+                  Recusar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="justify-center"
+                  icon={<CircleCheck className="size-4" />}
+                  onClick={() => onAccept(claim)}
+                >
+                  Aceitar
+                </Button>
+              </div>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }

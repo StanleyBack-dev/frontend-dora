@@ -27,6 +27,8 @@ export { ChoiceCards, type ChoiceOption } from "./components/ChoiceCards";
 export { DraftNotice } from "./components/DraftNotice";
 export { CollapsibleSection } from "./components/CollapsibleSection";
 export { FormActions } from "./components/FormActions";
+export { DrawerActions } from "./components/DrawerActions";
+export { MoreActions, type MoreAction } from "./components/MoreActions";
 export { FormIssues } from "./components/FormIssues";
 export { FormSection } from "./components/FormSection";
 export { Hint } from "./components/Hint";

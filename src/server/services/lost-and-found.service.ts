@@ -1,22 +1,33 @@
 import "server-only";
 import { backendGraphql } from "@/server/graphql/client";
 import {
+  claimFoundItemDocument,
   decideFoundItemClaimDocument,
   discardFoundItemDocument,
   donateFoundItemDocument,
   foundItemDocument,
+  foundItemClaimsDocument,
   foundItemOverviewDocument,
+  foundItemOwnersDocument,
   foundItemsDocument,
+  keptFoundItemsDocument,
+  myFoundItemClaimsDocument,
   registerFoundItemDocument,
+  releaseFoundItemDocument,
   returnFoundItemDocument,
+  withdrawFoundItemClaimDocument,
 } from "@/server/graphql/operations/lost-and-found.operations";
 import type { Paginated } from "@/shared/contracts/api";
+import type { ResidentOption } from "@/shared/contracts/residents-search";
 import type {
   FoundItem,
+  FoundItemCategory,
   FoundItemClaim,
   FoundItemDetails,
   FoundItemFilter,
   FoundItemOverview,
+  KeptFoundItem,
+  QueuedFoundItemClaim,
   RegisterFoundItemInput,
   ReturnFoundItemInput,
 } from "@/shared/contracts/lost-and-found";
@@ -36,6 +47,84 @@ export const lostAndFoundService = {
       variables: { filter, page },
     });
     return foundItems;
+  },
+
+  /** The items still kept (what residents browse), with their claim. */
+  async kept(
+    token: string,
+    category: FoundItemCategory | null,
+    page: PageRequest,
+  ): Promise<Paginated<KeptFoundItem>> {
+    const { keptFoundItems } = await backendGraphql(keptFoundItemsDocument, {
+      token,
+      variables: { category, page },
+    });
+    return keptFoundItems;
+  },
+
+  /** The desk's claims: the open ones (a queue) or every claim. */
+  async claims(
+    token: string,
+    open: boolean,
+    page: PageRequest,
+  ): Promise<Paginated<QueuedFoundItemClaim>> {
+    const { foundItemClaims } = await backendGraphql(foundItemClaimsDocument, {
+      token,
+      variables: { open, page },
+    });
+    return foundItemClaims;
+  },
+
+  /** The caller's claims, newest first. */
+  async myClaims(
+    token: string,
+    page: PageRequest,
+  ): Promise<Paginated<FoundItemClaim>> {
+    const { myFoundItemClaims } = await backendGraphql(
+      myFoundItemClaimsDocument,
+      { token, variables: { page } },
+    );
+    return myFoundItemClaims;
+  },
+
+  /** Says an item is the caller's (the desk is told). */
+  async claim(
+    token: string,
+    itemId: string,
+    message: string | null,
+  ): Promise<FoundItemClaim> {
+    const { claimFoundItem } = await backendGraphql(claimFoundItemDocument, {
+      token,
+      variables: { itemId, message },
+    });
+    return claimFoundItem;
+  },
+
+  /** Cancels one of the caller's claims still waiting. */
+  async withdraw(token: string, claimId: string): Promise<FoundItemClaim> {
+    const { withdrawFoundItemClaim } = await backendGraphql(
+      withdrawFoundItemClaimDocument,
+      { token, variables: { claimId } },
+    );
+    return withdrawFoundItemClaim;
+  },
+
+  /** Residents (with their unit) by part of the name, to name an owner. */
+  async owners(token: string, search: string): Promise<ResidentOption[]> {
+    const { foundItemOwners } = await backendGraphql(foundItemOwnersDocument, {
+      token,
+      variables: { search },
+    });
+    return foundItemOwners;
+  },
+
+  /** Lifts a reservation ("Não é meu", or the desk for everyone). */
+  async release(token: string, id: string): Promise<FoundItem> {
+    const { releaseFoundItem } = await backendGraphql(
+      releaseFoundItemDocument,
+      { token, variables: { id } },
+    );
+    return releaseFoundItem;
   },
 
   async overview(token: string): Promise<FoundItemOverview> {
