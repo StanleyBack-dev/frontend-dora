@@ -1,12 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ChevronRight,
-  HandHelping,
-  PackageCheck,
-  SearchCheck,
-} from "lucide-react";
+import { HandHelping, PackageCheck, SearchCheck } from "lucide-react";
 import {
   Badge,
   buttonClasses,
@@ -25,6 +20,17 @@ import {
 } from "@/features/lost-and-found/model/found-item-labels";
 import type { FoundItem } from "@/shared/contracts/lost-and-found";
 import { formatDateTime } from "@/shared/lib/datetime";
+
+/** A long badge (a name, a unit) wraps instead of being cut on phones. */
+const WRAPS = "max-w-full rounded-lg whitespace-normal break-words";
+
+/** What opening the item shows first: its claims, the item, or how it left. */
+const openLabel = (item: FoundItem) =>
+  item.status === "FOUND"
+    ? item.pendingClaims > 0
+      ? `Ver pedidos (${item.pendingClaims})`
+      : "Ver item"
+    : "Ver detalhes";
 
 const itemHref = (item: FoundItem) => `/achados-e-perdidos/${item.id}`;
 
@@ -133,15 +139,19 @@ export function FoundItemsTable({
               </Badge>
             )}
             {item.awaitedByName && (
-              <Badge tone="success">
+              <Badge tone="success" className={WRAPS}>
                 Aguardando retirada: {item.awaitedByName.split(" ")[0]}
               </Badge>
             )}
             {reservedFor(item) && (
-              <Badge tone="brand">Reservado: {reservedFor(item)}</Badge>
+              <Badge tone="brand" className={WRAPS}>
+                Reservado: {reservedFor(item)}
+              </Badge>
             )}
             {keep && keep.tone !== "neutral" && (
-              <Badge tone={keep.tone}>{keep.text}</Badge>
+              <Badge tone={keep.tone} className={WRAPS}>
+                {keep.text}
+              </Badge>
             )}
           </span>
         );
@@ -171,11 +181,25 @@ export function FoundItemsTable({
       label: "",
       className: "text-right",
       mobile: "hidden",
+      // The same buttons as the phone cards' footer.
       render: (item) => (
-        <Link href={itemHref(item)} className={buttonClasses("ghost", "sm")}>
-          Abrir
-          <ChevronRight aria-hidden className="ml-1 size-4" />
-        </Link>
+        <span className="inline-flex justify-end gap-2 whitespace-nowrap">
+          <Link
+            href={itemHref(item)}
+            className={buttonClasses("secondary", "sm")}
+          >
+            {openLabel(item)}
+          </Link>
+          {item.status === "FOUND" && (
+            <Link
+              href={`${itemHref(item)}?devolver=1`}
+              className={buttonClasses("primary", "sm")}
+            >
+              <PackageCheck aria-hidden className="mr-1.5 size-4" />
+              Devolver
+            </Link>
+          )}
+        </span>
       ),
     },
   ];
@@ -198,11 +222,7 @@ export function FoundItemsTable({
             href={itemHref(item)}
             className={cn(buttonClasses("secondary", "sm"), "w-full")}
           >
-            {item.status === "FOUND"
-              ? item.pendingClaims > 0
-                ? `Ver pedidos (${item.pendingClaims})`
-                : "Ver item"
-              : "Ver detalhes"}
+            {openLabel(item)}
           </Link>
           {item.status === "FOUND" && (
             <Link

@@ -122,15 +122,22 @@ export function myClaimView(
   }
 }
 
-/** "Sonia · Bloco A · 101" or "Bloco A · 101" (null: not reserved). */
+/**
+ * "Sonia · Bloco A · 101", "Bloco A · 101" or a staff member's name (null:
+ * not reserved, or no longer kept).
+ */
 export const reservedFor = (
-  item: Pick<FoundItem, "ownerName" | "ownerUnitLabel">,
+  item: Pick<FoundItem, "ownerName" | "ownerUnitLabel" | "status">,
 ) =>
-  item.ownerUnitLabel
-    ? item.ownerName
-      ? `${item.ownerName} · ${item.ownerUnitLabel}`
-      : item.ownerUnitLabel
-    : null;
+  // Only while kept: once it left, the reservation means nothing.
+  item.status !== "FOUND"
+    ? null
+    : item.ownerUnitLabel
+      ? item.ownerName
+        ? `${item.ownerName} · ${item.ownerUnitLabel}`
+        : item.ownerUnitLabel
+      : // A staff member (no unit).
+        item.ownerName;
 
 /** A claim can be made again after it was rejected or withdrawn. */
 export const canClaimAgain = (status: FoundItemClaimStatus | undefined) =>

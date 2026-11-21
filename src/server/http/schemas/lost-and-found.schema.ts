@@ -36,6 +36,7 @@ export const registerFoundItemSchema = z.object({
   photoHidden: z.boolean().nullish(),
   ownerUnitId: idSchema.nullish(),
   ownerUserId: idSchema.nullish(),
+  lostReportId: idSchema.nullish(),
 });
 
 export const ownerSearchSchema = z.string().trim().max(60);
@@ -56,3 +57,23 @@ export const decideClaimSchema = z.object({
   accept: z.boolean(),
   note: optionalText(300),
 });
+
+export const lostReportIdSchema = idSchema;
+
+export const reportLostItemSchema = z.object({
+  category: z.enum(CATEGORIES),
+  title: z.string().trim().min(2).max(80),
+  description: optionalText(300),
+  lostLocation: optionalText(80),
+  lostOn: z.iso.date().nullish(),
+  photo: z
+    .string()
+    .max(1_400_000)
+    .regex(/^[A-Za-z0-9+/]+={0,2}$/)
+    .nullish(),
+  shared: z.boolean().default(false),
+});
+
+export const spotLostReportSchema = z.object({ note: optionalText(300) });
+
+export const closeLostReportSchema = z.object({ found: z.boolean() });

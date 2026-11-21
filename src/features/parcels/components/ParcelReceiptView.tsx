@@ -1,4 +1,4 @@
-import { ReceiptPdfButton } from "@/features/parcels/components/ReceiptPdfButton";
+import { ReceiptPdfButton } from "@/features/signature/components/ReceiptPdfButton";
 import { SignatureReceiptView } from "@/features/signature/components/SignatureReceiptView";
 import type { ParcelReceipt } from "@/shared/contracts/parcels";
 
@@ -15,7 +15,12 @@ export function ParcelReceiptView({
       title="Comprovante de retirada"
       signerLabel="Quem retirou"
       receipt={receipt}
-      actions={<ReceiptPdfButton parcelId={parcelId} />}
+      actions={
+        <ReceiptPdfButton
+          path={`/parcels/${parcelId}/receipt`}
+          fallbackName="comprovante-encomenda.pdf"
+        />
+      }
     />
   );
 }

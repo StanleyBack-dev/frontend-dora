@@ -95,7 +95,12 @@ export type FoundItemDetails = KeptFoundItem & {
   claims: FoundItemClaim[];
   /** The text after "Eu, <nome>, " (null: no longer kept). */
   returnDeclaration: string | null;
-  returnReceipt: SignatureReceipt | null;
+  /**
+   * The viewer is the team's only member: they may hand over an item they
+   * claimed themselves (the receipt says so).
+   */
+  soleStaffMember: boolean;
+  returnReceipt: (SignatureReceipt & { selfHandover: boolean }) | null;
 };
 
 /** Filters of the condominium's found items (absent: any). */
@@ -146,6 +151,8 @@ export type RegisterFoundItemInput = {
   ownerUnitId?: string | null;
   /** …or one of its residents (only them, with an accepted claim). */
   ownerUserId?: string | null;
+  /** The "Perdi algo" report it answers (ends as found, linked to it). */
+  lostReportId?: string | null;
 };
 
 /** The return: who takes it, the claim it answers and the signature. */
@@ -165,4 +172,61 @@ export type ReturnFoundItemInput = {
   clientTimeZone?: string | null;
   location: SignatureLocation;
   device?: SignatureDevice | null;
+};
+
+/** "Perdi algo": still looking, got it back, gave up, ended without news. */
+export type LostReportStatus = "OPEN" | "FOUND" | "CANCELLED" | "EXPIRED";
+
+/** "Perdi algo": what someone lost. */
+export type LostReport = {
+  id: string;
+  userId: string;
+  userName: string;
+  /** Their unit (to name them as an item's owner). */
+  unitId: string | null;
+  unitLabel: string | null;
+  category: FoundItemCategory;
+  title: string;
+  description: string | null;
+  lostLocation: string | null;
+  /** The day it was lost ("2026-11-20"; null: not informed). */
+  lostOn: string | null;
+  /** Short-lived link to the photo (null: none). */
+  photoUrl: string | null;
+  /** Shown on the neighbours' board. */
+  shared: boolean;
+  /** Neighbours who said "Achei isso". */
+  spotCount: number;
+  status: LostReportStatus;
+  /** The found item it ended with. */
+  foundItemId: string | null;
+  closedAt: string | null;
+  createdAt: string;
+};
+
+export type ReportLostItemInput = {
+  category: FoundItemCategory;
+  title: string;
+  description: string | null;
+  lostLocation: string | null;
+  lostOn: string | null;
+  /** Base64 JPEG/PNG/WebP (no data: prefix). */
+  photo: string | null;
+  /** Show it on the neighbours' board. */
+  shared: boolean;
+};
+
+/** A report on the neighbours' "Procura-se" board: never who lost it. */
+export type LostReportBoardItem = {
+  id: string;
+  category: FoundItemCategory;
+  title: string;
+  lostLocation: string | null;
+  lostOn: string | null;
+  photoUrl: string | null;
+  /** The viewer's own report. */
+  mine: boolean;
+  /** The viewer already said "Achei isso". */
+  spottedByMe: boolean;
+  createdAt: string;
 };

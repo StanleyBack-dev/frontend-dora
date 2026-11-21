@@ -511,6 +511,13 @@ export type LoginInput = {
   password: string;
 };
 
+/** Aviso de item perdido: procurando, encontrado, cancelado ou encerrado sem notícias. */
+export type LostReportStatus =
+  | 'CANCELLED'
+  | 'EXPIRED'
+  | 'FOUND'
+  | 'OPEN';
+
 /** Vínculo com o condomínio: morador ou funcionário. */
 export type MemberKind =
   | 'EMPLOYEE'
@@ -544,6 +551,9 @@ export type NotificationType =
   | 'FOUND_ITEM_FOR_YOU'
   | 'FOUND_ITEM_NOT_OWNER'
   | 'FOUND_ITEM_RETURNED'
+  | 'LOST_REPORT_EXPIRED'
+  | 'LOST_REPORT_MATCH'
+  | 'LOST_REPORT_SPOTTED'
   | 'PARCEL_AUTHORIZED'
   | 'PARCEL_CANCELLED'
   | 'PARCEL_PICKED_UP'
@@ -709,9 +719,11 @@ export type RegisterFoundItemInput = {
   foundAt?: string | null | undefined;
   /** Onde foi achado. */
   foundLocation: string;
+  /** O aviso de "Perdi algo" que o item atende: ele se encerra como encontrado, ligado ao item. */
+  lostReportId?: string | number | null | undefined;
   /** De quem é, se a portaria sabe: a unidade (os moradores dela são avisados e veem o item). */
   ownerUnitId?: string | number | null | undefined;
-  /** Ou um morador da unidade: só ele é avisado e vê o item, com o pedido já aceito. */
+  /** Ou um morador da unidade (com ownerUnitId), ou alguém da equipe (sem unidade): só essa pessoa é avisada e vê o item, com o pedido já aceito. */
   ownerUserId?: string | number | null | undefined;
   /** Foto (JPEG, PNG ou WebP em base64, até 1 MB). */
   photo?: string | null | undefined;
@@ -747,6 +759,23 @@ export type RegisterParcelInput = {
   trackingCode?: string | null | undefined;
   /** A unidade de destino. */
   unitId: string | number;
+};
+
+/** "Perdi algo": o que o morador perdeu. */
+export type ReportLostItemInput = {
+  category: FoundItemCategory;
+  /** Detalhes que ajudam a reconhecer (cor, marca…). */
+  description?: string | null | undefined;
+  /** Onde pode ter perdido. */
+  lostLocation?: string | null | undefined;
+  /** O dia em que perdeu (AAAA-MM-DD), se souber. */
+  lostOn?: string | null | undefined;
+  /** Foto do objeto ou de um parecido: JPEG, PNG ou WebP em base64 (sem o prefixo data:), até 1 MB. */
+  photo?: string | null | undefined;
+  /** Mostrar no mural dos vizinhos (sem o nome, a unidade e os detalhes). */
+  shared?: boolean | null | undefined;
+  /** O que é (ex.: chave com chaveiro azul). */
+  title: string;
 };
 
 export type ResetPasswordInput = {
@@ -1555,7 +1584,7 @@ export type UnitPageQuery = { unitPage: { total: number, page: number, limit: nu
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, activeSpaces: number, pendingBookings: number, bookingsToday: number, openSupportRequests: number | null, failedNotifications: number | null, parcels: { waiting: number, stuck: number, perishableOverdue: number, pickedUpLast30Days: number, averagePickupHours: number | null, monthly: Array<{ month: string, received: number, pickedUp: number }> } | null } };
+export type DashboardQuery = { dashboard: { activeUsers: number, pendingEnrollments: number, units: number, activeSpaces: number, pendingBookings: number, bookingsToday: number, openSupportRequests: number | null, failedNotifications: number | null, parcels: { waiting: number, stuck: number, perishableOverdue: number, pickedUpLast30Days: number, averagePickupHours: number | null, monthly: Array<{ month: string, received: number, pickedUp: number }> } | null, lostAndFound: { kept: number, pendingClaims: number, expiringSoon: number, openLostReports: number, returnedLast90Days: number, returnRate: number | null, monthly: Array<{ month: string, found: number, returned: number }> } | null } };
 
 export type DependentFieldsFragment = { id: string, name: string, birthDate: string, relationship: DependentRelationship, status: DependentStatus, holderName: string | null, unitLabel: string | null, rejectReason: string | null, reviewedAt: string | null, createdAt: string, documentUrl: string, documentContentType: string };
 
@@ -1874,7 +1903,7 @@ export type FoundItemQueryVariables = Exact<{
 }>;
 
 
-export type FoundItemQuery = { foundItem: { privateDetails: string | null, returnDeclaration: string | null, id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null, claims: Array<{ id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null }>, myClaim: { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null } | null, returnReceipt: { signerName: string, signerDocumentType: DocumentType | null, signerDocumentMasked: string | null, declaration: string, imageUrl: string, imageSha256: string, strokesSha256: string, signedAt: string, clientSignedAt: string | null, clientTimeZone: string | null, ipAddress: string | null, userAgent: string | null, device: string, locationStatus: SignatureLocationStatus, latitude: number | null, longitude: number | null, locationAccuracyMeters: number | null, collectedByName: string, collectedByRole: string, evidenceSha256: string, intact: boolean } | null } };
+export type FoundItemQuery = { foundItem: { privateDetails: string | null, returnDeclaration: string | null, soleStaffMember: boolean, id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null, claims: Array<{ id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null }>, myClaim: { id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null } | null, returnReceipt: { signerName: string, signerDocumentType: DocumentType | null, signerDocumentMasked: string | null, declaration: string, imageUrl: string, imageSha256: string, strokesSha256: string, signedAt: string, clientSignedAt: string | null, clientTimeZone: string | null, ipAddress: string | null, userAgent: string | null, device: string, locationStatus: SignatureLocationStatus, latitude: number | null, longitude: number | null, locationAccuracyMeters: number | null, collectedByName: string, collectedByRole: string, evidenceSha256: string, intact: boolean, selfHandover: boolean } | null } };
 
 export type KeptFoundItemsQueryVariables = Exact<{
   category?: FoundItemCategory | null | undefined;
@@ -1966,6 +1995,65 @@ export type FoundItemClaimsQueryVariables = Exact<{
 
 
 export type FoundItemClaimsQuery = { foundItemClaims: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, itemId: string, itemTitle: string, itemStatus: FoundItemStatus, itemCategory: FoundItemCategory, userId: string, userName: string, unitLabel: string | null, message: string | null, status: FoundItemClaimStatus, createdAt: string, decidedAt: string | null, decidedByName: string | null, decisionNote: string | null, item: { privateDetails: string | null, id: string, category: FoundItemCategory, title: string, description: string | null, foundLocation: string, foundAt: string, storageLocation: string, photoHidden: boolean, status: FoundItemStatus, registeredByName: string | null, keepUntil: string, closedAt: string | null, closedByName: string | null, closeReason: string | null, returnedToName: string | null, signerName: string | null, pendingClaims: number, awaitedByName: string | null, photoUrl: string | null, ownerUnitLabel: string | null, ownerName: string | null } }> } };
+
+export type FoundItemReceiptPdfQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type FoundItemReceiptPdfQuery = { foundItemReceiptPdf: { fileName: string, mimeType: string, base64Content: string } };
+
+export type FoundItemStaffQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FoundItemStaffQuery = { foundItemStaff: Array<{ userId: string, name: string, roleLabel: string }> };
+
+export type LostReportFieldsFragment = { id: string, userId: string, userName: string, unitId: string | null, unitLabel: string | null, category: FoundItemCategory, title: string, description: string | null, lostLocation: string | null, lostOn: string | null, photoUrl: string | null, shared: boolean, spotCount: number, status: LostReportStatus, foundItemId: string | null, closedAt: string | null, createdAt: string };
+
+export type MyLostReportsQueryVariables = Exact<{
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type MyLostReportsQuery = { myLostReports: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, userId: string, userName: string, unitId: string | null, unitLabel: string | null, category: FoundItemCategory, title: string, description: string | null, lostLocation: string | null, lostOn: string | null, photoUrl: string | null, shared: boolean, spotCount: number, status: LostReportStatus, foundItemId: string | null, closedAt: string | null, createdAt: string }> } };
+
+export type LostReportsQueryVariables = Exact<{
+  open?: boolean | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type LostReportsQuery = { lostReports: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, userId: string, userName: string, unitId: string | null, unitLabel: string | null, category: FoundItemCategory, title: string, description: string | null, lostLocation: string | null, lostOn: string | null, photoUrl: string | null, shared: boolean, spotCount: number, status: LostReportStatus, foundItemId: string | null, closedAt: string | null, createdAt: string }> } };
+
+export type ReportLostItemMutationVariables = Exact<{
+  input: ReportLostItemInput;
+}>;
+
+
+export type ReportLostItemMutation = { reportLostItem: { id: string, userId: string, userName: string, unitId: string | null, unitLabel: string | null, category: FoundItemCategory, title: string, description: string | null, lostLocation: string | null, lostOn: string | null, photoUrl: string | null, shared: boolean, spotCount: number, status: LostReportStatus, foundItemId: string | null, closedAt: string | null, createdAt: string } };
+
+export type CloseLostReportMutationVariables = Exact<{
+  id: string | number;
+  found: boolean;
+}>;
+
+
+export type CloseLostReportMutation = { closeLostReport: { id: string, userId: string, userName: string, unitId: string | null, unitLabel: string | null, category: FoundItemCategory, title: string, description: string | null, lostLocation: string | null, lostOn: string | null, photoUrl: string | null, shared: boolean, spotCount: number, status: LostReportStatus, foundItemId: string | null, closedAt: string | null, createdAt: string } };
+
+export type LostReportBoardQueryVariables = Exact<{
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type LostReportBoardQuery = { lostReportBoard: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, category: FoundItemCategory, title: string, lostLocation: string | null, lostOn: string | null, photoUrl: string | null, mine: boolean, spottedByMe: boolean, createdAt: string }> } };
+
+export type SpotLostReportMutationVariables = Exact<{
+  id: string | number;
+  note?: string | null | undefined;
+}>;
+
+
+export type SpotLostReportMutation = { spotLostReport: boolean };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -2698,6 +2786,27 @@ export const FoundItemClaimFieldsFragmentDoc = new TypedDocumentString(`
   decisionNote
 }
     `, {"fragmentName":"FoundItemClaimFields"}) as unknown as TypedDocumentString<FoundItemClaimFieldsFragment, unknown>;
+export const LostReportFieldsFragmentDoc = new TypedDocumentString(`
+    fragment LostReportFields on LostReport {
+  id
+  userId
+  userName
+  unitId
+  unitLabel
+  category
+  title
+  description
+  lostLocation
+  lostOn
+  photoUrl
+  shared
+  spotCount
+  status
+  foundItemId
+  closedAt
+  createdAt
+}
+    `, {"fragmentName":"LostReportFields"}) as unknown as TypedDocumentString<LostReportFieldsFragment, unknown>;
 export const ParcelFieldsFragmentDoc = new TypedDocumentString(`
     fragment ParcelFields on Parcel {
   id
@@ -4139,6 +4248,19 @@ export const DashboardDocument = new TypedDocumentString(`
         pickedUp
       }
     }
+    lostAndFound {
+      kept
+      pendingClaims
+      expiringSoon
+      openLostReports
+      returnedLast90Days
+      returnRate
+      monthly {
+        month
+        found
+        returned
+      }
+    }
   }
 }
     `) as unknown as TypedDocumentString<DashboardQuery, DashboardQueryVariables>;
@@ -5503,6 +5625,7 @@ export const FoundItemDocument = new TypedDocumentString(`
       ...FoundItemClaimFields
     }
     returnDeclaration
+    soleStaffMember
     returnReceipt {
       signerName
       signerDocumentType
@@ -5525,6 +5648,7 @@ export const FoundItemDocument = new TypedDocumentString(`
       collectedByRole
       evidenceSha256
       intact
+      selfHandover
     }
   }
 }
@@ -5925,6 +6049,162 @@ fragment FoundItemClaimFields on FoundItemClaim {
   decidedByName
   decisionNote
 }`) as unknown as TypedDocumentString<FoundItemClaimsQuery, FoundItemClaimsQueryVariables>;
+export const FoundItemReceiptPdfDocument = new TypedDocumentString(`
+    query FoundItemReceiptPdf($id: ID!) {
+  foundItemReceiptPdf(id: $id) {
+    fileName
+    mimeType
+    base64Content
+  }
+}
+    `) as unknown as TypedDocumentString<FoundItemReceiptPdfQuery, FoundItemReceiptPdfQueryVariables>;
+export const FoundItemStaffDocument = new TypedDocumentString(`
+    query FoundItemStaff {
+  foundItemStaff {
+    userId
+    name
+    roleLabel
+  }
+}
+    `) as unknown as TypedDocumentString<FoundItemStaffQuery, FoundItemStaffQueryVariables>;
+export const MyLostReportsDocument = new TypedDocumentString(`
+    query MyLostReports($page: PageInput) {
+  myLostReports(page: $page) {
+    items {
+      ...LostReportFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment LostReportFields on LostReport {
+  id
+  userId
+  userName
+  unitId
+  unitLabel
+  category
+  title
+  description
+  lostLocation
+  lostOn
+  photoUrl
+  shared
+  spotCount
+  status
+  foundItemId
+  closedAt
+  createdAt
+}`) as unknown as TypedDocumentString<MyLostReportsQuery, MyLostReportsQueryVariables>;
+export const LostReportsDocument = new TypedDocumentString(`
+    query LostReports($open: Boolean, $page: PageInput) {
+  lostReports(open: $open, page: $page) {
+    items {
+      ...LostReportFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment LostReportFields on LostReport {
+  id
+  userId
+  userName
+  unitId
+  unitLabel
+  category
+  title
+  description
+  lostLocation
+  lostOn
+  photoUrl
+  shared
+  spotCount
+  status
+  foundItemId
+  closedAt
+  createdAt
+}`) as unknown as TypedDocumentString<LostReportsQuery, LostReportsQueryVariables>;
+export const ReportLostItemDocument = new TypedDocumentString(`
+    mutation ReportLostItem($input: ReportLostItemInput!) {
+  reportLostItem(input: $input) {
+    ...LostReportFields
+  }
+}
+    fragment LostReportFields on LostReport {
+  id
+  userId
+  userName
+  unitId
+  unitLabel
+  category
+  title
+  description
+  lostLocation
+  lostOn
+  photoUrl
+  shared
+  spotCount
+  status
+  foundItemId
+  closedAt
+  createdAt
+}`) as unknown as TypedDocumentString<ReportLostItemMutation, ReportLostItemMutationVariables>;
+export const CloseLostReportDocument = new TypedDocumentString(`
+    mutation CloseLostReport($id: ID!, $found: Boolean!) {
+  closeLostReport(id: $id, found: $found) {
+    ...LostReportFields
+  }
+}
+    fragment LostReportFields on LostReport {
+  id
+  userId
+  userName
+  unitId
+  unitLabel
+  category
+  title
+  description
+  lostLocation
+  lostOn
+  photoUrl
+  shared
+  spotCount
+  status
+  foundItemId
+  closedAt
+  createdAt
+}`) as unknown as TypedDocumentString<CloseLostReportMutation, CloseLostReportMutationVariables>;
+export const LostReportBoardDocument = new TypedDocumentString(`
+    query LostReportBoard($page: PageInput) {
+  lostReportBoard(page: $page) {
+    items {
+      id
+      category
+      title
+      lostLocation
+      lostOn
+      photoUrl
+      mine
+      spottedByMe
+      createdAt
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    `) as unknown as TypedDocumentString<LostReportBoardQuery, LostReportBoardQueryVariables>;
+export const SpotLostReportDocument = new TypedDocumentString(`
+    mutation SpotLostReport($id: ID!, $note: String) {
+  spotLostReport(id: $id, note: $note)
+}
+    `) as unknown as TypedDocumentString<SpotLostReportMutation, SpotLostReportMutationVariables>;
 export const MyNotificationsDocument = new TypedDocumentString(`
     query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {
   myNotifications(unreadOnly: $unreadOnly, page: $page) {

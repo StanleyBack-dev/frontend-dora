@@ -24,6 +24,7 @@ export function FoundItemClaimsList({
   claims,
   kept,
   viewerId,
+  soleStaffMember = false,
   onAccept,
   onReject,
 }: {
@@ -32,6 +33,8 @@ export function FoundItemClaimsList({
   kept: boolean;
   /** Who is looking: their own claim is answered by a colleague. */
   viewerId: string;
+  /** The viewer is the team's only member (may hand their own over). */
+  soleStaffMember?: boolean;
   onAccept: (claim: FoundItemClaim) => void;
   onReject: (claim: FoundItemClaim) => void;
 }) {
@@ -88,8 +91,9 @@ export function FoundItemClaimsList({
 
             {open && mine && (
               <p className="text-xs text-muted">
-                Este pedido é seu: outra pessoa da portaria ou da gestão confere
-                e entrega.
+                {soleStaffMember
+                  ? "Este pedido é seu. Como você é a única pessoa da equipe, use “Devolver” e assine: o comprovante registra isso."
+                  : "Este pedido é seu: outra pessoa da portaria ou da gestão confere e entrega."}
               </p>
             )}
 

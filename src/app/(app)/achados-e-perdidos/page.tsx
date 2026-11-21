@@ -163,9 +163,10 @@ async function LostAndFoundDesk({ query }: { query: RawSearchParams }) {
   const category = oneOf(firstParam(query, "categoria"), FOUND_ITEM_CATEGORIES);
   const page = pageParam(query);
   const pageSize = pageSizeParam(query);
-  const [overview, units] = await Promise.all([
+  const [overview, units, staff] = await Promise.all([
     authed((token) => lostAndFoundService.overview(token)),
     authed((token) => condominiumsService.units(token)),
+    authed((token) => lostAndFoundService.staff(token)),
   ]);
   // Item, resident and places: one of the values in use.
   const title = oneOf(firstParam(query, "item"), overview.titles);
@@ -222,6 +223,7 @@ async function LostAndFoundDesk({ query }: { query: RawSearchParams }) {
 
       <FoundItemDeskActions
         units={units.map((unit) => ({ id: unit.id, label: unit.label }))}
+        staff={staff}
       />
 
       <FoundItemsSummary overview={overview} />

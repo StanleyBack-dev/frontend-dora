@@ -17,6 +17,8 @@ export type Dashboard = {
   failedNotifications: number | null;
   /** The parcels module's numbers (null: the module is off). */
   parcels: ParcelIndicators | null;
+  /** The lost and found module's numbers (null: the module is off). */
+  lostAndFound: LostFoundIndicators | null;
 };
 
 /** Parcels at a glance (the management dashboard). */
@@ -31,4 +33,19 @@ export type ParcelIndicators = {
   averagePickupHours: number | null;
   /** The last 6 months, oldest first ("2026-11"). */
   monthly: { month: string; received: number; pickedUp: number }[];
+};
+
+/** Lost and found at a glance (the management dashboard). */
+export type LostFoundIndicators = {
+  /** Kept now; claims waiting; keeping period ending within 7 days. */
+  kept: number;
+  pendingClaims: number;
+  expiringSoon: number;
+  /** "Perdi algo" reports still open. */
+  openLostReports: number;
+  /** Returned in the last 90 days, and the share of what left (0-100). */
+  returnedLast90Days: number;
+  returnRate: number | null;
+  /** The last 6 months, oldest first ("2026-11"). */
+  monthly: { month: string; found: number; returned: number }[];
 };

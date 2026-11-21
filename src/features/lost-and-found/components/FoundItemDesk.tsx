@@ -43,6 +43,14 @@ import { useToast } from "@/shared/toast/useToast";
 // claims is in the drawer); the rest (donate, discard, open a reservation
 // to everyone, claim it for oneself) under "Mais ações". The residents'
 // claims follow. The page reloads from the API after each change.
+/**
+ * The viewer asked for it (or it was reserved for them): a colleague hands
+ * it over, unless the viewer is the team's only member.
+ */
+const ownItemOnOpen = (item: FoundItemDetails) =>
+  !item.soleStaffMember &&
+  (item.myClaim?.status === "PENDING" || item.myClaim?.status === "ACCEPTED");
+
 export function FoundItemDesk({
   item,
   viewerId,
@@ -65,12 +73,14 @@ export function FoundItemDesk({
   const kept = item.status === "FOUND";
   // Whoever the return goes to by default: an accepted claim of someone
   // else first, then a pending one.
+  const handsOver = (claim: FoundItemClaim) =>
+    claim.userId !== viewerId || item.soleStaffMember;
   const target =
     item.claims.find(
-      (claim) => claim.status === "ACCEPTED" && claim.userId !== viewerId,
+      (claim) => claim.status === "ACCEPTED" && handsOver(claim),
     ) ??
     item.claims.find(
-      (claim) => claim.status === "PENDING" && claim.userId !== viewerId,
+      (claim) => claim.status === "PENDING" && handsOver(claim),
     ) ??
     null;
   const [deciding, setDeciding] = useState<{
@@ -82,7 +92,7 @@ export function FoundItemDesk({
     claimId: string | null;
     key: number;
   } | null>(
-    kept && returnClaimId
+    kept && returnClaimId && !ownItemOnOpen(item)
       ? {
           // A claim of this item, or (any other value) the default one.
           claimId: item.claims.some((claim) => claim.id === returnClaimId)
@@ -123,9 +133,12 @@ export function FoundItemDesk({
     setReturning({ claimId, key: ++openings.current });
 
   const mine = item.myClaim ? myClaimView(item.myClaim) : null;
+  // The viewer's own open claim (or a reservation for them): a colleague
+  // hands it over, so no "Devolver" here.
+  const ownItem = ownItemOnOpen(item);
   const more: MoreAction[] = kept
     ? [
-        ...(item.ownerUnitLabel
+        ...(item.ownerUnitLabel || item.ownerName
           ? [
               {
                 label: "Liberar para todos",
@@ -164,23 +177,34 @@ export function FoundItemDesk({
         {kept && (
           <div className="flex flex-col-reverse gap-2 border-t border-border bg-surface-muted/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <MoreActions actions={more} />
-            <Button
-              className="justify-center"
-              icon={<PackageCheck className="size-4" />}
-              onClick={() => openReturn(target?.id ?? null)}
-            >
-              {target
-                ? `Devolver para ${target.userName.split(" ")[0]}`
-                : "Devolver com assinatura"}
-            </Button>
+            {!ownItem && (
+              <Button
+                className="justify-center"
+                icon={<PackageCheck className="size-4" />}
+                onClick={() => openReturn(target?.id ?? null)}
+              >
+                {target
+                  ? `Devolver para ${target.userName.split(" ")[0]}`
+                  : "Devolver com assinatura"}
+              </Button>
+            )}
           </div>
         )}
       </Card>
 
-      {item.myClaim && mine && kept && (
+      {item.myClaim && mine && kept && item.soleStaffMember && (
+        <Alert tone="warning">
+          <strong>Seu pedido: {mine.label.toLowerCase()}.</strong> Como você é a
+          única pessoa da equipe, pode entregar este item a si mesmo. O
+          comprovante registra que foi entregue pela própria pessoa.
+        </Alert>
+      )}
+
+      {item.myClaim && mine && kept && !item.soleStaffMember && (
         <Alert tone="info">
-          <strong>Seu pedido: {mine.label.toLowerCase()}.</strong> Outra pessoa
-          da portaria ou da gestão confere e entrega.
+          <strong>Seu pedido: {mine.label.toLowerCase()}.</strong> Você não pode
+          entregar um item para si mesmo: outra pessoa da portaria ou da gestão
+          confere e entrega.
         </Alert>
       )}
 
@@ -194,6 +218,7 @@ export function FoundItemDesk({
             claims={item.claims}
             kept={kept}
             viewerId={viewerId}
+            soleStaffMember={item.soleStaffMember}
             onAccept={(claim) => setDeciding({ claim, accept: true })}
             onReject={(claim) => setDeciding({ claim, accept: false })}
           />

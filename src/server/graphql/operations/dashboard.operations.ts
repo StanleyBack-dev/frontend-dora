@@ -23,6 +23,19 @@ export const dashboardDocument = graphql(`
           pickedUp
         }
       }
+      lostAndFound {
+        kept
+        pendingClaims
+        expiringSoon
+        openLostReports
+        returnedLast90Days
+        returnRate
+        monthly {
+          month
+          found
+          returned
+        }
+      }
     }
   }
 `);

@@ -74,7 +74,8 @@ export function FoundItemReturnDrawer({
   const accepted = item.claims.filter(
     (claim) =>
       (claim.status === "ACCEPTED" || claim.status === "PENDING") &&
-      claim.userId !== viewerId,
+      // Their own claim only when nobody else on the team could hand it over.
+      (claim.userId !== viewerId || item.soleStaffMember),
   );
   const initial = accepted.find((claim) => claim.id === claimId) ?? null;
   const [choice, setChoice] = useState<string>(initial?.id ?? OTHER);
@@ -235,6 +236,11 @@ export function FoundItemReturnDrawer({
                   : `Os outros ${others} pedidos abertos deste item serão recusados e os moradores, avisados.`}
               </Alert>
             )}
+            <p className="text-xs text-muted">
+              {choice === OTHER
+                ? "Digite o nome de quem está retirando e confira um documento."
+                : "Já vem com o nome de quem pediu. Se outra pessoa vier retirar (um familiar, por exemplo), troque o nome."}
+            </p>
             <div className="grid gap-3 sm:grid-cols-[1fr_auto_1fr]">
               <Field
                 label="Nome completo"

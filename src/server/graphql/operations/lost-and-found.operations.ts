@@ -91,6 +91,7 @@ export const foundItemDocument = graphql(`
         ...FoundItemClaimFields
       }
       returnDeclaration
+      soleStaffMember
       returnReceipt {
         signerName
         signerDocumentType
@@ -113,6 +114,7 @@ export const foundItemDocument = graphql(`
         collectedByRole
         evidenceSha256
         intact
+        selfHandover
       }
     }
   }
@@ -242,6 +244,26 @@ export const foundItemClaimsDocument = graphql(`
       page
       limit
       totalPages
+    }
+  }
+`);
+
+export const foundItemReceiptPdfDocument = graphql(`
+  query FoundItemReceiptPdf($id: ID!) {
+    foundItemReceiptPdf(id: $id) {
+      fileName
+      mimeType
+      base64Content
+    }
+  }
+`);
+
+export const foundItemStaffDocument = graphql(`
+  query FoundItemStaff {
+    foundItemStaff {
+      userId
+      name
+      roleLabel
     }
   }
 `);

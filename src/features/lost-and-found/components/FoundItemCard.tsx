@@ -52,7 +52,7 @@ export function FoundItemCard({
         <Badge tone="neutral">
           {FOUND_ITEM_CATEGORY_LABELS[item.category]}
         </Badge>
-        {item.ownerUnitLabel && item.status === "FOUND" && (
+        {(item.ownerUnitLabel || item.ownerName) && item.status === "FOUND" && (
           <Badge tone="brand">
             {item.ownerName ? "Achado para você" : "Para a sua unidade"}
           </Badge>

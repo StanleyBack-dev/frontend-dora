@@ -6,3 +6,11 @@ export type ResidentOption = {
   unitId: string;
   unitLabel: string;
 };
+
+/** Someone of the condominium's team (gate, management). */
+export type StaffOption = {
+  userId: string;
+  name: string;
+  /** "Portaria" or "Gestão". */
+  roleLabel: string;
+};

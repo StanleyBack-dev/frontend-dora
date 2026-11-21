@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
-import { Camera, EyeOff, ImagePlus, PackagePlus, Trash2 } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { EyeOff, PackagePlus } from "lucide-react";
 import {
   Button,
   Combobox,
@@ -22,12 +22,8 @@ import {
   FOUND_ITEM_CATEGORY_LABELS,
   hidesPhotoByDefault,
 } from "@/features/lost-and-found/model/found-item-labels";
-import {
-  PhotoError,
-  prepareSpacePhoto,
-  SPACE_PHOTO_ACCEPT,
-  type PreparedPhoto,
-} from "@/features/spaces/model/space-photo-file";
+import { ItemPhotoPicker } from "@/features/lost-and-found/components/ItemPhotoPicker";
+import { useItemPhoto } from "@/features/lost-and-found/model/use-item-photo";
 import type {
   FoundItem,
   FoundItemCategory,
@@ -37,15 +33,13 @@ import { fromLocalInput, toLocalInput } from "@/shared/lib/datetime";
 import {
   UnitOrResidentPicker,
   type ResidentOption,
+  type StaffOption,
 } from "@/features/residents/components/UnitOrResidentPicker";
 import { sameShape } from "@/shared/lib/form-draft";
 import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
 
 const FORM_ID = "found-item-register-form";
-/** What the API accepts for a photo (bytes). */
-const PHOTO_MAX_BYTES = 1_000_000;
-
 const asOptions = (values: readonly string[]) =>
   values.map((value) => ({ value, label: value }));
 
@@ -63,6 +57,8 @@ type RegisterDraft = {
   /** Whose the desk knows it is (null: unknown). */
   ownerUnitId: string | null;
   ownerResident: ResidentOption | null;
+  /** Or someone of the team (no unit). */
+  ownerStaff: StaffOption | null;
 };
 
 const EMPTY: RegisterDraft = {
@@ -76,6 +72,28 @@ const EMPTY: RegisterDraft = {
   photoHidden: null,
   ownerUnitId: null,
   ownerResident: null,
+  ownerStaff: null,
+};
+
+/** What a form opened from elsewhere starts with. */
+export type RegisterPrefill = {
+  /** Identifies the source (a report id): applied once per source. */
+  key: string;
+  /** The "Perdi algo" report it answers: it ends when registered. */
+  lostReportId?: string;
+  values: Partial<
+    Pick<
+      RegisterDraft,
+      | "category"
+      | "title"
+      | "description"
+      | "privateDetails"
+      | "foundLocation"
+      | "ownerUnitId"
+      | "ownerResident"
+      | "ownerStaff"
+    >
+  >;
 };
 
 const parseDraft = (raw: unknown) => {
@@ -98,12 +116,18 @@ const parseDraft = (raw: unknown) => {
 export function FoundItemRegisterDrawer({
   open,
   units,
+  staff,
+  prefill = null,
   onClose,
   onDone,
 }: {
   open: boolean;
   /** The condominium's units, to say whose the item is. */
   units: { id: string; label: string }[];
+  /** The team, to say an item is a staff member's (absent: not offered). */
+  staff?: StaffOption[];
+  /** Starts filled in (e.g. from a "Perdi algo" report); null: blank. */
+  prefill?: RegisterPrefill | null;
   onClose: () => void;
   onDone: (item: FoundItem) => void;
 }) {
@@ -115,8 +139,8 @@ export function FoundItemRegisterDrawer({
     { open },
   );
   const form = draft.value;
-  const [photo, setPhoto] = useState<PreparedPhoto | null>(null);
-  const [preparing, setPreparing] = useState(false);
+  const itemPhoto = useItemPhoto();
+  const { photo, preparing, drop: dropPhoto } = itemPhoto;
   const [sending, setSending] = useState(false);
   // The latest moment the date field accepts (now), refreshed whenever the
   // field is used: read on events, never while rendering.
@@ -124,8 +148,21 @@ export function FoundItemRegisterDrawer({
   const refreshLatest = () => setLatest(toLocalInput(new Date().toISOString()));
   // Remounts the owner picker after a reset or a restored draft.
   const [resets, setResets] = useState(0);
-  const cameraInput = useRef<HTMLInputElement>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
+  // A new prefill replaces the form once, when the drawer opens with it
+  // (state adjusted while rendering, as useFormDraft does).
+  const [appliedPrefill, setAppliedPrefill] = useState<string | null>(null);
+  if (open && prefill && prefill.key !== appliedPrefill) {
+    setAppliedPrefill(prefill.key);
+    // Not a restored draft: the report's data replaces it.
+    draft.discard();
+    draft.set({ ...EMPTY, ...prefill.values });
+    setResets((count) => count + 1);
+  } else if (!open && appliedPrefill !== null) {
+    // A form filled in from a report is not a draft of the desk's own.
+    setAppliedPrefill(null);
+    draft.discard();
+    dropPhoto();
+  }
 
   const set =
     <K extends keyof RegisterDraft>(key: K) =>
@@ -146,41 +183,11 @@ export function FoundItemRegisterDrawer({
     form.foundLocation.trim().length >= 2 &&
     form.storageLocation.trim().length >= 2;
 
-  function dropPhoto() {
-    setPhoto((current) => {
-      if (current) URL.revokeObjectURL(current.previewUrl);
-      return null;
-    });
-  }
-
   function cancel() {
     draft.discard();
     setResets((count) => count + 1);
     dropPhoto();
     onClose();
-  }
-
-  async function pick(input: HTMLInputElement) {
-    const file = input.files?.[0];
-    if (!file) return;
-    setPreparing(true);
-    try {
-      const prepared = await prepareSpacePhoto(file, PHOTO_MAX_BYTES);
-      setPhoto((current) => {
-        if (current) URL.revokeObjectURL(current.previewUrl);
-        return prepared;
-      });
-    } catch (cause) {
-      showError(
-        cause instanceof PhotoError
-          ? cause.message
-          : "Não foi possível usar esta foto.",
-      );
-    } finally {
-      setPreparing(false);
-      // The same photo can be picked again after removing it.
-      input.value = "";
-    }
   }
 
   async function submit(event: FormEvent) {
@@ -203,15 +210,21 @@ export function FoundItemRegisterDrawer({
         photo: photo?.base64 ?? null,
         photoHidden: photo ? photoHidden : null,
         ownerUnitId: form.ownerUnitId,
-        ownerUserId: form.ownerResident?.userId ?? null,
+        ownerUserId:
+          form.ownerResident?.userId ?? form.ownerStaff?.userId ?? null,
+        lostReportId: prefill?.lostReportId ?? null,
       });
       showSuccess(
-        "Item registrado.",
-        form.ownerResident
-          ? `Só ${form.ownerResident.name} foi avisado e vê o item.`
-          : form.ownerUnitId
-            ? "Os moradores da unidade foram avisados e veem o item."
-            : "Ele aparece para os moradores, que podem pedir se for deles.",
+        prefill?.lostReportId
+          ? "Item registrado e aviso encerrado como encontrado."
+          : "Item registrado.",
+        form.ownerStaff
+          ? `Só ${form.ownerStaff.name} foi avisado e vê o item.`
+          : form.ownerResident
+            ? `Só ${form.ownerResident.name} foi avisado e vê o item.`
+            : form.ownerUnitId
+              ? "Os moradores da unidade foram avisados e veem o item."
+              : "Ele aparece para os moradores, que podem pedir se for deles.",
       );
       draft.discard();
       setResets((count) => count + 1);
@@ -257,7 +270,7 @@ export function FoundItemRegisterDrawer({
 
         <FormSection
           title="De quem é? (opcional)"
-          description="Se a portaria sabe de quem é, só a unidade ou o morador é avisado e vê o item."
+          description="Se a portaria sabe de quem é, só a unidade, o morador ou o funcionário é avisado e vê o item."
         >
           <UnitOrResidentPicker
             key={`${resets}-${draft.restored ? "restored" : "blank"}`}
@@ -266,11 +279,15 @@ export function FoundItemRegisterDrawer({
             units={units}
             value={form.ownerUnitId}
             initialResident={form.ownerResident}
+            staff={staff}
+            initialStaff={form.ownerStaff}
             notes={{
               none: "O item aparece para todos os moradores, que pedem se for deles.",
               unit: "Os moradores da unidade são avisados e só eles veem o item.",
               resident:
                 "Só o morador escolhido é avisado e vê o item, já liberado para retirar.",
+              staff:
+                "Só o funcionário escolhido é avisado e vê o item, já liberado para retirar. Outra pessoa da equipe faz a entrega.",
             }}
             search={lostAndFoundClient.owners}
             onChange={(pick) =>
@@ -278,6 +295,15 @@ export function FoundItemRegisterDrawer({
                 ...current,
                 ownerUnitId: pick?.unitId ?? null,
                 ownerResident: pick?.resident ?? null,
+                ownerStaff: null,
+              }))
+            }
+            onStaffChange={(member) =>
+              draft.set((current) => ({
+                ...current,
+                ownerUnitId: null,
+                ownerResident: null,
+                ownerStaff: member,
               }))
             }
           />
@@ -372,58 +398,7 @@ export function FoundItemRegisterDrawer({
           title="Foto (opcional)"
           description="Ajuda o dono a reconhecer o item."
         >
-          <input
-            ref={cameraInput}
-            type="file"
-            accept={SPACE_PHOTO_ACCEPT}
-            capture="environment"
-            className="hidden"
-            onChange={(event) => void pick(event.target)}
-          />
-          <input
-            ref={fileInput}
-            type="file"
-            accept={SPACE_PHOTO_ACCEPT}
-            className="hidden"
-            onChange={(event) => void pick(event.target)}
-          />
-          {photo ? (
-            <div className="flex items-end justify-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element -- local preview */}
-              <img
-                src={photo.previewUrl}
-                alt="Foto do item"
-                className="h-32 w-32 rounded-xl border border-border object-cover"
-              />
-              <Button
-                size="sm"
-                variant="secondary"
-                icon={<Trash2 className="size-4" />}
-                onClick={dropPhoto}
-              >
-                Remover
-              </Button>
-            </div>
-          ) : (
-            <div className="mx-auto grid max-w-sm grid-cols-2 gap-2">
-              <Button
-                variant="brand"
-                loading={preparing}
-                icon={<Camera className="size-4" />}
-                onClick={() => cameraInput.current?.click()}
-              >
-                Tirar foto
-              </Button>
-              <Button
-                variant="brand"
-                disabled={preparing}
-                icon={<ImagePlus className="size-4" />}
-                onClick={() => fileInput.current?.click()}
-              >
-                Anexar foto
-              </Button>
-            </div>
-          )}
+          <ItemPhotoPicker photo={itemPhoto} alt="Foto do item" />
           {photo && (
             <label
               className={cn(
