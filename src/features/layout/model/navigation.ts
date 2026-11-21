@@ -24,7 +24,9 @@ import {
   PartyPopper,
   Receipt,
   ScrollText,
+  ScanSearch,
   SearchCheck,
+  SearchX,
   Settings,
   UserCheck,
   UserCog,
@@ -219,10 +221,21 @@ export const SIDEBAR: SidebarEntry[] = [
         icon: HandHelping,
       },
       {
+        href: "/achados-e-perdidos/perdi",
+        label: "Perdi algo",
+        icon: SearchX,
+      },
+      {
         href: "/achados-e-perdidos/pedidos",
         label: "Pedidos para conferir",
         icon: ClipboardList,
         permission: "LOST_FOUND_MANAGE",
+      },
+      // Everyone: residents get the neighbours' board, the desk every report.
+      {
+        href: "/achados-e-perdidos/procurados",
+        label: "Itens procurados",
+        icon: ScanSearch,
       },
       // Everyone: residents browse the kept items, the desk gets its view.
       {

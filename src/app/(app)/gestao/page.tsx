@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/design-system";
 import { DashboardPanel } from "@/features/dashboard/components/DashboardPanel";
+import { LostFoundIndicatorsPanel } from "@/features/dashboard/components/LostFoundIndicatorsPanel";
 import { ParcelIndicatorsPanel } from "@/features/dashboard/components/ParcelIndicatorsPanel";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { dashboardService } from "@/server/services/dashboard.service";
@@ -38,6 +39,12 @@ export default async function ManagementPage() {
         <ParcelIndicatorsPanel
           indicators={dashboard.parcels}
           canOpenDesk={can(user, "PARCELS_MANAGE")}
+        />
+      )}
+      {dashboard?.lostAndFound && (
+        <LostFoundIndicatorsPanel
+          indicators={dashboard.lostAndFound}
+          canOpenDesk={can(user, "LOST_FOUND_MANAGE")}
         />
       )}
     </div>

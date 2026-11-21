@@ -108,6 +108,21 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Para a portaria e a gestão: o morador indicado disse que o item não é seu, e ele passou a aparecer para todos.",
   },
+  LOST_REPORT_MATCH: {
+    label: "Pode ser o que você perdeu",
+    description:
+      "Você avisou em “Perdi algo” e a portaria registrou um item da mesma categoria.",
+  },
+  LOST_REPORT_EXPIRED: {
+    label: "Aviso de item perdido encerrado",
+    description:
+      "Um aviso de “Perdi algo” ficou 90 dias sem notícias e foi encerrado.",
+  },
+  LOST_REPORT_SPOTTED: {
+    label: "Um vizinho achou o que foi perdido",
+    description:
+      "Um vizinho viu o aviso no mural e diz que achou o item: quem perdeu e a portaria são avisados.",
+  },
   FOUND_ITEM_EXPIRING: {
     label: "Item achado perto do fim da guarda",
     description:

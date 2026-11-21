@@ -1,4 +1,4 @@
-import { apiDownload, apiRequest } from "@/shared/lib/api-client";
+import { apiRequest } from "@/shared/lib/api-client";
 import type {
   AuthorizePickupInput,
   Parcel,
@@ -9,9 +9,6 @@ import type {
 } from "@/shared/contracts/parcels";
 
 export const parcelsClient = {
-  /** The pickup receipt as a PDF file. */
-  receiptPdf: (id: string) => apiDownload(`/parcels/${id}/receipt`),
-
   register: (input: RegisterParcelInput) =>
     apiRequest<Parcel>("/parcels", {
       method: "POST",

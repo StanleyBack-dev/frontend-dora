@@ -24,7 +24,9 @@ export function FoundItemClaimAction({ item }: { item: KeptFoundItem }) {
   const mine = claim ? myClaimView(claim) : null;
   const canClaim = item.status === "FOUND" && canClaimAgain(claim?.status);
   // Reserved by the desk for them (or their unit): they may say it is not.
-  const reserved = item.status === "FOUND" && item.ownerUnitLabel !== null;
+  const reserved =
+    item.status === "FOUND" &&
+    (item.ownerUnitLabel !== null || item.ownerName !== null);
   const { showError, showSuccess } = useToast();
   const [releasing, setReleasing] = useState(false);
 

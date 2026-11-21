@@ -20,6 +20,7 @@ export function ChoiceCards<T extends string>({
   options,
   value,
   onChange,
+  columns,
   className,
 }: {
   /** The radio group's name (unique in the form). */
@@ -29,6 +30,8 @@ export function ChoiceCards<T extends string>({
   options: ChoiceOption<T>[];
   value: T | "";
   onChange: (value: T) => void;
+  /** Columns from `sm` up (default: 2 for two options, else 3). */
+  columns?: 2 | 3;
   className?: string;
 }) {
   return (
@@ -39,7 +42,9 @@ export function ChoiceCards<T extends string>({
       <div
         className={cn(
           "grid gap-3",
-          options.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3",
+          (columns ?? (options.length === 2 ? 2 : 3)) === 2
+            ? "sm:grid-cols-2"
+            : "sm:grid-cols-3",
         )}
       >
         {options.map((option) => {

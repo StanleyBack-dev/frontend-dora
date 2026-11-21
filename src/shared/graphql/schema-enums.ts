@@ -193,6 +193,13 @@ export type LimitPeriod =
   | 'MONTH'
   | 'WEEK';
 
+/** Aviso de item perdido: procurando, encontrado, cancelado ou encerrado sem notícias. */
+export type LostReportStatus =
+  | 'CANCELLED'
+  | 'EXPIRED'
+  | 'FOUND'
+  | 'OPEN';
+
 /** Vínculo com o condomínio: morador ou funcionário. */
 export type MemberKind =
   | 'EMPLOYEE'
@@ -226,6 +233,9 @@ export type NotificationType =
   | 'FOUND_ITEM_FOR_YOU'
   | 'FOUND_ITEM_NOT_OWNER'
   | 'FOUND_ITEM_RETURNED'
+  | 'LOST_REPORT_EXPIRED'
+  | 'LOST_REPORT_MATCH'
+  | 'LOST_REPORT_SPOTTED'
   | 'PARCEL_AUTHORIZED'
   | 'PARCEL_CANCELLED'
   | 'PARCEL_PICKED_UP'

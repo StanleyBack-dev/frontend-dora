@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Building2, CircleHelp, UserRound } from "lucide-react";
+import { BadgeCheck, Building2, CircleHelp, UserRound } from "lucide-react";
 import {
   Alert,
   ChoiceCards,
@@ -9,11 +9,14 @@ import {
   type ComboboxOption,
 } from "@/design-system";
 
-import type { ResidentOption } from "@/shared/contracts/residents-search";
+import type {
+  ResidentOption,
+  StaffOption,
+} from "@/shared/contracts/residents-search";
 
-export type { ResidentOption };
+export type { ResidentOption, StaffOption };
 
-type Mode = "none" | "unit" | "resident";
+type Mode = "none" | "unit" | "resident" | "staff";
 
 /** What the picker hands over: the unit, and the resident when chosen by name. */
 export type UnitOrResidentPick = {
@@ -30,16 +33,20 @@ const SEARCH_DELAY_MS = 300;
 // searched by the API as the person types (only those with a unit), each
 // shown with their unit. By unit, every resident there is told; by name,
 // only that resident. With `optional`, "Não sei" comes first and picks
-// nobody.
+// nobody. With `staff` (the team, loaded with the page), "Funcionário"
+// names someone of the team instead (no unit).
 export function UnitOrResidentPicker({
   name,
   units,
   value,
   initialResident = null,
   optional = false,
+  staff,
+  initialStaff = null,
   notes,
   search,
   onChange,
+  onStaffChange,
 }: {
   /** The radio group's name (unique in the page). */
   name: string;
@@ -50,15 +57,30 @@ export function UnitOrResidentPicker({
   initialResident?: ResidentOption | null;
   /** May be left unknown ("Não sei"). */
   optional?: boolean;
+  /** The team, to name one of them ("Funcionário"); absent: no such option. */
+  staff?: StaffOption[];
+  /** Chosen from the team before (a restored draft): starts on it. */
+  initialStaff?: StaffOption | null;
   /** What each choice means (who is told and sees it). */
-  notes: { none?: string; unit: string; resident: string };
+  notes: { none?: string; unit: string; resident: string; staff?: string };
   /** Residents whose name matches (the feature's API). */
   search: (term: string) => Promise<ResidentOption[]>;
   onChange: (pick: UnitOrResidentPick | null) => void;
+  /** Someone of the team chosen (null: none, or another option). */
+  onStaffChange?: (member: StaffOption | null) => void;
 }) {
   const [mode, setMode] = useState<Mode>(
-    initialResident ? "resident" : value ? "unit" : optional ? "none" : "unit",
+    initialStaff && staff
+      ? "staff"
+      : initialResident
+        ? "resident"
+        : value
+          ? "unit"
+          : optional
+            ? "none"
+            : "unit",
   );
+  const [member, setMember] = useState<StaffOption | null>(initialStaff);
   const [term, setTerm] = useState("");
   const [found, setFound] = useState<ResidentOption[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,7 +114,9 @@ export function UnitOrResidentPicker({
     setTerm("");
     setFound([]);
     setResident(null);
+    setMember(null);
     onChange(null);
+    onStaffChange?.(null);
   }
 
   // The chosen resident stays in the list while a new search runs.
@@ -112,7 +136,9 @@ export function UnitOrResidentPicker({
       ? notes.none
       : mode === "unit"
         ? notes.unit
-        : notes.resident;
+        : mode === "staff"
+          ? notes.staff
+          : notes.resident;
 
   return (
     <div className="space-y-3">
@@ -121,6 +147,8 @@ export function UnitOrResidentPicker({
         legend="Buscar por"
         value={mode}
         onChange={switchTo}
+        // Four choices (with "Funcionário"): two by two.
+        columns={staff && optional ? 2 : undefined}
         options={[
           ...(optional
             ? [
@@ -144,6 +172,16 @@ export function UnitOrResidentPicker({
             hint: "Pelo nome de quem mora na unidade",
             icon: <UserRound />,
           },
+          ...(staff
+            ? [
+                {
+                  value: "staff" as const,
+                  title: "Funcionário",
+                  hint: "Alguém da portaria ou da gestão",
+                  icon: <BadgeCheck />,
+                },
+              ]
+            : []),
         ]}
       />
       {note && <Alert tone="info">{note}</Alert>}
@@ -193,6 +231,26 @@ export function UnitOrResidentPicker({
               picked ? { unitId: picked.unitId, resident: picked } : null,
             );
           }}
+        />
+      )}
+      {mode === "staff" && staff && (
+        <Combobox
+          label="Funcionário"
+          required
+          placeholder="Digite ou escolha o nome"
+          options={staff.map((person) => ({
+            value: person.userId,
+            label: person.name,
+            description: person.roleLabel,
+          }))}
+          value={member?.userId ?? null}
+          onSelect={(userId) => {
+            const picked =
+              staff.find((person) => person.userId === userId) ?? null;
+            setMember(picked);
+            onStaffChange?.(picked);
+          }}
+          emptyText="Ninguém da equipe com esse nome"
         />
       )}
     </div>

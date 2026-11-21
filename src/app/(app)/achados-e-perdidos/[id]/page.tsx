@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BackLink, Card, PageHeader } from "@/design-system";
+import { Alert, BackLink, Card, PageHeader } from "@/design-system";
 import { ModuleUnavailable } from "@/features/access/components/ModuleUnavailable";
 import { NoCondominium } from "@/features/condominiums/components/NoCondominium";
 import { FoundItemCard } from "@/features/lost-and-found/components/FoundItemCard";
@@ -8,6 +8,7 @@ import { FoundItemClaimAction } from "@/features/lost-and-found/components/Found
 import { FoundItemDesk } from "@/features/lost-and-found/components/FoundItemDesk";
 import { FoundItemDetails } from "@/features/lost-and-found/components/FoundItemDetails";
 import { foundItemOutcome } from "@/features/lost-and-found/model/found-item-labels";
+import { ReceiptPdfButton } from "@/features/signature/components/ReceiptPdfButton";
 import { SignatureReceiptView } from "@/features/signature/components/SignatureReceiptView";
 import { getSessionUser } from "@/server/auth/current-user";
 import { loadFoundItem } from "@/server/loaders/load-found-item";
@@ -42,6 +43,20 @@ export default async function FoundItemPage({
       title="Comprovante de devolução"
       signerLabel="Quem retirou"
       receipt={item.returnReceipt}
+      actions={
+        <>
+          {item.returnReceipt.selfHandover && (
+            <Alert tone="warning">
+              Entregue pela própria pessoa que pediu: era a única da equipe do
+              condomínio no momento.
+            </Alert>
+          )}
+          <ReceiptPdfButton
+            path={`/lost-and-found/${item.id}/receipt`}
+            fallbackName="comprovante-devolucao.pdf"
+          />
+        </>
+      }
     />
   );
 

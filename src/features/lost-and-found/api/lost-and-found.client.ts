@@ -2,7 +2,9 @@ import { apiRequest } from "@/shared/lib/api-client";
 import type {
   FoundItem,
   FoundItemClaim,
+  LostReport,
   RegisterFoundItemInput,
+  ReportLostItemInput,
   ReturnFoundItemInput,
 } from "@/shared/contracts/lost-and-found";
 import type { ResidentOption } from "@/shared/contracts/residents-search";
@@ -57,5 +59,24 @@ export const lostAndFoundClient = {
     apiRequest<FoundItem>(`/lost-and-found/${id}/discard`, {
       method: "POST",
       body: JSON.stringify({ reason }),
+    }),
+
+  /** "Perdi algo". */
+  reportLost: (input: ReportLostItemInput) =>
+    apiRequest<LostReport>("/lost-reports", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+
+  spotLostReport: (id: string, note: string | null) =>
+    apiRequest<{ ok: true }>(`/lost-reports/${id}/spot`, {
+      method: "POST",
+      body: JSON.stringify({ note }),
+    }),
+
+  closeLostReport: (id: string, found: boolean) =>
+    apiRequest<LostReport>(`/lost-reports/${id}/close`, {
+      method: "POST",
+      body: JSON.stringify({ found }),
     }),
 };

@@ -552,7 +552,16 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Em “Meus pedidos” você acompanha a resposta da portaria e pode cancelar um pedido que ainda aguarda.",
         },
         {
-          text: "Para retirar, vá à portaria com um documento: o porteiro confere se o item é seu e você assina na tela. O comprovante fica no item, em “Meus pedidos”.",
+          text: "Para retirar, vá à portaria com um documento: o porteiro confere se o item é seu e você assina na tela. O comprovante fica no item, em “Meus pedidos”, e pode ser baixado em PDF.",
+        },
+        {
+          text: "Perdeu algo e não está entre os achados? Em “Perdi algo”, toque em “Avisar que perdi” e diga a categoria e o que é. Quando a portaria registrar um item da mesma categoria, você recebe um aviso.",
+        },
+        {
+          text: "Encontrou ou desistiu? Encerre o aviso com “Encontrei” ou “Não procuro mais”. Se a portaria devolver o item a você, o aviso se encerra sozinho.",
+        },
+        {
+          text: "Com “Mostrar para os vizinhos” marcado, o aviso aparece em “Itens procurados”, sem o seu nome, a sua unidade e os detalhes. Quem achar toca em “Achei isso”: você e a portaria são avisados, e o item é deixado na portaria.",
         },
       ],
       rules: [
@@ -564,6 +573,9 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
         {
           text: "Os itens ficam guardados por 90 dias; depois, podem ser doados ou descartados.",
+        },
+        {
+          text: "Um aviso de “Perdi algo” sem notícias se encerra depois de 90 dias.",
         },
       ],
       access: [
@@ -588,7 +600,7 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Achou algo: toque em “Registrar item achado”, escolha a categoria, diga o que é, onde e quando foi achado e onde ficou guardado e, se quiser, tire ou anexe uma foto.",
         },
         {
-          text: "Sabe de quem é? Em “De quem é?”, escolha a unidade (os moradores dela são avisados e só eles veem o item) ou o morador (só essa pessoa é avisada, já liberada para retirar). Se a pessoa disser “Não é meu”, você é avisado e o item passa a aparecer para todos; “Liberar para todos” faz o mesmo pela portaria.",
+          text: "Sabe de quem é? Em “De quem é?”, escolha a unidade (os moradores dela são avisados e só eles veem o item) o morador (só essa pessoa é avisada, já liberada para retirar) ou um funcionário da portaria ou da gestão (também só ele é avisado; outra pessoa da equipe faz a entrega). Se a pessoa disser “Não é meu”, você é avisado e o item passa a aparecer para todos; “Liberar para todos” faz o mesmo pela portaria.",
         },
         {
           text: "Escreva na descrição o que os moradores podem ver (cor, marca) e guarde em “Detalhes para conferir o dono” o que só o dono saberia (o que tem dentro, o nome no documento): só a portaria e a gestão veem.",
@@ -601,6 +613,15 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
         {
           text: "Ninguém pediu? Na página do item, em “Mais ações”, use “Doar” ou “Descartar”, com o motivo.",
+        },
+        {
+          text: "Em “Itens procurados” você vê o que os moradores avisaram que perderam. Ao registrar um item da mesma categoria, eles são avisados automaticamente. Se um vizinho tocar em “Achei isso”, você é avisado de quem achou.",
+        },
+        {
+          text: "O item procurado chegou à portaria? Em “Itens procurados”, toque em “Registrar item achado”: o formulário vem preenchido e quem perdeu já fica indicado como dono, é avisado e pode retirar. Ao devolver, o aviso se encerra sozinho.",
+        },
+        {
+          text: "Depois da devolução, o comprovante fica na página do item e pode ser baixado em PDF, com a assinatura e as provas.",
         },
       ],
       rules: [

@@ -80,9 +80,11 @@ export function FoundItemDetails({ item, now }: { item: Item; now: number }) {
             <p className="text-sm text-fg">
               Reservado para <strong className="font-semibold">{owner}</strong>
               <span className="block text-xs text-muted">
-                {item.ownerName
-                  ? "Só esse morador vê o item."
-                  : "Só os moradores da unidade veem o item."}
+                {item.ownerName && !item.ownerUnitLabel
+                  ? "Só essa pessoa da equipe vê o item."
+                  : item.ownerName
+                    ? "Só esse morador vê o item."
+                    : "Só os moradores da unidade veem o item."}
               </span>
             </p>
           </div>

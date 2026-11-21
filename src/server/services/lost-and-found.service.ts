@@ -9,6 +9,8 @@ import {
   foundItemClaimsDocument,
   foundItemOverviewDocument,
   foundItemOwnersDocument,
+  foundItemReceiptPdfDocument,
+  foundItemStaffDocument,
   foundItemsDocument,
   keptFoundItemsDocument,
   myFoundItemClaimsDocument,
@@ -18,7 +20,10 @@ import {
   withdrawFoundItemClaimDocument,
 } from "@/server/graphql/operations/lost-and-found.operations";
 import type { Paginated } from "@/shared/contracts/api";
-import type { ResidentOption } from "@/shared/contracts/residents-search";
+import type {
+  ResidentOption,
+  StaffOption,
+} from "@/shared/contracts/residents-search";
 import type {
   FoundItem,
   FoundItemCategory,
@@ -118,6 +123,14 @@ export const lostAndFoundService = {
     return foundItemOwners;
   },
 
+  /** The team (gate, management), to name a staff member as owner. */
+  async staff(token: string): Promise<StaffOption[]> {
+    const { foundItemStaff } = await backendGraphql(foundItemStaffDocument, {
+      token,
+    });
+    return foundItemStaff;
+  },
+
   /** Lifts a reservation ("Não é meu", or the desk for everyone). */
   async release(token: string, id: string): Promise<FoundItem> {
     const { releaseFoundItem } = await backendGraphql(
@@ -195,5 +208,21 @@ export const lostAndFoundService = {
       { token, variables: { id, reason } },
     );
     return discardFoundItem;
+  },
+
+  /** The return receipt as a PDF file (the API checks who may see it). */
+  async receiptPdf(
+    token: string,
+    id: string,
+  ): Promise<{ fileName: string; mimeType: string; content: Buffer }> {
+    const { foundItemReceiptPdf } = await backendGraphql(
+      foundItemReceiptPdfDocument,
+      { token, variables: { id } },
+    );
+    return {
+      fileName: foundItemReceiptPdf.fileName,
+      mimeType: foundItemReceiptPdf.mimeType,
+      content: Buffer.from(foundItemReceiptPdf.base64Content, "base64"),
+    };
   },
 };
