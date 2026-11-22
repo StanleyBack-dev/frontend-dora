@@ -28,6 +28,8 @@ import {
   SearchCheck,
   SearchX,
   Settings,
+  ShoppingCart,
+  Truck,
   UserCheck,
   UserCog,
   UsersRound,
@@ -242,6 +244,22 @@ export const SIDEBAR: SidebarEntry[] = [
         href: "/achados-e-perdidos",
         label: "Todos os achados",
         icon: SearchCheck,
+      },
+    ],
+  },
+  // Purchases: the condominium's purchases (suppliers, requests, quotes).
+  // Purchases between residents will be another group's module.
+  {
+    id: "purchases",
+    label: "Compras",
+    icon: ShoppingCart,
+    module: "PURCHASES",
+    items: [
+      {
+        href: "/compras/fornecedores",
+        label: "Fornecedores",
+        icon: Truck,
+        permission: "PURCHASES_MANAGE",
       },
     ],
   },

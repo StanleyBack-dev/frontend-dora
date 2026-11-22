@@ -8,7 +8,8 @@ export type AppModule =
   | 'BOOKINGS'
   | 'EVENTS'
   | 'LOST_AND_FOUND'
-  | 'PARCELS';
+  | 'PARCELS'
+  | 'PURCHASES';
 
 /** Quem é a pessoa do pedido: eu, um dependente ou outra pessoa. */
 export type AttendeeSource =
@@ -268,6 +269,7 @@ export type Permission =
   | 'PARCELS_MANAGE'
   | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
+  | 'PURCHASES_MANAGE'
   | 'RESIDENTS_READ'
   | 'SPACES_MANAGE'
   | 'SUPPORTERS_MANAGE'
@@ -282,6 +284,29 @@ export type PixKeyType =
   | 'EMAIL'
   | 'PHONE'
   | 'RANDOM';
+
+/** Categoria de uma compra ou do que um fornecedor atende (manutenção, elétrica, limpeza, alimentação…); o que não estiver na lista é OTHER, com o texto digitado. */
+export type PurchaseCategory =
+  | 'CLEANING'
+  | 'CONSTRUCTION'
+  | 'ELECTRICAL'
+  | 'ELEVATORS'
+  | 'EVENTS'
+  | 'FOOD'
+  | 'FURNITURE'
+  | 'GARDENING'
+  | 'GAS'
+  | 'MAINTENANCE'
+  | 'OFFICE'
+  | 'OTHER'
+  | 'PAINTING'
+  | 'PEST_CONTROL'
+  | 'PLUMBING'
+  | 'POOL'
+  | 'PROFESSIONAL'
+  | 'SECURITY'
+  | 'TECHNOLOGY'
+  | 'UNIFORMS';
 
 /** Localização do aparelho na assinatura: obtida, recusada ou indisponível. */
 export type SignatureLocationStatus =
@@ -306,6 +331,11 @@ export type SpaceKind =
   | 'OTHER'
   | 'PARTY_ROOM'
   | 'POOL';
+
+/** Fornecedor com CNPJ (empresa) ou CPF (autônomo). */
+export type SupplierDocumentType =
+  | 'CNPJ'
+  | 'CPF';
 
 /** Do que se trata a solicitação de suporte. */
 export type SupportCategory =

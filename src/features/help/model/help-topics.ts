@@ -21,6 +21,7 @@ import {
   type LucideIcon,
   ScrollText,
   Blocks,
+  Truck,
 } from "lucide-react";
 import type { Permission, AppModule } from "@/shared/contracts/api";
 
@@ -644,6 +645,45 @@ export const HELP_TOPICS: HelpTopic[] = [
       access: [
         {
           text: "Portaria e gestores cuidam dos achados e perdidos (permissão “Registrar itens achados, conferir pedidos e devolver”); o gestor pode ajustar quem tem essa permissão.",
+        },
+      ],
+    },
+  },
+  {
+    id: "fornecedores",
+    href: "/compras/fornecedores",
+    title: "Fornecedores",
+    icon: Truck,
+    module: "PURCHASES",
+    permission: "PURCHASES_MANAGE",
+    area: "main",
+    tour: "Cadastre quem o condomínio contrata ou de quem compra, com o contato e o PIX para pagamento.",
+    sections: {
+      howto: [
+        {
+          text: "Toque em “Cadastrar fornecedor”, escolha CNPJ (empresa) ou CPF (autônomo), informe o documento, a razão social ou o nome e marque o que ele atende (uma ou mais: manutenção, elétrica, limpeza, alimentação e bebidas…). Não está na lista? Marque “Outros (digitar)” e escreva, por exemplo, “Dedetização”.",
+        },
+        {
+          text: "Se quiser, preencha o contato (nome, telefone ou WhatsApp, e-mail), a cidade e a chave PIX: ela fica à mão quando a compra for paga.",
+        },
+        {
+          text: "Na lista, filtre pelo nome, contato, CNPJ/CPF, categoria ou situação. Toque na linha para ver o e-mail, o PIX e as observações.",
+        },
+        {
+          text: "Use “Editar” para corrigir os dados e “Desativar” para tirar da lista de novas cotações sem perder o histórico; “Reativar” traz de volta.",
+        },
+      ],
+      rules: [
+        {
+          text: "Cada CNPJ/CPF é cadastrado uma vez no condomínio. Um fornecedor não é apagado, só desativado.",
+        },
+        {
+          text: "Fechar o formulário de cadastro guarda o que foi digitado; só “Cancelar” limpa.",
+        },
+      ],
+      access: [
+        {
+          text: "Gestores cuidam das compras (permissão “Cuidar das compras”); o gestor pode dar essa permissão a outros membros da equipe.",
         },
       ],
     },

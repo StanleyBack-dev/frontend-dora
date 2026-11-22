@@ -111,7 +111,7 @@ export function maskPixKey(type: PixKeyType | "", value: string): string {
 }
 
 /** CNPJ check digits (14 digits). */
-function isCnpj(digits: string): boolean {
+export function isCnpj(digits: string): boolean {
   if (!/^\d{14}$/.test(digits) || /^(\d)\1{13}$/.test(digits)) return false;
   const check = (length: number) => {
     let weight = length - 7;

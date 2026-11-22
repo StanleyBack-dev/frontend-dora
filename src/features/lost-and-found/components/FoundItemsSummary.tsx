@@ -1,11 +1,12 @@
-import { Archive, Clock, HandHelping, PackageCheck, Undo2 } from "lucide-react";
+import { Archive, Clock, HandHelping, PackageCheck } from "lucide-react";
 import { StatCard, StatGrid } from "@/design-system";
 import type {
   FoundItemOverview,
   FoundItemStatus,
 } from "@/shared/contracts/lost-and-found";
 
-// The condominium's found items in numbers, whatever the filters.
+// The condominium's found items in numbers, whatever the filters (four
+// cards, one row on desktop).
 export function FoundItemsSummary({
   overview,
 }: {
@@ -41,12 +42,6 @@ export function FoundItemsSummary({
         value={String(count("RETURNED"))}
         icon={<PackageCheck className="size-4" />}
         tone="success"
-      />
-      <StatCard
-        label="Doados ou descartados"
-        value={String(count("DONATED") + count("DISCARDED"))}
-        icon={<Undo2 className="size-4" />}
-        tone="neutral"
       />
     </StatGrid>
   );

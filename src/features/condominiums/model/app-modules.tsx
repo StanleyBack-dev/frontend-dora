@@ -1,4 +1,10 @@
-import { CalendarDays, Package, PartyPopper, SearchCheck } from "lucide-react";
+import {
+  CalendarDays,
+  Package,
+  PartyPopper,
+  SearchCheck,
+  ShoppingCart,
+} from "lucide-react";
 import type { AppModule } from "@/shared/contracts/condominiums";
 
 /** A module a condominium contracts apart (Plataforma turns it on). */
@@ -38,5 +44,12 @@ export const APP_MODULES: AppModuleInfo[] = [
     description:
       "Itens achados no condomínio: os moradores pedem o que é seu e a devolução é feita com assinatura na tela.",
     icon: <SearchCheck aria-hidden className="size-4" />,
+  },
+  {
+    module: "PURCHASES",
+    label: "Compras",
+    description:
+      "Compras do condomínio: fornecedores, solicitações, cotações comparadas e aprovação do síndico.",
+    icon: <ShoppingCart aria-hidden className="size-4" />,
   },
 ];
