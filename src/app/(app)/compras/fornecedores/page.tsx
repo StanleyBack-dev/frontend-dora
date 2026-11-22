@@ -13,17 +13,17 @@ import {
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { ModuleUnavailable } from "@/features/access/components/ModuleUnavailable";
 import { NoCondominium } from "@/features/condominiums/components/NoCondominium";
-import { SupplierDeskActions } from "@/features/purchases/components/SupplierDeskActions";
-import { SuppliersSummary } from "@/features/purchases/components/SuppliersSummary";
-import { SuppliersTable } from "@/features/purchases/components/SuppliersTable";
+import { SupplierDeskActions } from "@/features/suppliers/components/SupplierDeskActions";
+import { SuppliersSummary } from "@/features/suppliers/components/SuppliersSummary";
+import { SuppliersTable } from "@/features/suppliers/components/SuppliersTable";
 import {
-  maskSupplierDocument,
-  PURCHASE_CATEGORIES,
-  PURCHASE_CATEGORY_LABELS,
-} from "@/features/purchases/model/purchase-labels";
+  CATEGORIES,
+  CATEGORY_LABELS,
+} from "@/features/catalog/model/categories";
+import { maskSupplierDocument } from "@/features/suppliers/model/supplier-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
-import { purchasesService } from "@/server/services/purchases.service";
-import type { SupplierFilter } from "@/shared/contracts/purchases";
+import { suppliersService } from "@/server/services/suppliers.service";
+import type { SupplierFilter } from "@/shared/contracts/suppliers";
 import { can } from "@/shared/lib/access";
 import {
   buildHref,
@@ -66,10 +66,10 @@ export default async function SuppliersPage({
       firstParam(query, "situacao"),
       Object.keys(STATUSES) as StatusKey[],
     ) ?? DEFAULT_STATUS;
-  const category = oneOf(firstParam(query, "categoria"), PURCHASE_CATEGORIES);
+  const category = oneOf(firstParam(query, "categoria"), CATEGORIES);
   const [options, overview] = await Promise.all([
-    authed((token) => purchasesService.supplierFilterOptions(token)),
-    authed((token) => purchasesService.supplierOverview(token)),
+    authed((token) => suppliersService.supplierFilterOptions(token)),
+    authed((token) => suppliersService.supplierOverview(token)),
   ]);
   // Name, contact and document: one of the values in use.
   const supplierId = oneOf(
@@ -96,7 +96,7 @@ export default async function SuppliersPage({
     status !== DEFAULT_STATUS ||
     [supplierId, contactName, document, category].some(Boolean);
   const suppliers = await authed((token) =>
-    purchasesService.suppliers(token, filter, { page, limit: pageSize }),
+    suppliersService.suppliers(token, filter, { page, limit: pageSize }),
   );
 
   const hrefWith = (overrides: Record<string, string | number | undefined>) =>
@@ -162,9 +162,9 @@ export default async function SuppliersPage({
               name="categoria"
               defaultValue={category ?? ""}
               placeholder="Todas"
-              options={PURCHASE_CATEGORIES.map((value) => ({
+              options={CATEGORIES.map((value) => ({
                 value,
-                label: PURCHASE_CATEGORY_LABELS[value],
+                label: CATEGORY_LABELS[value],
               }))}
             />
             <FilterCombobox

@@ -78,6 +78,20 @@ type Documents = {
     "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": typeof types.BroadcastsDocument,
     "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": typeof types.SendBroadcastDocument,
     "\n  query BroadcastStats {\n    broadcastStats {\n      total\n      recent\n      withEmail\n      recentRecipients\n    }\n  }\n": typeof types.BroadcastStatsDocument,
+    "\n  fragment ProductFields on Product {\n    id\n    name\n    unit\n    description\n    active\n    createdAt\n    updatedAt\n  }\n": typeof types.ProductFieldsFragmentDoc,
+    "\n  fragment BrandFields on Brand {\n    id\n    name\n    active\n    createdAt\n    updatedAt\n  }\n": typeof types.BrandFieldsFragmentDoc,
+    "\n  query Products($filter: CatalogFilterInput, $page: PageInput) {\n    products(filter: $filter, page: $page) {\n      items {\n        ...ProductFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.ProductsDocument,
+    "\n  query ProductOptions {\n    productOptions {\n      id\n      name\n      active\n      unit\n    }\n  }\n": typeof types.ProductOptionsDocument,
+    "\n  query ProductCounts {\n    productCounts {\n      active\n      inactive\n    }\n  }\n": typeof types.ProductCountsDocument,
+    "\n  mutation CreateProduct($input: ProductInput!) {\n    createProduct(input: $input) {\n      ...ProductFields\n    }\n  }\n": typeof types.CreateProductDocument,
+    "\n  mutation UpdateProduct($id: ID!, $input: ProductInput!) {\n    updateProduct(id: $id, input: $input) {\n      ...ProductFields\n    }\n  }\n": typeof types.UpdateProductDocument,
+    "\n  mutation SetProductActive($id: ID!, $active: Boolean!) {\n    setProductActive(id: $id, active: $active) {\n      ...ProductFields\n    }\n  }\n": typeof types.SetProductActiveDocument,
+    "\n  query Brands($filter: CatalogFilterInput, $page: PageInput) {\n    brands(filter: $filter, page: $page) {\n      items {\n        ...BrandFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.BrandsDocument,
+    "\n  query BrandOptions {\n    brandOptions {\n      id\n      name\n      active\n    }\n  }\n": typeof types.BrandOptionsDocument,
+    "\n  query BrandCounts {\n    brandCounts {\n      active\n      inactive\n    }\n  }\n": typeof types.BrandCountsDocument,
+    "\n  mutation CreateBrand($name: String!) {\n    createBrand(name: $name) {\n      ...BrandFields\n    }\n  }\n": typeof types.CreateBrandDocument,
+    "\n  mutation RenameBrand($id: ID!, $name: String!) {\n    renameBrand(id: $id, name: $name) {\n      ...BrandFields\n    }\n  }\n": typeof types.RenameBrandDocument,
+    "\n  mutation SetBrandActive($id: ID!, $active: Boolean!) {\n    setBrandActive(id: $id, active: $active) {\n      ...BrandFields\n    }\n  }\n": typeof types.SetBrandActiveDocument,
     "\n  fragment CondominiumFields on Condominium {\n    id\n    name\n    document\n    city\n    state\n    status\n    addressFormat\n    modules\n    activeMembers\n    managers\n    units\n    pendingEnrollments\n    lastActivityAt\n    createdAt\n  }\n": typeof types.CondominiumFieldsFragmentDoc,
     "\n  query Condominiums($filter: CondominiumFilterInput) {\n    condominiums(filter: $filter) {\n      ...CondominiumFields\n    }\n  }\n": typeof types.CondominiumsDocument,
     "\n  mutation CreateCondominium($input: CondominiumInput!) {\n    createCondominium(input: $input) {\n      ...CondominiumFields\n    }\n  }\n": typeof types.CreateCondominiumDocument,
@@ -193,13 +207,15 @@ type Documents = {
     "\n  query PlatformMetrics($filter: PlatformMetricsFilterInput) {\n    platformMetrics(filter: $filter) {\n      from\n      to\n      days\n      condominiumId\n      bookings {\n        total\n        confirmed\n        pending\n        cancelled\n        rejected\n        stalePending\n        granularity\n        series {\n          bucket\n          total\n          cancelled\n        }\n        byCondominium {\n          condominiumId\n          name\n          total\n          cancelled\n        }\n      }\n      parcels {\n        condominiumsWithModule\n        received\n        pickedUp\n        returned\n        cancelled\n        perishable\n        averagePickupHours\n        waitingNow\n        stuckNow\n        perishableOverdueNow\n        granularity\n        series {\n          bucket\n          received\n          pickedUp\n        }\n        byCondominium {\n          condominiumId\n          name\n          received\n          pickedUp\n        }\n      }\n      spaces {\n        activeSpaces\n        unusedCount\n        mostUsed {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        unused {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        byWeekday {\n          weekday\n          bookings\n        }\n        byHour {\n          hour\n          bookings\n        }\n      }\n      engagement {\n        members\n        active7d\n        active30d\n        newMembers\n        enrollments\n        inactiveCount\n        inactiveCondominiums {\n          condominiumId\n          name\n          lastActivityAt\n        }\n      }\n      health {\n        staleEnrollments\n        failedNotifications\n        delayedNotifications\n        withoutManager\n        withoutUnits\n        openSupport\n      }\n    }\n  }\n": typeof types.PlatformMetricsDocument,
     "\n  query PlatformPeople($filter: PlatformPeopleFilterInput, $page: PageInput) {\n    platformPeople(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        name\n        email\n        username\n        phone\n        platformAdmin\n        active\n        lockedUntil\n        lastLoginAt\n        createdAt\n        memberships {\n          condominiumId\n          condominiumName\n          role\n          kind\n          active\n        }\n      }\n    }\n  }\n": typeof types.PlatformPeopleDocument,
     "\n  query CondominiumMembers($condominiumId: ID!) {\n    condominiumMembers(condominiumId: $condominiumId) {\n      userId\n      name\n      email\n      username\n      phone\n      role\n      kind\n      active\n      unitLabel\n      jobTitle\n      lastLoginAt\n      since\n    }\n  }\n": typeof types.CondominiumMembersDocument,
-    "\n  fragment SupplierFields on Supplier {\n    id\n    documentType\n    document\n    name\n    tradeName\n    categories\n    categoryOther\n    contactName\n    email\n    phone\n    city\n    state\n    pixKeyType\n    pixKey\n    notes\n    active\n    createdAt\n    updatedAt\n  }\n": typeof types.SupplierFieldsFragmentDoc,
-    "\n  query Suppliers($filter: SupplierFilterInput, $page: PageInput) {\n    suppliers(filter: $filter, page: $page) {\n      items {\n        ...SupplierFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SuppliersDocument,
-    "\n  mutation CreateSupplier($input: SupplierInput!) {\n    createSupplier(input: $input) {\n      ...SupplierFields\n    }\n  }\n": typeof types.CreateSupplierDocument,
-    "\n  mutation UpdateSupplier($id: ID!, $input: SupplierInput!) {\n    updateSupplier(id: $id, input: $input) {\n      ...SupplierFields\n    }\n  }\n": typeof types.UpdateSupplierDocument,
-    "\n  mutation SetSupplierActive($id: ID!, $active: Boolean!) {\n    setSupplierActive(id: $id, active: $active) {\n      ...SupplierFields\n    }\n  }\n": typeof types.SetSupplierActiveDocument,
-    "\n  query SupplierFilterOptions {\n    supplierFilterOptions {\n      suppliers {\n        id\n        name\n      }\n      contacts\n      documents {\n        documentType\n        document\n      }\n    }\n  }\n": typeof types.SupplierFilterOptionsDocument,
-    "\n  query SupplierOverview {\n    supplierOverview {\n      active\n      inactive\n      activeWithoutPix\n      activeWithoutContact\n      categoriesServed\n    }\n  }\n": typeof types.SupplierOverviewDocument,
+    "\n  fragment PurchaseRequestFields on PurchaseRequest {\n    id\n    number\n    title\n    description\n    categories\n    categoryOther\n    priority\n    spaceId\n    location\n    neededBy\n    status\n    requestedById\n    requestedByName\n    items {\n      id\n      productId\n      productName\n      quantity\n      unit\n      brandId\n      brandName\n      note\n    }\n    cancelReason\n    cancelledAt\n    createdAt\n    updatedAt\n  }\n": typeof types.PurchaseRequestFieldsFragmentDoc,
+    "\n  query PurchaseRequests(\n    $filter: PurchaseRequestFilterInput\n    $page: PageInput\n  ) {\n    purchaseRequests(filter: $filter, page: $page) {\n      items {\n        ...PurchaseRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.PurchaseRequestsDocument,
+    "\n  query PurchaseRequest($id: ID!) {\n    purchaseRequest(id: $id) {\n      ...PurchaseRequestFields\n    }\n  }\n": typeof types.PurchaseRequestDocument,
+    "\n  query PurchaseRequestFilterOptions {\n    purchaseRequestFilterOptions {\n      requests {\n        id\n        number\n        title\n      }\n      requesters {\n        id\n        name\n      }\n    }\n  }\n": typeof types.PurchaseRequestFilterOptionsDocument,
+    "\n  query PurchaseRequestOverview {\n    purchaseRequestOverview {\n      open\n      urgent\n      dueSoon\n      overdue\n    }\n  }\n": typeof types.PurchaseRequestOverviewDocument,
+    "\n  mutation CreatePurchaseRequest($input: PurchaseRequestInput!) {\n    createPurchaseRequest(input: $input) {\n      ...PurchaseRequestFields\n    }\n  }\n": typeof types.CreatePurchaseRequestDocument,
+    "\n  mutation UpdatePurchaseRequest($id: ID!, $input: PurchaseRequestInput!) {\n    updatePurchaseRequest(id: $id, input: $input) {\n      ...PurchaseRequestFields\n    }\n  }\n": typeof types.UpdatePurchaseRequestDocument,
+    "\n  mutation CancelPurchaseRequest($id: ID!, $reason: String!) {\n    cancelPurchaseRequest(id: $id, reason: $reason) {\n      ...PurchaseRequestFields\n    }\n  }\n": typeof types.CancelPurchaseRequestDocument,
+    "\n  query PurchaseCatalogUsage {\n    purchaseCatalogUsage {\n      productsInUse\n      topProduct {\n        name\n        requestCount\n      }\n      brandsInUse\n      topBrand {\n        name\n        requestCount\n      }\n    }\n  }\n": typeof types.PurchaseCatalogUsageDocument,
     "\n  query ResidentsDirectory($filter: ResidentsFilterInput, $page: PageInput) {\n    residentsDirectory(filter: $filter, page: $page) {\n      items {\n        userId\n        name\n        photoUrl\n        unitId\n        unitLabel\n        unitComplement\n        phone\n        dependents {\n          id\n          name\n          relationship\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.ResidentsDirectoryDocument,
     "\n  query ResidentNames {\n    residentNames {\n      id\n      name\n    }\n  }\n": typeof types.ResidentNamesDocument,
     "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n      feeCents\n      guests {\n        allowed\n        max\n        documentRequired\n      }\n      recurringAllowed\n    }\n  }\n": typeof types.SpaceFieldsFragmentDoc,
@@ -211,6 +227,13 @@ type Documents = {
     "\n  mutation AddSpacePhoto($spaceId: ID!, $photo: String!) {\n    addSpacePhoto(spaceId: $spaceId, photo: $photo) {\n      ...SpaceFields\n    }\n  }\n": typeof types.AddSpacePhotoDocument,
     "\n  mutation RemoveSpacePhoto($spaceId: ID!, $photoId: ID!) {\n    removeSpacePhoto(spaceId: $spaceId, photoId: $photoId) {\n      ...SpaceFields\n    }\n  }\n": typeof types.RemoveSpacePhotoDocument,
     "\n  mutation DeleteSpace($id: ID!) {\n    deleteSpace(id: $id)\n  }\n": typeof types.DeleteSpaceDocument,
+    "\n  fragment SupplierFields on Supplier {\n    id\n    documentType\n    document\n    name\n    tradeName\n    categories\n    categoryOther\n    contactName\n    email\n    phone\n    city\n    state\n    pixKeyType\n    pixKey\n    notes\n    active\n    createdAt\n    updatedAt\n  }\n": typeof types.SupplierFieldsFragmentDoc,
+    "\n  query Suppliers($filter: SupplierFilterInput, $page: PageInput) {\n    suppliers(filter: $filter, page: $page) {\n      items {\n        ...SupplierFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SuppliersDocument,
+    "\n  mutation CreateSupplier($input: SupplierInput!) {\n    createSupplier(input: $input) {\n      ...SupplierFields\n    }\n  }\n": typeof types.CreateSupplierDocument,
+    "\n  mutation UpdateSupplier($id: ID!, $input: SupplierInput!) {\n    updateSupplier(id: $id, input: $input) {\n      ...SupplierFields\n    }\n  }\n": typeof types.UpdateSupplierDocument,
+    "\n  mutation SetSupplierActive($id: ID!, $active: Boolean!) {\n    setSupplierActive(id: $id, active: $active) {\n      ...SupplierFields\n    }\n  }\n": typeof types.SetSupplierActiveDocument,
+    "\n  query SupplierFilterOptions {\n    supplierFilterOptions {\n      suppliers {\n        id\n        name\n      }\n      contacts\n      documents {\n        documentType\n        document\n      }\n    }\n  }\n": typeof types.SupplierFilterOptionsDocument,
+    "\n  query SupplierOverview {\n    supplierOverview {\n      active\n      inactive\n      activeWithoutPix\n      activeWithoutContact\n      categoriesServed\n    }\n  }\n": typeof types.SupplierOverviewDocument,
     "\n  fragment SupportRequestFields on SupportRequest {\n    id\n    protocol\n    userId\n    userName\n    condominiumName\n    category\n    subject\n    message\n    status\n    reply\n    repliedAt\n    repliedByName\n    finalizedAt\n    finalizedByName\n    createdAt\n  }\n": typeof types.SupportRequestFieldsFragmentDoc,
     "\n  query SupportPage($page: PageInput) {\n    supportQuota {\n      limit\n      sentToday\n      remaining\n      nextAllowedAt\n    }\n    mySupportRequests(page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SupportPageDocument,
     "\n  query SupportRequests($status: SupportStatus, $page: PageInput) {\n    supportRequests(status: $status, page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SupportRequestsDocument,
@@ -291,6 +314,20 @@ const documents: Documents = {
     "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": types.BroadcastsDocument,
     "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": types.SendBroadcastDocument,
     "\n  query BroadcastStats {\n    broadcastStats {\n      total\n      recent\n      withEmail\n      recentRecipients\n    }\n  }\n": types.BroadcastStatsDocument,
+    "\n  fragment ProductFields on Product {\n    id\n    name\n    unit\n    description\n    active\n    createdAt\n    updatedAt\n  }\n": types.ProductFieldsFragmentDoc,
+    "\n  fragment BrandFields on Brand {\n    id\n    name\n    active\n    createdAt\n    updatedAt\n  }\n": types.BrandFieldsFragmentDoc,
+    "\n  query Products($filter: CatalogFilterInput, $page: PageInput) {\n    products(filter: $filter, page: $page) {\n      items {\n        ...ProductFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.ProductsDocument,
+    "\n  query ProductOptions {\n    productOptions {\n      id\n      name\n      active\n      unit\n    }\n  }\n": types.ProductOptionsDocument,
+    "\n  query ProductCounts {\n    productCounts {\n      active\n      inactive\n    }\n  }\n": types.ProductCountsDocument,
+    "\n  mutation CreateProduct($input: ProductInput!) {\n    createProduct(input: $input) {\n      ...ProductFields\n    }\n  }\n": types.CreateProductDocument,
+    "\n  mutation UpdateProduct($id: ID!, $input: ProductInput!) {\n    updateProduct(id: $id, input: $input) {\n      ...ProductFields\n    }\n  }\n": types.UpdateProductDocument,
+    "\n  mutation SetProductActive($id: ID!, $active: Boolean!) {\n    setProductActive(id: $id, active: $active) {\n      ...ProductFields\n    }\n  }\n": types.SetProductActiveDocument,
+    "\n  query Brands($filter: CatalogFilterInput, $page: PageInput) {\n    brands(filter: $filter, page: $page) {\n      items {\n        ...BrandFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.BrandsDocument,
+    "\n  query BrandOptions {\n    brandOptions {\n      id\n      name\n      active\n    }\n  }\n": types.BrandOptionsDocument,
+    "\n  query BrandCounts {\n    brandCounts {\n      active\n      inactive\n    }\n  }\n": types.BrandCountsDocument,
+    "\n  mutation CreateBrand($name: String!) {\n    createBrand(name: $name) {\n      ...BrandFields\n    }\n  }\n": types.CreateBrandDocument,
+    "\n  mutation RenameBrand($id: ID!, $name: String!) {\n    renameBrand(id: $id, name: $name) {\n      ...BrandFields\n    }\n  }\n": types.RenameBrandDocument,
+    "\n  mutation SetBrandActive($id: ID!, $active: Boolean!) {\n    setBrandActive(id: $id, active: $active) {\n      ...BrandFields\n    }\n  }\n": types.SetBrandActiveDocument,
     "\n  fragment CondominiumFields on Condominium {\n    id\n    name\n    document\n    city\n    state\n    status\n    addressFormat\n    modules\n    activeMembers\n    managers\n    units\n    pendingEnrollments\n    lastActivityAt\n    createdAt\n  }\n": types.CondominiumFieldsFragmentDoc,
     "\n  query Condominiums($filter: CondominiumFilterInput) {\n    condominiums(filter: $filter) {\n      ...CondominiumFields\n    }\n  }\n": types.CondominiumsDocument,
     "\n  mutation CreateCondominium($input: CondominiumInput!) {\n    createCondominium(input: $input) {\n      ...CondominiumFields\n    }\n  }\n": types.CreateCondominiumDocument,
@@ -406,13 +443,15 @@ const documents: Documents = {
     "\n  query PlatformMetrics($filter: PlatformMetricsFilterInput) {\n    platformMetrics(filter: $filter) {\n      from\n      to\n      days\n      condominiumId\n      bookings {\n        total\n        confirmed\n        pending\n        cancelled\n        rejected\n        stalePending\n        granularity\n        series {\n          bucket\n          total\n          cancelled\n        }\n        byCondominium {\n          condominiumId\n          name\n          total\n          cancelled\n        }\n      }\n      parcels {\n        condominiumsWithModule\n        received\n        pickedUp\n        returned\n        cancelled\n        perishable\n        averagePickupHours\n        waitingNow\n        stuckNow\n        perishableOverdueNow\n        granularity\n        series {\n          bucket\n          received\n          pickedUp\n        }\n        byCondominium {\n          condominiumId\n          name\n          received\n          pickedUp\n        }\n      }\n      spaces {\n        activeSpaces\n        unusedCount\n        mostUsed {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        unused {\n          spaceId\n          name\n          condominiumName\n          bookings\n          hours\n        }\n        byWeekday {\n          weekday\n          bookings\n        }\n        byHour {\n          hour\n          bookings\n        }\n      }\n      engagement {\n        members\n        active7d\n        active30d\n        newMembers\n        enrollments\n        inactiveCount\n        inactiveCondominiums {\n          condominiumId\n          name\n          lastActivityAt\n        }\n      }\n      health {\n        staleEnrollments\n        failedNotifications\n        delayedNotifications\n        withoutManager\n        withoutUnits\n        openSupport\n      }\n    }\n  }\n": types.PlatformMetricsDocument,
     "\n  query PlatformPeople($filter: PlatformPeopleFilterInput, $page: PageInput) {\n    platformPeople(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        name\n        email\n        username\n        phone\n        platformAdmin\n        active\n        lockedUntil\n        lastLoginAt\n        createdAt\n        memberships {\n          condominiumId\n          condominiumName\n          role\n          kind\n          active\n        }\n      }\n    }\n  }\n": types.PlatformPeopleDocument,
     "\n  query CondominiumMembers($condominiumId: ID!) {\n    condominiumMembers(condominiumId: $condominiumId) {\n      userId\n      name\n      email\n      username\n      phone\n      role\n      kind\n      active\n      unitLabel\n      jobTitle\n      lastLoginAt\n      since\n    }\n  }\n": types.CondominiumMembersDocument,
-    "\n  fragment SupplierFields on Supplier {\n    id\n    documentType\n    document\n    name\n    tradeName\n    categories\n    categoryOther\n    contactName\n    email\n    phone\n    city\n    state\n    pixKeyType\n    pixKey\n    notes\n    active\n    createdAt\n    updatedAt\n  }\n": types.SupplierFieldsFragmentDoc,
-    "\n  query Suppliers($filter: SupplierFilterInput, $page: PageInput) {\n    suppliers(filter: $filter, page: $page) {\n      items {\n        ...SupplierFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SuppliersDocument,
-    "\n  mutation CreateSupplier($input: SupplierInput!) {\n    createSupplier(input: $input) {\n      ...SupplierFields\n    }\n  }\n": types.CreateSupplierDocument,
-    "\n  mutation UpdateSupplier($id: ID!, $input: SupplierInput!) {\n    updateSupplier(id: $id, input: $input) {\n      ...SupplierFields\n    }\n  }\n": types.UpdateSupplierDocument,
-    "\n  mutation SetSupplierActive($id: ID!, $active: Boolean!) {\n    setSupplierActive(id: $id, active: $active) {\n      ...SupplierFields\n    }\n  }\n": types.SetSupplierActiveDocument,
-    "\n  query SupplierFilterOptions {\n    supplierFilterOptions {\n      suppliers {\n        id\n        name\n      }\n      contacts\n      documents {\n        documentType\n        document\n      }\n    }\n  }\n": types.SupplierFilterOptionsDocument,
-    "\n  query SupplierOverview {\n    supplierOverview {\n      active\n      inactive\n      activeWithoutPix\n      activeWithoutContact\n      categoriesServed\n    }\n  }\n": types.SupplierOverviewDocument,
+    "\n  fragment PurchaseRequestFields on PurchaseRequest {\n    id\n    number\n    title\n    description\n    categories\n    categoryOther\n    priority\n    spaceId\n    location\n    neededBy\n    status\n    requestedById\n    requestedByName\n    items {\n      id\n      productId\n      productName\n      quantity\n      unit\n      brandId\n      brandName\n      note\n    }\n    cancelReason\n    cancelledAt\n    createdAt\n    updatedAt\n  }\n": types.PurchaseRequestFieldsFragmentDoc,
+    "\n  query PurchaseRequests(\n    $filter: PurchaseRequestFilterInput\n    $page: PageInput\n  ) {\n    purchaseRequests(filter: $filter, page: $page) {\n      items {\n        ...PurchaseRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.PurchaseRequestsDocument,
+    "\n  query PurchaseRequest($id: ID!) {\n    purchaseRequest(id: $id) {\n      ...PurchaseRequestFields\n    }\n  }\n": types.PurchaseRequestDocument,
+    "\n  query PurchaseRequestFilterOptions {\n    purchaseRequestFilterOptions {\n      requests {\n        id\n        number\n        title\n      }\n      requesters {\n        id\n        name\n      }\n    }\n  }\n": types.PurchaseRequestFilterOptionsDocument,
+    "\n  query PurchaseRequestOverview {\n    purchaseRequestOverview {\n      open\n      urgent\n      dueSoon\n      overdue\n    }\n  }\n": types.PurchaseRequestOverviewDocument,
+    "\n  mutation CreatePurchaseRequest($input: PurchaseRequestInput!) {\n    createPurchaseRequest(input: $input) {\n      ...PurchaseRequestFields\n    }\n  }\n": types.CreatePurchaseRequestDocument,
+    "\n  mutation UpdatePurchaseRequest($id: ID!, $input: PurchaseRequestInput!) {\n    updatePurchaseRequest(id: $id, input: $input) {\n      ...PurchaseRequestFields\n    }\n  }\n": types.UpdatePurchaseRequestDocument,
+    "\n  mutation CancelPurchaseRequest($id: ID!, $reason: String!) {\n    cancelPurchaseRequest(id: $id, reason: $reason) {\n      ...PurchaseRequestFields\n    }\n  }\n": types.CancelPurchaseRequestDocument,
+    "\n  query PurchaseCatalogUsage {\n    purchaseCatalogUsage {\n      productsInUse\n      topProduct {\n        name\n        requestCount\n      }\n      brandsInUse\n      topBrand {\n        name\n        requestCount\n      }\n    }\n  }\n": types.PurchaseCatalogUsageDocument,
     "\n  query ResidentsDirectory($filter: ResidentsFilterInput, $page: PageInput) {\n    residentsDirectory(filter: $filter, page: $page) {\n      items {\n        userId\n        name\n        photoUrl\n        unitId\n        unitLabel\n        unitComplement\n        phone\n        dependents {\n          id\n          name\n          relationship\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.ResidentsDirectoryDocument,
     "\n  query ResidentNames {\n    residentNames {\n      id\n      name\n    }\n  }\n": types.ResidentNamesDocument,
     "\n  fragment SpaceFields on Space {\n    id\n    name\n    kind\n    description\n    capacity\n    usageRules\n    active\n    photos {\n      id\n      url\n    }\n    createdAt\n    updatedAt\n    rules {\n      openingHours {\n        weekday\n        opensAt\n        closesAt\n      }\n      slotMinutes\n      minAdvanceHours\n      maxAdvanceDays\n      unitLimit {\n        count\n        period\n      }\n      requiresApproval\n      cancelUntilHours\n      feeCents\n      guests {\n        allowed\n        max\n        documentRequired\n      }\n      recurringAllowed\n    }\n  }\n": types.SpaceFieldsFragmentDoc,
@@ -424,6 +463,13 @@ const documents: Documents = {
     "\n  mutation AddSpacePhoto($spaceId: ID!, $photo: String!) {\n    addSpacePhoto(spaceId: $spaceId, photo: $photo) {\n      ...SpaceFields\n    }\n  }\n": types.AddSpacePhotoDocument,
     "\n  mutation RemoveSpacePhoto($spaceId: ID!, $photoId: ID!) {\n    removeSpacePhoto(spaceId: $spaceId, photoId: $photoId) {\n      ...SpaceFields\n    }\n  }\n": types.RemoveSpacePhotoDocument,
     "\n  mutation DeleteSpace($id: ID!) {\n    deleteSpace(id: $id)\n  }\n": types.DeleteSpaceDocument,
+    "\n  fragment SupplierFields on Supplier {\n    id\n    documentType\n    document\n    name\n    tradeName\n    categories\n    categoryOther\n    contactName\n    email\n    phone\n    city\n    state\n    pixKeyType\n    pixKey\n    notes\n    active\n    createdAt\n    updatedAt\n  }\n": types.SupplierFieldsFragmentDoc,
+    "\n  query Suppliers($filter: SupplierFilterInput, $page: PageInput) {\n    suppliers(filter: $filter, page: $page) {\n      items {\n        ...SupplierFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SuppliersDocument,
+    "\n  mutation CreateSupplier($input: SupplierInput!) {\n    createSupplier(input: $input) {\n      ...SupplierFields\n    }\n  }\n": types.CreateSupplierDocument,
+    "\n  mutation UpdateSupplier($id: ID!, $input: SupplierInput!) {\n    updateSupplier(id: $id, input: $input) {\n      ...SupplierFields\n    }\n  }\n": types.UpdateSupplierDocument,
+    "\n  mutation SetSupplierActive($id: ID!, $active: Boolean!) {\n    setSupplierActive(id: $id, active: $active) {\n      ...SupplierFields\n    }\n  }\n": types.SetSupplierActiveDocument,
+    "\n  query SupplierFilterOptions {\n    supplierFilterOptions {\n      suppliers {\n        id\n        name\n      }\n      contacts\n      documents {\n        documentType\n        document\n      }\n    }\n  }\n": types.SupplierFilterOptionsDocument,
+    "\n  query SupplierOverview {\n    supplierOverview {\n      active\n      inactive\n      activeWithoutPix\n      activeWithoutContact\n      categoriesServed\n    }\n  }\n": types.SupplierOverviewDocument,
     "\n  fragment SupportRequestFields on SupportRequest {\n    id\n    protocol\n    userId\n    userName\n    condominiumName\n    category\n    subject\n    message\n    status\n    reply\n    repliedAt\n    repliedByName\n    finalizedAt\n    finalizedByName\n    createdAt\n  }\n": types.SupportRequestFieldsFragmentDoc,
     "\n  query SupportPage($page: PageInput) {\n    supportQuota {\n      limit\n      sentToday\n      remaining\n      nextAllowedAt\n    }\n    mySupportRequests(page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SupportPageDocument,
     "\n  query SupportRequests($status: SupportStatus, $page: PageInput) {\n    supportRequests(status: $status, page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SupportRequestsDocument,
@@ -693,6 +739,62 @@ export function graphql(source: "\n  mutation SendBroadcast($input: BroadcastInp
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query BroadcastStats {\n    broadcastStats {\n      total\n      recent\n      withEmail\n      recentRecipients\n    }\n  }\n"): typeof import('./graphql').BroadcastStatsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ProductFields on Product {\n    id\n    name\n    unit\n    description\n    active\n    createdAt\n    updatedAt\n  }\n"): typeof import('./graphql').ProductFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment BrandFields on Brand {\n    id\n    name\n    active\n    createdAt\n    updatedAt\n  }\n"): typeof import('./graphql').BrandFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Products($filter: CatalogFilterInput, $page: PageInput) {\n    products(filter: $filter, page: $page) {\n      items {\n        ...ProductFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').ProductsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ProductOptions {\n    productOptions {\n      id\n      name\n      active\n      unit\n    }\n  }\n"): typeof import('./graphql').ProductOptionsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ProductCounts {\n    productCounts {\n      active\n      inactive\n    }\n  }\n"): typeof import('./graphql').ProductCountsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateProduct($input: ProductInput!) {\n    createProduct(input: $input) {\n      ...ProductFields\n    }\n  }\n"): typeof import('./graphql').CreateProductDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateProduct($id: ID!, $input: ProductInput!) {\n    updateProduct(id: $id, input: $input) {\n      ...ProductFields\n    }\n  }\n"): typeof import('./graphql').UpdateProductDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetProductActive($id: ID!, $active: Boolean!) {\n    setProductActive(id: $id, active: $active) {\n      ...ProductFields\n    }\n  }\n"): typeof import('./graphql').SetProductActiveDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Brands($filter: CatalogFilterInput, $page: PageInput) {\n    brands(filter: $filter, page: $page) {\n      items {\n        ...BrandFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').BrandsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query BrandOptions {\n    brandOptions {\n      id\n      name\n      active\n    }\n  }\n"): typeof import('./graphql').BrandOptionsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query BrandCounts {\n    brandCounts {\n      active\n      inactive\n    }\n  }\n"): typeof import('./graphql').BrandCountsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateBrand($name: String!) {\n    createBrand(name: $name) {\n      ...BrandFields\n    }\n  }\n"): typeof import('./graphql').CreateBrandDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RenameBrand($id: ID!, $name: String!) {\n    renameBrand(id: $id, name: $name) {\n      ...BrandFields\n    }\n  }\n"): typeof import('./graphql').RenameBrandDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetBrandActive($id: ID!, $active: Boolean!) {\n    setBrandActive(id: $id, active: $active) {\n      ...BrandFields\n    }\n  }\n"): typeof import('./graphql').SetBrandActiveDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -1156,31 +1258,39 @@ export function graphql(source: "\n  query CondominiumMembers($condominiumId: ID
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment SupplierFields on Supplier {\n    id\n    documentType\n    document\n    name\n    tradeName\n    categories\n    categoryOther\n    contactName\n    email\n    phone\n    city\n    state\n    pixKeyType\n    pixKey\n    notes\n    active\n    createdAt\n    updatedAt\n  }\n"): typeof import('./graphql').SupplierFieldsFragmentDoc;
+export function graphql(source: "\n  fragment PurchaseRequestFields on PurchaseRequest {\n    id\n    number\n    title\n    description\n    categories\n    categoryOther\n    priority\n    spaceId\n    location\n    neededBy\n    status\n    requestedById\n    requestedByName\n    items {\n      id\n      productId\n      productName\n      quantity\n      unit\n      brandId\n      brandName\n      note\n    }\n    cancelReason\n    cancelledAt\n    createdAt\n    updatedAt\n  }\n"): typeof import('./graphql').PurchaseRequestFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Suppliers($filter: SupplierFilterInput, $page: PageInput) {\n    suppliers(filter: $filter, page: $page) {\n      items {\n        ...SupplierFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').SuppliersDocument;
+export function graphql(source: "\n  query PurchaseRequests(\n    $filter: PurchaseRequestFilterInput\n    $page: PageInput\n  ) {\n    purchaseRequests(filter: $filter, page: $page) {\n      items {\n        ...PurchaseRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').PurchaseRequestsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation CreateSupplier($input: SupplierInput!) {\n    createSupplier(input: $input) {\n      ...SupplierFields\n    }\n  }\n"): typeof import('./graphql').CreateSupplierDocument;
+export function graphql(source: "\n  query PurchaseRequest($id: ID!) {\n    purchaseRequest(id: $id) {\n      ...PurchaseRequestFields\n    }\n  }\n"): typeof import('./graphql').PurchaseRequestDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateSupplier($id: ID!, $input: SupplierInput!) {\n    updateSupplier(id: $id, input: $input) {\n      ...SupplierFields\n    }\n  }\n"): typeof import('./graphql').UpdateSupplierDocument;
+export function graphql(source: "\n  query PurchaseRequestFilterOptions {\n    purchaseRequestFilterOptions {\n      requests {\n        id\n        number\n        title\n      }\n      requesters {\n        id\n        name\n      }\n    }\n  }\n"): typeof import('./graphql').PurchaseRequestFilterOptionsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation SetSupplierActive($id: ID!, $active: Boolean!) {\n    setSupplierActive(id: $id, active: $active) {\n      ...SupplierFields\n    }\n  }\n"): typeof import('./graphql').SetSupplierActiveDocument;
+export function graphql(source: "\n  query PurchaseRequestOverview {\n    purchaseRequestOverview {\n      open\n      urgent\n      dueSoon\n      overdue\n    }\n  }\n"): typeof import('./graphql').PurchaseRequestOverviewDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query SupplierFilterOptions {\n    supplierFilterOptions {\n      suppliers {\n        id\n        name\n      }\n      contacts\n      documents {\n        documentType\n        document\n      }\n    }\n  }\n"): typeof import('./graphql').SupplierFilterOptionsDocument;
+export function graphql(source: "\n  mutation CreatePurchaseRequest($input: PurchaseRequestInput!) {\n    createPurchaseRequest(input: $input) {\n      ...PurchaseRequestFields\n    }\n  }\n"): typeof import('./graphql').CreatePurchaseRequestDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query SupplierOverview {\n    supplierOverview {\n      active\n      inactive\n      activeWithoutPix\n      activeWithoutContact\n      categoriesServed\n    }\n  }\n"): typeof import('./graphql').SupplierOverviewDocument;
+export function graphql(source: "\n  mutation UpdatePurchaseRequest($id: ID!, $input: PurchaseRequestInput!) {\n    updatePurchaseRequest(id: $id, input: $input) {\n      ...PurchaseRequestFields\n    }\n  }\n"): typeof import('./graphql').UpdatePurchaseRequestDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CancelPurchaseRequest($id: ID!, $reason: String!) {\n    cancelPurchaseRequest(id: $id, reason: $reason) {\n      ...PurchaseRequestFields\n    }\n  }\n"): typeof import('./graphql').CancelPurchaseRequestDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query PurchaseCatalogUsage {\n    purchaseCatalogUsage {\n      productsInUse\n      topProduct {\n        name\n        requestCount\n      }\n      brandsInUse\n      topBrand {\n        name\n        requestCount\n      }\n    }\n  }\n"): typeof import('./graphql').PurchaseCatalogUsageDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -1225,6 +1335,34 @@ export function graphql(source: "\n  mutation RemoveSpacePhoto($spaceId: ID!, $p
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation DeleteSpace($id: ID!) {\n    deleteSpace(id: $id)\n  }\n"): typeof import('./graphql').DeleteSpaceDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment SupplierFields on Supplier {\n    id\n    documentType\n    document\n    name\n    tradeName\n    categories\n    categoryOther\n    contactName\n    email\n    phone\n    city\n    state\n    pixKeyType\n    pixKey\n    notes\n    active\n    createdAt\n    updatedAt\n  }\n"): typeof import('./graphql').SupplierFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Suppliers($filter: SupplierFilterInput, $page: PageInput) {\n    suppliers(filter: $filter, page: $page) {\n      items {\n        ...SupplierFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').SuppliersDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateSupplier($input: SupplierInput!) {\n    createSupplier(input: $input) {\n      ...SupplierFields\n    }\n  }\n"): typeof import('./graphql').CreateSupplierDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateSupplier($id: ID!, $input: SupplierInput!) {\n    updateSupplier(id: $id, input: $input) {\n      ...SupplierFields\n    }\n  }\n"): typeof import('./graphql').UpdateSupplierDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetSupplierActive($id: ID!, $active: Boolean!) {\n    setSupplierActive(id: $id, active: $active) {\n      ...SupplierFields\n    }\n  }\n"): typeof import('./graphql').SetSupplierActiveDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SupplierFilterOptions {\n    supplierFilterOptions {\n      suppliers {\n        id\n        name\n      }\n      contacts\n      documents {\n        documentType\n        document\n      }\n    }\n  }\n"): typeof import('./graphql').SupplierFilterOptionsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SupplierOverview {\n    supplierOverview {\n      active\n      inactive\n      activeWithoutPix\n      activeWithoutContact\n      categoriesServed\n    }\n  }\n"): typeof import('./graphql').SupplierOverviewDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

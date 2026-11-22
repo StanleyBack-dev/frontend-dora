@@ -22,6 +22,7 @@ import {
   ScrollText,
   Blocks,
   Truck,
+  ClipboardList,
 } from "lucide-react";
 import type { Permission, AppModule } from "@/shared/contracts/api";
 
@@ -645,6 +646,87 @@ export const HELP_TOPICS: HelpTopic[] = [
       access: [
         {
           text: "Portaria e gestores cuidam dos achados e perdidos (permissão “Registrar itens achados, conferir pedidos e devolver”); o gestor pode ajustar quem tem essa permissão.",
+        },
+      ],
+    },
+  },
+  {
+    id: "solicitacoes-de-compra",
+    href: "/compras/solicitacoes",
+    title: "Solicitações de compra",
+    icon: ClipboardList,
+    module: "PURCHASES",
+    anyPermission: ["PURCHASES_MANAGE", "PURCHASES_REQUEST"],
+    area: "main",
+    tour: "Peça o que precisa ser comprado ou contratado e acompanhe cada pedido até a entrega.",
+    sections: {
+      howto: [
+        {
+          text: "Toque em “Nova solicitação”, diga o que precisa, marque as categorias (uma ou mais; ou “Outros (digitar)”) e escolha a prioridade e, se quiser, onde vai ser usado (um espaço do condomínio ou “Outro local (digitar)”) e até quando precisa.",
+        },
+        {
+          text: "Em “Itens”, escolha o produto do catálogo (não achou? cadastre com o “+”), a quantidade, a unidade e, se quiser, a marca (ou “Qualquer marca”) e uma observação. Use “Adicionar item” para mais de um.",
+        },
+        {
+          text: "Ao enviar, a solicitação ganha um número (SC-0001…) e a gestão é avisada para fazer as cotações.",
+        },
+        {
+          text: "Enquanto aguarda cotação, abra a solicitação para “Editar solicitação” ou, em “Mais ações”, “Cancelar solicitação” com o motivo.",
+        },
+        {
+          text: "Na lista, filtre pela solicitação, categoria, prioridade e situação. Os cards mostram o que aguarda cotação, as urgentes, as com prazo em até 7 dias e as atrasadas.",
+        },
+      ],
+      rules: [
+        {
+          text: "Depois que as cotações começam, a solicitação não pode mais ser alterada nem cancelada.",
+        },
+        {
+          text: "Se a gestão cancelar uma solicitação sua, você é avisado com o motivo.",
+        },
+        {
+          text: "Fechar o formulário de uma nova solicitação guarda o que foi digitado; só “Cancelar” limpa.",
+        },
+      ],
+      access: [
+        {
+          text: "A portaria e os gestores podem pedir compras (permissão “Pedir compras”) e veem as próprias solicitações; quem cuida das compras (gestores) vê todas.",
+        },
+      ],
+    },
+  },
+  {
+    id: "produtos-e-marcas",
+    href: "/compras/produtos",
+    title: "Produtos e marcas",
+    icon: Package,
+    module: "PURCHASES",
+    permission: "PURCHASES_MANAGE",
+    area: "main",
+    tour: "Mantenha o catálogo de produtos e marcas que a equipe usa nas solicitações de compra.",
+    sections: {
+      howto: [
+        {
+          text: "Em Compras > Produtos, use “Cadastrar produto” com o nome, a unidade de costume (un, cx, kg…) e, se quiser, uma descrição (medida, modelo). Em Compras > Marcas, “Cadastrar marca”.",
+        },
+        {
+          text: "Quem pede compras também cadastra pelo “+” ao lado do produto ou da marca de um item: o cadastro já fica escolhido no item.",
+        },
+        {
+          text: "Use “Editar” para corrigir e “Desativar” para tirar dos novos itens sem perder o histórico; “Reativar” traz de volta. Os cards mostram os ativos, os usados em solicitações, o mais pedido e os inativos.",
+        },
+      ],
+      rules: [
+        {
+          text: "Cada nome é cadastrado uma vez no condomínio (maiúsculas e minúsculas não contam). Produtos e marcas não são apagados, só desativados.",
+        },
+        {
+          text: "O catálogo é do condomínio e poderá ser usado por outros módulos (estoque, manutenção…).",
+        },
+      ],
+      access: [
+        {
+          text: "Gestores cuidam do catálogo (permissão “Cuidar das compras”); quem pode pedir compras consulta e cadastra pelos itens.",
         },
       ],
     },

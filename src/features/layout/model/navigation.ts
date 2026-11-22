@@ -29,6 +29,7 @@ import {
   SearchX,
   Settings,
   ShoppingCart,
+  Tag,
   Truck,
   UserCheck,
   UserCog,
@@ -255,10 +256,30 @@ export const SIDEBAR: SidebarEntry[] = [
     icon: ShoppingCart,
     module: "PURCHASES",
     items: [
+      // The management gets every request; who only asks, their own.
+      {
+        href: "/compras/solicitacoes",
+        label: "Solicitações",
+        icon: ClipboardList,
+        anyPermission: ["PURCHASES_MANAGE", "PURCHASES_REQUEST"],
+      },
       {
         href: "/compras/fornecedores",
         label: "Fornecedores",
         icon: Truck,
+        permission: "PURCHASES_MANAGE",
+      },
+      // The catalog (shared by the modules), managed here.
+      {
+        href: "/compras/produtos",
+        label: "Produtos",
+        icon: Package,
+        permission: "PURCHASES_MANAGE",
+      },
+      {
+        href: "/compras/marcas",
+        label: "Marcas",
+        icon: Tag,
         permission: "PURCHASES_MANAGE",
       },
     ],

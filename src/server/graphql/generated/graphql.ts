@@ -89,6 +89,37 @@ export type BroadcastInput = {
   title: string;
 };
 
+/** Filtros dos produtos ou das marcas. */
+export type CatalogFilterInput = {
+  /** Só os ativos (true) ou só os inativos (false); vazio: todos. */
+  active?: boolean | null | undefined;
+  /** Exatamente este. */
+  id?: string | number | null | undefined;
+};
+
+/** Categoria de uma compra, de um fornecedor ou de outro registro (manutenção, elétrica, limpeza, alimentação…); o que não estiver na lista é OTHER, com o texto digitado. */
+export type Category =
+  | 'CLEANING'
+  | 'CONSTRUCTION'
+  | 'ELECTRICAL'
+  | 'ELEVATORS'
+  | 'EVENTS'
+  | 'FOOD'
+  | 'FURNITURE'
+  | 'GARDENING'
+  | 'GAS'
+  | 'MAINTENANCE'
+  | 'OFFICE'
+  | 'OTHER'
+  | 'PAINTING'
+  | 'PEST_CONTROL'
+  | 'PLUMBING'
+  | 'POOL'
+  | 'PROFESSIONAL'
+  | 'SECURITY'
+  | 'TECHNOLOGY'
+  | 'UNIFORMS';
+
 export type ChangePasswordInput = {
   currentPassword: string;
   newPassword: string;
@@ -561,6 +592,8 @@ export type NotificationType =
   | 'PARCEL_RECEIVED'
   | 'PARCEL_REMINDER'
   | 'PARCEL_RETURNED'
+  | 'PURCHASE_REQUEST_CANCELLED'
+  | 'PURCHASE_REQUEST_CREATED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
   | 'SUPPORT_REQUESTED'
@@ -624,6 +657,7 @@ export type Permission =
   | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
   | 'PURCHASES_MANAGE'
+  | 'PURCHASES_REQUEST'
   | 'RESIDENTS_READ'
   | 'SPACES_MANAGE'
   | 'SUPPORTERS_MANAGE'
@@ -690,28 +724,79 @@ export type PlatformPeopleFilterInput = {
   search?: string | null | undefined;
 };
 
-/** Categoria de uma compra ou do que um fornecedor atende (manutenção, elétrica, limpeza, alimentação…); o que não estiver na lista é OTHER, com o texto digitado. */
-export type PurchaseCategory =
-  | 'CLEANING'
-  | 'CONSTRUCTION'
-  | 'ELECTRICAL'
-  | 'ELEVATORS'
-  | 'EVENTS'
-  | 'FOOD'
-  | 'FURNITURE'
-  | 'GARDENING'
-  | 'GAS'
-  | 'MAINTENANCE'
-  | 'OFFICE'
-  | 'OTHER'
-  | 'PAINTING'
-  | 'PEST_CONTROL'
-  | 'PLUMBING'
-  | 'POOL'
-  | 'PROFESSIONAL'
-  | 'SECURITY'
-  | 'TECHNOLOGY'
-  | 'UNIFORMS';
+/** Dados de um produto do catálogo. */
+export type ProductInput = {
+  /** O que identifica o produto (medida, modelo…). */
+  description?: string | null | undefined;
+  name: string;
+  /** Unidade de costume (un, cx, kg…). */
+  unit: string;
+};
+
+/** Prioridade de uma solicitação de compra. */
+export type PurchasePriority =
+  | 'HIGH'
+  | 'LOW'
+  | 'NORMAL'
+  | 'URGENT';
+
+/** Filtros das solicitações de compra. */
+export type PurchaseRequestFilterInput = {
+  /** Com esta categoria entre as suas. */
+  category?: Category | null | undefined;
+  priority?: PurchasePriority | null | undefined;
+  /** Exatamente esta solicitação. */
+  requestId?: string | number | null | undefined;
+  /** Feitas por esta pessoa. */
+  requestedById?: string | number | null | undefined;
+  statuses?: Array<PurchaseRequestStatus> | null | undefined;
+};
+
+/** Dados de uma solicitação de compra. */
+export type PurchaseRequestInput = {
+  /** De que é a compra (ao menos uma). */
+  categories: Array<Category>;
+  /** Com OTHER entre as categorias: de que é a compra, digitado. */
+  categoryOther?: string | null | undefined;
+  description?: string | null | undefined;
+  items: Array<PurchaseRequestItemInput>;
+  /** Outro local (sem espaço), digitado. */
+  location?: string | null | undefined;
+  /** Dia em que precisa (AAAA-MM-DD), hoje ou depois. */
+  neededBy?: string | null | undefined;
+  /** Vazio: normal. */
+  priority?: PurchasePriority | null | undefined;
+  /** Um espaço do condomínio onde vai ser usado. */
+  spaceId?: string | number | null | undefined;
+  /** O que precisa ser comprado ou contratado. */
+  title: string;
+};
+
+/** Um item de uma solicitação de compra. */
+export type PurchaseRequestItemInput = {
+  /** Uma marca do catálogo (vazio: qualquer marca). */
+  brandId?: string | number | null | undefined;
+  /** Observação do item (cor, medida, modelo…). */
+  note?: string | null | undefined;
+  /** Um produto do catálogo do condomínio. */
+  productId: string | number;
+  /** Maior que zero, até 2 casas decimais. */
+  quantity: number;
+  /** un, cx, kg, m², serviço… */
+  unit: string;
+};
+
+/** Solicitação de compra: aguardando cotação, em cotação, aguardando aprovação, aprovada, pedido feito, recebida, concluída, reprovada ou cancelada. */
+export type PurchaseRequestStatus =
+  | 'APPROVED'
+  | 'AWAITING_APPROVAL'
+  | 'CANCELLED'
+  | 'COMPLETED'
+  | 'OPEN'
+  | 'ORDERED'
+  | 'QUOTING'
+  | 'RECEIVED'
+  | 'REJECTED';
 
 /** PushSubscription do navegador (PushManager). */
 export type PushSubscriptionInput = {
@@ -943,7 +1028,7 @@ export type SupplierDocumentType =
 export type SupplierFilterInput = {
   /** Só os ativos (true) ou só os inativos (false); vazio: todos. */
   active?: boolean | null | undefined;
-  category?: PurchaseCategory | null | undefined;
+  category?: Category | null | undefined;
   /** Exatamente este contato. */
   contactName?: string | null | undefined;
   /** Exatamente este CNPJ/CPF (com ou sem pontuação). */
@@ -955,7 +1040,7 @@ export type SupplierFilterInput = {
 /** Dados de um fornecedor. */
 export type SupplierInput = {
   /** O que o fornecedor atende (ao menos uma). */
-  categories: Array<PurchaseCategory>;
+  categories: Array<Category>;
   /** Com OTHER entre as categorias: o que ele atende, digitado (ex.: dedetização). */
   categoryOther?: string | null | undefined;
   city?: string | null | undefined;
@@ -1562,6 +1647,92 @@ export type BroadcastStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type BroadcastStatsQuery = { broadcastStats: { total: number, recent: number, withEmail: number, recentRecipients: number } };
+
+export type ProductFieldsFragment = { id: string, name: string, unit: string, description: string | null, active: boolean, createdAt: string, updatedAt: string };
+
+export type BrandFieldsFragment = { id: string, name: string, active: boolean, createdAt: string, updatedAt: string };
+
+export type ProductsQueryVariables = Exact<{
+  filter?: CatalogFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type ProductsQuery = { products: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, unit: string, description: string | null, active: boolean, createdAt: string, updatedAt: string }> } };
+
+export type ProductOptionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ProductOptionsQuery = { productOptions: Array<{ id: string, name: string, active: boolean, unit: string | null }> };
+
+export type ProductCountsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ProductCountsQuery = { productCounts: { active: number, inactive: number } };
+
+export type CreateProductMutationVariables = Exact<{
+  input: ProductInput;
+}>;
+
+
+export type CreateProductMutation = { createProduct: { id: string, name: string, unit: string, description: string | null, active: boolean, createdAt: string, updatedAt: string } };
+
+export type UpdateProductMutationVariables = Exact<{
+  id: string | number;
+  input: ProductInput;
+}>;
+
+
+export type UpdateProductMutation = { updateProduct: { id: string, name: string, unit: string, description: string | null, active: boolean, createdAt: string, updatedAt: string } };
+
+export type SetProductActiveMutationVariables = Exact<{
+  id: string | number;
+  active: boolean;
+}>;
+
+
+export type SetProductActiveMutation = { setProductActive: { id: string, name: string, unit: string, description: string | null, active: boolean, createdAt: string, updatedAt: string } };
+
+export type BrandsQueryVariables = Exact<{
+  filter?: CatalogFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type BrandsQuery = { brands: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, active: boolean, createdAt: string, updatedAt: string }> } };
+
+export type BrandOptionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BrandOptionsQuery = { brandOptions: Array<{ id: string, name: string, active: boolean }> };
+
+export type BrandCountsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BrandCountsQuery = { brandCounts: { active: number, inactive: number } };
+
+export type CreateBrandMutationVariables = Exact<{
+  name: string;
+}>;
+
+
+export type CreateBrandMutation = { createBrand: { id: string, name: string, active: boolean, createdAt: string, updatedAt: string } };
+
+export type RenameBrandMutationVariables = Exact<{
+  id: string | number;
+  name: string;
+}>;
+
+
+export type RenameBrandMutation = { renameBrand: { id: string, name: string, active: boolean, createdAt: string, updatedAt: string } };
+
+export type SetBrandActiveMutationVariables = Exact<{
+  id: string | number;
+  active: boolean;
+}>;
+
+
+export type SetBrandActiveMutation = { setBrandActive: { id: string, name: string, active: boolean, createdAt: string, updatedAt: string } };
 
 export type CondominiumFieldsFragment = { id: string, name: string, document: string | null, city: string, state: string, status: CondominiumStatus, addressFormat: AddressFormat, modules: Array<AppModule>, activeMembers: number, managers: number, units: number, pendingEnrollments: number, lastActivityAt: string | null, createdAt: string };
 
@@ -2318,48 +2489,60 @@ export type CondominiumMembersQueryVariables = Exact<{
 
 export type CondominiumMembersQuery = { condominiumMembers: Array<{ userId: string, name: string, email: string, username: string, phone: string | null, role: UserGroup, kind: MemberKind, active: boolean, unitLabel: string | null, jobTitle: string | null, lastLoginAt: string | null, since: string }> };
 
-export type SupplierFieldsFragment = { id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<PurchaseCategory>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string };
+export type PurchaseRequestFieldsFragment = { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> };
 
-export type SuppliersQueryVariables = Exact<{
-  filter?: SupplierFilterInput | null | undefined;
+export type PurchaseRequestsQueryVariables = Exact<{
+  filter?: PurchaseRequestFilterInput | null | undefined;
   page?: PageInput | null | undefined;
 }>;
 
 
-export type SuppliersQuery = { suppliers: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<PurchaseCategory>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string }> } };
+export type PurchaseRequestsQuery = { purchaseRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> }> } };
 
-export type CreateSupplierMutationVariables = Exact<{
-  input: SupplierInput;
-}>;
-
-
-export type CreateSupplierMutation = { createSupplier: { id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<PurchaseCategory>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string } };
-
-export type UpdateSupplierMutationVariables = Exact<{
+export type PurchaseRequestQueryVariables = Exact<{
   id: string | number;
-  input: SupplierInput;
 }>;
 
 
-export type UpdateSupplierMutation = { updateSupplier: { id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<PurchaseCategory>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string } };
+export type PurchaseRequestQuery = { purchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
 
-export type SetSupplierActiveMutationVariables = Exact<{
+export type PurchaseRequestFilterOptionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PurchaseRequestFilterOptionsQuery = { purchaseRequestFilterOptions: { requests: Array<{ id: string, number: number, title: string }>, requesters: Array<{ id: string, name: string }> } };
+
+export type PurchaseRequestOverviewQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PurchaseRequestOverviewQuery = { purchaseRequestOverview: { open: number, urgent: number, dueSoon: number, overdue: number } };
+
+export type CreatePurchaseRequestMutationVariables = Exact<{
+  input: PurchaseRequestInput;
+}>;
+
+
+export type CreatePurchaseRequestMutation = { createPurchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
+
+export type UpdatePurchaseRequestMutationVariables = Exact<{
   id: string | number;
-  active: boolean;
+  input: PurchaseRequestInput;
 }>;
 
 
-export type SetSupplierActiveMutation = { setSupplierActive: { id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<PurchaseCategory>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string } };
+export type UpdatePurchaseRequestMutation = { updatePurchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
 
-export type SupplierFilterOptionsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type SupplierFilterOptionsQuery = { supplierFilterOptions: { contacts: Array<string>, suppliers: Array<{ id: string, name: string }>, documents: Array<{ documentType: SupplierDocumentType, document: string }> } };
-
-export type SupplierOverviewQueryVariables = Exact<{ [key: string]: never; }>;
+export type CancelPurchaseRequestMutationVariables = Exact<{
+  id: string | number;
+  reason: string;
+}>;
 
 
-export type SupplierOverviewQuery = { supplierOverview: { active: number, inactive: number, activeWithoutPix: number, activeWithoutContact: number, categoriesServed: number } };
+export type CancelPurchaseRequestMutation = { cancelPurchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
+
+export type PurchaseCatalogUsageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PurchaseCatalogUsageQuery = { purchaseCatalogUsage: { productsInUse: number, brandsInUse: number, topProduct: { name: string, requestCount: number } | null, topBrand: { name: string, requestCount: number } | null } };
 
 export type ResidentsDirectoryQueryVariables = Exact<{
   filter?: ResidentsFilterInput | null | undefined;
@@ -2435,6 +2618,49 @@ export type DeleteSpaceMutationVariables = Exact<{
 
 
 export type DeleteSpaceMutation = { deleteSpace: boolean };
+
+export type SupplierFieldsFragment = { id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<Category>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string };
+
+export type SuppliersQueryVariables = Exact<{
+  filter?: SupplierFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type SuppliersQuery = { suppliers: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<Category>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string }> } };
+
+export type CreateSupplierMutationVariables = Exact<{
+  input: SupplierInput;
+}>;
+
+
+export type CreateSupplierMutation = { createSupplier: { id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<Category>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string } };
+
+export type UpdateSupplierMutationVariables = Exact<{
+  id: string | number;
+  input: SupplierInput;
+}>;
+
+
+export type UpdateSupplierMutation = { updateSupplier: { id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<Category>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string } };
+
+export type SetSupplierActiveMutationVariables = Exact<{
+  id: string | number;
+  active: boolean;
+}>;
+
+
+export type SetSupplierActiveMutation = { setSupplierActive: { id: string, documentType: SupplierDocumentType, document: string, name: string, tradeName: string | null, categories: Array<Category>, categoryOther: string | null, contactName: string | null, email: string | null, phone: string | null, city: string | null, state: string | null, pixKeyType: PixKeyType | null, pixKey: string | null, notes: string | null, active: boolean, createdAt: string, updatedAt: string } };
+
+export type SupplierFilterOptionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SupplierFilterOptionsQuery = { supplierFilterOptions: { contacts: Array<string>, suppliers: Array<{ id: string, name: string }>, documents: Array<{ documentType: SupplierDocumentType, document: string }> } };
+
+export type SupplierOverviewQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SupplierOverviewQuery = { supplierOverview: { active: number, inactive: number, activeWithoutPix: number, activeWithoutContact: number, categoriesServed: number } };
 
 export type SupportRequestFieldsFragment = { id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string };
 
@@ -2655,6 +2881,26 @@ export const BroadcastFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"BroadcastFields"}) as unknown as TypedDocumentString<BroadcastFieldsFragment, unknown>;
+export const ProductFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ProductFields on Product {
+  id
+  name
+  unit
+  description
+  active
+  createdAt
+  updatedAt
+}
+    `, {"fragmentName":"ProductFields"}) as unknown as TypedDocumentString<ProductFieldsFragment, unknown>;
+export const BrandFieldsFragmentDoc = new TypedDocumentString(`
+    fragment BrandFields on Brand {
+  id
+  name
+  active
+  createdAt
+  updatedAt
+}
+    `, {"fragmentName":"BrandFields"}) as unknown as TypedDocumentString<BrandFieldsFragment, unknown>;
 export const CondominiumFieldsFragmentDoc = new TypedDocumentString(`
     fragment CondominiumFields on Condominium {
   id
@@ -2945,28 +3191,37 @@ export const ParcelFieldsFragmentDoc = new TypedDocumentString(`
   photoUrl
 }
     `, {"fragmentName":"ParcelFields"}) as unknown as TypedDocumentString<ParcelFieldsFragment, unknown>;
-export const SupplierFieldsFragmentDoc = new TypedDocumentString(`
-    fragment SupplierFields on Supplier {
+export const PurchaseRequestFieldsFragmentDoc = new TypedDocumentString(`
+    fragment PurchaseRequestFields on PurchaseRequest {
   id
-  documentType
-  document
-  name
-  tradeName
+  number
+  title
+  description
   categories
   categoryOther
-  contactName
-  email
-  phone
-  city
-  state
-  pixKeyType
-  pixKey
-  notes
-  active
+  priority
+  spaceId
+  location
+  neededBy
+  status
+  requestedById
+  requestedByName
+  items {
+    id
+    productId
+    productName
+    quantity
+    unit
+    brandId
+    brandName
+    note
+  }
+  cancelReason
+  cancelledAt
   createdAt
   updatedAt
 }
-    `, {"fragmentName":"SupplierFields"}) as unknown as TypedDocumentString<SupplierFieldsFragment, unknown>;
+    `, {"fragmentName":"PurchaseRequestFields"}) as unknown as TypedDocumentString<PurchaseRequestFieldsFragment, unknown>;
 export const SpaceFieldsFragmentDoc = new TypedDocumentString(`
     fragment SpaceFields on Space {
   id
@@ -3007,6 +3262,28 @@ export const SpaceFieldsFragmentDoc = new TypedDocumentString(`
   }
 }
     `, {"fragmentName":"SpaceFields"}) as unknown as TypedDocumentString<SpaceFieldsFragment, unknown>;
+export const SupplierFieldsFragmentDoc = new TypedDocumentString(`
+    fragment SupplierFields on Supplier {
+  id
+  documentType
+  document
+  name
+  tradeName
+  categories
+  categoryOther
+  contactName
+  email
+  phone
+  city
+  state
+  pixKeyType
+  pixKey
+  notes
+  active
+  createdAt
+  updatedAt
+}
+    `, {"fragmentName":"SupplierFields"}) as unknown as TypedDocumentString<SupplierFieldsFragment, unknown>;
 export const SupportRequestFieldsFragmentDoc = new TypedDocumentString(`
     fragment SupportRequestFields on SupportRequest {
   id
@@ -4152,6 +4429,165 @@ export const BroadcastStatsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<BroadcastStatsQuery, BroadcastStatsQueryVariables>;
+export const ProductsDocument = new TypedDocumentString(`
+    query Products($filter: CatalogFilterInput, $page: PageInput) {
+  products(filter: $filter, page: $page) {
+    items {
+      ...ProductFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment ProductFields on Product {
+  id
+  name
+  unit
+  description
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<ProductsQuery, ProductsQueryVariables>;
+export const ProductOptionsDocument = new TypedDocumentString(`
+    query ProductOptions {
+  productOptions {
+    id
+    name
+    active
+    unit
+  }
+}
+    `) as unknown as TypedDocumentString<ProductOptionsQuery, ProductOptionsQueryVariables>;
+export const ProductCountsDocument = new TypedDocumentString(`
+    query ProductCounts {
+  productCounts {
+    active
+    inactive
+  }
+}
+    `) as unknown as TypedDocumentString<ProductCountsQuery, ProductCountsQueryVariables>;
+export const CreateProductDocument = new TypedDocumentString(`
+    mutation CreateProduct($input: ProductInput!) {
+  createProduct(input: $input) {
+    ...ProductFields
+  }
+}
+    fragment ProductFields on Product {
+  id
+  name
+  unit
+  description
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CreateProductMutation, CreateProductMutationVariables>;
+export const UpdateProductDocument = new TypedDocumentString(`
+    mutation UpdateProduct($id: ID!, $input: ProductInput!) {
+  updateProduct(id: $id, input: $input) {
+    ...ProductFields
+  }
+}
+    fragment ProductFields on Product {
+  id
+  name
+  unit
+  description
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<UpdateProductMutation, UpdateProductMutationVariables>;
+export const SetProductActiveDocument = new TypedDocumentString(`
+    mutation SetProductActive($id: ID!, $active: Boolean!) {
+  setProductActive(id: $id, active: $active) {
+    ...ProductFields
+  }
+}
+    fragment ProductFields on Product {
+  id
+  name
+  unit
+  description
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<SetProductActiveMutation, SetProductActiveMutationVariables>;
+export const BrandsDocument = new TypedDocumentString(`
+    query Brands($filter: CatalogFilterInput, $page: PageInput) {
+  brands(filter: $filter, page: $page) {
+    items {
+      ...BrandFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment BrandFields on Brand {
+  id
+  name
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<BrandsQuery, BrandsQueryVariables>;
+export const BrandOptionsDocument = new TypedDocumentString(`
+    query BrandOptions {
+  brandOptions {
+    id
+    name
+    active
+  }
+}
+    `) as unknown as TypedDocumentString<BrandOptionsQuery, BrandOptionsQueryVariables>;
+export const BrandCountsDocument = new TypedDocumentString(`
+    query BrandCounts {
+  brandCounts {
+    active
+    inactive
+  }
+}
+    `) as unknown as TypedDocumentString<BrandCountsQuery, BrandCountsQueryVariables>;
+export const CreateBrandDocument = new TypedDocumentString(`
+    mutation CreateBrand($name: String!) {
+  createBrand(name: $name) {
+    ...BrandFields
+  }
+}
+    fragment BrandFields on Brand {
+  id
+  name
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CreateBrandMutation, CreateBrandMutationVariables>;
+export const RenameBrandDocument = new TypedDocumentString(`
+    mutation RenameBrand($id: ID!, $name: String!) {
+  renameBrand(id: $id, name: $name) {
+    ...BrandFields
+  }
+}
+    fragment BrandFields on Brand {
+  id
+  name
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<RenameBrandMutation, RenameBrandMutationVariables>;
+export const SetBrandActiveDocument = new TypedDocumentString(`
+    mutation SetBrandActive($id: ID!, $active: Boolean!) {
+  setBrandActive(id: $id, active: $active) {
+    ...BrandFields
+  }
+}
+    fragment BrandFields on Brand {
+  id
+  name
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<SetBrandActiveMutation, SetBrandActiveMutationVariables>;
 export const CondominiumsDocument = new TypedDocumentString(`
     query Condominiums($filter: CondominiumFilterInput) {
   condominiums(filter: $filter) {
@@ -6976,11 +7412,11 @@ export const CondominiumMembersDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<CondominiumMembersQuery, CondominiumMembersQueryVariables>;
-export const SuppliersDocument = new TypedDocumentString(`
-    query Suppliers($filter: SupplierFilterInput, $page: PageInput) {
-  suppliers(filter: $filter, page: $page) {
+export const PurchaseRequestsDocument = new TypedDocumentString(`
+    query PurchaseRequests($filter: PurchaseRequestFilterInput, $page: PageInput) {
+  purchaseRequests(filter: $filter, page: $page) {
     items {
-      ...SupplierFields
+      ...PurchaseRequestFields
     }
     total
     page
@@ -6988,130 +7424,216 @@ export const SuppliersDocument = new TypedDocumentString(`
     totalPages
   }
 }
-    fragment SupplierFields on Supplier {
+    fragment PurchaseRequestFields on PurchaseRequest {
   id
-  documentType
-  document
-  name
-  tradeName
+  number
+  title
+  description
   categories
   categoryOther
-  contactName
-  email
-  phone
-  city
-  state
-  pixKeyType
-  pixKey
-  notes
-  active
+  priority
+  spaceId
+  location
+  neededBy
+  status
+  requestedById
+  requestedByName
+  items {
+    id
+    productId
+    productName
+    quantity
+    unit
+    brandId
+    brandName
+    note
+  }
+  cancelReason
+  cancelledAt
   createdAt
   updatedAt
-}`) as unknown as TypedDocumentString<SuppliersQuery, SuppliersQueryVariables>;
-export const CreateSupplierDocument = new TypedDocumentString(`
-    mutation CreateSupplier($input: SupplierInput!) {
-  createSupplier(input: $input) {
-    ...SupplierFields
+}`) as unknown as TypedDocumentString<PurchaseRequestsQuery, PurchaseRequestsQueryVariables>;
+export const PurchaseRequestDocument = new TypedDocumentString(`
+    query PurchaseRequest($id: ID!) {
+  purchaseRequest(id: $id) {
+    ...PurchaseRequestFields
   }
 }
-    fragment SupplierFields on Supplier {
+    fragment PurchaseRequestFields on PurchaseRequest {
   id
-  documentType
-  document
-  name
-  tradeName
+  number
+  title
+  description
   categories
   categoryOther
-  contactName
-  email
-  phone
-  city
-  state
-  pixKeyType
-  pixKey
-  notes
-  active
-  createdAt
-  updatedAt
-}`) as unknown as TypedDocumentString<CreateSupplierMutation, CreateSupplierMutationVariables>;
-export const UpdateSupplierDocument = new TypedDocumentString(`
-    mutation UpdateSupplier($id: ID!, $input: SupplierInput!) {
-  updateSupplier(id: $id, input: $input) {
-    ...SupplierFields
+  priority
+  spaceId
+  location
+  neededBy
+  status
+  requestedById
+  requestedByName
+  items {
+    id
+    productId
+    productName
+    quantity
+    unit
+    brandId
+    brandName
+    note
   }
-}
-    fragment SupplierFields on Supplier {
-  id
-  documentType
-  document
-  name
-  tradeName
-  categories
-  categoryOther
-  contactName
-  email
-  phone
-  city
-  state
-  pixKeyType
-  pixKey
-  notes
-  active
+  cancelReason
+  cancelledAt
   createdAt
   updatedAt
-}`) as unknown as TypedDocumentString<UpdateSupplierMutation, UpdateSupplierMutationVariables>;
-export const SetSupplierActiveDocument = new TypedDocumentString(`
-    mutation SetSupplierActive($id: ID!, $active: Boolean!) {
-  setSupplierActive(id: $id, active: $active) {
-    ...SupplierFields
-  }
-}
-    fragment SupplierFields on Supplier {
-  id
-  documentType
-  document
-  name
-  tradeName
-  categories
-  categoryOther
-  contactName
-  email
-  phone
-  city
-  state
-  pixKeyType
-  pixKey
-  notes
-  active
-  createdAt
-  updatedAt
-}`) as unknown as TypedDocumentString<SetSupplierActiveMutation, SetSupplierActiveMutationVariables>;
-export const SupplierFilterOptionsDocument = new TypedDocumentString(`
-    query SupplierFilterOptions {
-  supplierFilterOptions {
-    suppliers {
+}`) as unknown as TypedDocumentString<PurchaseRequestQuery, PurchaseRequestQueryVariables>;
+export const PurchaseRequestFilterOptionsDocument = new TypedDocumentString(`
+    query PurchaseRequestFilterOptions {
+  purchaseRequestFilterOptions {
+    requests {
+      id
+      number
+      title
+    }
+    requesters {
       id
       name
     }
-    contacts
-    documents {
-      documentType
-      document
+  }
+}
+    `) as unknown as TypedDocumentString<PurchaseRequestFilterOptionsQuery, PurchaseRequestFilterOptionsQueryVariables>;
+export const PurchaseRequestOverviewDocument = new TypedDocumentString(`
+    query PurchaseRequestOverview {
+  purchaseRequestOverview {
+    open
+    urgent
+    dueSoon
+    overdue
+  }
+}
+    `) as unknown as TypedDocumentString<PurchaseRequestOverviewQuery, PurchaseRequestOverviewQueryVariables>;
+export const CreatePurchaseRequestDocument = new TypedDocumentString(`
+    mutation CreatePurchaseRequest($input: PurchaseRequestInput!) {
+  createPurchaseRequest(input: $input) {
+    ...PurchaseRequestFields
+  }
+}
+    fragment PurchaseRequestFields on PurchaseRequest {
+  id
+  number
+  title
+  description
+  categories
+  categoryOther
+  priority
+  spaceId
+  location
+  neededBy
+  status
+  requestedById
+  requestedByName
+  items {
+    id
+    productId
+    productName
+    quantity
+    unit
+    brandId
+    brandName
+    note
+  }
+  cancelReason
+  cancelledAt
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CreatePurchaseRequestMutation, CreatePurchaseRequestMutationVariables>;
+export const UpdatePurchaseRequestDocument = new TypedDocumentString(`
+    mutation UpdatePurchaseRequest($id: ID!, $input: PurchaseRequestInput!) {
+  updatePurchaseRequest(id: $id, input: $input) {
+    ...PurchaseRequestFields
+  }
+}
+    fragment PurchaseRequestFields on PurchaseRequest {
+  id
+  number
+  title
+  description
+  categories
+  categoryOther
+  priority
+  spaceId
+  location
+  neededBy
+  status
+  requestedById
+  requestedByName
+  items {
+    id
+    productId
+    productName
+    quantity
+    unit
+    brandId
+    brandName
+    note
+  }
+  cancelReason
+  cancelledAt
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<UpdatePurchaseRequestMutation, UpdatePurchaseRequestMutationVariables>;
+export const CancelPurchaseRequestDocument = new TypedDocumentString(`
+    mutation CancelPurchaseRequest($id: ID!, $reason: String!) {
+  cancelPurchaseRequest(id: $id, reason: $reason) {
+    ...PurchaseRequestFields
+  }
+}
+    fragment PurchaseRequestFields on PurchaseRequest {
+  id
+  number
+  title
+  description
+  categories
+  categoryOther
+  priority
+  spaceId
+  location
+  neededBy
+  status
+  requestedById
+  requestedByName
+  items {
+    id
+    productId
+    productName
+    quantity
+    unit
+    brandId
+    brandName
+    note
+  }
+  cancelReason
+  cancelledAt
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CancelPurchaseRequestMutation, CancelPurchaseRequestMutationVariables>;
+export const PurchaseCatalogUsageDocument = new TypedDocumentString(`
+    query PurchaseCatalogUsage {
+  purchaseCatalogUsage {
+    productsInUse
+    topProduct {
+      name
+      requestCount
+    }
+    brandsInUse
+    topBrand {
+      name
+      requestCount
     }
   }
 }
-    `) as unknown as TypedDocumentString<SupplierFilterOptionsQuery, SupplierFilterOptionsQueryVariables>;
-export const SupplierOverviewDocument = new TypedDocumentString(`
-    query SupplierOverview {
-  supplierOverview {
-    active
-    inactive
-    activeWithoutPix
-    activeWithoutContact
-    categoriesServed
-  }
-}
-    `) as unknown as TypedDocumentString<SupplierOverviewQuery, SupplierOverviewQueryVariables>;
+    `) as unknown as TypedDocumentString<PurchaseCatalogUsageQuery, PurchaseCatalogUsageQueryVariables>;
 export const ResidentsDirectoryDocument = new TypedDocumentString(`
     query ResidentsDirectory($filter: ResidentsFilterInput, $page: PageInput) {
   residentsDirectory(filter: $filter, page: $page) {
@@ -7457,6 +7979,142 @@ export const DeleteSpaceDocument = new TypedDocumentString(`
   deleteSpace(id: $id)
 }
     `) as unknown as TypedDocumentString<DeleteSpaceMutation, DeleteSpaceMutationVariables>;
+export const SuppliersDocument = new TypedDocumentString(`
+    query Suppliers($filter: SupplierFilterInput, $page: PageInput) {
+  suppliers(filter: $filter, page: $page) {
+    items {
+      ...SupplierFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment SupplierFields on Supplier {
+  id
+  documentType
+  document
+  name
+  tradeName
+  categories
+  categoryOther
+  contactName
+  email
+  phone
+  city
+  state
+  pixKeyType
+  pixKey
+  notes
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<SuppliersQuery, SuppliersQueryVariables>;
+export const CreateSupplierDocument = new TypedDocumentString(`
+    mutation CreateSupplier($input: SupplierInput!) {
+  createSupplier(input: $input) {
+    ...SupplierFields
+  }
+}
+    fragment SupplierFields on Supplier {
+  id
+  documentType
+  document
+  name
+  tradeName
+  categories
+  categoryOther
+  contactName
+  email
+  phone
+  city
+  state
+  pixKeyType
+  pixKey
+  notes
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CreateSupplierMutation, CreateSupplierMutationVariables>;
+export const UpdateSupplierDocument = new TypedDocumentString(`
+    mutation UpdateSupplier($id: ID!, $input: SupplierInput!) {
+  updateSupplier(id: $id, input: $input) {
+    ...SupplierFields
+  }
+}
+    fragment SupplierFields on Supplier {
+  id
+  documentType
+  document
+  name
+  tradeName
+  categories
+  categoryOther
+  contactName
+  email
+  phone
+  city
+  state
+  pixKeyType
+  pixKey
+  notes
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<UpdateSupplierMutation, UpdateSupplierMutationVariables>;
+export const SetSupplierActiveDocument = new TypedDocumentString(`
+    mutation SetSupplierActive($id: ID!, $active: Boolean!) {
+  setSupplierActive(id: $id, active: $active) {
+    ...SupplierFields
+  }
+}
+    fragment SupplierFields on Supplier {
+  id
+  documentType
+  document
+  name
+  tradeName
+  categories
+  categoryOther
+  contactName
+  email
+  phone
+  city
+  state
+  pixKeyType
+  pixKey
+  notes
+  active
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<SetSupplierActiveMutation, SetSupplierActiveMutationVariables>;
+export const SupplierFilterOptionsDocument = new TypedDocumentString(`
+    query SupplierFilterOptions {
+  supplierFilterOptions {
+    suppliers {
+      id
+      name
+    }
+    contacts
+    documents {
+      documentType
+      document
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<SupplierFilterOptionsQuery, SupplierFilterOptionsQueryVariables>;
+export const SupplierOverviewDocument = new TypedDocumentString(`
+    query SupplierOverview {
+  supplierOverview {
+    active
+    inactive
+    activeWithoutPix
+    activeWithoutContact
+    categoriesServed
+  }
+}
+    `) as unknown as TypedDocumentString<SupplierOverviewQuery, SupplierOverviewQueryVariables>;
 export const SupportPageDocument = new TypedDocumentString(`
     query SupportPage($page: PageInput) {
   supportQuota {
