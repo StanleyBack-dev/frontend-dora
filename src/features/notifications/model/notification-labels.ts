@@ -123,6 +123,16 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Um vizinho viu o aviso no mural e diz que achou o item: quem perdeu e a portaria são avisados.",
   },
+  PURCHASE_REQUEST_CREATED: {
+    label: "Nova solicitação de compra",
+    description:
+      "Para a gestão: alguém da equipe pediu uma compra; confira os itens e comece as cotações.",
+  },
+  PURCHASE_REQUEST_CANCELLED: {
+    label: "Solicitação de compra cancelada",
+    description:
+      "Uma solicitação de compra que você fez foi cancelada pela gestão, com o motivo.",
+  },
   FOUND_ITEM_EXPIRING: {
     label: "Item achado perto do fim da guarda",
     description:

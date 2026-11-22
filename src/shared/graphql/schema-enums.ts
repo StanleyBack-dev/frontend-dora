@@ -34,6 +34,29 @@ export type BroadcastAudience =
   | 'GRUPO'
   | 'TODOS';
 
+/** Categoria de uma compra, de um fornecedor ou de outro registro (manutenção, elétrica, limpeza, alimentação…); o que não estiver na lista é OTHER, com o texto digitado. */
+export type Category =
+  | 'CLEANING'
+  | 'CONSTRUCTION'
+  | 'ELECTRICAL'
+  | 'ELEVATORS'
+  | 'EVENTS'
+  | 'FOOD'
+  | 'FURNITURE'
+  | 'GARDENING'
+  | 'GAS'
+  | 'MAINTENANCE'
+  | 'OFFICE'
+  | 'OTHER'
+  | 'PAINTING'
+  | 'PEST_CONTROL'
+  | 'PLUMBING'
+  | 'POOL'
+  | 'PROFESSIONAL'
+  | 'SECURITY'
+  | 'TECHNOLOGY'
+  | 'UNIFORMS';
+
 /** Situação do condomínio na plataforma. */
 export type CondominiumStatus =
   | 'ACTIVE'
@@ -243,6 +266,8 @@ export type NotificationType =
   | 'PARCEL_RECEIVED'
   | 'PARCEL_REMINDER'
   | 'PARCEL_RETURNED'
+  | 'PURCHASE_REQUEST_CANCELLED'
+  | 'PURCHASE_REQUEST_CREATED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
   | 'SUPPORT_REQUESTED'
@@ -270,6 +295,7 @@ export type Permission =
   | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
   | 'PURCHASES_MANAGE'
+  | 'PURCHASES_REQUEST'
   | 'RESIDENTS_READ'
   | 'SPACES_MANAGE'
   | 'SUPPORTERS_MANAGE'
@@ -285,28 +311,24 @@ export type PixKeyType =
   | 'PHONE'
   | 'RANDOM';
 
-/** Categoria de uma compra ou do que um fornecedor atende (manutenção, elétrica, limpeza, alimentação…); o que não estiver na lista é OTHER, com o texto digitado. */
-export type PurchaseCategory =
-  | 'CLEANING'
-  | 'CONSTRUCTION'
-  | 'ELECTRICAL'
-  | 'ELEVATORS'
-  | 'EVENTS'
-  | 'FOOD'
-  | 'FURNITURE'
-  | 'GARDENING'
-  | 'GAS'
-  | 'MAINTENANCE'
-  | 'OFFICE'
-  | 'OTHER'
-  | 'PAINTING'
-  | 'PEST_CONTROL'
-  | 'PLUMBING'
-  | 'POOL'
-  | 'PROFESSIONAL'
-  | 'SECURITY'
-  | 'TECHNOLOGY'
-  | 'UNIFORMS';
+/** Prioridade de uma solicitação de compra. */
+export type PurchasePriority =
+  | 'HIGH'
+  | 'LOW'
+  | 'NORMAL'
+  | 'URGENT';
+
+/** Solicitação de compra: aguardando cotação, em cotação, aguardando aprovação, aprovada, pedido feito, recebida, concluída, reprovada ou cancelada. */
+export type PurchaseRequestStatus =
+  | 'APPROVED'
+  | 'AWAITING_APPROVAL'
+  | 'CANCELLED'
+  | 'COMPLETED'
+  | 'OPEN'
+  | 'ORDERED'
+  | 'QUOTING'
+  | 'RECEIVED'
+  | 'REJECTED';
 
 /** Localização do aparelho na assinatura: obtida, recusada ou indisponível. */
 export type SignatureLocationStatus =
