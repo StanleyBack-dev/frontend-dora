@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/design-system/components/Button";
 import { cn } from "@/design-system/utils/cn";
@@ -41,13 +41,27 @@ export function FormTabs({
   );
   const previous = tabs[index - 1];
   const next = tabs[index + 1];
+  const strip = useRef<HTMLDivElement>(null);
+
+  // On a phone the strip is wider than the screen: keep the active tab in
+  // sight (scrolling the strip only, never the page).
+  useEffect(() => {
+    const list = strip.current;
+    const active = list?.children[index] as HTMLElement | undefined;
+    if (!list || !active || list.scrollWidth <= list.clientWidth) return;
+    list.scrollTo({
+      left: active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2,
+      behavior: "smooth",
+    });
+  }, [index]);
 
   return (
     <div className="rounded-2xl border border-border bg-surface shadow-card">
       <div
+        ref={strip}
         role="tablist"
         aria-label={label}
-        className="flex gap-1 overflow-x-auto rounded-t-[calc(1rem-1px)] bg-chrome p-2"
+        className="relative flex gap-1 overflow-x-auto rounded-t-[calc(1rem-1px)] bg-chrome p-2"
       >
         {tabs.map((tab, position) => {
           const active = position === index;
@@ -113,13 +127,15 @@ export function FormTabs({
             size="sm"
             icon={<ChevronLeft className="size-4" />}
             onClick={() => onChange(previous.id)}
+            aria-label={`Voltar para ${previous.label}`}
           >
-            {previous.label}
+            {/* On a phone only the arrow: the next tab's name needs the room. */}
+            <span className="hidden sm:inline">{previous.label}</span>
           </Button>
         ) : (
           <span />
         )}
-        <span className="text-xs text-soft">
+        <span className="shrink-0 whitespace-nowrap text-xs text-soft">
           {index + 1} de {tabs.length}
         </span>
         {next ? (
