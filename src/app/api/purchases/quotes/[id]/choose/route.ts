@@ -10,6 +10,10 @@ import { purchaseQuotesService } from "@/server/services/purchase-quotes.service
 export const POST = bffRoute<{ id: string }>(async (request, { params }) => {
   const id = purchaseQuoteIdSchema.parse((await params).id);
   const { justification } = await readBody(request, choosePurchaseQuoteSchema);
-  await purchaseQuotesService.choose(await requireToken(), id, justification);
-  return NextResponse.json({ ok: true });
+  const status = await purchaseQuotesService.choose(
+    await requireToken(),
+    id,
+    justification,
+  );
+  return NextResponse.json({ status });
 });

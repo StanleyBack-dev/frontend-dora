@@ -19,13 +19,14 @@ import {
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { loadPurchaseRequest } from "@/server/loaders/load-purchase-request";
 import { purchaseQuotesService } from "@/server/services/purchase-quotes.service";
-import { can } from "@/shared/lib/access";
+import { can, canAny } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Cotação" };
 
-// A request's quote page (management): what was asked (folded, to check
-// the items while quoting) and the quotes with the comparison map (screen
-// and PDF), adding, editing, choosing and reopening.
+// A request's quote page: what was asked (folded, to check the items while
+// quoting) and the quotes with the comparison map (screen, PDF, sharing).
+// Adding, editing, choosing and reopening are the management's; the
+// approvers read. The approval has a page of its own (/compras/aprovacoes).
 export default async function RequestQuotesPage({
   params,
 }: {
@@ -36,7 +37,11 @@ export default async function RequestQuotesPage({
   if (!user.condominium.modules.includes("PURCHASES")) {
     return <ModuleUnavailable name="Compras" />;
   }
-  if (!can(user, "PURCHASES_MANAGE")) return <AccessDenied />;
+  // The management works the quotes; the approvers read them and decide.
+  if (!canAny(user, "PURCHASES_MANAGE", "PURCHASES_APPROVE")) {
+    return <AccessDenied />;
+  }
+  const canManage = can(user, "PURCHASES_MANAGE");
   const request = await loadPurchaseRequest((await params).id);
   if (!request) notFound();
   const cancelled = request.status === "CANCELLED";
@@ -65,7 +70,11 @@ export default async function RequestQuotesPage({
             Esta solicitação foi cancelada: não tem mais cotações.
           </Alert>
         ) : (
-          <QuotesPanel request={request} quotes={quotes} />
+          <QuotesPanel
+            request={request}
+            quotes={quotes}
+            canManage={canManage}
+          />
         )}
       </div>
     </>

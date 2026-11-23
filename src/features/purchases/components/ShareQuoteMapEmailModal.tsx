@@ -176,11 +176,8 @@ export function ShareQuoteMapEmailModal({
           rows={8}
           maxLength={MAX_SHARE_MESSAGE}
           value={message}
-          hint={
-            tried && messageProblem
-              ? messageProblem
-              : `${message.length}/${MAX_SHARE_MESSAGE} caracteres. Pode mudar o texto à vontade.`
-          }
+          hint={`${message.length}/${MAX_SHARE_MESSAGE} caracteres. Pode mudar o texto à vontade.`}
+          error={tried && messageProblem ? messageProblem : undefined}
           onChange={(event) => setMessage(event.target.value)}
         />
         <p className="flex items-center gap-2 rounded-xl bg-brand-soft px-3 py-2 text-[13px] text-brand-ink">

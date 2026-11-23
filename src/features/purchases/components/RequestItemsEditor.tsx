@@ -112,7 +112,7 @@ export function RequestItemsEditor({
                 kind="product"
                 label="Produto"
                 required
-                placeholder="Busque ou cadastre com o +"
+                placeholder="Busque o produto"
                 options={products}
                 value={item.productId || null}
                 onCreated={onProductCreated}

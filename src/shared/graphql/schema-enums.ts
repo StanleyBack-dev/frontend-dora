@@ -266,8 +266,12 @@ export type NotificationType =
   | 'PARCEL_RECEIVED'
   | 'PARCEL_REMINDER'
   | 'PARCEL_RETURNED'
+  | 'PURCHASE_APPROVAL_REQUESTED'
+  | 'PURCHASE_APPROVED'
+  | 'PURCHASE_REJECTED'
   | 'PURCHASE_REQUEST_CANCELLED'
   | 'PURCHASE_REQUEST_CREATED'
+  | 'PURCHASE_RETURNED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
   | 'SUPPORT_REQUESTED'
@@ -305,6 +309,7 @@ export type Permission =
   | 'PARCELS_MANAGE'
   | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
+  | 'PURCHASES_APPROVE'
   | 'PURCHASES_MANAGE'
   | 'PURCHASES_REQUEST'
   | 'RESIDENTS_READ'
@@ -321,6 +326,18 @@ export type PixKeyType =
   | 'EMAIL'
   | 'PHONE'
   | 'RANDOM';
+
+/** Decisão sobre uma compra: aprovada na alçada (ao escolher), aprovada, devolvida para cotação ou reprovada. */
+export type PurchaseApprovalDecision =
+  | 'APPROVED'
+  | 'AUTO_APPROVED'
+  | 'REJECTED'
+  | 'RETURNED';
+
+/** Como o condomínio aprova as compras: toda compra passa pelo aprovador (ALWAYS) ou, até o limite (alçada), segue aprovada ao escolher a cotação (LIMIT). */
+export type PurchaseApprovalMode =
+  | 'ALWAYS'
+  | 'LIMIT';
 
 /** Prioridade de uma solicitação de compra. */
 export type PurchasePriority =

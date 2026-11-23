@@ -79,6 +79,11 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Pedir compras (solicitações de compra)",
     area: "Gestão",
   },
+  PURCHASES_APPROVE: {
+    label:
+      "Aprovar, devolver ou reprovar compras e definir a alçada (o valor que dispensa aprovação)",
+    area: "Gestão",
+  },
   EVENTS_MANAGE: {
     label: "Criar, publicar e cancelar eventos",
     area: "Gestão",

@@ -48,14 +48,19 @@ export const metadata: Metadata = { title: "Cotações" };
 
 const BASE = "/compras/cotacoes";
 /** The stage filter in the address (Portuguese words → API statuses). */
+// By default only the pending ones; the approved and rejected through the
+// filter, so they don't crowd what still needs work.
 const STAGES = {
+  pendentes: ["OPEN", "QUOTING", "AWAITING_APPROVAL"],
   todas: null,
   "aguardando-cotacao": ["OPEN"],
   "em-cotacao": ["QUOTING"],
   "aguardando-aprovacao": ["AWAITING_APPROVAL"],
+  aprovadas: ["APPROVED"],
+  reprovadas: ["REJECTED"],
 } as const satisfies Record<string, readonly PurchaseRequestStatus[] | null>;
 type StageKey = keyof typeof STAGES;
-const DEFAULT_STAGE: StageKey = "todas";
+const DEFAULT_STAGE: StageKey = "pendentes";
 
 // Compras > Cotações (management): the requests waiting for quotes, in
 // quotes or waiting for the approval, with how their quotes stand; each
@@ -116,7 +121,7 @@ export default async function QuoteBoardPage({
     <>
       <PageHeader
         title="Cotações"
-        description="As solicitações em cotação: quantas cotações cada uma tem, a mais barata e a escolhida. Abra uma para ver o mapa de cotação."
+        description="As solicitações em cotação e as já decididas: quantas cotações cada uma tem, a mais barata, a escolhida e a situação. Abra uma para ver o mapa de cotação."
       />
 
       <QuoteBoardSummary overview={overview} />
@@ -161,7 +166,7 @@ export default async function QuoteBoardPage({
               label="Situação"
               name="situacao"
               defaultValue={stage === DEFAULT_STAGE ? "" : stage}
-              placeholder="Todas"
+              placeholder="Pendentes"
               options={[
                 { value: "aguardando-cotacao", label: "Aguardando cotação" },
                 { value: "em-cotacao", label: "Em cotação" },
@@ -169,6 +174,9 @@ export default async function QuoteBoardPage({
                   value: "aguardando-aprovacao",
                   label: "Aguardando aprovação",
                 },
+                { value: "aprovadas", label: "Aprovadas" },
+                { value: "reprovadas", label: "Reprovadas" },
+                { value: "todas", label: "Todas" },
               ]}
             />
             <FilterActions

@@ -22,6 +22,7 @@ import {
 import { pricedCount } from "@/features/purchases/model/quote-ranking";
 import { formatRequestDay } from "@/features/purchases/model/request-labels";
 import type { PurchaseQuote } from "@/shared/contracts/purchase-quotes";
+import type { PurchaseRequestStatus } from "@/shared/contracts/purchase-requests";
 import { formatCents } from "@/shared/lib/format";
 
 function Fact({
@@ -63,6 +64,7 @@ export function QuoteSummaryCard({
   itemCount,
   cheapestCents,
   actions,
+  requestStatus,
 }: {
   quote: PurchaseQuote;
   rank: number;
@@ -70,6 +72,8 @@ export function QuoteSummaryCard({
   /** The cheapest complete total (null: none is complete). */
   cheapestCents: number | null;
   actions: QuoteMapActions;
+  /** The request's status: the chosen quote shows how its approval stands. */
+  requestStatus: PurchaseRequestStatus;
 }) {
   const priced = pricedCount(quote);
   const above =
@@ -118,6 +122,15 @@ export function QuoteSummaryCard({
           </h4>
           <div className="mt-1 flex flex-wrap gap-1">
             {quote.chosen && <Badge tone="brand">Escolhida</Badge>}
+            {quote.chosen && requestStatus === "AWAITING_APPROVAL" && (
+              <Badge tone="warning">Aguardando aprovação</Badge>
+            )}
+            {quote.chosen && requestStatus === "APPROVED" && (
+              <Badge tone="success">Aprovada</Badge>
+            )}
+            {quote.chosen && requestStatus === "REJECTED" && (
+              <Badge tone="danger">Reprovada</Badge>
+            )}
             {quote.cheapest && <Badge tone="success">Mais barata</Badge>}
             {!quote.complete && <Badge tone="warning">Parcial</Badge>}
           </div>

@@ -13,7 +13,10 @@ import {
   updatePurchaseQuoteDocument,
 } from "@/server/graphql/operations/purchase-quotes.operations";
 import type { Paginated } from "@/shared/contracts/api";
-import type { PurchaseRequestFilter } from "@/shared/contracts/purchase-requests";
+import type {
+  PurchaseRequestFilter,
+  PurchaseRequestStatus,
+} from "@/shared/contracts/purchase-requests";
 import type {
   QuoteBoardOverview,
   QuoteBoardRow,
@@ -107,15 +110,17 @@ export const purchaseQuotesService = {
     });
   },
 
+  /** Chooses the quote; the request's status after it (approved within the limit, or waiting). */
   async choose(
     token: string,
     id: string,
     justification: string | null,
-  ): Promise<void> {
-    await backendGraphql(choosePurchaseQuoteDocument, {
-      token,
-      variables: { id, justification },
-    });
+  ): Promise<PurchaseRequestStatus> {
+    const { choosePurchaseQuote } = await backendGraphql(
+      choosePurchaseQuoteDocument,
+      { token, variables: { id, justification } },
+    );
+    return choosePurchaseQuote.status;
   },
 
   /** Sends the map PDF by e-mail; how many were sent. */

@@ -43,6 +43,16 @@ export const ACTIVE_REQUEST_STATUSES: PurchaseRequestStatus[] = [
   "RECEIVED",
 ];
 
+/**
+ * Still waiting on someone (quotes or the approval): what the purchases
+ * pages show by default; the decided ones only through the filter.
+ */
+export const PENDING_REQUEST_STATUSES: PurchaseRequestStatus[] = [
+  "OPEN",
+  "QUOTING",
+  "AWAITING_APPROVAL",
+];
+
 /** Edited and cancelled only before the quotes start. */
 export const isEditableRequest = (request: Pick<PurchaseRequest, "status">) =>
   request.status === "OPEN";

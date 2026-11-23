@@ -133,6 +133,26 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Uma solicitação de compra que você fez foi cancelada pela gestão, com o motivo.",
   },
+  PURCHASE_APPROVAL_REQUESTED: {
+    label: "Compra aguardando aprovação",
+    description:
+      "Para quem aprova as compras: uma cotação escolhida passou da alçada (ou toda compra passa por aprovação) e espera a sua decisão.",
+  },
+  PURCHASE_APPROVED: {
+    label: "Compra aprovada",
+    description:
+      "Uma compra foi aprovada, por quem aprova ou dentro da alçada: quem pediu e a gestão são avisados.",
+  },
+  PURCHASE_RETURNED: {
+    label: "Compra devolvida para cotação",
+    description:
+      "Quem aprova devolveu a compra para cotação, com o motivo: a gestão ajusta e escolhe de novo.",
+  },
+  PURCHASE_REJECTED: {
+    label: "Compra reprovada",
+    description:
+      "Quem aprova reprovou a compra, com o motivo, e a solicitação foi encerrada.",
+  },
   FOUND_ITEM_EXPIRING: {
     label: "Item achado perto do fim da guarda",
     description:
