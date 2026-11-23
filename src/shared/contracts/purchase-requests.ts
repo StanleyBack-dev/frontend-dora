@@ -48,6 +48,8 @@ export type PurchaseRequest = {
   chosenQuoteId: string | null;
   choiceJustification: string | null;
   chosenAt: string | null;
+  /** Who chose the quote. */
+  chosenByName: string | null;
   cancelReason: string | null;
   cancelledAt: string | null;
   createdAt: string;

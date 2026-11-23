@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Calculator, Scale } from "lucide-react";
+import { BadgeCheck, Calculator, Scale } from "lucide-react";
 import {
   Badge,
   buttonClasses,
@@ -29,6 +29,12 @@ import { formatCents } from "@/shared/lib/format";
 
 const requestHref = (row: QuoteBoardRow) =>
   `/compras/cotacoes/${row.request.id}`;
+
+/** A quote was chosen: the purchase has its approval page. */
+const hasApproval = (row: QuoteBoardRow) =>
+  row.request.status === "AWAITING_APPROVAL" ||
+  row.request.status === "APPROVED" ||
+  row.request.status === "REJECTED";
 
 function Pick({ pick }: { pick: QuoteBoardPick | null }) {
   if (!pick) return <span className="text-soft">—</span>;
@@ -61,12 +67,12 @@ export function QuoteBoardTable({
         title={
           filtered
             ? "Nenhuma solicitação encontrada"
-            : "Nenhuma solicitação em cotação"
+            : "Nenhuma cotação pendente"
         }
         description={
           filtered
             ? "Tente outra solicitação, categoria, prioridade ou situação, ou limpe os filtros."
-            : "As solicitações aguardando cotação aparecem aqui."
+            : "As solicitações aguardando cotação aparecem aqui. As aprovadas e reprovadas ficam no filtro “Situação”."
         }
       />
     );
@@ -95,6 +101,13 @@ export function QuoteBoardTable({
           {requestCode(row.request.number)} · {row.request.title}
         </span>
       ),
+    },
+    // Phones cut the title in the card header: the whole name opens here.
+    {
+      key: "title",
+      label: "Solicitação",
+      desktop: "hidden",
+      render: (row) => row.request.title,
     },
     {
       key: "quotes",
@@ -185,6 +198,13 @@ export function QuoteBoardTable({
               icon={<Calculator />}
             />
           )}
+          {hasApproval(row) && (
+            <IconLink
+              href={`/compras/aprovacoes/${row.request.id}`}
+              label="Ver aprovação"
+              icon={<BadgeCheck />}
+            />
+          )}
           <IconLink
             href={requestHref(row)}
             label="Abrir cotação"
@@ -203,6 +223,15 @@ export function QuoteBoardTable({
             >
               <Calculator aria-hidden className="mr-1.5 size-4" />
               Adicionar cotação
+            </Link>
+          )}
+          {hasApproval(row) && (
+            <Link
+              href={`/compras/aprovacoes/${row.request.id}`}
+              className={buttonClasses("secondary", "sm")}
+            >
+              <BadgeCheck aria-hidden className="mr-1.5 size-4" />
+              Aprovação
             </Link>
           )}
           <Link

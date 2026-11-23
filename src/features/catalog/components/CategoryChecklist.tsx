@@ -88,7 +88,7 @@ export function CategoryChecklist({
         hideLabel
         icon={<Search className="size-4" />}
         autoComplete="off"
-        placeholder="Buscar categoria (ex.: elétrica, alimentação)"
+        placeholder="Buscar categoria"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
       />

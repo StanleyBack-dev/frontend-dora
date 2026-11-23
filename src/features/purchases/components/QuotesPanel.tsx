@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Calculator, RotateCcw, Scale } from "lucide-react";
+import { BadgeCheck, Calculator, RotateCcw, Scale } from "lucide-react";
 import {
   Alert,
   Button,
@@ -33,9 +33,12 @@ import { useToast } from "@/shared/toast/useToast";
 export function QuotesPanel({
   request,
   quotes,
+  canManage,
 }: {
   request: PurchaseRequest;
   quotes: PurchaseQuote[];
+  /** Works the quotes (add, edit, choose, reopen); otherwise read only. */
+  canManage: boolean;
 }) {
   const router = useRouter();
   const { showError, showSuccess } = useToast();
@@ -44,9 +47,15 @@ export function QuotesPanel({
   const [reopening, setReopening] = useState(false);
   const [pending, setPending] = useState(false);
 
-  const canAdd = request.status === "OPEN" || request.status === "QUOTING";
-  const editable = request.status === "QUOTING";
-  const reopenable = request.status === "AWAITING_APPROVAL";
+  const canAdd =
+    canManage && (request.status === "OPEN" || request.status === "QUOTING");
+  const editable = canManage && request.status === "QUOTING";
+  const reopenable = canManage && request.status === "AWAITING_APPROVAL";
+  // A quote was chosen: its approval has a page of its own.
+  const hasApproval =
+    request.status === "AWAITING_APPROVAL" ||
+    request.status === "APPROVED" ||
+    request.status === "REJECTED";
   const done = () => {
     setChoosing(null);
     setRemoving(null);
@@ -101,7 +110,7 @@ export function QuotesPanel({
           mais barata pede justificativa.
         </p>
       </div>
-      {(quotes.length > 0 || reopenable || canAdd) && (
+      {(quotes.length > 0 || reopenable || canAdd || hasApproval) && (
         // As the desks: the document actions on the left (PDF, share), the
         // page's main action on the right; on phones the main one on top.
         <div className="flex flex-col-reverse gap-2 border-b border-border bg-surface-muted/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -124,6 +133,15 @@ export function QuotesPanel({
             <span className="hidden sm:block" />
           )}
           <div className="grid gap-2 sm:flex">
+            {hasApproval && (
+              <Link
+                href={`/compras/aprovacoes/${request.id}`}
+                className={buttonClasses("secondary")}
+              >
+                <BadgeCheck aria-hidden className="size-4" />
+                Ver aprovação
+              </Link>
+            )}
             {reopenable && (
               <Button
                 variant="secondary"
@@ -148,6 +166,34 @@ export function QuotesPanel({
       )}
 
       <div className="space-y-4 p-4 sm:p-6">
+        {hasApproval && (
+          <Alert
+            tone={
+              request.status === "APPROVED"
+                ? "success"
+                : request.status === "REJECTED"
+                  ? "danger"
+                  : "warning"
+            }
+          >
+            <strong>
+              {request.status === "APPROVED"
+                ? "Compra aprovada."
+                : request.status === "REJECTED"
+                  ? "Compra reprovada."
+                  : "Aguardando aprovação."}
+            </strong>{" "}
+            {request.status === "AWAITING_APPROVAL"
+              ? "A cotação escolhida espera a decisão de quem aprova as compras."
+              : "As cotações ficam aqui para consulta."}{" "}
+            <Link
+              href={`/compras/aprovacoes/${request.id}`}
+              className="font-semibold underline"
+            >
+              Ver aprovação
+            </Link>
+          </Alert>
+        )}
         {request.chosenQuoteId && request.choiceJustification && (
           <Alert tone="info">
             <strong>Justificativa da escolha:</strong>{" "}
@@ -187,7 +233,11 @@ export function QuotesPanel({
           quote={choosing}
           total={quotes.length}
           onClose={() => setChoosing(null)}
-          onDone={done}
+          onDone={() => {
+            // The choice goes on to its approval (its own page).
+            setChoosing(null);
+            router.push(`/compras/aprovacoes/${request.id}`);
+          }}
         />
       )}
       <Modal

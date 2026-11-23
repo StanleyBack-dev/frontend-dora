@@ -119,6 +119,7 @@ export function QuoteComparison({
               itemCount={request.items.length}
               cheapestCents={insights.cheapest?.totalCents ?? null}
               actions={actions}
+              requestStatus={request.status}
             />
           ))}
         </div>

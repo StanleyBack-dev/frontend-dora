@@ -21,7 +21,7 @@ import {
   CATEGORY_LABELS,
 } from "@/features/catalog/model/categories";
 import {
-  ACTIVE_REQUEST_STATUSES,
+  PENDING_REQUEST_STATUSES,
   PRIORITY_LABELS,
   PURCHASE_PRIORITIES,
   requestCode,
@@ -49,16 +49,19 @@ export const metadata: Metadata = { title: "Solicitações de compra" };
 
 const BASE = "/compras/solicitacoes";
 /** The status filter in the address (Portuguese words → API statuses). */
+// By default only the pending ones (in quotes or waiting for the
+// approval); the approved and the others through the filter.
 const STATUSES = {
-  "em-andamento": ACTIVE_REQUEST_STATUSES,
+  pendentes: PENDING_REQUEST_STATUSES,
   "aguardando-cotacao": ["OPEN"],
+  aprovadas: ["APPROVED"],
   concluidas: ["COMPLETED"],
   reprovadas: ["REJECTED"],
   canceladas: ["CANCELLED"],
   todas: null,
 } as const satisfies Record<string, readonly PurchaseRequestStatus[] | null>;
 type StatusKey = keyof typeof STATUSES;
-const DEFAULT_STATUS: StatusKey = "em-andamento";
+const DEFAULT_STATUS: StatusKey = "pendentes";
 
 // Compras > Solicitações: the management sees every purchase request; who
 // only asks for purchases (the gate, the caretaker) sees their own (the API
@@ -196,9 +199,10 @@ export default async function PurchaseRequestsPage({
               label="Situação"
               name="situacao"
               defaultValue={status === DEFAULT_STATUS ? "" : status}
-              placeholder="Em andamento"
+              placeholder="Pendentes"
               options={[
                 { value: "aguardando-cotacao", label: "Aguardando cotação" },
+                { value: "aprovadas", label: "Aprovadas" },
                 { value: "concluidas", label: "Concluídas" },
                 { value: "reprovadas", label: "Reprovadas" },
                 { value: "canceladas", label: "Canceladas" },
@@ -219,7 +223,7 @@ export default async function PurchaseRequestsPage({
               requests={requests.items}
               filtered={filtered}
               viewerId={user.id}
-              canManage={desk}
+              canManage={desk || can(user, "PURCHASES_APPROVE")}
               openId={requestId}
             />
             <Pagination

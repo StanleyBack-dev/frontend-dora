@@ -3,6 +3,7 @@ import type {
   PurchaseQuote,
   PurchaseQuoteInput,
 } from "@/shared/contracts/purchase-quotes";
+import type { PurchaseRequestStatus } from "@/shared/contracts/purchase-requests";
 
 export const purchaseQuotesClient = {
   add: (
@@ -31,10 +32,13 @@ export const purchaseQuotesClient = {
     apiRequest<{ ok: true }>(`/purchases/quotes/${id}`, { method: "DELETE" }),
 
   choose: (id: string, justification: string | null) =>
-    apiRequest<{ ok: true }>(`/purchases/quotes/${id}/choose`, {
-      method: "POST",
-      body: JSON.stringify({ justification }),
-    }),
+    apiRequest<{ status: PurchaseRequestStatus }>(
+      `/purchases/quotes/${id}/choose`,
+      {
+        method: "POST",
+        body: JSON.stringify({ justification }),
+      },
+    ),
 
   shareMapByEmail: (
     requestId: string,

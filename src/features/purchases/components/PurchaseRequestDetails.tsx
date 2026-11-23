@@ -16,11 +16,14 @@ import { formatDateTime } from "@/shared/lib/datetime";
 
 // A purchase request at a glance: code, status and priority, the facts
 // (category, where, by when, who asked) and its items, so whoever quotes
-// knows exactly what to ask the suppliers.
+// knows exactly what to ask the suppliers. Inside a list row, which already
+// shows the code, status and priority, the header is left out.
 export function PurchaseRequestDetails({
   request,
+  withHeader = true,
 }: {
   request: PurchaseRequest;
+  withHeader?: boolean;
 }) {
   const facts = [
     { label: "Onde vai ser usado", value: request.location },
@@ -36,17 +39,19 @@ export function PurchaseRequestDetails({
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-lg font-semibold tracking-wider text-fg">
-          {requestCode(request.number)}
-        </span>
-        <Badge tone={REQUEST_STATUS_TONES[request.status]}>
-          {REQUEST_STATUS_LABELS[request.status]}
-        </Badge>
-        <Badge tone={PRIORITY_TONES[request.priority]}>
-          Prioridade {PRIORITY_LABELS[request.priority].toLowerCase()}
-        </Badge>
-      </div>
+      {withHeader && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-mono text-lg font-semibold tracking-wider text-fg">
+            {requestCode(request.number)}
+          </span>
+          <Badge tone={REQUEST_STATUS_TONES[request.status]}>
+            {REQUEST_STATUS_LABELS[request.status]}
+          </Badge>
+          <Badge tone={PRIORITY_TONES[request.priority]}>
+            Prioridade {PRIORITY_LABELS[request.priority].toLowerCase()}
+          </Badge>
+        </div>
+      )}
 
       {request.status === "CANCELLED" && request.cancelReason && (
         <Alert tone="warning">

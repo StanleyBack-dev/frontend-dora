@@ -29,6 +29,7 @@ export const purchaseRequestFieldsFragment = graphql(`
     chosenQuoteId
     choiceJustification
     chosenAt
+    chosenByName
     cancelReason
     cancelledAt
     createdAt

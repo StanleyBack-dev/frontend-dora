@@ -674,7 +674,7 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Enquanto aguarda cotação, use “Editar” na linha da solicitação para mudar tudo, ou abra a linha para “Cancelar solicitação” com o motivo. Em cotação, “Editar” ainda muda a prioridade, o local e a data; o título, os detalhes, os itens e as categorias ficam como estão.",
         },
         {
-          text: "Na lista, filtre pela solicitação, categoria, prioridade e situação. Os cards mostram o que aguarda cotação, as urgentes, as com prazo em até 7 dias e as atrasadas.",
+          text: "A lista mostra as pendentes (aguardando cotação, em cotação ou aprovação); as aprovadas, reprovadas e canceladas aparecem pelo filtro “Situação”. Filtre também pela solicitação, categoria e prioridade. Os cards mostram o que aguarda cotação, as urgentes, as com prazo em até 7 dias e as atrasadas.",
         },
         {
           text: "Gestão: em Compras > Cotações, use “Abrir cotação” na solicitação e “Adicionar cotação” para cada fornecedor (os que atendem as categorias da solicitação aparecem primeiro), com o preço de cada item (vazio quando o fornecedor não tem), frete, um ou mais encargos (escolha o tipo e informe o valor), desconto em valor ou porcentagem, pagamento (parcelas e juros ao mês, com a simulação), prazo, validade e o orçamento em PDF ou foto; o extrato mostra a nota da cotação. A lista de Cotações mostra quantas cotações cada solicitação tem, a mais barata e a escolhida; o mapa de cotação (tela e PDF) fica na página de cotação de cada uma, e dá para baixá-lo ou usar “Compartilhar” para mandar por WhatsApp ou e-mail com o PDF em anexo. Em Solicitações, cada linha abre os dados da solicitação, com “Editar” e “Abrir cotação”.",
@@ -683,7 +683,16 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "O mapa compara os fornecedores item a item: o menor preço de cada item fica em verde e a cotação completa mais barata é marcada. Baixe o “Mapa de cotação (PDF)” para arquivar ou apresentar.",
         },
         {
-          text: "Use “Escolher” na vencedora: a solicitação passa a aguardar aprovação. Enquanto não for aprovada, “Reabrir cotações” (em “Mais ações”) desfaz a escolha.",
+          text: "Use “Escolher” na vencedora. Pela regra do condomínio, a compra segue aprovada na hora (total dentro da alçada) ou passa a aguardar aprovação. Depois de escolher, abre a página de aprovação da compra (também em “Ver aprovação” na cotação). Enquanto aguarda, “Reabrir cotações” desfaz a escolha.",
+        },
+        {
+          text: "Quem aprova as compras: em Compras > Aprovações, veja o que aguarda a sua decisão e abra cada compra para “Aprovar” (com observação opcional), “Devolver para cotação” ou “Reprovar” (os dois com o motivo). Quem pediu e a gestão são avisados.",
+        },
+        {
+          text: "Na página de aprovação, “Resumo da compra (PDF)” gera um documento para arquivar ou prestar contas: a solicitação, as cotações, a escolhida e a justificativa, a decisão, a linha do tempo e as assinaturas.",
+        },
+        {
+          text: "Em Compras > Aprovações, “Alterar” na regra de aprovação define se toda compra passa pelo aprovador ou se, até um valor (a alçada), ela segue aprovada ao escolher a cotação. Vale para as próximas escolhas.",
         },
       ],
       rules: [
@@ -695,6 +704,15 @@ export const HELP_TOPICS: HelpTopic[] = [
         },
         {
           text: "Escolher uma cotação que não é a completa mais barata, ou com menos de 3 cotações, exige justificativa: ela fica registrada e aparece no mapa.",
+        },
+        {
+          text: "Só quem tem a permissão de aprovar compras decide e muda a alçada; por padrão, a gestão. O condomínio pode deixar só o síndico com ela (Gestão > Equipe > permissões).",
+        },
+        {
+          text: "Quem escolheu a cotação pode também aprová-la, se tiver a permissão: o histórico e o mapa em PDF mostram quem escolheu e quem aprovou.",
+        },
+        {
+          text: "Devolvida para cotação, a escolha é desfeita e a gestão pode ajustar e escolher de novo; reprovada, a solicitação é encerrada.",
         },
         {
           text: "Se a gestão cancelar uma solicitação sua, você é avisado com o motivo.",

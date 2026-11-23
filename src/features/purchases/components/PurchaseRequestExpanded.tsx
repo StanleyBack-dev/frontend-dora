@@ -25,7 +25,7 @@ export function PurchaseRequestExpanded({
 
   return (
     <div className="space-y-4 border-t border-border bg-surface p-3 sm:mt-2 sm:rounded-xl sm:border sm:p-5">
-      <PurchaseRequestDetails request={request} />
+      <PurchaseRequestDetails request={request} withHeader={false} />
       {editable && (
         <>
           <div className="flex justify-end border-t border-border pt-3">

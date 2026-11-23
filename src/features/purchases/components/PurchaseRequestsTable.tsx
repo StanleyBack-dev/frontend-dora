@@ -98,7 +98,7 @@ export function PurchaseRequestsTable({
   requests: PurchaseRequest[];
   filtered: boolean;
   viewerId: string;
-  /** Manages the purchases (has the quote pages). */
+  /** Opens the quote pages (the management and the approvers). */
   canManage: boolean;
   /** A request to show open (the list filtered to it). */
   openId?: string;
@@ -110,12 +110,12 @@ export function PurchaseRequestsTable({
         title={
           filtered
             ? "Nenhuma solicitação encontrada"
-            : "Nenhuma solicitação ainda"
+            : "Nenhuma solicitação pendente"
         }
         description={
           filtered
             ? "Tente outra solicitação, solicitante, categoria, prioridade ou situação, ou limpe os filtros."
-            : "Use “Nova solicitação” para pedir o que precisa ser comprado ou contratado."
+            : "Use “Nova solicitação” para pedir o que precisa ser comprado ou contratado. As aprovadas, reprovadas e canceladas ficam no filtro “Situação”."
         }
       />
     );
@@ -139,6 +139,13 @@ export function PurchaseRequestsTable({
           {requestCode(request.number)} · {request.title}
         </span>
       ),
+    },
+    // Phones cut the title in the card header: the whole name opens here.
+    {
+      key: "title",
+      label: "Solicitação",
+      desktop: "hidden",
+      render: (request) => request.title,
     },
     {
       key: "priority",

@@ -1,4 +1,5 @@
 import {
+  BadgeCheck,
   Bell,
   Blocks,
   Building,
@@ -270,6 +271,13 @@ export const SIDEBAR: SidebarEntry[] = [
         label: "Cotações",
         icon: Scale,
         permission: "PURCHASES_MANAGE",
+      },
+      // The purchases waiting for a decision (and the alçada).
+      {
+        href: "/compras/aprovacoes",
+        label: "Aprovações",
+        icon: BadgeCheck,
+        permission: "PURCHASES_APPROVE",
       },
       {
         href: "/compras/fornecedores",

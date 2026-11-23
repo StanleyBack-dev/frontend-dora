@@ -39,10 +39,17 @@ export function ChooseQuoteModal({
     if (!ready) return;
     setPending(true);
     try {
-      await purchaseQuotesClient.choose(quote.id, justification.trim() || null);
+      const { status } = await purchaseQuotesClient.choose(
+        quote.id,
+        justification.trim() || null,
+      );
       showSuccess(
-        "Cotação escolhida.",
-        "A solicitação agora aguarda aprovação.",
+        status === "APPROVED"
+          ? "Compra aprovada na alçada."
+          : "Cotação escolhida.",
+        status === "APPROVED"
+          ? "O total ficou dentro do limite do condomínio: a compra já está aprovada."
+          : "A compra agora aguarda a decisão de quem aprova as compras.",
       );
       onDone();
     } catch (cause) {
@@ -78,9 +85,10 @@ export function ChooseQuoteModal({
         <p>
           <strong className="text-fg">{quote.supplierName}</strong> ·{" "}
           {formatCents(quote.totalCents)}
-          {quote.complete ? "" : " (parcial)"}. A solicitação segue para a
-          aprovação e as cotações não podem mais ser alteradas (dá para reabrir
-          enquanto não for aprovada).
+          {quote.complete ? "" : " (parcial)"}. Pela regra de aprovação do
+          condomínio, a compra segue aprovada na hora (dentro da alçada) ou
+          passa a aguardar aprovação. Depois de escolher, as cotações não mudam
+          mais (dá para reabrir enquanto a compra aguarda aprovação).
         </p>
         {reason && <Alert tone="warning">{reason}</Alert>}
         <TextArea
