@@ -133,3 +133,9 @@ export function dateParts(iso: string) {
 /** "2026-11" → "novembro de 2026". */
 export const formatMonth = (month: string) =>
   monthFormat.format(new Date(`${month}-01T12:00:00Z`));
+
+/** The calendar day `count` days after (or before) `day` (YYYY-MM-DD). */
+export const addDays = (day: string, count: number) =>
+  new Date(new Date(`${day}T12:00:00Z`).getTime() + count * 86_400_000)
+    .toISOString()
+    .slice(0, 10);

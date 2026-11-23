@@ -47,11 +47,13 @@ function Option({
   );
 }
 
-// The categories of a supplier or a purchase request, as a checklist: a
-// search on top filters the
-// options as it is typed (accents ignored), the chosen ones show as chips
-// (removable, even when hidden by the search) and "Outros (digitar)"
-// always stays at the end, for what is not on the list.
+/**
+ * The categories of a supplier or a purchase request, as a checklist: a
+ * search on top filters the
+ * options as it is typed (accents ignored), the chosen ones show as chips
+ * (removable, even when hidden by the search) and "Outros (digitar)"
+ * always stays at the end, for what is not on the list.
+ */
 export function CategoryChecklist({
   value,
   label = "Categorias que o fornecedor atende",

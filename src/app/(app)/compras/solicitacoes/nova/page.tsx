@@ -11,7 +11,7 @@ import { canAny } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Nova solicitação de compra" };
 
-// Asks for a purchase: what is needed, categories, where and when, items.
+/** Asks for a purchase: what is needed, categories, where and when, items. */
 export default async function NewPurchaseRequestPage() {
   const user = await getSessionUser();
   if (!user.condominium) return <NoCondominium user={user} />;

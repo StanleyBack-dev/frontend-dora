@@ -8,8 +8,10 @@ import type { PurchaseApproval } from "@/shared/contracts/purchase-approvals";
 import { formatDateTime } from "@/shared/lib/datetime";
 import { formatCents } from "@/shared/lib/format";
 
-// Every decision on a purchase, the latest first: what it was, the quote
-// as it was then, who chose and who decided, when, and the note or reason.
+/**
+ * Every decision on a purchase, the latest first: what it was, the quote
+ * as it was then, who chose and who decided, when, and the note or reason.
+ */
 export function ApprovalHistory({
   approvals,
 }: {

@@ -1,3 +1,4 @@
+import { unitFor } from "@/features/catalog/model/units";
 import type { Tone } from "@/design-system";
 import type {
   PurchasePriority,
@@ -53,6 +54,17 @@ export const PENDING_REQUEST_STATUSES: PurchaseRequestStatus[] = [
   "AWAITING_APPROVAL",
 ];
 
+/** Approved, and the order, the deliveries and the payment after it. */
+export const APPROVED_STATUSES: PurchaseRequestStatus[] = [
+  "APPROVED",
+  "ORDERED",
+  "RECEIVED",
+  "COMPLETED",
+];
+
+export const isApprovedOrLater = (status: PurchaseRequestStatus) =>
+  APPROVED_STATUSES.includes(status);
+
 /** Edited and cancelled only before the quotes start. */
 export const isEditableRequest = (request: Pick<PurchaseRequest, "status">) =>
   request.status === "OPEN";
@@ -91,9 +103,16 @@ export const PRIORITY_TONES: Record<PurchasePriority, Tone> = {
 export const formatRequestDay = (day: string) =>
   day.split("-").reverse().join("/");
 
-/** "12 un", "2,5 kg". */
+/** "12 un", "2,5 kg", "4 rolos". */
 export const formatQuantity = (quantity: number, unit: string) =>
-  `${quantity.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} ${unit}`;
+  `${quantity.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} ${unitFor(quantity, unit)}`;
+
+/** "Philips · bivolt": the brand asked for (or any) and the note. */
+export const itemSpec = (item: {
+  brandName: string | null;
+  note: string | null;
+}) =>
+  [item.brandName ?? "Qualquer marca", item.note].filter(Boolean).join(" · ");
 
 /** "1 item", "3 itens". */
 export const itemsCount = (count: number) =>

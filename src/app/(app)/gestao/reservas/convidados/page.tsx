@@ -14,7 +14,7 @@ import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { BookingGuestsSummary } from "@/features/bookings/components/BookingGuestsSummary";
 import { BookingGuestsTable } from "@/features/bookings/components/BookingGuestsTable";
 import { BookingsCalendarNav } from "@/features/bookings/components/BookingsCalendarNav";
-import { addDays } from "@/features/bookings/model/booking-calendar";
+import { addDays } from "@/shared/lib/datetime";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { requestTime } from "@/server/request-time";
 import { bookingsService } from "@/server/services/bookings.service";

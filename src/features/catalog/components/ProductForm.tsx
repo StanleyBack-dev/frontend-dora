@@ -10,13 +10,15 @@ import {
 } from "@/features/catalog/components/CatalogFormShell";
 import { UNIT_OPTIONS } from "@/features/catalog/model/units";
 import type { Product } from "@/shared/contracts/catalog";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
-// Registers a product of the catalog or edits one: in a drawer on the
-// Produtos page, in a modal with the "+" next to an item's product (it
-// comes back to be chosen right away). The parent mounts it when opening,
-// so each opening starts from `product`.
+/**
+ * Registers a product of the catalog or edits one: in a drawer on the
+ * Produtos page, in a modal with the "+" next to an item's product (it
+ * comes back to be chosen right away). The parent mounts it when opening,
+ * so each opening starts from `product`.
+ */
 export function ProductForm({
   product = null,
   variant = "drawer",
@@ -40,8 +42,10 @@ export function ProductForm({
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    // React events bubble through portals: never reach the form this one
-    // opened from (the request's drawer).
+    /**
+     * React events bubble through portals: never reach the form this one
+     * opened from (the request's drawer).
+     */
     event.stopPropagation();
     if (!complete) return;
     const input = {
@@ -57,11 +61,7 @@ export function ProductForm({
       showSuccess(product ? "Produto atualizado." : "Produto cadastrado.");
       onDone(saved);
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível salvar o produto.",
-      );
+      showError(errorMessage(cause, "Não foi possível salvar o produto."));
     } finally {
       setSending(false);
     }

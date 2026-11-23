@@ -23,10 +23,12 @@ import { can, canAny } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Cotação" };
 
-// A request's quote page: what was asked (folded, to check the items while
-// quoting) and the quotes with the comparison map (screen, PDF, sharing).
-// Adding, editing, choosing and reopening are the management's; the
-// approvers read. The approval has a page of its own (/compras/aprovacoes).
+/**
+ * A request's quote page: what was asked (folded, to check the items while
+ * quoting) and the quotes with the comparison map (screen, PDF, sharing).
+ * Adding, editing, choosing and reopening are the management's; the
+ * approvers read. The approval has a page of its own (/compras/aprovacoes).
+ */
 export default async function RequestQuotesPage({
   params,
 }: {
@@ -37,7 +39,6 @@ export default async function RequestQuotesPage({
   if (!user.condominium.modules.includes("PURCHASES")) {
     return <ModuleUnavailable name="Compras" />;
   }
-  // The management works the quotes; the approvers read them and decide.
   if (!canAny(user, "PURCHASES_MANAGE", "PURCHASES_APPROVE")) {
     return <AccessDenied />;
   }

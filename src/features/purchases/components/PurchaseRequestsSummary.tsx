@@ -2,8 +2,10 @@ import { CalendarClock, CalendarX, ClipboardList, Siren } from "lucide-react";
 import { StatCard, StatGrid } from "@/design-system";
 import type { PurchaseRequestOverview } from "@/shared/contracts/purchase-requests";
 
-// The purchase requests in numbers, whatever the filters (four cards, one
-// row on desktop): what waits for quotes and what is pressing.
+/**
+ * The purchase requests in numbers, whatever the filters (four cards, one
+ * row on desktop): what waits for quotes and what is pressing.
+ */
 export function PurchaseRequestsSummary({
   overview,
 }: {

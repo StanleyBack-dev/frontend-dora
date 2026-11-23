@@ -20,6 +20,7 @@ import {
   type LucideIcon,
   MapPin,
   Package,
+  PackageCheck,
   PackageOpen,
   Megaphone,
   PartyPopper,
@@ -278,6 +279,28 @@ export const SIDEBAR: SidebarEntry[] = [
         label: "Aprovações",
         icon: BadgeCheck,
         permission: "PURCHASES_APPROVE",
+      },
+      {
+        href: "/compras/pedidos",
+        label: "Pedidos",
+        icon: PackageCheck,
+        anyPermission: ["PURCHASES_MANAGE", "PURCHASES_APPROVE"],
+      },
+      {
+        href: "/compras/recebimentos",
+        label: "Recebimentos",
+        icon: PackageOpen,
+        anyPermission: [
+          "PURCHASES_MANAGE",
+          "PURCHASES_APPROVE",
+          "PURCHASES_REQUEST",
+        ],
+      },
+      {
+        href: "/compras/pagamentos",
+        label: "Pagamentos",
+        icon: Wallet,
+        anyPermission: ["PURCHASES_MANAGE", "PURCHASES_APPROVE"],
       },
       {
         href: "/compras/fornecedores",

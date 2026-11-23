@@ -6,10 +6,12 @@ import { formatQuantity } from "@/features/purchases/model/request-labels";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
 import { formatCents } from "@/shared/lib/format";
 
-// From sm up: the items in rows and the suppliers in columns (in the map's
-// order), the lowest price of each item in a green chip; then how each
-// total is made up and the total itself. The item column stays put while
-// the suppliers scroll sideways.
+/**
+ * From sm up: the items in rows and the suppliers in columns (in the map's
+ * order), the lowest price of each item in a green chip; then how each
+ * total is made up and the total itself. The item column stays put while
+ * the suppliers scroll sideways.
+ */
 export function QuoteItemsTable({
   request,
   ranked,

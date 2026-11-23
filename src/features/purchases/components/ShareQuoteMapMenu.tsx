@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { Mail, MessageCircle, Share2 } from "lucide-react";
 import { MoreActions } from "@/design-system";
-import { ShareQuoteMapEmailModal } from "@/features/purchases/components/ShareQuoteMapEmailModal";
-import { ShareQuoteMapWhatsAppModal } from "@/features/purchases/components/ShareQuoteMapWhatsAppModal";
+import { purchaseQuotesClient } from "@/features/purchases/api/purchase-quotes.client";
+import { DocumentEmailModal } from "@/features/purchases/components/DocumentEmailModal";
+import { DocumentWhatsAppModal } from "@/features/purchases/components/DocumentWhatsAppModal";
 import {
   quoteMapFileName,
   quoteShareMessage,
@@ -12,9 +13,11 @@ import {
 import type { PurchaseQuote } from "@/shared/contracts/purchase-quotes";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
 
-// "Compartilhar" beside the map's PDF: WhatsApp or e-mail, each with the
-// PDF attached and a message already written. Each dialog mounts when
-// chosen, so it starts from the current quotes.
+/**
+ * "Compartilhar" beside the map's PDF: WhatsApp or e-mail, each with the
+ * PDF attached and a message already written. Each dialog mounts when
+ * chosen, so it starts from the current quotes.
+ */
 export function ShareQuoteMapMenu({
   request,
   quotes,
@@ -49,7 +52,7 @@ export function ShareQuoteMapMenu({
         ]}
       />
       {channel === "whatsapp" && (
-        <ShareQuoteMapWhatsAppModal
+        <DocumentWhatsAppModal
           open
           path={`/purchases/requests/${request.id}/quote-map`}
           fileName={fileName}
@@ -58,12 +61,16 @@ export function ShareQuoteMapMenu({
         />
       )}
       {channel === "email" && (
-        <ShareQuoteMapEmailModal
+        <DocumentEmailModal
           open
-          requestId={request.id}
+          title="Enviar mapa por e-mail"
+          sentTitle="Mapa de cotação enviado."
           fileName={fileName}
           defaultMessage={message}
           onClose={() => setChannel(null)}
+          onSend={(input) =>
+            purchaseQuotesClient.shareMapByEmail(request.id, input)
+          }
         />
       )}
     </>

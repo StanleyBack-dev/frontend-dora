@@ -14,8 +14,10 @@ export type QuoteMapActions = {
   onChoose: (quote: PurchaseQuote) => void;
 };
 
-// A quote's buttons in the map: choose it (the main one, full width),
-// then edit and remove side by side.
+/**
+ * A quote's buttons in the map: choose it (the main one, full width),
+ * then edit and remove side by side.
+ */
 export function QuoteActions({
   quote,
   actions,

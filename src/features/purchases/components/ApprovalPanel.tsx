@@ -31,6 +31,7 @@ import type { PurchaseQuote } from "@/shared/contracts/purchase-quotes";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
 import { formatDateTime } from "@/shared/lib/datetime";
 import { formatCents } from "@/shared/lib/format";
+import { isApprovedOrLater } from "@/features/purchases/model/request-labels";
 
 const LOOKS = {
   waiting: {
@@ -50,9 +51,11 @@ const LOOKS = {
   },
 } as const;
 
-// The approval on the quote page: while it waits, who chose what and why
-// it waits (the rule), with "Aprovar", "Devolver" and "Reprovar" for whoever
-// approves; once decided, the decision; and every decision so far.
+/**
+ * The approval on the quote page: while it waits, who chose what and why
+ * it waits (the rule), with "Aprovar", "Devolver" and "Reprovar" for whoever
+ * approves; once decided, the decision; and every decision so far.
+ */
 export function ApprovalPanel({
   request,
   quotes,
@@ -68,14 +71,16 @@ export function ApprovalPanel({
 }) {
   const router = useRouter();
   const [action, setAction] = useState<ApprovalAction | null>(null);
-  // After a decision the page reloads its data: the buttons wait for it,
-  // so a second click can't hit a purchase that no longer waits.
+  /**
+   * After a decision the page reloads its data: the buttons wait for it,
+   * so a second click can't hit a purchase that no longer waits.
+   */
   const [refreshing, startRefresh] = useTransition();
   const chosen = quotes.find((quote) => quote.chosen) ?? null;
   const latest = approvals[0] ?? null;
   const waiting = request.status === "AWAITING_APPROVAL";
   const decided =
-    request.status === "APPROVED" || request.status === "REJECTED";
+    isApprovedOrLater(request.status) || request.status === "REJECTED";
   if (!waiting && !decided && approvals.length === 0) return null;
   // Sent back to quotes (the last decision) and not chosen again yet.
   const returned =

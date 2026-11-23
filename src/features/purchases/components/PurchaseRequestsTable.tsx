@@ -10,6 +10,7 @@ import {
   IconLink,
   type DataTableColumn,
 } from "@/design-system";
+import { RowTitle } from "@/features/purchases/components/RowTitle";
 import { PurchaseRequestExpanded } from "@/features/purchases/components/PurchaseRequestExpanded";
 import {
   formatRequestDay,
@@ -21,6 +22,7 @@ import {
   requestCode,
 } from "@/features/purchases/model/request-labels";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
+import { fullTitleColumn } from "@/features/purchases/model/request-columns";
 
 /** The request has a quote page (the management, once it isn't cancelled). */
 const quotable = (request: PurchaseRequest) => request.status !== "CANCELLED";
@@ -83,11 +85,13 @@ function RowActions({
   );
 }
 
-// The purchase requests (Compras > Solicitações): code and title, priority,
-// the day it is needed by and the status, with "Editar" (while it waits for
-// quotes) and, for the management, "Abrir cotação" (the request's quote
-// page, where the comparison map lives). The row opens to the whole
-// request: facts, categories, details and items.
+/**
+ * The purchase requests (Compras > Solicitações): code and title, priority,
+ * the day it is needed by and the status, with "Editar" (while it waits for
+ * quotes) and, for the management, "Abrir cotação" (the request's quote
+ * page, where the comparison map lives). The row opens to the whole
+ * request: facts, categories, details and items.
+ */
 export function PurchaseRequestsTable({
   requests,
   filtered,
@@ -127,12 +131,7 @@ export function PurchaseRequestsTable({
       label: "Solicitação",
       mobile: "title",
       render: (request) => (
-        <span className="flex min-w-0 flex-col">
-          <span className="truncate font-medium text-fg">{request.title}</span>
-          <span className="font-mono text-xs text-soft">
-            {requestCode(request.number)}
-          </span>
-        </span>
+        <RowTitle title={request.title} meta={requestCode(request.number)} />
       ),
       renderMobile: (request) => (
         <span className="font-medium text-fg">
@@ -140,13 +139,7 @@ export function PurchaseRequestsTable({
         </span>
       ),
     },
-    // Phones cut the title in the card header: the whole name opens here.
-    {
-      key: "title",
-      label: "Solicitação",
-      desktop: "hidden",
-      render: (request) => request.title,
-    },
+    fullTitleColumn((request) => request.title),
     {
       key: "priority",
       label: "Prioridade",

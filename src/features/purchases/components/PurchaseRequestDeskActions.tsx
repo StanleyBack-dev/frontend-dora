@@ -2,8 +2,10 @@ import Link from "next/link";
 import { ClipboardPlus } from "lucide-react";
 import { buttonClasses } from "@/design-system";
 
-// The page's main action: ask for a purchase (on its own row, to the
-// right, as on the parcels and lost-and-found desks).
+/**
+ * The page's main action: ask for a purchase (on its own row, to the
+ * right, as on the parcels and lost-and-found desks).
+ */
 export function PurchaseRequestDeskActions() {
   return (
     <div className="mb-5 flex justify-end">

@@ -17,7 +17,7 @@ import { canAny } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Editar solicitação de compra" };
 
-// Edits a request while it waits for quotes (the API checks who may).
+/** Edits a request while it waits for quotes (the API checks who may). */
 export default async function EditPurchaseRequestPage({
   params,
 }: {

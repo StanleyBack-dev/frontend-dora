@@ -5,11 +5,13 @@ import { Button, Modal, TextArea } from "@/design-system";
 import { purchaseRequestsClient } from "@/features/purchases/api/purchase-requests.client";
 import { requestCode } from "@/features/purchases/model/request-labels";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
-// Cancels a request waiting for quotes, with the reason (when it was
-// someone else's, they are told why).
+/**
+ * Cancels a request waiting for quotes, with the reason (when it was
+ * someone else's, they are told why).
+ */
 export function CancelPurchaseRequestModal({
   request,
   open,
@@ -42,9 +44,7 @@ export function CancelPurchaseRequestModal({
       onDone();
     } catch (cause) {
       showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível cancelar a solicitação.",
+        errorMessage(cause, "Não foi possível cancelar a solicitação."),
       );
     } finally {
       setPending(false);

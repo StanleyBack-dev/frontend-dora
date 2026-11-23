@@ -15,16 +15,18 @@ import { catalogClient } from "@/features/catalog/api/catalog.client";
 import { BrandForm } from "@/features/catalog/components/BrandForm";
 import { ProductForm } from "@/features/catalog/components/ProductForm";
 import type { Brand, Product } from "@/shared/contracts/catalog";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
 type Row = Product | Brand;
 const isProduct = (row: Row): row is Product => "unit" in row;
 
-// The catalog's products (or brands): name, unit (products) and status;
-// the description opens below the row. "Editar" (primary) opens the same
-// modal as registering; "Desativar" (danger, asked first) keeps the
-// history; "Reativar" is secondary, as on Fornecedores.
+/**
+ * The catalog's products (or brands): name, unit (products) and status;
+ * the description opens below the row. "Editar" (primary) opens the same
+ * modal as registering; "Desativar" (danger, asked first) keeps the
+ * history; "Reativar" is secondary, as on Fornecedores.
+ */
 export function CatalogTable({
   kind,
   rows,
@@ -65,9 +67,10 @@ export function CatalogTable({
       router.refresh();
     } catch (cause) {
       showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : `Não foi possível alterar ${products ? "o produto" : "a marca"}.`,
+        errorMessage(
+          cause,
+          `Não foi possível alterar ${products ? "o produto" : "a marca"}.`,
+        ),
       );
     } finally {
       setPending(false);

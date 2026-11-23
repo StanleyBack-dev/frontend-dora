@@ -39,11 +39,13 @@ function MapSection({
   );
 }
 
-// The comparison map, read top to bottom: the numbers that matter (the
-// cheapest, what it saves, the quickest delivery, how many are complete),
-// then one card per supplier from the cheapest complete one up, then the
-// price of each item side by side (a table from sm up; one list per item
-// on phones).
+/**
+ * The comparison map, read top to bottom: the numbers that matter (the
+ * cheapest, what it saves, the quickest delivery, how many are complete),
+ * then one card per supplier from the cheapest complete one up, then the
+ * price of each item side by side (a table from sm up; one list per item
+ * on phones).
+ */
 export function QuoteComparison({
   request,
   quotes,

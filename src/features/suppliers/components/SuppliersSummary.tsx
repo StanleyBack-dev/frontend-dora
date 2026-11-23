@@ -3,8 +3,10 @@ import { StatCard, StatGrid } from "@/design-system";
 import { CATEGORIES } from "@/features/catalog/model/categories";
 import type { SupplierOverview } from "@/shared/contracts/suppliers";
 
-// The condominium's suppliers in numbers, whatever the filters: who is
-// ready to quote and who still lacks the data to contact or pay them.
+/**
+ * The condominium's suppliers in numbers, whatever the filters: who is
+ * ready to quote and who still lacks the data to contact or pay them.
+ */
 export function SuppliersSummary({ overview }: { overview: SupplierOverview }) {
   return (
     <StatGrid>

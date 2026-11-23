@@ -9,12 +9,14 @@ import {
   type CatalogFormVariant,
 } from "@/features/catalog/components/CatalogFormShell";
 import type { Brand } from "@/shared/contracts/catalog";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
-// Registers a brand of the catalog or renames one: in a drawer on the
-// Marcas page, in a modal with the "+" next to an item's brand (it comes
-// back to be chosen right away). The parent mounts it when opening.
+/**
+ * Registers a brand of the catalog or renames one: in a drawer on the
+ * Marcas page, in a modal with the "+" next to an item's brand (it comes
+ * back to be chosen right away). The parent mounts it when opening.
+ */
 export function BrandForm({
   brand = null,
   variant = "drawer",
@@ -36,8 +38,10 @@ export function BrandForm({
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    // React events bubble through portals: never reach the form this one
-    // opened from (the request's drawer).
+    /**
+     * React events bubble through portals: never reach the form this one
+     * opened from (the request's drawer).
+     */
     event.stopPropagation();
     if (!complete) return;
     setSending(true);
@@ -48,11 +52,7 @@ export function BrandForm({
       showSuccess(brand ? "Marca atualizada." : "Marca cadastrada.");
       onDone(saved);
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível salvar a marca.",
-      );
+      showError(errorMessage(cause, "Não foi possível salvar a marca."));
     } finally {
       setSending(false);
     }

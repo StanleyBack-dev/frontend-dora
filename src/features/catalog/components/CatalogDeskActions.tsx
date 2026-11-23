@@ -7,8 +7,10 @@ import { Button } from "@/design-system";
 import { BrandForm } from "@/features/catalog/components/BrandForm";
 import { ProductForm } from "@/features/catalog/components/ProductForm";
 
-// The page's main action: register a product (or a brand), on its own row,
-// to the right, as on the other module pages.
+/**
+ * The page's main action: register a product (or a brand), on its own row,
+ * to the right, as on the other module pages.
+ */
 export function CatalogDeskActions({ kind }: { kind: "product" | "brand" }) {
   const router = useRouter();
   const [creating, setCreating] = useState(false);

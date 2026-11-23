@@ -35,6 +35,9 @@ export { FormTabs, type FormTab } from "./components/FormTabs";
 export { Hint } from "./components/Hint";
 export { LinkPending, LinkPendingSwap } from "./components/LinkPending";
 export { Modal } from "./components/Modal";
+export { ConfirmModal } from "./components/ConfirmModal";
+export { FactList, type Fact } from "./components/FactList";
+export { FileLink } from "./components/FileLink";
 export { PageHeader } from "./components/PageHeader";
 export {
   PageTitleAddon,

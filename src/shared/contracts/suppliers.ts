@@ -30,6 +30,9 @@ export type Supplier = {
   pixKey: string | null;
   notes: string | null;
   active: boolean;
+  /** The average of its ratings, 1 to 5 (null: never rated). */
+  ratingAverage: number | null;
+  ratingCount: number;
   createdAt: string;
   updatedAt: string;
 };

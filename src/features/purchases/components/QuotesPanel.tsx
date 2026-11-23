@@ -7,10 +7,10 @@ import { BadgeCheck, Calculator, RotateCcw, Scale } from "lucide-react";
 import {
   Alert,
   Button,
-  buttonClasses,
   Card,
+  ConfirmModal,
   EmptyState,
-  Modal,
+  buttonClasses,
 } from "@/design-system";
 import { purchaseQuotesClient } from "@/features/purchases/api/purchase-quotes.client";
 import { ChooseQuoteModal } from "@/features/purchases/components/ChooseQuoteModal";
@@ -23,13 +23,16 @@ import {
   type PurchaseQuote,
 } from "@/shared/contracts/purchase-quotes";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
+import { isApprovedOrLater } from "@/features/purchases/model/request-labels";
 
-// The quotes of a request, for the management: "Adicionar cotação" while
-// it waits for or is in quotes, the comparison map (screen and PDF), edit
-// and remove while in quotes, and "Escolher" to pick the winner (the
-// request then waits for the approval); then "Reabrir cotações" undoes it.
+/**
+ * The quotes of a request, for the management: "Adicionar cotação" while
+ * it waits for or is in quotes, the comparison map (screen and PDF), edit
+ * and remove while in quotes, and "Escolher" to pick the winner (the
+ * request then waits for the approval); then "Reabrir cotações" undoes it.
+ */
 export function QuotesPanel({
   request,
   quotes,
@@ -51,10 +54,9 @@ export function QuotesPanel({
     canManage && (request.status === "OPEN" || request.status === "QUOTING");
   const editable = canManage && request.status === "QUOTING";
   const reopenable = canManage && request.status === "AWAITING_APPROVAL";
-  // A quote was chosen: its approval has a page of its own.
   const hasApproval =
     request.status === "AWAITING_APPROVAL" ||
-    request.status === "APPROVED" ||
+    isApprovedOrLater(request.status) ||
     request.status === "REJECTED";
   const done = () => {
     setChoosing(null);
@@ -71,11 +73,7 @@ export function QuotesPanel({
       showSuccess("Cotação removida.");
       done();
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível remover a cotação.",
-      );
+      showError(errorMessage(cause, "Não foi possível remover a cotação."));
     } finally {
       setPending(false);
     }
@@ -88,11 +86,7 @@ export function QuotesPanel({
       showSuccess("Cotações reabertas.", "Escolha outra ou ajuste os preços.");
       done();
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível reabrir as cotações.",
-      );
+      showError(errorMessage(cause, "Não foi possível reabrir as cotações."));
     } finally {
       setPending(false);
     }
@@ -111,8 +105,10 @@ export function QuotesPanel({
         </p>
       </div>
       {(quotes.length > 0 || reopenable || canAdd || hasApproval) && (
-        // As the desks: the document actions on the left (PDF, share), the
-        // page's main action on the right; on phones the main one on top.
+        /**
+         * As the desks: the document actions on the left (PDF, share), the
+         * page's main action on the right; on phones the main one on top.
+         */
         <div className="flex flex-col-reverse gap-2 border-b border-border bg-surface-muted/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           {quotes.length > 0 ? (
             <div className="grid grid-cols-2 gap-2 sm:flex">
@@ -169,7 +165,7 @@ export function QuotesPanel({
         {hasApproval && (
           <Alert
             tone={
-              request.status === "APPROVED"
+              isApprovedOrLater(request.status)
                 ? "success"
                 : request.status === "REJECTED"
                   ? "danger"
@@ -177,7 +173,7 @@ export function QuotesPanel({
             }
           >
             <strong>
-              {request.status === "APPROVED"
+              {isApprovedOrLater(request.status)
                 ? "Compra aprovada."
                 : request.status === "REJECTED"
                   ? "Compra reprovada."
@@ -234,58 +230,33 @@ export function QuotesPanel({
           total={quotes.length}
           onClose={() => setChoosing(null)}
           onDone={() => {
-            // The choice goes on to its approval (its own page).
             setChoosing(null);
             router.push(`/compras/aprovacoes/${request.id}`);
           }}
         />
       )}
-      <Modal
+      <ConfirmModal
         open={removing !== null}
         onClose={() => setRemoving(null)}
         title="Remover cotação"
-        tone="danger"
-        busy={pending}
-        footer={
-          <>
-            <Button
-              variant="cancel"
-              onClick={() => setRemoving(null)}
-              disabled={pending}
-            >
-              Cancelar
-            </Button>
-            <Button variant="danger" onClick={remove} loading={pending}>
-              Remover
-            </Button>
-          </>
-        }
+        confirmLabel="Remover"
+        pending={pending}
+        onConfirm={remove}
       >
         {`A cotação de ${removing?.supplierName ?? "o fornecedor"} sai do mapa${quotes.length === 1 ? " e a solicitação volta a aguardar cotação" : ""}.`}
-      </Modal>
-      <Modal
+      </ConfirmModal>
+      <ConfirmModal
         open={reopening}
         onClose={() => setReopening(false)}
         title="Reabrir cotações"
-        busy={pending}
-        footer={
-          <>
-            <Button
-              variant="cancel"
-              onClick={() => setReopening(false)}
-              disabled={pending}
-            >
-              Cancelar
-            </Button>
-            <Button onClick={reopen} loading={pending}>
-              Reabrir cotações
-            </Button>
-          </>
-        }
+        confirmLabel="Reabrir cotações"
+        tone="neutral"
+        pending={pending}
+        onConfirm={reopen}
       >
         A escolha é desfeita e a solicitação volta para “Em cotação”: dá para
         ajustar as cotações e escolher de novo.
-      </Modal>
+      </ConfirmModal>
     </Card>
   );
 }

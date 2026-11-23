@@ -5,9 +5,11 @@ import {
   type QuoteBoardOverview,
 } from "@/shared/contracts/purchase-quotes";
 
-// The quotes in numbers, whatever the filters (four cards, one row on
-// desktop): what waits for the first quote, what is in quotes (and short
-// of the recommended number) and what waits for the approval.
+/**
+ * The quotes in numbers, whatever the filters (four cards, one row on
+ * desktop): what waits for the first quote, what is in quotes (and short
+ * of the recommended number) and what waits for the approval.
+ */
 export function QuoteBoardSummary({
   overview,
 }: {

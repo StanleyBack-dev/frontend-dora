@@ -15,9 +15,12 @@ import { CopyShareValue } from "@/features/admin/components/CopyShareValue";
 import { suppliersClient } from "@/features/suppliers/api/suppliers.client";
 import { CategoriesFold } from "@/features/catalog/components/CategoriesFold";
 import { SupplierFormDrawer } from "@/features/suppliers/components/SupplierFormDrawer";
-import { maskSupplierDocument } from "@/features/suppliers/model/supplier-labels";
+import {
+  maskSupplierDocument,
+  ratingLabel,
+} from "@/features/suppliers/model/supplier-labels";
 import type { Supplier } from "@/shared/contracts/suppliers";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { formatPhone } from "@/shared/lib/masks";
 import { formatPixKey, PIX_KEY_TYPE_LABELS } from "@/shared/lib/pix-key";
 import { useToast } from "@/shared/toast/useToast";
@@ -29,12 +32,14 @@ const displayName = (supplier: Supplier) => supplier.tradeName ?? supplier.name;
 const copyable = (value: string | null, label: string) =>
   value ? <CopyShareValue value={value} label={label} share={false} /> : "—";
 
-// The condominium's suppliers (Compras > Fornecedores): name and status;
-// the document, contact, PIX and notes (each with a copy button) and what
-// they serve (its own folding block) open below the row. The buttons
-// follow Espaços and Equipe:
-// "Editar" (primary) opens the same drawer as registering; "Desativar"
-// (danger, asked first) keeps the history; "Reativar" is secondary.
+/**
+ * The condominium's suppliers (Compras > Fornecedores): name and status;
+ * the document, contact, PIX and notes (each with a copy button) and what
+ * they serve (its own folding block) open below the row. The buttons
+ * follow Espaços and Equipe:
+ * "Editar" (primary) opens the same drawer as registering; "Desativar"
+ * (danger, asked first) keeps the history; "Reativar" is secondary.
+ */
 export function SuppliersTable({
   suppliers,
   filtered,
@@ -60,11 +65,7 @@ export function SuppliersTable({
       setToggling(null);
       router.refresh();
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível alterar o fornecedor.",
-      );
+      showError(errorMessage(cause, "Não foi possível alterar o fornecedor."));
     } finally {
       setPending(false);
     }
@@ -97,8 +98,10 @@ export function SuppliersTable({
         </span>
       ),
     },
-    // Desktop: columns of the row. Phones: the legal name is the card's
-    // subtitle and the document goes to the details.
+    /**
+     * Desktop: columns of the row. Phones: the legal name is the card's
+     * subtitle and the document goes to the details.
+     */
     {
       key: "name",
       label: "Razão social",
@@ -115,6 +118,13 @@ export function SuppliersTable({
           maskSupplierDocument(supplier.documentType, supplier.document),
           supplier.documentType,
         ),
+    },
+    {
+      key: "rating",
+      label: "Avaliação",
+      className: "whitespace-nowrap",
+      render: (supplier) =>
+        ratingLabel(supplier) ?? <span className="text-soft">—</span>,
     },
     {
       key: "status",

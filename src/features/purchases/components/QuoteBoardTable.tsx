@@ -11,6 +11,7 @@ import {
   type DataTableColumn,
 } from "@/design-system";
 import { CategoriesFold } from "@/features/catalog/components/CategoriesFold";
+import { RowTitle } from "@/features/purchases/components/RowTitle";
 import {
   formatRequestDay,
   itemsCount,
@@ -19,6 +20,7 @@ import {
   REQUEST_STATUS_LABELS,
   REQUEST_STATUS_TONES,
   requestCode,
+  isApprovedOrLater,
 } from "@/features/purchases/model/request-labels";
 import {
   MIN_QUOTES,
@@ -26,6 +28,7 @@ import {
   type QuoteBoardRow,
 } from "@/shared/contracts/purchase-quotes";
 import { formatCents } from "@/shared/lib/format";
+import { fullTitleColumn } from "@/features/purchases/model/request-columns";
 
 const requestHref = (row: QuoteBoardRow) =>
   `/compras/cotacoes/${row.request.id}`;
@@ -33,7 +36,7 @@ const requestHref = (row: QuoteBoardRow) =>
 /** A quote was chosen: the purchase has its approval page. */
 const hasApproval = (row: QuoteBoardRow) =>
   row.request.status === "AWAITING_APPROVAL" ||
-  row.request.status === "APPROVED" ||
+  isApprovedOrLater(row.request.status) ||
   row.request.status === "REJECTED";
 
 function Pick({ pick }: { pick: QuoteBoardPick | null }) {
@@ -48,11 +51,13 @@ function Pick({ pick }: { pick: QuoteBoardPick | null }) {
   );
 }
 
-// The quotes page (Compras > Cotações): each request in the quote stages
-// with its number of quotes (short of the recommended in red), the
-// cheapest complete one and the chosen one; priority, the day it is
-// needed by, items and categories open below the row. "Abrir cotação" opens
-// the request's quote page (the comparison map); "Adicionar cotação" the quote form.
+/**
+ * The quotes page (Compras > Cotações): each request in the quote stages
+ * with its number of quotes (short of the recommended in red), the
+ * cheapest complete one and the chosen one; priority, the day it is
+ * needed by, items and categories open below the row. "Abrir cotação" opens
+ * the request's quote page (the comparison map); "Adicionar cotação" the quote form.
+ */
 export function QuoteBoardTable({
   rows,
   filtered,
@@ -84,17 +89,11 @@ export function QuoteBoardTable({
       label: "Solicitação",
       mobile: "title",
       render: (row) => (
-        <span className="flex min-w-0 flex-col">
-          <Link
-            href={requestHref(row)}
-            className="truncate font-medium text-fg hover:underline"
-          >
-            {row.request.title}
-          </Link>
-          <span className="font-mono text-xs text-soft">
-            {requestCode(row.request.number)}
-          </span>
-        </span>
+        <RowTitle
+          title={row.request.title}
+          href={requestHref(row)}
+          meta={requestCode(row.request.number)}
+        />
       ),
       renderMobile: (row) => (
         <span className="font-medium text-fg">
@@ -102,13 +101,7 @@ export function QuoteBoardTable({
         </span>
       ),
     },
-    // Phones cut the title in the card header: the whole name opens here.
-    {
-      key: "title",
-      label: "Solicitação",
-      desktop: "hidden",
-      render: (row) => row.request.title,
-    },
+    fullTitleColumn((row) => row.request.title),
     {
       key: "quotes",
       label: "Cotações",

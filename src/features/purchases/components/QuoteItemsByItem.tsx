@@ -5,9 +5,11 @@ import { formatQuantity } from "@/features/purchases/model/request-labels";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
 import { formatCents } from "@/shared/lib/format";
 
-// On phones, the price comparison one item at a time: the suppliers from
-// the lowest price to the highest, the lowest in green; who didn't quote
-// it comes last.
+/**
+ * On phones, the price comparison one item at a time: the suppliers from
+ * the lowest price to the highest, the lowest in green; who didn't quote
+ * it comes last.
+ */
 export function QuoteItemsByItem({
   request,
   ranked,

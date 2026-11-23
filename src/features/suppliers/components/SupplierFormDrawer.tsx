@@ -29,7 +29,7 @@ import type {
   Supplier,
   SupplierDocumentType,
 } from "@/shared/contracts/suppliers";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { BRAZILIAN_STATES } from "@/shared/lib/brazilian-states";
 import { sameShape } from "@/shared/lib/form-draft";
 import { cpfError } from "@/shared/lib/identity-document";
@@ -119,10 +119,12 @@ function documentProblem(form: SupplierForm): string | null {
   return isCnpj(digits) ? null : "CNPJ inválido. Confira os números.";
 }
 
-// Registers or edits a supplier (Compras > Fornecedores): CNPJ or CPF,
-// name, what it serves, contact, city and, optionally, the PIX to pay it.
-// A new supplier's form is kept as a draft until saved or cancelled; an
-// edit starts from the supplier (the parent remounts it for each one).
+/**
+ * Registers or edits a supplier (Compras > Fornecedores): CNPJ or CPF,
+ * name, what it serves, contact, city and, optionally, the PIX to pay it.
+ * A new supplier's form is kept as a draft until saved or cancelled; an
+ * edit starts from the supplier (the parent remounts it for each one).
+ */
 export function SupplierFormDrawer({
   open,
   supplier = null,
@@ -136,9 +138,11 @@ export function SupplierFormDrawer({
   onDone: (supplier: Supplier) => void;
 }) {
   const { showError, showSuccess } = useToast();
-  // One id per drawer: the register and the edit drawers live on the same
-  // page (a closed dialog stays in the DOM), and the footer button submits
-  // the form by id.
+  /**
+   * One id per drawer: the register and the edit drawers live on the same
+   * page (a closed dialog stays in the DOM), and the footer button submits
+   * the form by id.
+   */
   const formId = useId();
   const draft = useFormDraft<SupplierForm>("supplier-new", EMPTY, parseDraft, {
     open: open && supplier === null,
@@ -217,11 +221,7 @@ export function SupplierFormDrawer({
       if (!supplier) draft.discard();
       onDone(saved);
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível salvar o fornecedor.",
-      );
+      showError(errorMessage(cause, "Não foi possível salvar o fornecedor."));
     } finally {
       setSending(false);
     }

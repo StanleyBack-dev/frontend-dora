@@ -2,9 +2,11 @@ import { BadgeCheck, CircleX, Hourglass, Undo2 } from "lucide-react";
 import { StatCard, StatGrid } from "@/design-system";
 import type { ApprovalOverview } from "@/shared/contracts/purchase-approvals";
 
-// The approvals in numbers, whatever the filters (four cards): what waits
-// for a decision, and this month's approved (within the limit too),
-// returned and rejected.
+/**
+ * The approvals in numbers, whatever the filters (four cards): what waits
+ * for a decision, and this month's approved (within the limit too),
+ * returned and rejected.
+ */
 export function ApprovalBoardSummary({
   overview,
 }: {

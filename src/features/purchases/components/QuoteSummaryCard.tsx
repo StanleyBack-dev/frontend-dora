@@ -54,10 +54,12 @@ function Fact({
   );
 }
 
-// One supplier in the map: its place, the total in large type, how much
-// more than the cheapest, the terms at a glance, how the total is made
-// up (folded) and the buttons. The chosen quote is outlined in orange,
-// the cheapest in green.
+/**
+ * One supplier in the map: its place, the total in large type, how much
+ * more than the cheapest, the terms at a glance, how the total is made
+ * up (folded) and the buttons. The chosen quote is outlined in orange,
+ * the cheapest in green.
+ */
 export function QuoteSummaryCard({
   quote,
   rank,

@@ -24,8 +24,10 @@ import type { PurchaseRequestFilter } from "@/shared/contracts/purchase-requests
 
 type PageRequest = { page: number; limit: number };
 
-// The approval of the chosen quotes (aprovação por alçada): the settings,
-// the approvals page, a request's decisions and the decisions themselves.
+/**
+ * The approval of the chosen quotes (aprovação por alçada): the settings,
+ * the approvals page, a request's decisions and the decisions themselves.
+ */
 export const purchaseApprovalsService = {
   async settings(token: string): Promise<PurchaseSettings> {
     const { purchaseSettings } = await backendGraphql(

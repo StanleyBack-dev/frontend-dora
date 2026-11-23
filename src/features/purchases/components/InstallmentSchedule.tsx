@@ -3,8 +3,10 @@ import { formatCents } from "@/shared/lib/format";
 /** "1ª", "2ª"… */
 const ordinal = (index: number) => `${index + 1}ª`;
 
-// Each installment and its value, as a short list that scrolls when long
-// (up to 60x). Renders nothing for a payment at once.
+/**
+ * Each installment and its value, as a short list that scrolls when long
+ * (up to 60x). Renders nothing for a payment at once.
+ */
 export function InstallmentSchedule({ values }: { values: number[] }) {
   if (values.length < 2) return null;
   return (

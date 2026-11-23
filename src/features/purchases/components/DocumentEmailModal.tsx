@@ -3,34 +3,45 @@
 import { useState } from "react";
 import { Mail, Paperclip, Plus, Send, Trash2 } from "lucide-react";
 import { Button, Field, Modal, TextArea } from "@/design-system";
-import { purchaseQuotesClient } from "@/features/purchases/api/purchase-quotes.client";
 import {
   isEmail,
   MAX_SHARE_EMAILS,
   MAX_SHARE_MESSAGE,
 } from "@/features/purchases/model/quote-share";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { useToast } from "@/shared/toast/useToast";
 
-// Sends the map by e-mail: who to (up to 5) and the message, already
-// written (it can be changed). The API attaches the PDF and sends one
-// e-mail per address; replies go to whoever sent it.
-export function ShareQuoteMapEmailModal({
-  requestId,
+/**
+ * Sends a purchase document (the comparison map, the purchase order) by
+ * e-mail: who to (up to 5, maybe suggested) and the message, already written
+ * (it can be changed). The API attaches the PDF and sends one e-mail per
+ * address; replies go to whoever sent it.
+ */
+export function DocumentEmailModal({
+  title,
+  sentTitle,
   fileName,
+  defaultEmails = [],
   defaultMessage,
   open,
   onClose,
+  onSend,
 }: {
-  requestId: string;
+  title: string;
+  /** The toast once sent ("Mapa de cotação enviado."). */
+  sentTitle: string;
   fileName: string;
+  defaultEmails?: string[];
   defaultMessage: string;
   open: boolean;
   onClose: () => void;
+  onSend: (input: { emails: string[]; message: string }) => Promise<{
+    sent: number;
+  }>;
 }) {
+  const firstEmails = defaultEmails.length ? defaultEmails : [""];
   const { showError, showSuccess } = useToast();
-  // One field per address; "Adicionar e-mail" adds another, up to the limit.
-  const [emails, setEmails] = useState<string[]>([""]);
+  const [emails, setEmails] = useState<string[]>(firstEmails);
   const [message, setMessage] = useState(defaultMessage);
   const [tried, setTried] = useState(false);
   const [sending, setSending] = useState(false);
@@ -72,26 +83,19 @@ export function ShareQuoteMapEmailModal({
     if (emailsProblem || messageProblem) return;
     setSending(true);
     try {
-      const { sent } = await purchaseQuotesClient.shareMapByEmail(requestId, {
-        emails: list,
-        message: message.trim(),
-      });
+      const { sent } = await onSend({ emails: list, message: message.trim() });
       showSuccess(
-        "Mapa de cotação enviado.",
+        sentTitle,
         sent === 1
           ? "1 e-mail com o PDF em anexo."
           : `${sent} e-mails com o PDF em anexo.`,
       );
-      setEmails([""]);
+      setEmails(firstEmails);
       setMessage(defaultMessage);
       setTried(false);
       onClose();
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível enviar o e-mail.",
-      );
+      showError(errorMessage(cause, "Não foi possível enviar o e-mail."));
     } finally {
       setSending(false);
     }
@@ -101,7 +105,7 @@ export function ShareQuoteMapEmailModal({
     <Modal
       open={open}
       onClose={close}
-      title="Enviar mapa por e-mail"
+      title={title}
       icon={<Mail className="size-4" />}
       busy={sending}
       footer={

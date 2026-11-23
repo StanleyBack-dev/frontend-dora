@@ -153,6 +153,25 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Quem aprova reprovou a compra, com o motivo, e a solicitação foi encerrada.",
   },
+  PURCHASE_ORDERED: {
+    label: "Pedido feito",
+    description:
+      "A gestão fez o pedido da compra aprovada ao fornecedor (ordem de compra), com a entrega prevista.",
+  },
+  PURCHASE_RECEIVED: {
+    label: "Entrega recebida",
+    description:
+      "Chegou a entrega de uma compra, toda ou em parte, registrada pela gestão ou pela portaria.",
+  },
+  PURCHASE_ORDER_CANCELLED: {
+    label: "Pedido cancelado",
+    description:
+      "A gestão cancelou o pedido feito ao fornecedor, com o motivo; a compra volta a aprovada para um novo pedido.",
+  },
+  PURCHASE_COMPLETED: {
+    label: "Compra concluída",
+    description: "A compra foi toda recebida e paga ao fornecedor.",
+  },
   FOUND_ITEM_EXPIRING: {
     label: "Item achado perto do fim da guarda",
     description:

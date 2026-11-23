@@ -5,6 +5,7 @@ import { Button, Combobox, Field } from "@/design-system";
 import { CatalogPicker } from "@/features/catalog/components/CatalogPicker";
 import { UNIT_OPTIONS } from "@/features/catalog/model/units";
 import type { CatalogOption } from "@/shared/contracts/catalog";
+import { parseDecimal } from "@/shared/lib/masks";
 
 /** An item as the form edits it (quantity as typed: "2,5"). */
 export type RequestItemForm = {
@@ -37,14 +38,10 @@ export const blankItem = (): RequestItemForm => ({
  * number with up to 2 decimals.
  */
 export function parseQuantity(value: string): number | null {
-  const raw = value.trim();
-  // With a comma, dots group thousands; without one, a dot is the decimal.
-  const text = raw.includes(",")
-    ? raw.replace(/\./g, "").replace(",", ".")
-    : raw;
-  if (!/^\d+(\.\d{1,2})?$/.test(text)) return null;
-  const quantity = Number(text);
-  return quantity > 0 && quantity <= 1_000_000 ? quantity : null;
+  const quantity = parseDecimal(value);
+  return quantity !== null && quantity > 0 && quantity <= 1_000_000
+    ? quantity
+    : null;
 }
 
 /** Whether an item is filled in well enough to send. */
@@ -53,10 +50,12 @@ export const itemComplete = (item: RequestItemForm) =>
   parseQuantity(item.quantity) !== null &&
   item.unit.trim() !== "";
 
-// The items of a purchase request: a product of the catalog (or a new one,
-// with the "+"), how many and in which unit (the product's usual one comes
-// filled in), the brand (or any brand) and a note. Each item is its own
-// small card; there is always at least one.
+/**
+ * The items of a purchase request: a product of the catalog (or a new one,
+ * with the "+"), how many and in which unit (the product's usual one comes
+ * filled in), the brand (or any brand) and a note. Each item is its own
+ * small card; there is always at least one.
+ */
 export function RequestItemsEditor({
   items,
   products,

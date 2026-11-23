@@ -9,9 +9,11 @@ import { PurchaseRequestDetails } from "@/features/purchases/components/Purchase
 import { isEditableRequest } from "@/features/purchases/model/request-labels";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
 
-// What a request's row opens to on Solicitações: the whole request (facts,
-// categories, details and items) and, while it waits for quotes, cancelling
-// it (with the reason).
+/**
+ * What a request's row opens to on Solicitações: the whole request (facts,
+ * categories, details and items) and, while it waits for quotes, cancelling
+ * it (with the reason).
+ */
 export function PurchaseRequestExpanded({
   request,
   viewerId,
