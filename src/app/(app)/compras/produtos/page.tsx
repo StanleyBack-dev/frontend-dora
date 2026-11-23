@@ -4,7 +4,7 @@ import type { RawSearchParams } from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Produtos" };
 
-// Compras > Produtos (the catalog shared by the modules).
+/** Compras > Produtos (the catalog shared by the modules). */
 export default function Page({
   searchParams,
 }: {

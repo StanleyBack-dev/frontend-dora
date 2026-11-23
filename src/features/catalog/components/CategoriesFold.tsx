@@ -2,10 +2,12 @@ import { Badge } from "@/design-system";
 import { categoryLabels } from "@/features/catalog/model/categories";
 import type { Category } from "@/shared/contracts/catalog";
 
-// The categories of a supplier or of a purchase request, inside a row's
-// details: their own folding block ("3 categorias") that opens to the
-// badges, so a long list doesn't push the other details down. Same markup
-// on phones and desktop.
+/**
+ * The categories of a supplier or of a purchase request, inside a row's
+ * details: their own folding block ("3 categorias") that opens to the
+ * badges, so a long list doesn't push the other details down. Same markup
+ * on phones and desktop.
+ */
 export function CategoriesFold({
   value,
 }: {

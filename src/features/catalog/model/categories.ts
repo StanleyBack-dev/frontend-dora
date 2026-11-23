@@ -1,7 +1,9 @@
 import type { Category } from "@/shared/contracts/catalog";
 
-// The categories shared by the modules (what a purchase request or a
-// supplier is about): a fixed list; anything else is "Outros" with a text.
+/**
+ * The categories shared by the modules (what a purchase request or a
+ * supplier is about): a fixed list; anything else is "Outros" with a text.
+ */
 
 /** The categories in the order the forms and filters show them. */
 export const CATEGORIES: Category[] = [

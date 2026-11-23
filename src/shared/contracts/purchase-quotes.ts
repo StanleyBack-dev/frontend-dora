@@ -1,5 +1,7 @@
-// Quotes (cotações) of a purchase request: contract types shared by the BFF
-// routes and the UI. Money in cents; days "YYYY-MM-DD".
+/**
+ * Quotes (cotações) of a purchase request: contract types shared by the BFF
+ * routes and the UI. Money in cents; days "YYYY-MM-DD".
+ */
 import type { Category } from "@/shared/contracts/catalog";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
 import type { PaymentMethod } from "@/shared/graphql/schema-enums";
@@ -81,6 +83,8 @@ export type QuoteSupplierOption = {
   name: string;
   categories: Category[];
   categoryOther: string | null;
+  ratingAverage: number | null;
+  ratingCount: number;
 };
 
 /** A supplier and what its quote costs in the end. */

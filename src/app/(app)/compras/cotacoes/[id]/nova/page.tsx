@@ -14,8 +14,10 @@ import { can } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Nova cotação" };
 
-// The management records a supplier's quote for a request, while it waits
-// for or is in quotes.
+/**
+ * The management records a supplier's quote for a request, while it waits
+ * for or is in quotes.
+ */
 export default async function NewPurchaseQuotePage({
   params,
 }: {

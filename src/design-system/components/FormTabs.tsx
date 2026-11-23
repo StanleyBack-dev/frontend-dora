@@ -17,10 +17,12 @@ export type FormTab = {
   content: ReactNode;
 };
 
-// A long form split in tabs inside one card: the tab strip in the dark
-// header (the chrome colors), the active tab's fields below and "Anterior" /
-// "Próxima" at its foot. Every tab stays mounted (hidden), so nothing typed
-// is lost when switching.
+/**
+ * A long form split in tabs inside one card: the tab strip in the dark
+ * header (the chrome colors), the active tab's fields below and "Anterior" /
+ * "Próxima" at its foot. Every tab stays mounted (hidden), so nothing typed
+ * is lost when switching.
+ */
 export function FormTabs({
   label,
   tabs,
@@ -43,8 +45,10 @@ export function FormTabs({
   const next = tabs[index + 1];
   const strip = useRef<HTMLDivElement>(null);
 
-  // On a phone the strip is wider than the screen: keep the active tab in
-  // sight (scrolling the strip only, never the page).
+  /**
+   * On a phone the strip is wider than the screen: keep the active tab in
+   * sight (scrolling the strip only, never the page).
+   */
   useEffect(() => {
     const list = strip.current;
     const active = list?.children[index] as HTMLElement | undefined;

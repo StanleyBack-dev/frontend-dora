@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { MessageCircle, Paperclip } from "lucide-react";
 import { Alert, Button, Modal, Spinner, TextArea } from "@/design-system";
 import { MAX_SHARE_MESSAGE } from "@/features/purchases/model/quote-share";
-import { ApiClientError, apiDownload } from "@/shared/lib/api-client";
+import { errorMessage, apiDownload } from "@/shared/lib/api-client";
 import { saveFile } from "@/shared/lib/save-file";
 import { useToast } from "@/shared/toast/useToast";
 
@@ -22,15 +22,27 @@ function sharesFiles(file: File) {
   );
 }
 
-// Shares the map on WhatsApp with the message. The PDF is built when the
-// dialog opens, so the tap on "Compartilhar" can hand it straight to the
-// device's share sheet, attached (WhatsApp links can't carry files). Where
-// there is no share sheet for files (most computers), the PDF is
-// downloaded and WhatsApp Web opens with the message, to attach it there.
-export function ShareQuoteMapWhatsAppModal({
+/** "5562999990000" from a Brazilian phone as typed (null: none). */
+function whatsAppNumber(phone: string | null | undefined): string | null {
+  const digits = phone?.replace(/\D/g, "") ?? "";
+  if (digits.length === 10 || digits.length === 11) return `55${digits}`;
+  return digits.length >= 12 ? digits : null;
+}
+
+/**
+ * Shares a document (the quote map, the purchase order) on WhatsApp with
+ * the message. The PDF is built when the dialog opens, so the tap on
+ * "Compartilhar" can hand it straight to the device's share sheet,
+ * attached (WhatsApp links can't carry files). Where there is no share
+ * sheet for files (most computers), the PDF is downloaded and WhatsApp Web
+ * opens with the message (in the chat with `phone`, when given), to attach
+ * it there.
+ */
+export function DocumentWhatsAppModal({
   path,
   fileName,
   defaultMessage,
+  phone,
   open,
   onClose,
 }: {
@@ -38,6 +50,8 @@ export function ShareQuoteMapWhatsAppModal({
   path: string;
   fileName: string;
   defaultMessage: string;
+  /** Whom to write to (e.g. the supplier); else WhatsApp asks. */
+  phone?: string | null;
   open: boolean;
   onClose: () => void;
 }) {
@@ -47,7 +61,6 @@ export function ShareQuoteMapWhatsAppModal({
 
   useEffect(() => {
     if (!open) return;
-    // Mounted when chosen: it starts "loading".
     let active = true;
     apiDownload(path)
       .then(({ blob, fileName: name }) => {
@@ -61,10 +74,7 @@ export function ShareQuoteMapWhatsAppModal({
         if (!active) return;
         setPrepared({
           state: "failed",
-          message:
-            cause instanceof ApiClientError
-              ? cause.message
-              : "Não foi possível gerar o PDF.",
+          message: errorMessage(cause, "Não foi possível gerar o PDF."),
         });
       });
     return () => {
@@ -89,7 +99,7 @@ export function ShareQuoteMapWhatsAppModal({
     }
     saveFile(prepared.file, prepared.file.name);
     window.open(
-      `https://wa.me/?text=${encodeURIComponent(text)}`,
+      `https://wa.me/${whatsAppNumber(phone) ?? ""}?text=${encodeURIComponent(text)}`,
       "_blank",
       "noopener,noreferrer",
     );

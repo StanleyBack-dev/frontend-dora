@@ -13,15 +13,17 @@ import type {
   ApprovalMode,
   PurchaseSettings,
 } from "@/shared/contracts/purchase-approvals";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { formatDateTime } from "@/shared/lib/datetime";
 import { centsOf, maskMoney, moneyField } from "@/shared/lib/masks";
 import { useToast } from "@/shared/toast/useToast";
 
-// The condominium's approval rule (the alçada) on the approvals page, with
-// "Alterar" for whoever approves: every purchase through the approver, or
-// up to a value approved when the quote is chosen. Takes effect on the
-// next choices.
+/**
+ * The condominium's approval rule (the alçada) on the approvals page, with
+ * "Alterar" for whoever approves: every purchase through the approver, or
+ * up to a value approved when the quote is chosen. Takes effect on the
+ * next choices.
+ */
 export function ApprovalSettingsCard({
   settings,
   canEdit,
@@ -71,11 +73,7 @@ export function ApprovalSettingsCard({
       setEditing(false);
       router.refresh();
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível salvar a regra.",
-      );
+      showError(errorMessage(cause, "Não foi possível salvar a regra."));
     } finally {
       setPending(false);
     }

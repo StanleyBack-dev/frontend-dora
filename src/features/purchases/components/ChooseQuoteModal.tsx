@@ -9,13 +9,15 @@ import {
   justificationReason,
 } from "@/features/purchases/model/quote-labels";
 import type { PurchaseQuote } from "@/shared/contracts/purchase-quotes";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { formatCents } from "@/shared/lib/format";
 import { useToast } from "@/shared/toast/useToast";
 
-// Chooses the winning quote: the request goes to "Aguardando aprovação".
-// A justification is asked (and required) when it isn't the cheapest
-// complete quote or there are fewer than three quotes.
+/**
+ * Chooses the winning quote: the request goes to "Aguardando aprovação".
+ * A justification is asked (and required) when it isn't the cheapest
+ * complete quote or there are fewer than three quotes.
+ */
 export function ChooseQuoteModal({
   quote,
   total,
@@ -53,11 +55,7 @@ export function ChooseQuoteModal({
       );
       onDone();
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível escolher a cotação.",
-      );
+      showError(errorMessage(cause, "Não foi possível escolher a cotação."));
     } finally {
       setPending(false);
     }

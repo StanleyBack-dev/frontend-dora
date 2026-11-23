@@ -11,6 +11,7 @@ import {
   type DataTableColumn,
 } from "@/design-system";
 import { CategoriesFold } from "@/features/catalog/components/CategoriesFold";
+import { RowTitle } from "@/features/purchases/components/RowTitle";
 import { ReceiptPdfButton } from "@/features/signature/components/ReceiptPdfButton";
 import {
   formatRequestDay,
@@ -26,6 +27,7 @@ import type {
   QuoteBoardRow,
 } from "@/shared/contracts/purchase-quotes";
 import { formatCents } from "@/shared/lib/format";
+import { fullTitleColumn } from "@/features/purchases/model/request-columns";
 
 const approvalHref = (row: QuoteBoardRow) =>
   `/compras/aprovacoes/${row.request.id}`;
@@ -55,11 +57,13 @@ function Pick({ pick }: { pick: QuoteBoardPick | null }) {
   );
 }
 
-// The approvals page (Compras > Aprovações): each purchase waiting for a
-// decision, approved or rejected, with the chosen quote (and the cheapest,
-// to compare); priority, the day it is needed by, who chose, items and
-// categories open below the row. "Decidir" (or "Ver") opens the purchase's
-// approval page; the PDF button downloads its "Resumo da compra".
+/**
+ * The approvals page (Compras > Aprovações): each purchase waiting for a
+ * decision, approved or rejected, with the chosen quote (and the cheapest,
+ * to compare); priority, the day it is needed by, who chose, items and
+ * categories open below the row. "Decidir" (or "Ver") opens the purchase's
+ * approval page; the PDF button downloads its "Resumo da compra".
+ */
 export function ApprovalBoardTable({
   rows,
   filtered,
@@ -89,17 +93,11 @@ export function ApprovalBoardTable({
       label: "Solicitação",
       mobile: "title",
       render: (row) => (
-        <span className="flex min-w-0 flex-col">
-          <Link
-            href={approvalHref(row)}
-            className="truncate font-medium text-fg hover:underline"
-          >
-            {row.request.title}
-          </Link>
-          <span className="font-mono text-xs text-soft">
-            {requestCode(row.request.number)}
-          </span>
-        </span>
+        <RowTitle
+          title={row.request.title}
+          href={approvalHref(row)}
+          meta={requestCode(row.request.number)}
+        />
       ),
       renderMobile: (row) => (
         <span className="font-medium text-fg">
@@ -107,13 +105,7 @@ export function ApprovalBoardTable({
         </span>
       ),
     },
-    // Phones cut the title in the card header: the whole name opens here.
-    {
-      key: "title",
-      label: "Solicitação",
-      desktop: "hidden",
-      render: (row) => row.request.title,
-    },
+    fullTitleColumn((row) => row.request.title),
     {
       key: "chosen",
       label: "Escolhida",

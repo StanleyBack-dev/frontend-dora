@@ -5,7 +5,7 @@ import { BadgeCheck, Ban, Undo2 } from "lucide-react";
 import { Button, Modal, TextArea } from "@/design-system";
 import { purchaseApprovalsClient } from "@/features/purchases/api/purchase-approvals.client";
 import { MAX_APPROVAL_NOTE } from "@/features/purchases/model/approval-labels";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { formatCents } from "@/shared/lib/format";
 import { useToast } from "@/shared/toast/useToast";
 
@@ -61,8 +61,10 @@ const ICONS: Record<ApprovalAction, React.ReactNode> = {
   reject: <Ban className="size-4" />,
 };
 
-// The approver's decision on a chosen quote: approve (an optional note),
-// send it back to quotes or reject it (both need the reason).
+/**
+ * The approver's decision on a chosen quote: approve (an optional note),
+ * send it back to quotes or reject it (both need the reason).
+ */
 export function ApprovalDecisionModal({
   action,
   requestId,
@@ -104,11 +106,7 @@ export function ApprovalDecisionModal({
       showSuccess(copy.done);
       onDone();
     } catch (cause) {
-      showError(
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível registrar a decisão.",
-      );
+      showError(errorMessage(cause, "Não foi possível registrar a decisão."));
       setPending(false);
     }
   }

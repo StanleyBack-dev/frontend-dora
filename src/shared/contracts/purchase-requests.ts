@@ -1,5 +1,7 @@
-// Purchase requests (solicitações de compra): contract types shared by the
-// BFF routes and the UI. Dates are ISO strings; days are "YYYY-MM-DD".
+/**
+ * Purchase requests (solicitações de compra): contract types shared by the
+ * BFF routes and the UI. Dates are ISO strings; days are "YYYY-MM-DD".
+ */
 import type {
   Category,
   PurchasePriority,

@@ -7,10 +7,12 @@ import { BrandForm } from "@/features/catalog/components/BrandForm";
 import { ProductForm } from "@/features/catalog/components/ProductForm";
 import type { CatalogOption } from "@/shared/contracts/catalog";
 
-// A searchable select of the catalog (products or brands) with a "+" beside
-// it: not on the list? Register it in a modal and it comes back chosen.
-// New choices offer only the active ones; the one already chosen stays
-// even if deactivated since.
+/**
+ * A searchable select of the catalog (products or brands) with a "+" beside
+ * it: not on the list? Register it in a modal and it comes back chosen.
+ * New choices offer only the active ones; the one already chosen stays
+ * even if deactivated since.
+ */
 export function CatalogPicker({
   kind,
   label,

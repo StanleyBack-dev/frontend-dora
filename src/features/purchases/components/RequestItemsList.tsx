@@ -1,8 +1,10 @@
 import { formatQuantity } from "@/features/purchases/model/request-labels";
 import type { PurchaseRequestItem } from "@/shared/contracts/purchase-requests";
 
-// A request's items, read only: number, product, brand (or any) and note,
-// and the quantity.
+/**
+ * A request's items, read only: number, product, brand (or any) and note,
+ * and the quantity.
+ */
 export function RequestItemsList({ items }: { items: PurchaseRequestItem[] }) {
   return (
     <ol className="divide-y divide-border rounded-xl border border-border">

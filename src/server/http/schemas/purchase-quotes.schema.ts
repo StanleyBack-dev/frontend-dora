@@ -2,8 +2,10 @@ import "server-only";
 import { z } from "zod";
 import { idSchema, optionalText } from "@/server/http/schemas/fields";
 
-// Request shapes of the quotes routes. Shapes only: the API checks every
-// value again (the request's items, prices, the file).
+/**
+ * Request shapes of the quotes routes. Shapes only: the API checks every
+ * value again (the request's items, prices, the file).
+ */
 
 export const purchaseQuoteIdSchema = idSchema;
 
@@ -68,12 +70,6 @@ export const updatePurchaseQuoteSchema = z.object({
   /** A new document; null with removeFile drops it; absent keeps it. */
   file: base64File.nullish().transform((value) => value ?? null),
   removeFile: z.boolean().default(false),
-});
-
-/** The map by e-mail: 1 to 5 addresses and the message (as the API). */
-export const shareQuoteMapSchema = z.object({
-  emails: z.array(z.email().max(254)).min(1).max(5),
-  message: z.string().trim().min(1).max(1000),
 });
 
 export const choosePurchaseQuoteSchema = z.object({

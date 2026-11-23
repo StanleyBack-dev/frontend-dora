@@ -268,6 +268,10 @@ export type NotificationType =
   | 'PARCEL_RETURNED'
   | 'PURCHASE_APPROVAL_REQUESTED'
   | 'PURCHASE_APPROVED'
+  | 'PURCHASE_COMPLETED'
+  | 'PURCHASE_ORDERED'
+  | 'PURCHASE_ORDER_CANCELLED'
+  | 'PURCHASE_RECEIVED'
   | 'PURCHASE_REJECTED'
   | 'PURCHASE_REQUEST_CANCELLED'
   | 'PURCHASE_REQUEST_CREATED'
@@ -338,6 +342,13 @@ export type PurchaseApprovalDecision =
 export type PurchaseApprovalMode =
   | 'ALWAYS'
   | 'LIMIT';
+
+/** Parcela a pagar: em aberto, vencida, vencendo em até 7 dias ou paga. */
+export type PurchaseInstallmentState =
+  | 'DUE_SOON'
+  | 'OPEN'
+  | 'OVERDUE'
+  | 'PAID';
 
 /** Prioridade de uma solicitação de compra. */
 export type PurchasePriority =

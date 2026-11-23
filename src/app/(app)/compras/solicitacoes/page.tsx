@@ -49,8 +49,10 @@ export const metadata: Metadata = { title: "Solicitações de compra" };
 
 const BASE = "/compras/solicitacoes";
 /** The status filter in the address (Portuguese words → API statuses). */
-// By default only the pending ones (in quotes or waiting for the
-// approval); the approved and the others through the filter.
+/**
+ * By default only the pending ones (in quotes or waiting for the
+ * approval); the approved and the others through the filter.
+ */
 const STATUSES = {
   pendentes: PENDING_REQUEST_STATUSES,
   "aguardando-cotacao": ["OPEN"],
@@ -63,9 +65,11 @@ const STATUSES = {
 type StatusKey = keyof typeof STATUSES;
 const DEFAULT_STATUS: StatusKey = "pendentes";
 
-// Compras > Solicitações: the management sees every purchase request; who
-// only asks for purchases (the gate, the caretaker) sees their own (the API
-// decides). The filters and the pages are applied by the API.
+/**
+ * Compras > Solicitações: the management sees every purchase request; who
+ * only asks for purchases (the gate, the caretaker) sees their own (the API
+ * decides). The filters and the pages are applied by the API.
+ */
 export default async function PurchaseRequestsPage({
   searchParams,
 }: {

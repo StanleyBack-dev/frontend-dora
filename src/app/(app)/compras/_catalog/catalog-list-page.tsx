@@ -54,9 +54,11 @@ const COPY = {
   },
 } as const;
 
-// Compras > Produtos / Marcas: the catalog shared by the modules, managed
-// here by who manages the purchases. Four cards, the filters (name, status)
-// and the pages are applied by the API.
+/**
+ * Compras > Produtos / Marcas: the catalog shared by the modules, managed
+ * here by who manages the purchases. Four cards, the filters (name, status)
+ * and the pages are applied by the API.
+ */
 export async function CatalogListPage({
   kind,
   searchParams,

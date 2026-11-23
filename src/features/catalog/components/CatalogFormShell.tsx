@@ -11,9 +11,11 @@ import {
 
 export type CatalogFormVariant = "drawer" | "modal";
 
-// Where a catalog form opens: a drawer on the catalog's pages (as every
-// register/edit form of the app) or a modal over another form (the "+"
-// beside an item's product or brand, already inside a drawer).
+/**
+ * Where a catalog form opens: a drawer on the catalog's pages (as every
+ * register/edit form of the app) or a modal over another form (the "+"
+ * beside an item's product or brand, already inside a drawer).
+ */
 export function CatalogFormShell({
   variant,
   title,
@@ -55,11 +57,13 @@ export function CatalogFormShell({
       </Drawer>
     );
   }
-  // Desktop: wider, and tall enough for a select's list (e.g. the units) to
-  // open whole inside the modal instead of being cut by its scroll. The
-  // product and the brand forms share the same size. Rendered in <body>:
-  // the modal opens from inside another form (the request's drawer), and a
-  // form inside a form would submit the outer one (reloading the page).
+  /**
+   * Desktop: wider, and tall enough for a select's list (e.g. the units) to
+   * open whole inside the modal instead of being cut by its scroll. The
+   * product and the brand forms share the same size. Rendered in <body>:
+   * the modal opens from inside another form (the request's drawer), and a
+   * form inside a form would submit the outer one (reloading the page).
+   */
   return createPortal(
     <Modal
       open

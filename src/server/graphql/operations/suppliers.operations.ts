@@ -18,6 +18,8 @@ export const supplierFieldsFragment = graphql(`
     pixKey
     notes
     active
+    ratingAverage
+    ratingCount
     createdAt
     updatedAt
   }
@@ -96,6 +98,8 @@ export const supplierOptionsDocument = graphql(`
       name
       categories
       categoryOther
+      ratingAverage
+      ratingCount
     }
   }
 `);

@@ -177,6 +177,11 @@ body {
   color: var(--fg);
 }
 
+/* A modal dialog or drawer open: the page behind it doesn't scroll. */
+html:has(dialog:modal) {
+  overflow: hidden;
+}
+
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

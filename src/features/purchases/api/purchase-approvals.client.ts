@@ -4,7 +4,7 @@ import type {
   PurchaseSettings,
 } from "@/shared/contracts/purchase-approvals";
 
-// The approval of the chosen quotes, from the browser (through the BFF).
+/** The approval of the chosen quotes, from the browser (through the BFF). */
 export const purchaseApprovalsClient = {
   updateSettings: (input: {
     approvalMode: ApprovalMode;

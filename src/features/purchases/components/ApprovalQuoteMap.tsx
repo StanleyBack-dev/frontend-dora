@@ -19,8 +19,10 @@ const READ_ONLY: QuoteMapActions = {
   onChoose: () => undefined,
 };
 
-// The comparison map on the approval page, folded: to check the chosen
-// quote against the others before deciding (the PDF and sharing too).
+/**
+ * The comparison map on the approval page, folded: to check the chosen
+ * quote against the others before deciding (the PDF and sharing too).
+ */
 export function ApprovalQuoteMap({
   request,
   quotes,

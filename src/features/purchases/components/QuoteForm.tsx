@@ -59,13 +59,17 @@ import type {
   QuoteSupplierOption,
 } from "@/shared/contracts/purchase-quotes";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { formatCents } from "@/shared/lib/format";
 import { sameShape } from "@/shared/lib/form-draft";
 import { centsOf, maskMoney, moneyField } from "@/shared/lib/masks";
 import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
+import {
+  byRating,
+  ratingLabel,
+} from "@/features/suppliers/model/supplier-labels";
 
 type ChargeField = { label: string; amount: string };
 type DiscountMode = "fixed" | "percent";
@@ -199,15 +203,17 @@ const INSTALLMENT_OPTIONS = Array.from(
   }),
 );
 
-// The page form of a supplier's quote for a request (new or editing): the
-// supplier (those serving the request's categories first), each item's unit
-// price (empty: the supplier doesn't have it), how it is paid (a method or
-// "Outro (digitar)", installments and the monthly interest, Price table,
-// simulated here), shipping, other charges, discount, delivery, validity,
-// notes and the supplier's document, in tabs (Fornecedor, Itens e preços,
-// Pagamento, Condições, Valores e extrato: the values beside the statement).
-// A new quote is kept as a draft
-// per request (the document isn't) until saved or cancelled.
+/**
+ * The page form of a supplier's quote for a request (new or editing): the
+ * supplier (those serving the request's categories first), each item's unit
+ * price (empty: the supplier doesn't have it), how it is paid (a method or
+ * "Outro (digitar)", installments and the monthly interest, Price table,
+ * simulated here), shipping, other charges, discount, delivery, validity,
+ * notes and the supplier's document, in tabs (Fornecedor, Itens e preços,
+ * Pagamento, Condições, Valores e extrato: the values beside the statement).
+ * A new quote is kept as a draft
+ * per request (the document isn't) until saved or cancelled.
+ */
 export function QuoteForm({
   request,
   quote = null,
@@ -232,7 +238,6 @@ export function QuoteForm({
     (raw) => {
       const parsed = sameShape(blank, raw);
       if (!parsed) return null;
-      // Only this request's items, as typed.
       const prices =
         parsed.prices && typeof parsed.prices === "object" ? parsed.prices : {};
       parsed.prices = Object.fromEntries(
@@ -301,15 +306,21 @@ export function QuoteForm({
       !takenSupplierIds.includes(supplier.id),
   );
   const supplierOptions = [
-    ...available.filter((supplier) => serves(supplier).length > 0),
-    ...available.filter((supplier) => serves(supplier).length === 0),
+    ...available
+      .filter((supplier) => serves(supplier).length > 0)
+      .sort(byRating),
+    ...available
+      .filter((supplier) => serves(supplier).length === 0)
+      .sort(byRating),
   ].map((supplier) => {
     const matching = serves(supplier);
+    const rating = ratingLabel(supplier);
+    const name = rating ? `${supplier.name} ${rating}` : supplier.name;
     return {
       value: supplier.id,
       label: matching.length
-        ? `${supplier.name} — atende ${categoryLabels({ categories: matching, categoryOther: supplier.categoryOther }).join(", ")}`
-        : supplier.name,
+        ? `${name} — atende ${categoryLabels({ categories: matching, categoryOther: supplier.categoryOther }).join(", ")}`
+        : name,
     };
   });
 
@@ -324,8 +335,10 @@ export function QuoteForm({
   const priced = lines.filter((line) => line.unit !== null).length;
   const itemsCents = lines.reduce((sum, line) => sum + (line.total ?? 0), 0);
   const shippingCents = centsOf(form.shipping) ?? 0;
-  // Charges count once picked and valued; a picked one without a value
-  // blocks saving.
+  /**
+   * Charges count once picked and valued; a picked one without a value
+   * blocks saving.
+   */
   const charges = form.charges
     .map((charge) => ({
       label: charge.label.trim(),
@@ -482,10 +495,7 @@ export function QuoteForm({
       router.push(back);
       router.refresh();
     } catch (cause) {
-      const message =
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível salvar a cotação.";
+      const message = errorMessage(cause, "Não foi possível salvar a cotação.");
       setError(message);
       showError(message);
       setPending(false);

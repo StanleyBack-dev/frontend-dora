@@ -13,7 +13,7 @@ import { can } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Editar cotação" };
 
-// The management edits a quote while the request is in quotes.
+/** The management edits a quote while the request is in quotes. */
 export default async function EditPurchaseQuotePage({
   params,
 }: {

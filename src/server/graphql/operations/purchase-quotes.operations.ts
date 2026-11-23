@@ -120,7 +120,7 @@ export const reopenPurchaseQuotesDocument = graphql(`
 export const sharePurchaseQuoteMapByEmailDocument = graphql(`
   mutation SharePurchaseQuoteMapByEmail(
     $requestId: ID!
-    $input: ShareQuoteMapInput!
+    $input: PurchaseEmailInput!
   ) {
     sharePurchaseQuoteMapByEmail(requestId: $requestId, input: $input)
   }

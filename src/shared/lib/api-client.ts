@@ -80,3 +80,7 @@ export async function apiDownload(
   const fileName = /filename="([^"]+)"/.exec(disposition)?.[1] ?? null;
   return { blob: await response.blob(), fileName };
 }
+
+/** The API's message for the user, or `fallback` for anything else. */
+export const errorMessage = (cause: unknown, fallback: string) =>
+  cause instanceof ApiClientError ? cause.message : fallback;

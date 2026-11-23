@@ -47,7 +47,7 @@ import type {
   PurchasePriority,
   PurchaseRequest,
 } from "@/shared/contracts/purchase-requests";
-import { ApiClientError } from "@/shared/lib/api-client";
+import { errorMessage } from "@/shared/lib/api-client";
 import { localDay } from "@/shared/lib/datetime";
 import { sameShape } from "@/shared/lib/form-draft";
 import { startNavigation } from "@/shared/lib/navigation-progress";
@@ -107,12 +107,14 @@ const formOf = (request: PurchaseRequest): RequestForm => ({
 /** The form's tabs, in order. */
 type RequestTab = "what" | "where" | "items" | "categories";
 
-// Asks for a purchase (or edits one waiting for quotes): what is needed,
-// its categories (as a supplier's, with "Outros (digitar)"), the priority,
-// where and by when, and the items (products and brands of the catalog,
-// which can be registered from here). A new request's form is kept as a
-// draft until sent or cancelled; an edit starts from the request. A page
-// form (as the event's): saving opens the request.
+/**
+ * Asks for a purchase (or edits one waiting for quotes): what is needed,
+ * its categories (as a supplier's, with "Outros (digitar)"), the priority,
+ * where and by when, and the items (products and brands of the catalog,
+ * which can be registered from here). A new request's form is kept as a
+ * draft until sent or cancelled; an edit starts from the request. A page
+ * form (as the event's): saving opens the request.
+ */
 export function PurchaseRequestForm({
   request = null,
   spaces,
@@ -270,24 +272,25 @@ export function PurchaseRequestForm({
       );
       if (!request) draft.discard();
       startNavigation();
-      // The list, showing the request just saved (opened).
       router.push(
         `/compras/solicitacoes?solicitacao=${saved.id}&situacao=todas`,
       );
       router.refresh();
     } catch (cause) {
-      const message =
-        cause instanceof ApiClientError
-          ? cause.message
-          : "Não foi possível salvar a solicitação.";
+      const message = errorMessage(
+        cause,
+        "Não foi possível salvar a solicitação.",
+      );
       setError(message);
       showError(message);
       setSending(false);
     }
   }
 
-  // In quotes the title, details, items and categories are kept (the API refuses
-  // changes).
+  /**
+   * In quotes the title, details, items and categories are kept (the API refuses
+   * changes).
+   */
   const scopeLocked = request?.status === "QUOTING";
   const lockedNote = (
     <Alert tone="info">

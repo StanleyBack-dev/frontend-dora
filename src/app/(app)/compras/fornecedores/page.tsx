@@ -45,9 +45,11 @@ const STATUSES = { ativos: true, inativos: false, todos: undefined } as const;
 type StatusKey = keyof typeof STATUSES;
 const DEFAULT_STATUS: StatusKey = "ativos";
 
-// Compras > Fornecedores: who the condominium buys from. The filters
-// (name, contact, CNPJ/CPF, category, status; the options come from the
-// values in use) and the pages are applied by the API.
+/**
+ * Compras > Fornecedores: who the condominium buys from. The filters
+ * (name, contact, CNPJ/CPF, category, status; the options come from the
+ * values in use) and the pages are applied by the API.
+ */
 export default async function SuppliersPage({
   searchParams,
 }: {
@@ -71,7 +73,6 @@ export default async function SuppliersPage({
     authed((token) => suppliersService.supplierFilterOptions(token)),
     authed((token) => suppliersService.supplierOverview(token)),
   ]);
-  // Name, contact and document: one of the values in use.
   const supplierId = oneOf(
     firstParam(query, "fornecedor"),
     options.suppliers.map((supplier) => supplier.id),

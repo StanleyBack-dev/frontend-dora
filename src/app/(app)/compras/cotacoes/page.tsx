@@ -48,23 +48,27 @@ export const metadata: Metadata = { title: "Cotações" };
 
 const BASE = "/compras/cotacoes";
 /** The stage filter in the address (Portuguese words → API statuses). */
-// By default only the pending ones; the approved and rejected through the
-// filter, so they don't crowd what still needs work.
+/**
+ * By default only the pending ones; the approved and rejected through the
+ * filter, so they don't crowd what still needs work.
+ */
 const STAGES = {
   pendentes: ["OPEN", "QUOTING", "AWAITING_APPROVAL"],
   todas: null,
   "aguardando-cotacao": ["OPEN"],
   "em-cotacao": ["QUOTING"],
   "aguardando-aprovacao": ["AWAITING_APPROVAL"],
-  aprovadas: ["APPROVED"],
+  aprovadas: ["APPROVED", "ORDERED", "RECEIVED", "COMPLETED"],
   reprovadas: ["REJECTED"],
 } as const satisfies Record<string, readonly PurchaseRequestStatus[] | null>;
 type StageKey = keyof typeof STAGES;
 const DEFAULT_STAGE: StageKey = "pendentes";
 
-// Compras > Cotações (management): the requests waiting for quotes, in
-// quotes or waiting for the approval, with how their quotes stand; each
-// opens the request's comparison map. The filters and pages are the API's.
+/**
+ * Compras > Cotações (management): the requests waiting for quotes, in
+ * quotes or waiting for the approval, with how their quotes stand; each
+ * opens the request's comparison map. The filters and pages are the API's.
+ */
 export default async function QuoteBoardPage({
   searchParams,
 }: {

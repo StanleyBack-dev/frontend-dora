@@ -58,11 +58,13 @@ function Row({
   );
 }
 
-// The quote's statement, as a receipt (read only, worked out as the form is
-// filled): the supplier, each product (quantity × price = total, or not
-// quoted), the items, shipping, other charges, discount and the total paid
-// at once; how it is paid with the interest and every installment; delivery
-// and validity.
+/**
+ * The quote's statement, as a receipt (read only, worked out as the form is
+ * filled): the supplier, each product (quantity × price = total, or not
+ * quoted), the items, shipping, other charges, discount and the total paid
+ * at once; how it is paid with the interest and every installment; delivery
+ * and validity.
+ */
 export function QuoteStatement({
   supplierName,
   lines,

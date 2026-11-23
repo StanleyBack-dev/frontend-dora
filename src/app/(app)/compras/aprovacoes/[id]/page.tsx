@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ClipboardList, Scale } from "lucide-react";
+import { ClipboardList, PackageCheck, Scale } from "lucide-react";
 import {
   Alert,
   BackLink,
@@ -20,6 +20,7 @@ import { PurchaseRequestDetails } from "@/features/purchases/components/Purchase
 import {
   itemsCount,
   requestCode,
+  isApprovedOrLater,
 } from "@/features/purchases/model/request-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { loadPurchaseRequest } from "@/server/loaders/load-purchase-request";
@@ -29,11 +30,13 @@ import { can, canAny } from "@/shared/lib/access";
 
 export const metadata: Metadata = { title: "Aprovação" };
 
-// A purchase's approval page, apart from its quotes: the decision (waiting,
-// with "Aprovar", "Devolver" and "Reprovar" for whoever approves; or how it
-// was decided) beside the chosen quote, the decisions so far, and, folded,
-// the comparison map and what was asked. The management lands here after
-// choosing a quote and follows it; only the approvers decide.
+/**
+ * A purchase's approval page, apart from its quotes: the decision (waiting,
+ * with "Aprovar", "Devolver" and "Reprovar" for whoever approves; or how it
+ * was decided) beside the chosen quote, the decisions so far, and, folded,
+ * the comparison map and what was asked. The management lands here after
+ * choosing a quote and follows it; only the approvers decide.
+ */
 export default async function PurchaseApprovalPage({
   params,
 }: {
@@ -58,7 +61,7 @@ export default async function PurchaseApprovalPage({
   ]);
   const hasApproval =
     request.status === "AWAITING_APPROVAL" ||
-    request.status === "APPROVED" ||
+    isApprovedOrLater(request.status) ||
     request.status === "REJECTED" ||
     approvals.length > 0;
 
@@ -96,6 +99,17 @@ export default async function PurchaseApprovalPage({
             variant="brand"
             className="justify-center"
           />
+          {isApprovedOrLater(request.status) && (
+            <Link
+              href={`/compras/pedidos/${request.id}`}
+              className={cn(buttonClasses("secondary"), "justify-center")}
+            >
+              <PackageCheck aria-hidden className="size-4" />
+              {canManage && request.status === "APPROVED"
+                ? "Fazer o pedido"
+                : "Ver o pedido"}
+            </Link>
+          )}
           {canManage && request.status !== "CANCELLED" && (
             <Link
               href={`/compras/cotacoes/${request.id}`}

@@ -2,9 +2,11 @@ import { CircleCheck, PowerOff, Star, TrendingUp } from "lucide-react";
 import { StatCard, StatGrid } from "@/design-system";
 import type { CatalogCounts } from "@/shared/contracts/catalog";
 
-// The catalog's products (or brands) in numbers, whatever the filters (four
-// cards, one row on desktop): active, used by the purchase requests, the
-// most asked for and inactive.
+/**
+ * The catalog's products (or brands) in numbers, whatever the filters (four
+ * cards, one row on desktop): active, used by the purchase requests, the
+ * most asked for and inactive.
+ */
 export function CatalogSummary({
   kind,
   counts,

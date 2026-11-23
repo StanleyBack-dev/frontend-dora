@@ -2,8 +2,10 @@ import "server-only";
 import { z } from "zod";
 import { idSchema, optionalText } from "@/server/http/schemas/fields";
 
-// Request shapes of the purchase requests routes. Shapes only: the API
-// checks every value again (texts, category, date, items).
+/**
+ * Request shapes of the purchase requests routes. Shapes only: the API
+ * checks every value again (texts, category, date, items).
+ */
 
 export const purchaseRequestIdSchema = idSchema;
 
