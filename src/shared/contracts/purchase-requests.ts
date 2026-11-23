@@ -42,6 +42,12 @@ export type PurchaseRequest = {
   requestedById: string;
   requestedByName: string;
   items: PurchaseRequestItem[];
+  /** How many quotes it has. */
+  quoteCount: number;
+  /** The quote the management chose (null: none yet). */
+  chosenQuoteId: string | null;
+  choiceJustification: string | null;
+  chosenAt: string | null;
   cancelReason: string | null;
   cancelledAt: string | null;
   createdAt: string;

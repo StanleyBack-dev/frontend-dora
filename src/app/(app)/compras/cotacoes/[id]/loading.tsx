@@ -1,5 +1,5 @@
 import { PageLoading } from "@/features/layout/components/PageLoading";
 
 export default function Loading() {
-  return <PageLoading label="Carregando a solicitação…" />;
+  return <PageLoading label="Carregando as cotações…" />;
 }

@@ -15,6 +15,8 @@ import {
   Badge,
   Button,
   Card,
+  cn,
+  CollapsibleSection,
   DraftNotice,
   Drawer,
   EmptyState,
@@ -22,7 +24,6 @@ import {
   LinkPending,
   Modal,
   TextArea,
-  cn,
 } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { condominiumsClient } from "@/features/condominiums/api/condominiums.client";
@@ -245,65 +246,79 @@ export function UnitsManager({
           {creating && createDraft.restored && (
             <DraftNotice onDiscard={createDraft.discard} />
           )}
-          {house && (
-            <Field
-              label="Rua"
-              required
-              value={street}
-              maxLength={80}
-              placeholder="Ex.: Rua das Flores"
-              onChange={(event) => setStreet(event.target.value)}
-            />
-          )}
-          {house ? (
-            <Field
-              label="Quadra"
-              required
-              value={block}
-              maxLength={30}
-              placeholder="Ex.: 3"
-              onChange={(event) => setBlock(event.target.value)}
-            />
-          ) : (
-            <div>
+          <CollapsibleSection
+            icon={<Building />}
+            title={house ? "Rua, quadra e lote" : "Bloco e número"}
+            description={
+              creating
+                ? house
+                  ? "Os lotes a criar nesta rua e quadra."
+                  : "As unidades a criar (com o bloco, se houver)."
+                : house
+                  ? "Onde fica a casa."
+                  : "Onde fica a unidade."
+            }
+          >
+            {house && (
               <Field
-                label="Bloco ou torre"
+                label="Rua"
+                required
+                value={street}
+                maxLength={80}
+                placeholder="Ex.: Rua das Flores"
+                onChange={(event) => setStreet(event.target.value)}
+              />
+            )}
+            {house ? (
+              <Field
+                label="Quadra"
+                required
                 value={block}
                 maxLength={30}
-                placeholder="Ex.: Bloco A, Torre 1"
+                placeholder="Ex.: 3"
                 onChange={(event) => setBlock(event.target.value)}
               />
-              <p className="mt-1.5 text-xs text-soft">
-                Deixe em branco se o condomínio não tem blocos (casas, prédio
-                único).
-              </p>
-            </div>
-          )}
-          {creating ? (
-            <div>
-              <TextArea
-                label={house ? "Lotes" : "Números"}
+            ) : (
+              <div>
+                <Field
+                  label="Bloco ou torre"
+                  value={block}
+                  maxLength={30}
+                  placeholder="Ex.: Bloco A, Torre 1"
+                  onChange={(event) => setBlock(event.target.value)}
+                />
+                <p className="mt-1.5 text-xs text-soft">
+                  Deixe em branco se o condomínio não tem blocos (casas, prédio
+                  único).
+                </p>
+              </div>
+            )}
+            {creating ? (
+              <div>
+                <TextArea
+                  label={house ? "Lotes" : "Números"}
+                  required
+                  rows={4}
+                  value={numbers}
+                  placeholder={house ? "1-20, 25" : "101-104, 201-204"}
+                  onChange={(event) => setNumbers(event.target.value)}
+                />
+                <p className="mt-1.5 text-xs text-soft">
+                  {house
+                    ? "Separe por vírgula ou por linha. Faixas como 1-20 criam todos os lotes do intervalo nesta rua e quadra (até 500 por vez)."
+                    : "Separe por vírgula ou por linha. Faixas como 101-110 criam todas as unidades do intervalo (até 500 por vez)."}
+                </p>
+              </div>
+            ) : (
+              <Field
+                label={house ? "Lote" : "Número"}
                 required
-                rows={4}
                 value={numbers}
-                placeholder={house ? "1-20, 25" : "101-104, 201-204"}
+                maxLength={20}
                 onChange={(event) => setNumbers(event.target.value)}
               />
-              <p className="mt-1.5 text-xs text-soft">
-                {house
-                  ? "Separe por vírgula ou por linha. Faixas como 1-20 criam todos os lotes do intervalo nesta rua e quadra (até 500 por vez)."
-                  : "Separe por vírgula ou por linha. Faixas como 101-110 criam todas as unidades do intervalo (até 500 por vez)."}
-              </p>
-            </div>
-          ) : (
-            <Field
-              label={house ? "Lote" : "Número"}
-              required
-              value={numbers}
-              maxLength={20}
-              onChange={(event) => setNumbers(event.target.value)}
-            />
-          )}
+            )}
+          </CollapsibleSection>
         </div>
       </Drawer>
 

@@ -88,3 +88,14 @@ export const supplierOverviewDocument = graphql(`
     }
   }
 `);
+
+export const supplierOptionsDocument = graphql(`
+  query SupplierOptions {
+    supplierOptions {
+      id
+      name
+      categories
+      categoryOther
+    }
+  }
+`);

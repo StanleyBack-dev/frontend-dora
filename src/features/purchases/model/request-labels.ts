@@ -47,6 +47,15 @@ export const ACTIVE_REQUEST_STATUSES: PurchaseRequestStatus[] = [
 export const isEditableRequest = (request: Pick<PurchaseRequest, "status">) =>
   request.status === "OPEN";
 
+/**
+ * Mirrors the API: in quotes, the place, date and priority still change
+ * (the title, details, items and categories don't: the quotes were made on
+ * them).
+ */
+export const isDetailsEditableRequest = (
+  request: Pick<PurchaseRequest, "status">,
+) => request.status === "OPEN" || request.status === "QUOTING";
+
 export const PURCHASE_PRIORITIES: PurchasePriority[] = [
   "LOW",
   "NORMAL",

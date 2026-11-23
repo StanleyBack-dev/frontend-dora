@@ -75,46 +75,50 @@ export function Modal({
         size === "xl" ? "max-w-6xl" : size === "lg" ? "max-w-2xl" : "max-w-md",
       )}
     >
-      <div className="flex items-center gap-3 border-b border-chrome-line bg-chrome px-5 py-4">
-        {icon && (
-          <span
-            className={cn(
-              "grid size-9 shrink-0 place-items-center rounded-full",
-              tone === "danger"
-                ? "bg-danger text-white"
-                : "bg-brand/15 text-brand",
-            )}
+      {/* A column as tall as the screen allows: header and footer keep
+      their size (the footer may wrap to two rows on phones) and only the
+      content between them scrolls. */}
+      <div className="flex max-h-[calc(100dvh-2rem)] flex-col">
+        <div className="flex shrink-0 items-center gap-3 border-b border-chrome-line bg-chrome px-5 py-4">
+          {icon && (
+            <span
+              className={cn(
+                "grid size-9 shrink-0 place-items-center rounded-full",
+                tone === "danger"
+                  ? "bg-danger text-white"
+                  : "bg-brand/15 text-brand",
+              )}
+            >
+              {icon}
+            </span>
+          )}
+          <h2
+            id={titleId}
+            className="min-w-0 flex-1 truncate text-[15px] font-semibold text-chrome-fg"
           >
-            {icon}
-          </span>
-        )}
-        <h2
-          id={titleId}
-          className="min-w-0 flex-1 truncate text-[15px] font-semibold text-chrome-fg"
-        >
-          {title}
-        </h2>
-        <button
-          type="button"
-          onClick={onClose}
-          disabled={busy}
-          aria-label="Fechar"
-          className="grid size-8 shrink-0 place-items-center rounded-full text-chrome-subtle transition-colors hover:bg-chrome-hover hover:text-chrome-fg disabled:opacity-40"
-        >
-          <X className="size-[18px]" />
-        </button>
-      </div>
-      {/* Long content scrolls inside, header and footer stay put. */}
-      <div className="max-h-[calc(100dvh-11rem)] overflow-y-auto px-5 py-5 text-[13px] leading-relaxed text-muted">
-        {children}
-      </div>
-      {/* Phones: the buttons share the row while they fit and wrap to
-      full-width rows when they don't (never squeezed past their text). */}
-      {footer && (
-        <div className="flex flex-wrap justify-end gap-2 border-t border-border bg-surface-muted px-5 py-3.5 max-sm:[&>*]:flex-[1_1_auto] max-sm:[&>*]:justify-center">
-          {footer}
+            {title}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={busy}
+            aria-label="Fechar"
+            className="grid size-8 shrink-0 place-items-center rounded-full text-chrome-subtle transition-colors hover:bg-chrome-hover hover:text-chrome-fg disabled:opacity-40"
+          >
+            <X className="size-[18px]" />
+          </button>
         </div>
-      )}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 text-[13px] leading-relaxed text-muted">
+          {children}
+        </div>
+        {/* Phones: the buttons share the row while they fit and wrap to
+      full-width rows when they don't (never squeezed past their text). */}
+        {footer && (
+          <div className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-border bg-surface-muted px-5 py-3.5 max-sm:[&>*]:flex-[1_1_auto] max-sm:[&>*]:justify-center">
+            {footer}
+          </div>
+        )}
+      </div>
     </dialog>
   );
 }

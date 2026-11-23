@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { SearchX, Users } from "lucide-react";
+import { Camera, MapPin, Search, SearchX, Users } from "lucide-react";
 import {
   Button,
   Combobox,
@@ -9,7 +9,7 @@ import {
   Drawer,
   DrawerActions,
   Field,
-  FormSection,
+  CollapsibleSection,
   Select,
   TextArea,
   cn,
@@ -158,10 +158,10 @@ export function LostReportDrawer({
         </DrawerActions>
       }
     >
-      <form id={FORM_ID} onSubmit={submit} className="space-y-6">
+      <form id={FORM_ID} onSubmit={submit} className="space-y-4">
         {draft.restored && <DraftNotice onDiscard={draft.discard} />}
 
-        <FormSection title="O que você perdeu">
+        <CollapsibleSection icon={<Search />} title="O que você perdeu">
           <div className="grid items-start gap-3 sm:grid-cols-2">
             <Select
               label="Categoria"
@@ -196,9 +196,9 @@ export function LostReportDrawer({
             value={form.description}
             onChange={(event) => set("description")(event.target.value)}
           />
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection title="Onde e quando (opcional)">
+        <CollapsibleSection icon={<MapPin />} title="Onde e quando (opcional)">
           <div className="grid items-start gap-3 sm:grid-cols-2">
             <Combobox
               label="Onde pode ter perdido"
@@ -227,14 +227,15 @@ export function LostReportDrawer({
               }}
             />
           </div>
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection
+        <CollapsibleSection
+          icon={<Camera />}
           title="Foto (opcional)"
           description="Tem uma foto do objeto, ou de um parecido? Ajuda a portaria a reconhecer."
         >
           <ItemPhotoPicker photo={itemPhoto} alt="Foto do que você perdeu" />
-        </FormSection>
+        </CollapsibleSection>
 
         <label
           className={cn(

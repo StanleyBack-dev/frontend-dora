@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   MapPin,
   PackageCheck,
+  PenLine,
   ShieldQuestion,
   UserCheck,
   UserRound,
@@ -14,7 +15,7 @@ import {
   ChoiceCards,
   Drawer,
   Field,
-  FormSection,
+  CollapsibleSection,
   Select,
   DrawerActions,
 } from "@/design-system";
@@ -193,7 +194,7 @@ export function FoundItemReturnDrawer({
       {!declaration ? (
         <Alert tone="warning">Este item não está mais guardado.</Alert>
       ) : (
-        <form id={FORM_ID} onSubmit={submit} className="space-y-6">
+        <form id={FORM_ID} onSubmit={submit} className="space-y-4">
           <div className="rounded-xl border border-warning-border bg-warning-soft p-3">
             <p className="flex items-center gap-1.5 text-sm font-semibold text-fg">
               <ShieldQuestion aria-hidden className="size-4" />
@@ -206,7 +207,7 @@ export function FoundItemReturnDrawer({
             </p>
           </div>
 
-          <FormSection title="Quem está retirando">
+          <CollapsibleSection icon={<UserRound />} title="Quem está retirando">
             {accepted.length > 0 && (
               <ChoiceCards<string>
                 name="found-item-return-who"
@@ -274,9 +275,12 @@ export function FoundItemReturnDrawer({
                 }
               />
             </div>
-          </FormSection>
+          </CollapsibleSection>
 
-          <FormSection title="Declaração e assinatura">
+          <CollapsibleSection
+            icon={<PenLine />}
+            title="Declaração e assinatura"
+          >
             <blockquote className="rounded-xl border border-border bg-surface-muted p-4 text-sm leading-relaxed text-fg">
               Eu, <strong>{signerName || "________"}</strong>, {declaration}
             </blockquote>
@@ -289,7 +293,7 @@ export function FoundItemReturnDrawer({
               {" · "}A data, a hora, o IP e o aparelho também ficam registrados
               como prova da assinatura.
             </p>
-          </FormSection>
+          </CollapsibleSection>
         </form>
       )}
     </Drawer>

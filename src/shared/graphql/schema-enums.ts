@@ -280,6 +280,17 @@ export type ParcelStatus =
   | 'RECEIVED'
   | 'RETURNED';
 
+/** Forma de pagamento de uma cotação: PIX, dinheiro, cartão de débito ou de crédito, boleto, transferência, faturado ou outra (digitada). */
+export type PaymentMethod =
+  | 'BANK_TRANSFER'
+  | 'BOLETO'
+  | 'CASH'
+  | 'CREDIT_CARD'
+  | 'DEBIT_CARD'
+  | 'INVOICE'
+  | 'OTHER'
+  | 'PIX';
+
 /** Capacidade verificada pela API. */
 export type Permission =
   | 'AUDIT_READ'

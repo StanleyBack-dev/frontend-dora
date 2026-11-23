@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import { PackagePlus, Save } from "lucide-react";
+import { Package, PackagePlus, Save } from "lucide-react";
 import { Button, Combobox, Field, TextArea } from "@/design-system";
 import { catalogClient } from "@/features/catalog/api/catalog.client";
 import {
@@ -74,6 +74,11 @@ export function ProductForm({
       subtitle="Fica no catálogo do condomínio para as solicitações de compra. Marca e detalhes de cada pedido vão no item."
       busy={sending}
       onClose={onClose}
+      section={{
+        icon: <Package />,
+        title: "Produto",
+        description: "Nome, unidade de costume e o que o identifica.",
+      }}
       actions={
         <>
           <Button variant="cancel" onClick={onClose} disabled={sending}>

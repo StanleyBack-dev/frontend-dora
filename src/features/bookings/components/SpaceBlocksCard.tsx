@@ -2,13 +2,20 @@
 
 import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { Ban, Plus, Trash2 } from "lucide-react";
+import {
+  Ban,
+  CalendarOff,
+  MessageSquareText,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import {
   Alert,
   Button,
   Card,
   CardBody,
   CardHeader,
+  CollapsibleSection,
   DraftNotice,
   Drawer,
   Field,
@@ -225,34 +232,43 @@ export function SpaceBlocksCard({
       >
         <div className="space-y-4">
           {restored && <DraftNotice onDiscard={discard} />}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <CollapsibleSection
+            icon={<CalendarOff />}
+            title="Período"
+            description="De quando até quando o espaço fica bloqueado."
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                label="Início"
+                type="datetime-local"
+                required
+                value={draft.startsAt}
+                onChange={(event) => set("startsAt", event.target.value)}
+              />
+              <Field
+                label="Fim"
+                type="datetime-local"
+                required
+                value={draft.endsAt}
+                onChange={(event) => set("endsAt", event.target.value)}
+              />
+            </div>
+          </CollapsibleSection>
+          <CollapsibleSection
+            icon={<MessageSquareText />}
+            title="Motivo"
+            description="Aparece para os moradores no calendário do espaço."
+          >
             <Field
-              label="Início"
-              type="datetime-local"
+              label="Motivo"
               required
-              value={draft.startsAt}
-              onChange={(event) => set("startsAt", event.target.value)}
+              maxLength={200}
+              placeholder="Ex.: Manutenção da iluminação"
+              value={draft.reason}
+              onChange={(event) => set("reason", event.target.value)}
             />
-            <Field
-              label="Fim"
-              type="datetime-local"
-              required
-              value={draft.endsAt}
-              onChange={(event) => set("endsAt", event.target.value)}
-            />
-          </div>
-          <Field
-            label="Motivo"
-            required
-            maxLength={200}
-            placeholder="Ex.: Manutenção da iluminação"
-            value={draft.reason}
-            onChange={(event) => set("reason", event.target.value)}
-          />
+          </CollapsibleSection>
           {overlaps && <Alert tone="warning">{overlaps}</Alert>}
-          <p className="text-xs text-soft">
-            O motivo aparece para os moradores no calendário do espaço.
-          </p>
         </div>
       </Drawer>
     </Card>

@@ -2,7 +2,12 @@
 
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Drawer, DrawerActions, Modal } from "@/design-system";
+import {
+  CollapsibleSection,
+  Drawer,
+  DrawerActions,
+  Modal,
+} from "@/design-system";
 
 export type CatalogFormVariant = "drawer" | "modal";
 
@@ -15,6 +20,7 @@ export function CatalogFormShell({
   subtitle,
   busy,
   onClose,
+  section,
   actions,
   children,
 }: {
@@ -23,6 +29,8 @@ export function CatalogFormShell({
   subtitle: string;
   busy: boolean;
   onClose: () => void;
+  /** The drawer shows the fields in this section (as Equipe/Moradores). */
+  section: { icon: ReactNode; title: string; description: string };
   /** The cancel and submit buttons. */
   actions: ReactNode;
   children: ReactNode;
@@ -37,7 +45,13 @@ export function CatalogFormShell({
         subtitle={subtitle}
         footer={<DrawerActions>{actions}</DrawerActions>}
       >
-        {children}
+        <CollapsibleSection
+          icon={section.icon}
+          title={section.title}
+          description={section.description}
+        >
+          {children}
+        </CollapsibleSection>
       </Drawer>
     );
   }
