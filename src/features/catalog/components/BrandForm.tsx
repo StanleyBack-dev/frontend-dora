@@ -65,6 +65,11 @@ export function BrandForm({
       subtitle="Fica no catálogo do condomínio para os itens das solicitações de compra."
       busy={sending}
       onClose={onClose}
+      section={{
+        icon: <Tag />,
+        title: "Marca",
+        description: "O nome da marca, como aparece nos itens.",
+      }}
       actions={
         <>
           <Button variant="cancel" onClick={onClose} disabled={sending}>

@@ -1,14 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { MapPin, PackageCheck, UserCheck, UserRound } from "lucide-react";
+import {
+  MapPin,
+  PackageCheck,
+  PenLine,
+  UserCheck,
+  UserRound,
+} from "lucide-react";
 import {
   Alert,
   Button,
   ChoiceCards,
   Drawer,
   Field,
-  FormSection,
+  CollapsibleSection,
   Select,
   Spinner,
   DrawerActions,
@@ -205,7 +211,7 @@ export function ParcelPickupDrawer({
           <Spinner label="Buscando a encomenda…" />
         </div>
       ) : (
-        <form id={FORM_ID} onSubmit={submit} className="space-y-6">
+        <form id={FORM_ID} onSubmit={submit} className="space-y-4">
           <ParcelDetails parcel={parcel} />
 
           {!declaration ? (
@@ -214,7 +220,10 @@ export function ParcelPickupDrawer({
             </Alert>
           ) : (
             <>
-              <FormSection title="Quem está retirando">
+              <CollapsibleSection
+                icon={<UserRound />}
+                title="Quem está retirando"
+              >
                 {/* A person the resident authorized: pick them and the
                     fields fill in; otherwise, as always, typed here. */}
                 {parcel.authorizedName && (
@@ -282,9 +291,12 @@ export function ParcelPickupDrawer({
                     }
                   />
                 </div>
-              </FormSection>
+              </CollapsibleSection>
 
-              <FormSection title="Declaração e assinatura">
+              <CollapsibleSection
+                icon={<PenLine />}
+                title="Declaração e assinatura"
+              >
                 <blockquote className="rounded-xl border border-border bg-surface-muted p-4 text-sm leading-relaxed text-fg">
                   Eu, <strong>{signerName || "________"}</strong>, {declaration}
                 </blockquote>
@@ -297,7 +309,7 @@ export function ParcelPickupDrawer({
                   {" · "}A data, a hora, o IP e o aparelho também ficam
                   registrados como prova da assinatura.
                 </p>
-              </FormSection>
+              </CollapsibleSection>
             </>
           )}
         </form>

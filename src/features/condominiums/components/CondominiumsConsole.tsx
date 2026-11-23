@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  Blocks,
   Building2,
   House,
   LogIn,
@@ -17,7 +18,10 @@ import {
   Button,
   Card,
   ChoiceCards,
+  type ChoiceOption,
+  CollapsibleSection,
   DataTable,
+  type DataTableColumn,
   DraftNotice,
   Drawer,
   EmptyState,
@@ -25,8 +29,6 @@ import {
   FilterResults,
   Modal,
   Select,
-  type ChoiceOption,
-  type DataTableColumn,
 } from "@/design-system";
 import { condominiumsClient } from "@/features/condominiums/api/condominiums.client";
 import { CondominiumModules } from "@/features/condominiums/components/CondominiumModules";
@@ -366,50 +368,73 @@ export function CondominiumsConsole({
           {creating && createDraft.restored && (
             <DraftNotice onDiscard={createDraft.discard} />
           )}
-          <Field
-            label="Nome"
-            required
-            maxLength={120}
-            value={form.name}
-            placeholder="Ex.: Residencial Aurora"
-            onChange={(event) => set("name", event.target.value)}
-          />
-          <Field
-            label="CNPJ"
-            inputMode="numeric"
-            value={form.document ?? ""}
-            placeholder="Opcional"
-            onChange={(event) => set("document", maskCnpj(event.target.value))}
-          />
-          <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
+          <CollapsibleSection
+            icon={<Building2 />}
+            title="Dados do condomínio"
+            description="Nome, CNPJ e onde fica."
+          >
             <Field
-              label="Cidade"
+              label="Nome"
               required
-              maxLength={80}
-              value={form.city}
-              onChange={(event) => set("city", event.target.value)}
+              maxLength={120}
+              value={form.name}
+              placeholder="Ex.: Residencial Aurora"
+              onChange={(event) => set("name", event.target.value)}
             />
-            <Select
-              label="UF"
-              required
-              placeholder="UF"
-              value={form.state}
-              onChange={(event) => set("state", event.target.value)}
-              options={STATES.map((state) => ({ value: state, label: state }))}
+            <Field
+              label="CNPJ"
+              inputMode="numeric"
+              value={form.document ?? ""}
+              placeholder="Opcional"
+              onChange={(event) =>
+                set("document", maskCnpj(event.target.value))
+              }
             />
-          </div>
-          <ChoiceCards
-            name="addressFormat"
-            legend="Endereço das moradias"
-            options={ADDRESS_FORMATS}
-            value={form.addressFormat ?? "APARTMENT"}
-            onChange={(value) => set("addressFormat", value)}
-          />
+            <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
+              <Field
+                label="Cidade"
+                required
+                maxLength={80}
+                value={form.city}
+                onChange={(event) => set("city", event.target.value)}
+              />
+              <Select
+                label="UF"
+                required
+                placeholder="UF"
+                value={form.state}
+                onChange={(event) => set("state", event.target.value)}
+                options={STATES.map((state) => ({
+                  value: state,
+                  label: state,
+                }))}
+              />
+            </div>
+          </CollapsibleSection>
+          <CollapsibleSection
+            icon={<House />}
+            title="Moradias"
+            description="Como os endereços das moradias são escritos."
+          >
+            <ChoiceCards
+              name="addressFormat"
+              legend="Endereço das moradias"
+              options={ADDRESS_FORMATS}
+              value={form.addressFormat ?? "APARTMENT"}
+              onChange={(value) => set("addressFormat", value)}
+            />
+          </CollapsibleSection>
           {editing?.mode === "edit" && (
-            <CondominiumModules
-              key={editing.condominium.id}
-              condominium={editing.condominium}
-            />
+            <CollapsibleSection
+              icon={<Blocks />}
+              title="Módulos"
+              description="Os módulos contratados à parte pelo condomínio."
+            >
+              <CondominiumModules
+                key={editing.condominium.id}
+                condominium={editing.condominium}
+              />
+            </CollapsibleSection>
           )}
           {creating && (
             <p className="text-xs text-soft">

@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { ClipboardList, Eye } from "lucide-react";
+import { ClipboardList, Pencil, Scale } from "lucide-react";
 import {
   Badge,
   buttonClasses,
   DataTable,
   EmptyState,
+  IconLink,
   type DataTableColumn,
 } from "@/design-system";
-import { CategoriesFold } from "@/features/catalog/components/CategoriesFold";
+import { PurchaseRequestExpanded } from "@/features/purchases/components/PurchaseRequestExpanded";
 import {
   formatRequestDay,
-  itemsCount,
+  isDetailsEditableRequest,
   PRIORITY_LABELS,
   PRIORITY_TONES,
   REQUEST_STATUS_LABELS,
@@ -20,21 +21,87 @@ import {
   requestCode,
 } from "@/features/purchases/model/request-labels";
 import type { PurchaseRequest } from "@/shared/contracts/purchase-requests";
-import { formatDateTime } from "@/shared/lib/datetime";
 
-const requestHref = (request: PurchaseRequest) =>
-  `/compras/solicitacoes/${request.id}`;
+/** The request has a quote page (the management, once it isn't cancelled). */
+const quotable = (request: PurchaseRequest) => request.status !== "CANCELLED";
+
+function RowActions({
+  request,
+  canManage,
+  compact = false,
+}: {
+  request: PurchaseRequest;
+  canManage: boolean;
+  /** Icons only (the phone card's header). */
+  compact?: boolean;
+}) {
+  const edit = isDetailsEditableRequest(request);
+  const quotes = canManage && quotable(request);
+  if (!edit && !quotes) return null;
+  if (compact) {
+    return (
+      <>
+        {edit && (
+          <IconLink
+            href={`/compras/solicitacoes/${request.id}/editar`}
+            label="Editar solicitação"
+            icon={<Pencil />}
+          />
+        )}
+        {quotes && (
+          <IconLink
+            href={`/compras/cotacoes/${request.id}`}
+            label="Abrir cotação"
+            icon={<Scale />}
+            variant="primary"
+          />
+        )}
+      </>
+    );
+  }
+  return (
+    <div className="flex flex-wrap justify-center gap-2 sm:flex-nowrap sm:justify-end">
+      {edit && (
+        <Link
+          href={`/compras/solicitacoes/${request.id}/editar`}
+          className={buttonClasses("secondary", "sm")}
+        >
+          <Pencil aria-hidden className="mr-1.5 size-4" />
+          Editar
+        </Link>
+      )}
+      {quotes && (
+        <Link
+          href={`/compras/cotacoes/${request.id}`}
+          className={buttonClasses("primary", "sm")}
+        >
+          <Scale aria-hidden className="mr-1.5 size-4" />
+          Abrir cotação
+        </Link>
+      )}
+    </div>
+  );
+}
 
 // The purchase requests (Compras > Solicitações): code and title, priority,
-// the day it is needed by and the status; category, place, items, who
-// asked and when open below the row. The request's page has the items and
-// the actions.
+// the day it is needed by and the status, with "Editar" (while it waits for
+// quotes) and, for the management, "Abrir cotação" (the request's quote
+// page, where the comparison map lives). The row opens to the whole
+// request: facts, categories, details and items.
 export function PurchaseRequestsTable({
   requests,
   filtered,
+  viewerId,
+  canManage,
+  openId,
 }: {
   requests: PurchaseRequest[];
   filtered: boolean;
+  viewerId: string;
+  /** Manages the purchases (has the quote pages). */
+  canManage: boolean;
+  /** A request to show open (the list filtered to it). */
+  openId?: string;
 }) {
   if (requests.length === 0) {
     return (
@@ -61,12 +128,7 @@ export function PurchaseRequestsTable({
       mobile: "title",
       render: (request) => (
         <span className="flex min-w-0 flex-col">
-          <Link
-            href={requestHref(request)}
-            className="truncate font-medium text-fg hover:underline"
-          >
-            {request.title}
-          </Link>
+          <span className="truncate font-medium text-fg">{request.title}</span>
           <span className="font-mono text-xs text-soft">
             {requestCode(request.number)}
           </span>
@@ -105,51 +167,15 @@ export function PurchaseRequestsTable({
       ),
     },
     {
-      key: "items",
-      label: "Itens",
-      desktop: "detail",
-      render: (request) => itemsCount(request.items.length),
-    },
-    {
-      key: "location",
-      label: "Onde vai ser usado",
-      desktop: "detail",
-      render: (request) => request.location ?? "—",
-    },
-    {
-      key: "requester",
-      label: "Solicitante",
-      desktop: "detail",
-      render: (request) => request.requestedByName,
-    },
-    {
-      key: "createdAt",
-      label: "Feita em",
-      desktop: "detail",
-      render: (request) => formatDateTime(request.createdAt),
-    },
-    // Last of the details (its own folding block), as on Fornecedores.
-    {
-      key: "categories",
-      label: "Categorias",
-      desktop: "detail",
-      render: (request) => <CategoriesFold value={request} />,
-    },
-    {
       key: "actions",
       label: "",
       className: "text-right",
-      mobile: "detail",
+      mobile: "control",
       render: (request) => (
-        <div className="flex flex-wrap justify-center gap-2 sm:justify-end">
-          <Link
-            href={requestHref(request)}
-            className={buttonClasses("primary", "sm")}
-          >
-            <Eye aria-hidden className="mr-1.5 size-4" />
-            Ver solicitação
-          </Link>
-        </div>
+        <RowActions request={request} canManage={canManage} />
+      ),
+      renderMobile: (request) => (
+        <RowActions request={request} canManage={canManage} compact />
       ),
     },
   ];
@@ -159,6 +185,13 @@ export function PurchaseRequestsTable({
       rows={requests}
       columns={columns}
       getId={(request) => request.id}
+      initiallyOpen={(request) => request.id === openId}
+      renderExpanded={(request) => (
+        <PurchaseRequestExpanded request={request} viewerId={viewerId} />
+      )}
+      renderDesktopExpanded={(request) => (
+        <PurchaseRequestExpanded request={request} viewerId={viewerId} />
+      )}
     />
   );
 }

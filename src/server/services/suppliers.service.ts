@@ -4,11 +4,13 @@ import {
   createSupplierDocument,
   setSupplierActiveDocument,
   supplierFilterOptionsDocument,
+  supplierOptionsDocument,
   supplierOverviewDocument,
   suppliersDocument,
   updateSupplierDocument,
 } from "@/server/graphql/operations/suppliers.operations";
 import type { Paginated } from "@/shared/contracts/api";
+import type { QuoteSupplierOption } from "@/shared/contracts/purchase-quotes";
 import type {
   Supplier,
   SupplierFilter,
@@ -50,6 +52,14 @@ export const suppliersService = {
       { token },
     );
     return supplierOverview;
+  },
+
+  /** The active suppliers with what they serve (the quote's select). */
+  async supplierOptions(token: string): Promise<QuoteSupplierOption[]> {
+    const { supplierOptions } = await backendGraphql(supplierOptionsDocument, {
+      token,
+    });
+    return supplierOptions;
   },
 
   async createSupplier(token: string, input: SupplierInput): Promise<Supplier> {

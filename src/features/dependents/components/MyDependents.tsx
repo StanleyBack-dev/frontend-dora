@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, UsersRound } from "lucide-react";
+import { FileText, Plus, Trash2, UserRound, UsersRound } from "lucide-react";
 import {
   Badge,
   Button,
   Card,
+  CollapsibleSection,
   DraftNotice,
   Drawer,
   EmptyState,
@@ -297,40 +298,52 @@ function AddDependentDrawer({
           documento uma vez; depois, o dependente entra nos pedidos de ingressos
           com a idade certa.
         </p>
-        <Field
-          label="Nome completo"
-          required
-          maxLength={80}
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <CollapsibleSection
+          icon={<UserRound />}
+          title="Dados do dependente"
+          description="Nome, data de nascimento e parentesco."
+        >
           <Field
-            label="Data de nascimento"
+            label="Nome completo"
             required
-            type="date"
-            max={todayIso()}
-            value={birthDate}
-            onChange={(event) => setBirthDate(event.target.value)}
-            error={(birthDate && birthProblem) || undefined}
+            maxLength={80}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
           />
-          <Select
-            label="Parentesco"
-            required
-            placeholder="Escolha"
-            value={relationship}
-            onChange={(event) =>
-              setRelationship(event.target.value as DependentRelationship)
-            }
-            options={RELATIONSHIPS}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              label="Data de nascimento"
+              required
+              type="date"
+              max={todayIso()}
+              value={birthDate}
+              onChange={(event) => setBirthDate(event.target.value)}
+              error={(birthDate && birthProblem) || undefined}
+            />
+            <Select
+              label="Parentesco"
+              required
+              placeholder="Escolha"
+              value={relationship}
+              onChange={(event) =>
+                setRelationship(event.target.value as DependentRelationship)
+              }
+              options={RELATIONSHIPS}
+            />
+          </div>
+        </CollapsibleSection>
+        <CollapsibleSection
+          icon={<FileText />}
+          title="Documento"
+          description="Para a administração conferir a idade, uma vez."
+        >
+          <DocumentField
+            label="Documento com a data de nascimento"
+            hint="Certidão de nascimento, RG ou outro documento com foto: imagem ou PDF, até 1 MB."
+            value={document}
+            onChange={setDocument}
           />
-        </div>
-        <DocumentField
-          label="Documento com a data de nascimento"
-          hint="Certidão de nascimento, RG ou outro documento com foto: imagem ou PDF, até 1 MB."
-          value={document}
-          onChange={setDocument}
-        />
+        </CollapsibleSection>
       </div>
     </Drawer>
   );

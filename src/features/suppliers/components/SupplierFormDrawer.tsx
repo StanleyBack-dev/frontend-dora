@@ -1,14 +1,22 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import { Save, Truck } from "lucide-react";
+import {
+  IdCard,
+  Layers,
+  Phone,
+  Save,
+  StickyNote,
+  Truck,
+  Wallet,
+} from "lucide-react";
 import {
   Button,
   DraftNotice,
   Drawer,
   DrawerActions,
   Field,
-  FormSection,
+  CollapsibleSection,
   Select,
   TextArea,
 } from "@/design-system";
@@ -251,11 +259,11 @@ export function SupplierFormDrawer({
         </DrawerActions>
       }
     >
-      <form id={formId} onSubmit={submit} className="space-y-6">
+      <form id={formId} onSubmit={submit} className="space-y-4">
         {!supplier && draft.restored && (
           <DraftNotice onDiscard={draft.discard} />
         )}
-        <FormSection title="Identificação">
+        <CollapsibleSection icon={<IdCard />} title="Identificação">
           <div className="grid items-start gap-3 sm:grid-cols-[12rem_1fr]">
             <Select
               label="Documento"
@@ -312,9 +320,10 @@ export function SupplierFormDrawer({
               onChange={(event) => update({ tradeName: event.target.value })}
             />
           </div>
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection
+        <CollapsibleSection
+          icon={<Layers />}
           title="O que atende"
           description="Marque uma ou mais categorias: elas ajudam a encontrar o fornecedor ao cotar uma compra. Não está na lista? Marque “Outros (digitar)” e escreva."
         >
@@ -336,9 +345,9 @@ export function SupplierFormDrawer({
               }
             />
           )}
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection title="Contato">
+        <CollapsibleSection icon={<Phone />} title="Contato">
           <div className="grid items-start gap-3 sm:grid-cols-2">
             <Field
               label="Falar com"
@@ -392,9 +401,10 @@ export function SupplierFormDrawer({
               ]}
             />
           </div>
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection
+        <CollapsibleSection
+          icon={<Wallet />}
           title="PIX para pagamento (opcional)"
           description="Fica à mão quando a compra for paga."
         >
@@ -433,9 +443,9 @@ export function SupplierFormDrawer({
               }
             />
           </div>
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection title="Observações">
+        <CollapsibleSection icon={<StickyNote />} title="Observações">
           <TextArea
             label="Observações"
             hideLabel
@@ -445,7 +455,7 @@ export function SupplierFormDrawer({
             value={form.notes}
             onChange={(event) => update({ notes: event.target.value })}
           />
-        </FormSection>
+        </CollapsibleSection>
       </form>
     </Drawer>
   );

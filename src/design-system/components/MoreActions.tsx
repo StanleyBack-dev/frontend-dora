@@ -3,7 +3,10 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ChevronDown, MoreHorizontal } from "lucide-react";
-import { buttonClasses } from "@/design-system/components/Button";
+import {
+  buttonClasses,
+  type ButtonVariant,
+} from "@/design-system/components/Button";
 import { cn } from "@/design-system/utils/cn";
 
 export type MoreAction = {
@@ -23,10 +26,16 @@ export type MoreAction = {
 export function MoreActions({
   actions,
   label = "Mais ações",
+  icon,
+  variant = "secondary",
   className,
 }: {
   actions: MoreAction[];
   label?: string;
+  /** The button's icon (default: three dots). */
+  icon?: ReactNode;
+  /** The button's look (default: light). */
+  variant?: ButtonVariant;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -59,10 +68,10 @@ export function MoreActions({
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
-        className={cn(buttonClasses("secondary"), "w-full justify-center")}
+        className={cn(buttonClasses(variant), "w-full justify-center")}
         onClick={() => setOpen((value) => !value)}
       >
-        <MoreHorizontal aria-hidden className="size-4" />
+        {icon ?? <MoreHorizontal aria-hidden className="size-4" />}
         {label}
         <ChevronDown
           aria-hidden

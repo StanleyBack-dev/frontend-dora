@@ -1,20 +1,34 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
-import { ClipboardPlus, Save } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import {
+  ClipboardList,
+  ClipboardPlus,
+  FileText,
+  Layers,
+  ListChecks,
+  MapPin,
+  Save,
+} from "lucide-react";
+import {
+  Alert,
+  Badge,
   Button,
   Combobox,
   DraftNotice,
-  Drawer,
-  DrawerActions,
   Field,
-  FormSection,
+  FormActions,
+  FormIssues,
+  FormTabs,
+  type FormTab,
   Select,
   TextArea,
 } from "@/design-system";
 import { purchaseRequestsClient } from "@/features/purchases/api/purchase-requests.client";
 import { CategoryChecklist } from "@/features/catalog/components/CategoryChecklist";
+import { categoryLabels } from "@/features/catalog/model/categories";
+import { RequestItemsList } from "@/features/purchases/components/RequestItemsList";
 import {
   blankItem,
   itemComplete,
@@ -36,6 +50,7 @@ import type {
 import { ApiClientError } from "@/shared/lib/api-client";
 import { localDay } from "@/shared/lib/datetime";
 import { sameShape } from "@/shared/lib/form-draft";
+import { startNavigation } from "@/shared/lib/navigation-progress";
 import { useFormDraft } from "@/shared/lib/use-form-draft";
 import { useToast } from "@/shared/toast/useToast";
 
@@ -89,22 +104,21 @@ const formOf = (request: PurchaseRequest): RequestForm => ({
   })),
 });
 
+/** The form's tabs, in order. */
+type RequestTab = "what" | "where" | "items" | "categories";
+
 // Asks for a purchase (or edits one waiting for quotes): what is needed,
 // its categories (as a supplier's, with "Outros (digitar)"), the priority,
 // where and by when, and the items (products and brands of the catalog,
 // which can be registered from here). A new request's form is kept as a
-// draft until sent or cancelled; an edit starts from the request (the
-// parent remounts it).
-export function PurchaseRequestFormDrawer({
-  open,
+// draft until sent or cancelled; an edit starts from the request. A page
+// form (as the event's): saving opens the request.
+export function PurchaseRequestForm({
   request = null,
   spaces,
   products: initialProducts,
   brands: initialBrands,
-  onClose,
-  onDone,
 }: {
-  open: boolean;
   /** The request being edited (null: a new one). */
   request?: PurchaseRequest | null;
   /** The condominium's active spaces (where it will be used). */
@@ -112,12 +126,9 @@ export function PurchaseRequestFormDrawer({
   /** The catalog (the selects offer the active ones). */
   products: CatalogOption[];
   brands: CatalogOption[];
-  onClose: () => void;
-  onDone: (request: PurchaseRequest) => void;
 }) {
+  const router = useRouter();
   const { showError, showSuccess } = useToast();
-  // One id per drawer (a closed dialog stays in the DOM).
-  const formId = useId();
   const [blank] = useState(emptyForm);
   const draft = useFormDraft<RequestForm>(
     "purchase-request-new",
@@ -134,12 +145,15 @@ export function PurchaseRequestFormDrawer({
           : [blankItem()];
       return parsed;
     },
-    { open: open && request === null },
+    { open: request === null },
   );
   const [edited, setEdited] = useState<RequestForm | null>(() =>
     request ? formOf(request) : null,
   );
   const [sending, setSending] = useState(false);
+  const [tried, setTried] = useState(false);
+  const [tab, setTab] = useState<RequestTab>("what");
+  const [error, setError] = useState<string | null>(null);
   // The catalog, plus what is registered from this form.
   const [products, setProducts] = useState(initialProducts);
   const [brands, setBrands] = useState(initialBrands);
@@ -179,14 +193,31 @@ export function PurchaseRequestFormDrawer({
     today !== "" &&
     form.neededBy < today &&
     form.neededBy !== request?.neededBy;
-  const complete =
-    form.title.trim().length >= 3 &&
-    form.categories.length > 0 &&
-    (!form.categories.includes("OTHER") ||
-      form.categoryOther.trim().length >= 2) &&
-    !pastDate &&
-    form.items.length > 0 &&
-    form.items.every(itemComplete);
+  // What blocks sending, and the tab where it is fixed.
+  const issues = (
+    [
+      [
+        "what",
+        form.title.trim().length < 3 && "O que precisa (ao menos 3 letras)",
+      ],
+      ["where", pastDate && "Uma data a partir de hoje"],
+      [
+        "items",
+        (form.items.length === 0 || !form.items.every(itemComplete)) &&
+          "Os itens (produto, quantidade e unidade)",
+      ],
+      ["categories", form.categories.length === 0 && "Ao menos uma categoria"],
+      [
+        "categories",
+        form.categories.includes("OTHER") &&
+          form.categoryOther.trim().length < 2 &&
+          "Qual a outra categoria",
+      ],
+    ] as [RequestTab, string | false][]
+  ).filter((issue): issue is [RequestTab, string] => Boolean(issue[1]));
+  const problems = issues.map(([, problem]) => problem);
+  const invalid = (id: RequestTab) =>
+    tried && issues.some(([issueTab]) => issueTab === id);
 
   // Only once something was typed (an empty field just keeps "Enviar" off).
   const otherProblem =
@@ -196,12 +227,16 @@ export function PurchaseRequestFormDrawer({
 
   function cancel() {
     if (!request) draft.discard();
-    onClose();
+    router.push("/compras/solicitacoes");
   }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!complete) return;
+    setTried(true);
+    if (issues.length) {
+      setTab(issues[0][0]);
+      return;
+    }
     const input = {
       title: form.title.trim(),
       description: form.description.trim() || null,
@@ -222,6 +257,7 @@ export function PurchaseRequestFormDrawer({
       })),
     };
     setSending(true);
+    setError(null);
     try {
       const saved = request
         ? await purchaseRequestsClient.update(request.id, input)
@@ -233,57 +269,45 @@ export function PurchaseRequestFormDrawer({
         request ? undefined : "A gestão foi avisada para começar as cotações.",
       );
       if (!request) draft.discard();
-      onDone(saved);
+      startNavigation();
+      // The list, showing the request just saved (opened).
+      router.push(
+        `/compras/solicitacoes?solicitacao=${saved.id}&situacao=todas`,
+      );
+      router.refresh();
     } catch (cause) {
-      showError(
+      const message =
         cause instanceof ApiClientError
           ? cause.message
-          : "Não foi possível salvar a solicitação.",
-      );
-    } finally {
+          : "Não foi possível salvar a solicitação.";
+      setError(message);
+      showError(message);
       setSending(false);
     }
   }
 
-  return (
-    <Drawer
-      open={open}
-      onClose={onClose}
-      busy={sending}
-      title={
-        request
-          ? `Editar solicitação ${requestCode(request.number)}`
-          : "Nova solicitação de compra"
-      }
-      subtitle="Diga o que precisa ser comprado ou contratado. A gestão é avisada e faz as cotações."
-      footer={
-        <DrawerActions>
-          <Button variant="cancel" onClick={cancel} disabled={sending}>
-            Cancelar
-          </Button>
-          <Button
-            type="submit"
-            form={formId}
-            loading={sending}
-            disabled={!complete}
-            icon={
-              request ? (
-                <Save className="size-4" />
-              ) : (
-                <ClipboardPlus className="size-4" />
-              )
-            }
-          >
-            {request ? "Salvar alterações" : "Enviar solicitação"}
-          </Button>
-        </DrawerActions>
-      }
-    >
-      <form id={formId} onSubmit={submit} className="space-y-6">
-        {!request && draft.restored && (
-          <DraftNotice onDiscard={draft.discard} />
-        )}
-        <FormSection title="O que precisa">
+  // In quotes the title, details, items and categories are kept (the API refuses
+  // changes).
+  const scopeLocked = request?.status === "QUOTING";
+  const lockedNote = (
+    <Alert tone="info">
+      <strong>Em cotação:</strong> o título, os detalhes, os itens e as
+      categorias não mudam mais, porque as cotações foram feitas sobre eles.
+      Ainda dá para mudar a prioridade, o local e a data.
+    </Alert>
+  );
+
+  const tabs: FormTab[] = [
+    {
+      id: "what",
+      label: "O que precisa",
+      icon: <ClipboardList />,
+      invalid: invalid("what"),
+      description:
+        "O que precisa ser comprado ou contratado, a prioridade e, se quiser, mais detalhes.",
+      content: (
+        <>
+          {scopeLocked && lockedNote}
           <Field
             label="O que precisa ser comprado ou contratado"
             required
@@ -291,6 +315,7 @@ export function PurchaseRequestFormDrawer({
             autoComplete="off"
             placeholder="Ex.: lâmpadas para o hall do bloco A"
             value={form.title}
+            disabled={scopeLocked}
             onChange={(event) => update({ title: event.target.value })}
           />
           <div className="grid items-start gap-3 sm:grid-cols-2">
@@ -307,12 +332,105 @@ export function PurchaseRequestFormDrawer({
               }))}
             />
           </div>
-        </FormSection>
-
-        <FormSection
-          title="Categorias"
-          description="Marque uma ou mais: elas ajudam a escolher os fornecedores para as cotações. Não está na lista? Marque “Outros (digitar)” e escreva."
-        >
+          <TextArea
+            label="Detalhes (opcional)"
+            maxLength={1000}
+            rows={4}
+            placeholder="Ex.: marca de preferência, medidas, por que precisa."
+            value={form.description}
+            disabled={scopeLocked}
+            onChange={(event) => update({ description: event.target.value })}
+          />
+        </>
+      ),
+    },
+    {
+      id: "where",
+      label: "Onde e quando",
+      icon: <MapPin />,
+      invalid: invalid("where"),
+      description: "Onde vai ser usado e até quando precisa.",
+      content: (
+        <div className="grid items-start gap-3 sm:grid-cols-[1fr_12rem]">
+          <Combobox
+            label="Onde vai ser usado"
+            placeholder="Escolha o espaço ou digite"
+            freeText
+            freeTextLabel="Outro local (digitar)"
+            maxLength={80}
+            options={spaceOptions}
+            value={form.spaceId || form.location || null}
+            onSelect={pickPlace}
+          />
+          <Field
+            label="Precisa até"
+            type="date"
+            min={today || undefined}
+            value={form.neededBy}
+            error={pastDate ? "Não pode ser antes de hoje." : undefined}
+            onFocus={refreshToday}
+            onPointerDown={refreshToday}
+            onChange={(event) => {
+              refreshToday();
+              update({ neededBy: event.target.value });
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      id: "items",
+      label: `Itens (${form.items.length})`,
+      icon: <ListChecks />,
+      invalid: invalid("items"),
+      description: scopeLocked
+        ? "Os itens que foram cotados (somente leitura)."
+        : "Escolha o produto do catálogo (ou cadastre com o +), a quantidade, a unidade e, se quiser, a marca e uma observação.",
+      content: scopeLocked ? (
+        <>
+          {lockedNote}
+          <RequestItemsList items={request.items} />
+        </>
+      ) : (
+        <RequestItemsEditor
+          items={form.items}
+          products={products}
+          brands={brands}
+          onProductCreated={(product) =>
+            setProducts((current) => [...current, product])
+          }
+          onBrandCreated={(brand) =>
+            setBrands((current) => [...current, brand])
+          }
+          onChange={(items) => update({ items })}
+        />
+      ),
+    },
+    {
+      id: "categories",
+      label: "Categorias",
+      icon: <Layers />,
+      invalid: invalid("categories"),
+      description: scopeLocked
+        ? "As categorias da solicitação (somente leitura)."
+        : "Marque uma ou mais: elas ajudam a escolher os fornecedores para as cotações. Não está na lista? Marque “Outros (digitar)” e escreva.",
+      content: scopeLocked ? (
+        <>
+          {lockedNote}
+          <div className="flex flex-wrap gap-1.5">
+            {categoryLabels(request).map((label) => (
+              <Badge
+                key={label}
+                tone="neutral"
+                className="max-w-full whitespace-normal"
+              >
+                {label}
+              </Badge>
+            ))}
+          </div>
+        </>
+      ) : (
+        <>
           <CategoryChecklist
             label="Categorias da compra"
             value={form.categories}
@@ -332,66 +450,46 @@ export function PurchaseRequestFormDrawer({
               }
             />
           )}
-        </FormSection>
+        </>
+      ),
+    },
+  ];
 
-        <FormSection title="Onde e quando">
-          <div className="grid items-start gap-3 sm:grid-cols-[1fr_12rem]">
-            <Combobox
-              label="Onde vai ser usado"
-              placeholder="Escolha o espaço ou digite"
-              freeText
-              freeTextLabel="Outro local (digitar)"
-              maxLength={80}
-              options={spaceOptions}
-              value={form.spaceId || form.location || null}
-              onSelect={pickPlace}
-            />
-            <Field
-              label="Precisa até"
-              type="date"
-              min={today || undefined}
-              value={form.neededBy}
-              error={pastDate ? "Não pode ser antes de hoje." : undefined}
-              onFocus={refreshToday}
-              onPointerDown={refreshToday}
-              onChange={(event) => {
-                refreshToday();
-                update({ neededBy: event.target.value });
-              }}
-            />
-          </div>
-        </FormSection>
+  return (
+    <form onSubmit={submit} noValidate className="space-y-4">
+      {!request && draft.restored && <DraftNotice onDiscard={draft.discard} />}
+      <FormIssues missing={tried ? problems : []} error={error} />
 
-        <FormSection
-          title="Itens"
-          description="Escolha o produto do catálogo (ou cadastre com o +), a quantidade, a unidade e, se quiser, a marca e uma observação."
+      <FormTabs
+        label="Partes da solicitação"
+        tabs={tabs}
+        value={tab}
+        onChange={(id) => setTab(id as RequestTab)}
+      />
+
+      <FormActions>
+        <Button
+          type="button"
+          variant="cancel"
+          onClick={cancel}
+          disabled={sending}
         >
-          <RequestItemsEditor
-            items={form.items}
-            products={products}
-            brands={brands}
-            onProductCreated={(product) =>
-              setProducts((current) => [...current, product])
-            }
-            onBrandCreated={(brand) =>
-              setBrands((current) => [...current, brand])
-            }
-            onChange={(items) => update({ items })}
-          />
-        </FormSection>
-
-        <FormSection title="Detalhes (opcional)">
-          <TextArea
-            label="Detalhes"
-            hideLabel
-            maxLength={1000}
-            rows={3}
-            placeholder="Ex.: marca de preferência, medidas, por que precisa."
-            value={form.description}
-            onChange={(event) => update({ description: event.target.value })}
-          />
-        </FormSection>
-      </form>
-    </Drawer>
+          Cancelar
+        </Button>
+        <Button
+          type="submit"
+          loading={sending}
+          icon={
+            request ? (
+              <Save className="size-4" />
+            ) : (
+              <ClipboardPlus className="size-4" />
+            )
+          }
+        >
+          {request ? "Salvar alterações" : "Enviar solicitação"}
+        </Button>
+      </FormActions>
+    </form>
   );
 }

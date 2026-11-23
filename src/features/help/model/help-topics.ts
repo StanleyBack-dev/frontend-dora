@@ -671,15 +671,30 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Ao enviar, a solicitação ganha um número (SC-0001…) e a gestão é avisada para fazer as cotações.",
         },
         {
-          text: "Enquanto aguarda cotação, abra a solicitação para “Editar solicitação” ou, em “Mais ações”, “Cancelar solicitação” com o motivo.",
+          text: "Enquanto aguarda cotação, use “Editar” na linha da solicitação para mudar tudo, ou abra a linha para “Cancelar solicitação” com o motivo. Em cotação, “Editar” ainda muda a prioridade, o local e a data; o título, os detalhes, os itens e as categorias ficam como estão.",
         },
         {
           text: "Na lista, filtre pela solicitação, categoria, prioridade e situação. Os cards mostram o que aguarda cotação, as urgentes, as com prazo em até 7 dias e as atrasadas.",
         },
+        {
+          text: "Gestão: em Compras > Cotações, use “Abrir cotação” na solicitação e “Adicionar cotação” para cada fornecedor (os que atendem as categorias da solicitação aparecem primeiro), com o preço de cada item (vazio quando o fornecedor não tem), frete, um ou mais encargos (escolha o tipo e informe o valor), desconto em valor ou porcentagem, pagamento (parcelas e juros ao mês, com a simulação), prazo, validade e o orçamento em PDF ou foto; o extrato mostra a nota da cotação. A lista de Cotações mostra quantas cotações cada solicitação tem, a mais barata e a escolhida; o mapa de cotação (tela e PDF) fica na página de cotação de cada uma, e dá para baixá-lo ou usar “Compartilhar” para mandar por WhatsApp ou e-mail com o PDF em anexo. Em Solicitações, cada linha abre os dados da solicitação, com “Editar” e “Abrir cotação”.",
+        },
+        {
+          text: "O mapa compara os fornecedores item a item: o menor preço de cada item fica em verde e a cotação completa mais barata é marcada. Baixe o “Mapa de cotação (PDF)” para arquivar ou apresentar.",
+        },
+        {
+          text: "Use “Escolher” na vencedora: a solicitação passa a aguardar aprovação. Enquanto não for aprovada, “Reabrir cotações” (em “Mais ações”) desfaz a escolha.",
+        },
       ],
       rules: [
         {
-          text: "Depois que as cotações começam, a solicitação não pode mais ser alterada nem cancelada.",
+          text: "Depois que as cotações começam, a solicitação não pode ser cancelada e o título, os detalhes, os itens e as categorias não mudam mais (as cotações foram feitas sobre eles). Com uma cotação escolhida, nada muda.",
+        },
+        {
+          text: "A primeira cotação põe a solicitação “Em cotação”; sem nenhuma, ela volta a aguardar cotação. Cada fornecedor tem uma cotação por solicitação.",
+        },
+        {
+          text: "Escolher uma cotação que não é a completa mais barata, ou com menos de 3 cotações, exige justificativa: ela fica registrada e aparece no mapa.",
         },
         {
           text: "Se a gestão cancelar uma solicitação sua, você é avisado com o motivo.",

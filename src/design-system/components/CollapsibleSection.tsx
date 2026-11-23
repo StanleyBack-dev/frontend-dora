@@ -28,7 +28,7 @@ export function CollapsibleSection({
   return (
     <section
       className={cn(
-        "overflow-hidden rounded-2xl border border-border bg-surface shadow-card",
+        "rounded-2xl border border-border bg-surface shadow-card",
         className,
       )}
     >
@@ -37,7 +37,10 @@ export function CollapsibleSection({
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls={bodyId}
-        className="flex w-full items-center gap-3 bg-chrome px-4 py-3 text-left text-chrome-fg transition-colors hover:bg-chrome-raised sm:px-5"
+        className={cn(
+          "flex w-full items-center gap-3 rounded-t-[calc(1rem-1px)] bg-chrome px-4 py-3 text-left text-chrome-fg transition-colors hover:bg-chrome-raised sm:px-5",
+          !open && "rounded-b-[calc(1rem-1px)]",
+        )}
       >
         {icon && (
           <span

@@ -27,9 +27,7 @@ import {
   requestCode,
 } from "@/features/purchases/model/request-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
-import { catalogService } from "@/server/services/catalog.service";
 import { purchaseRequestsService } from "@/server/services/purchase-requests.service";
-import { spacesService } from "@/server/services/spaces.service";
 import type {
   PurchaseRequestFilter,
   PurchaseRequestStatus,
@@ -81,12 +79,9 @@ export default async function PurchaseRequestsPage({
   const desk = can(user, "PURCHASES_MANAGE");
 
   const query = await searchParams;
-  const [options, overview, products, brands, spaces] = await Promise.all([
+  const [options, overview] = await Promise.all([
     authed((token) => purchaseRequestsService.filterOptions(token)),
     authed((token) => purchaseRequestsService.overview(token)),
-    authed((token) => catalogService.productOptions(token)),
-    authed((token) => catalogService.brandOptions(token)),
-    authed((token) => spacesService.list(token)),
   ]);
   const status =
     oneOf(
@@ -145,11 +140,7 @@ export default async function PurchaseRequestsPage({
         }
       />
 
-      <PurchaseRequestDeskActions
-        spaces={spaces.map((space) => ({ id: space.id, name: space.name }))}
-        products={products}
-        brands={brands}
-      />
+      <PurchaseRequestDeskActions />
 
       <PurchaseRequestsSummary overview={overview} />
 
@@ -227,6 +218,9 @@ export default async function PurchaseRequestsPage({
             <PurchaseRequestsTable
               requests={requests.items}
               filtered={filtered}
+              viewerId={user.id}
+              canManage={desk}
+              openId={requestId}
             />
             <Pagination
               page={requests.page}

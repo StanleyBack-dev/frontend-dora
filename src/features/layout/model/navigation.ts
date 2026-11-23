@@ -28,6 +28,7 @@ import {
   SearchCheck,
   SearchX,
   Settings,
+  Scale,
   ShoppingCart,
   Tag,
   Truck,
@@ -262,6 +263,13 @@ export const SIDEBAR: SidebarEntry[] = [
         label: "Solicitações",
         icon: ClipboardList,
         anyPermission: ["PURCHASES_MANAGE", "PURCHASES_REQUEST"],
+      },
+      // The quotes of every request in the quote stages.
+      {
+        href: "/compras/cotacoes",
+        label: "Cotações",
+        icon: Scale,
+        permission: "PURCHASES_MANAGE",
       },
       {
         href: "/compras/fornecedores",

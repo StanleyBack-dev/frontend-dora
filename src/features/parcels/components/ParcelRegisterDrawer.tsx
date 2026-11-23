@@ -3,7 +3,9 @@
 import { useRef, useState, type FormEvent } from "react";
 import {
   Camera,
+  House,
   ImagePlus,
+  Package,
   PackagePlus,
   Snowflake,
   Trash2,
@@ -12,7 +14,7 @@ import {
   Button,
   Drawer,
   Field,
-  FormSection,
+  CollapsibleSection,
   cn,
   Combobox,
   Select,
@@ -232,8 +234,8 @@ export function ParcelRegisterDrawer({
         </DrawerActions>
       }
     >
-      <form key={formKey} id={FORM_ID} onSubmit={submit} className="space-y-6">
-        <FormSection title="Para quem">
+      <form key={formKey} id={FORM_ID} onSubmit={submit} className="space-y-4">
+        <CollapsibleSection icon={<House />} title="Para quem">
           <ParcelRecipientPicker
             units={units}
             value={form.unitId}
@@ -259,9 +261,9 @@ export function ParcelRegisterDrawer({
             value={form.recipientName}
             onChange={(event) => set("recipientName")(event.target.value)}
           />
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection title="A encomenda">
+        <CollapsibleSection icon={<Package />} title="A encomenda">
           <div className="grid items-start gap-3 sm:grid-cols-2">
             <Combobox
               label="Transportadora ou loja"
@@ -351,9 +353,10 @@ export function ParcelRegisterDrawer({
             value={form.notes}
             onChange={(event) => set("notes")(event.target.value)}
           />
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection
+        <CollapsibleSection
+          icon={<Camera />}
           title="Foto (opcional)"
           description="Ajuda a encontrar o pacote e mostra como ele chegou."
         >
@@ -414,7 +417,7 @@ export function ParcelRegisterDrawer({
               </Button>
             </div>
           )}
-        </FormSection>
+        </CollapsibleSection>
       </form>
     </Drawer>
   );

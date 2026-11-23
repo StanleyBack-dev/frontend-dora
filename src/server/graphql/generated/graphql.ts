@@ -642,6 +642,17 @@ export type ParcelStatus =
   | 'RECEIVED'
   | 'RETURNED';
 
+/** Forma de pagamento de uma cotação: PIX, dinheiro, cartão de débito ou de crédito, boleto, transferência, faturado ou outra (digitada). */
+export type PaymentMethod =
+  | 'BANK_TRANSFER'
+  | 'BOLETO'
+  | 'CASH'
+  | 'CREDIT_CARD'
+  | 'DEBIT_CARD'
+  | 'INVOICE'
+  | 'OTHER'
+  | 'PIX';
+
 /** Capacidade verificada pela API. */
 export type Permission =
   | 'AUDIT_READ'
@@ -740,6 +751,38 @@ export type PurchasePriority =
   | 'NORMAL'
   | 'URGENT';
 
+/** Preços e condições de uma cotação. */
+export type PurchaseQuoteInput = {
+  /** Outros encargos (instalação, taxas…), cada um com o valor. */
+  charges?: Array<QuoteChargeInput> | null | undefined;
+  /** Prazo de entrega em dias. */
+  deliveryDays?: number | null | undefined;
+  /** Desconto fixo, em centavos (ignorado com porcentagem). */
+  discountCents?: number | null | undefined;
+  /** Desconto em porcentagem de itens + frete + encargos, em centésimos de % (5% = 500; até 10000). */
+  discountPercentBp?: number | null | undefined;
+  /** Parcelas (2 a 60; vazio ou 1: à vista). Cartão de crédito, boleto, faturado ou outro. */
+  installments?: number | null | undefined;
+  /** Juros do parcelamento ao mês, em centésimos de % (1,99% = 199; até 2000). Só parcelado. */
+  interestRateBp?: number | null | undefined;
+  items: Array<PurchaseQuoteItemInput>;
+  notes?: string | null | undefined;
+  paymentMethod?: PaymentMethod | null | undefined;
+  /** Com OTHER: a forma de pagamento digitada. */
+  paymentTerms?: string | null | undefined;
+  /** Frete em centavos. */
+  shippingCents?: number | null | undefined;
+  /** Último dia em que os preços valem (AAAA-MM-DD). */
+  validUntil?: string | null | undefined;
+};
+
+/** O preço de um item da solicitação numa cotação. */
+export type PurchaseQuoteItemInput = {
+  requestItemId: string | number;
+  /** Preço unitário em centavos (vazio: o fornecedor não tem). */
+  unitPriceCents?: number | null | undefined;
+};
+
 /** Filtros das solicitações de compra. */
 export type PurchaseRequestFilterInput = {
   /** Com esta categoria entre as suas. */
@@ -805,6 +848,14 @@ export type PushSubscriptionInput = {
   endpoint: string;
   /** Chave pública do aparelho (base64url). */
   p256dh: string;
+};
+
+/** Um dos outros encargos de uma cotação. */
+export type QuoteChargeInput = {
+  /** Valor em centavos. */
+  amountCents: number;
+  /** O que é (instalação, taxa…). */
+  label: string;
 };
 
 export type RecordSupportContributionInput = {
@@ -936,6 +987,14 @@ export type SetUserPermissionsInput = {
   /** true descarta as exceções e volta ao padrão do grupo. */
   useGroupDefaults: boolean;
   userId: string | number;
+};
+
+/** Envio do mapa de cotação por e-mail. */
+export type ShareQuoteMapInput = {
+  /** De 1 a 5 e-mails. */
+  emails: Array<string>;
+  /** A mensagem que vai no e-mail. */
+  message: string;
 };
 
 /** O aparelho em que a assinatura foi feita. */
@@ -2489,7 +2548,86 @@ export type CondominiumMembersQueryVariables = Exact<{
 
 export type CondominiumMembersQuery = { condominiumMembers: Array<{ userId: string, name: string, email: string, username: string, phone: string | null, role: UserGroup, kind: MemberKind, active: boolean, unitLabel: string | null, jobTitle: string | null, lastLoginAt: string | null, since: string }> };
 
-export type PurchaseRequestFieldsFragment = { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> };
+export type PurchaseQuoteFieldsFragment = { id: string, supplierId: string, supplierName: string, shippingCents: number, chargesCents: number, discountCents: number, discountPercentBp: number | null, interestRateBp: number | null, itemsCents: number, cashCents: number, totalCents: number, interestCents: number, installmentValues: Array<number>, complete: boolean, cheapest: boolean, chosen: boolean, deliveryDays: number | null, paymentMethod: PaymentMethod | null, installments: number | null, paymentTerms: string | null, validUntil: string | null, notes: string | null, fileUrl: string | null, fileIsPdf: boolean | null, createdAt: string, lines: Array<{ requestItemId: string, unitPriceCents: number | null, lineCents: number | null }>, charges: Array<{ label: string, amountCents: number }> };
+
+export type PurchaseQuotesQueryVariables = Exact<{
+  requestId: string | number;
+}>;
+
+
+export type PurchaseQuotesQuery = { purchaseQuotes: Array<{ id: string, supplierId: string, supplierName: string, shippingCents: number, chargesCents: number, discountCents: number, discountPercentBp: number | null, interestRateBp: number | null, itemsCents: number, cashCents: number, totalCents: number, interestCents: number, installmentValues: Array<number>, complete: boolean, cheapest: boolean, chosen: boolean, deliveryDays: number | null, paymentMethod: PaymentMethod | null, installments: number | null, paymentTerms: string | null, validUntil: string | null, notes: string | null, fileUrl: string | null, fileIsPdf: boolean | null, createdAt: string, lines: Array<{ requestItemId: string, unitPriceCents: number | null, lineCents: number | null }>, charges: Array<{ label: string, amountCents: number }> }> };
+
+export type PurchaseQuoteMapPdfQueryVariables = Exact<{
+  requestId: string | number;
+}>;
+
+
+export type PurchaseQuoteMapPdfQuery = { purchaseQuoteMapPdf: { fileName: string, mimeType: string, base64Content: string } };
+
+export type AddPurchaseQuoteMutationVariables = Exact<{
+  requestId: string | number;
+  supplierId: string | number;
+  input: PurchaseQuoteInput;
+  file?: string | null | undefined;
+}>;
+
+
+export type AddPurchaseQuoteMutation = { addPurchaseQuote: { id: string, supplierId: string, supplierName: string, shippingCents: number, chargesCents: number, discountCents: number, discountPercentBp: number | null, interestRateBp: number | null, itemsCents: number, cashCents: number, totalCents: number, interestCents: number, installmentValues: Array<number>, complete: boolean, cheapest: boolean, chosen: boolean, deliveryDays: number | null, paymentMethod: PaymentMethod | null, installments: number | null, paymentTerms: string | null, validUntil: string | null, notes: string | null, fileUrl: string | null, fileIsPdf: boolean | null, createdAt: string, lines: Array<{ requestItemId: string, unitPriceCents: number | null, lineCents: number | null }>, charges: Array<{ label: string, amountCents: number }> } };
+
+export type UpdatePurchaseQuoteMutationVariables = Exact<{
+  id: string | number;
+  input: PurchaseQuoteInput;
+  file?: string | null | undefined;
+  removeFile?: boolean | null | undefined;
+}>;
+
+
+export type UpdatePurchaseQuoteMutation = { updatePurchaseQuote: { id: string, supplierId: string, supplierName: string, shippingCents: number, chargesCents: number, discountCents: number, discountPercentBp: number | null, interestRateBp: number | null, itemsCents: number, cashCents: number, totalCents: number, interestCents: number, installmentValues: Array<number>, complete: boolean, cheapest: boolean, chosen: boolean, deliveryDays: number | null, paymentMethod: PaymentMethod | null, installments: number | null, paymentTerms: string | null, validUntil: string | null, notes: string | null, fileUrl: string | null, fileIsPdf: boolean | null, createdAt: string, lines: Array<{ requestItemId: string, unitPriceCents: number | null, lineCents: number | null }>, charges: Array<{ label: string, amountCents: number }> } };
+
+export type RemovePurchaseQuoteMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type RemovePurchaseQuoteMutation = { removePurchaseQuote: boolean };
+
+export type ChoosePurchaseQuoteMutationVariables = Exact<{
+  id: string | number;
+  justification?: string | null | undefined;
+}>;
+
+
+export type ChoosePurchaseQuoteMutation = { choosePurchaseQuote: { id: string, status: PurchaseRequestStatus } };
+
+export type ReopenPurchaseQuotesMutationVariables = Exact<{
+  requestId: string | number;
+}>;
+
+
+export type ReopenPurchaseQuotesMutation = { reopenPurchaseQuotes: { id: string, status: PurchaseRequestStatus } };
+
+export type SharePurchaseQuoteMapByEmailMutationVariables = Exact<{
+  requestId: string | number;
+  input: ShareQuoteMapInput;
+}>;
+
+
+export type SharePurchaseQuoteMapByEmailMutation = { sharePurchaseQuoteMapByEmail: number };
+
+export type QuoteBoardQueryVariables = Exact<{
+  filter?: PurchaseRequestFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type QuoteBoardQuery = { quoteBoard: { total: number, page: number, limit: number, totalPages: number, items: Array<{ quoteCount: number, completeCount: number, request: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, quoteCount: number, chosenQuoteId: string | null, choiceJustification: string | null, chosenAt: string | null, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> }, cheapest: { supplierName: string, totalCents: number } | null, chosen: { supplierName: string, totalCents: number } | null }> } };
+
+export type QuoteBoardOverviewQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type QuoteBoardOverviewQuery = { quoteBoardOverview: { awaitingQuotes: number, quoting: number, belowMinimum: number, awaitingApproval: number } };
+
+export type PurchaseRequestFieldsFragment = { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, quoteCount: number, chosenQuoteId: string | null, choiceJustification: string | null, chosenAt: string | null, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> };
 
 export type PurchaseRequestsQueryVariables = Exact<{
   filter?: PurchaseRequestFilterInput | null | undefined;
@@ -2497,14 +2635,14 @@ export type PurchaseRequestsQueryVariables = Exact<{
 }>;
 
 
-export type PurchaseRequestsQuery = { purchaseRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> }> } };
+export type PurchaseRequestsQuery = { purchaseRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, quoteCount: number, chosenQuoteId: string | null, choiceJustification: string | null, chosenAt: string | null, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> }> } };
 
 export type PurchaseRequestQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type PurchaseRequestQuery = { purchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
+export type PurchaseRequestQuery = { purchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, quoteCount: number, chosenQuoteId: string | null, choiceJustification: string | null, chosenAt: string | null, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
 
 export type PurchaseRequestFilterOptionsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2521,7 +2659,7 @@ export type CreatePurchaseRequestMutationVariables = Exact<{
 }>;
 
 
-export type CreatePurchaseRequestMutation = { createPurchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
+export type CreatePurchaseRequestMutation = { createPurchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, quoteCount: number, chosenQuoteId: string | null, choiceJustification: string | null, chosenAt: string | null, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
 
 export type UpdatePurchaseRequestMutationVariables = Exact<{
   id: string | number;
@@ -2529,7 +2667,7 @@ export type UpdatePurchaseRequestMutationVariables = Exact<{
 }>;
 
 
-export type UpdatePurchaseRequestMutation = { updatePurchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
+export type UpdatePurchaseRequestMutation = { updatePurchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, quoteCount: number, chosenQuoteId: string | null, choiceJustification: string | null, chosenAt: string | null, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
 
 export type CancelPurchaseRequestMutationVariables = Exact<{
   id: string | number;
@@ -2537,7 +2675,7 @@ export type CancelPurchaseRequestMutationVariables = Exact<{
 }>;
 
 
-export type CancelPurchaseRequestMutation = { cancelPurchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
+export type CancelPurchaseRequestMutation = { cancelPurchaseRequest: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, quoteCount: number, chosenQuoteId: string | null, choiceJustification: string | null, chosenAt: string | null, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> } };
 
 export type PurchaseCatalogUsageQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2661,6 +2799,11 @@ export type SupplierOverviewQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SupplierOverviewQuery = { supplierOverview: { active: number, inactive: number, activeWithoutPix: number, activeWithoutContact: number, categoriesServed: number } };
+
+export type SupplierOptionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SupplierOptionsQuery = { supplierOptions: Array<{ id: string, name: string, categories: Array<Category>, categoryOther: string | null }> };
 
 export type SupportRequestFieldsFragment = { id: string, protocol: number, userId: string, userName: string, condominiumName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string };
 
@@ -3191,6 +3334,44 @@ export const ParcelFieldsFragmentDoc = new TypedDocumentString(`
   photoUrl
 }
     `, {"fragmentName":"ParcelFields"}) as unknown as TypedDocumentString<ParcelFieldsFragment, unknown>;
+export const PurchaseQuoteFieldsFragmentDoc = new TypedDocumentString(`
+    fragment PurchaseQuoteFields on PurchaseQuote {
+  id
+  supplierId
+  supplierName
+  lines {
+    requestItemId
+    unitPriceCents
+    lineCents
+  }
+  shippingCents
+  charges {
+    label
+    amountCents
+  }
+  chargesCents
+  discountCents
+  discountPercentBp
+  interestRateBp
+  itemsCents
+  cashCents
+  totalCents
+  interestCents
+  installmentValues
+  complete
+  cheapest
+  chosen
+  deliveryDays
+  paymentMethod
+  installments
+  paymentTerms
+  validUntil
+  notes
+  fileUrl
+  fileIsPdf
+  createdAt
+}
+    `, {"fragmentName":"PurchaseQuoteFields"}) as unknown as TypedDocumentString<PurchaseQuoteFieldsFragment, unknown>;
 export const PurchaseRequestFieldsFragmentDoc = new TypedDocumentString(`
     fragment PurchaseRequestFields on PurchaseRequest {
   id
@@ -3216,6 +3397,10 @@ export const PurchaseRequestFieldsFragmentDoc = new TypedDocumentString(`
     brandName
     note
   }
+  quoteCount
+  chosenQuoteId
+  choiceJustification
+  chosenAt
   cancelReason
   cancelledAt
   createdAt
@@ -7412,6 +7597,244 @@ export const CondominiumMembersDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<CondominiumMembersQuery, CondominiumMembersQueryVariables>;
+export const PurchaseQuotesDocument = new TypedDocumentString(`
+    query PurchaseQuotes($requestId: ID!) {
+  purchaseQuotes(requestId: $requestId) {
+    ...PurchaseQuoteFields
+  }
+}
+    fragment PurchaseQuoteFields on PurchaseQuote {
+  id
+  supplierId
+  supplierName
+  lines {
+    requestItemId
+    unitPriceCents
+    lineCents
+  }
+  shippingCents
+  charges {
+    label
+    amountCents
+  }
+  chargesCents
+  discountCents
+  discountPercentBp
+  interestRateBp
+  itemsCents
+  cashCents
+  totalCents
+  interestCents
+  installmentValues
+  complete
+  cheapest
+  chosen
+  deliveryDays
+  paymentMethod
+  installments
+  paymentTerms
+  validUntil
+  notes
+  fileUrl
+  fileIsPdf
+  createdAt
+}`) as unknown as TypedDocumentString<PurchaseQuotesQuery, PurchaseQuotesQueryVariables>;
+export const PurchaseQuoteMapPdfDocument = new TypedDocumentString(`
+    query PurchaseQuoteMapPdf($requestId: ID!) {
+  purchaseQuoteMapPdf(requestId: $requestId) {
+    fileName
+    mimeType
+    base64Content
+  }
+}
+    `) as unknown as TypedDocumentString<PurchaseQuoteMapPdfQuery, PurchaseQuoteMapPdfQueryVariables>;
+export const AddPurchaseQuoteDocument = new TypedDocumentString(`
+    mutation AddPurchaseQuote($requestId: ID!, $supplierId: ID!, $input: PurchaseQuoteInput!, $file: String) {
+  addPurchaseQuote(
+    requestId: $requestId
+    supplierId: $supplierId
+    input: $input
+    file: $file
+  ) {
+    ...PurchaseQuoteFields
+  }
+}
+    fragment PurchaseQuoteFields on PurchaseQuote {
+  id
+  supplierId
+  supplierName
+  lines {
+    requestItemId
+    unitPriceCents
+    lineCents
+  }
+  shippingCents
+  charges {
+    label
+    amountCents
+  }
+  chargesCents
+  discountCents
+  discountPercentBp
+  interestRateBp
+  itemsCents
+  cashCents
+  totalCents
+  interestCents
+  installmentValues
+  complete
+  cheapest
+  chosen
+  deliveryDays
+  paymentMethod
+  installments
+  paymentTerms
+  validUntil
+  notes
+  fileUrl
+  fileIsPdf
+  createdAt
+}`) as unknown as TypedDocumentString<AddPurchaseQuoteMutation, AddPurchaseQuoteMutationVariables>;
+export const UpdatePurchaseQuoteDocument = new TypedDocumentString(`
+    mutation UpdatePurchaseQuote($id: ID!, $input: PurchaseQuoteInput!, $file: String, $removeFile: Boolean) {
+  updatePurchaseQuote(
+    id: $id
+    input: $input
+    file: $file
+    removeFile: $removeFile
+  ) {
+    ...PurchaseQuoteFields
+  }
+}
+    fragment PurchaseQuoteFields on PurchaseQuote {
+  id
+  supplierId
+  supplierName
+  lines {
+    requestItemId
+    unitPriceCents
+    lineCents
+  }
+  shippingCents
+  charges {
+    label
+    amountCents
+  }
+  chargesCents
+  discountCents
+  discountPercentBp
+  interestRateBp
+  itemsCents
+  cashCents
+  totalCents
+  interestCents
+  installmentValues
+  complete
+  cheapest
+  chosen
+  deliveryDays
+  paymentMethod
+  installments
+  paymentTerms
+  validUntil
+  notes
+  fileUrl
+  fileIsPdf
+  createdAt
+}`) as unknown as TypedDocumentString<UpdatePurchaseQuoteMutation, UpdatePurchaseQuoteMutationVariables>;
+export const RemovePurchaseQuoteDocument = new TypedDocumentString(`
+    mutation RemovePurchaseQuote($id: ID!) {
+  removePurchaseQuote(id: $id)
+}
+    `) as unknown as TypedDocumentString<RemovePurchaseQuoteMutation, RemovePurchaseQuoteMutationVariables>;
+export const ChoosePurchaseQuoteDocument = new TypedDocumentString(`
+    mutation ChoosePurchaseQuote($id: ID!, $justification: String) {
+  choosePurchaseQuote(id: $id, justification: $justification) {
+    id
+    status
+  }
+}
+    `) as unknown as TypedDocumentString<ChoosePurchaseQuoteMutation, ChoosePurchaseQuoteMutationVariables>;
+export const ReopenPurchaseQuotesDocument = new TypedDocumentString(`
+    mutation ReopenPurchaseQuotes($requestId: ID!) {
+  reopenPurchaseQuotes(requestId: $requestId) {
+    id
+    status
+  }
+}
+    `) as unknown as TypedDocumentString<ReopenPurchaseQuotesMutation, ReopenPurchaseQuotesMutationVariables>;
+export const SharePurchaseQuoteMapByEmailDocument = new TypedDocumentString(`
+    mutation SharePurchaseQuoteMapByEmail($requestId: ID!, $input: ShareQuoteMapInput!) {
+  sharePurchaseQuoteMapByEmail(requestId: $requestId, input: $input)
+}
+    `) as unknown as TypedDocumentString<SharePurchaseQuoteMapByEmailMutation, SharePurchaseQuoteMapByEmailMutationVariables>;
+export const QuoteBoardDocument = new TypedDocumentString(`
+    query QuoteBoard($filter: PurchaseRequestFilterInput, $page: PageInput) {
+  quoteBoard(filter: $filter, page: $page) {
+    items {
+      request {
+        ...PurchaseRequestFields
+      }
+      quoteCount
+      completeCount
+      cheapest {
+        supplierName
+        totalCents
+      }
+      chosen {
+        supplierName
+        totalCents
+      }
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment PurchaseRequestFields on PurchaseRequest {
+  id
+  number
+  title
+  description
+  categories
+  categoryOther
+  priority
+  spaceId
+  location
+  neededBy
+  status
+  requestedById
+  requestedByName
+  items {
+    id
+    productId
+    productName
+    quantity
+    unit
+    brandId
+    brandName
+    note
+  }
+  quoteCount
+  chosenQuoteId
+  choiceJustification
+  chosenAt
+  cancelReason
+  cancelledAt
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<QuoteBoardQuery, QuoteBoardQueryVariables>;
+export const QuoteBoardOverviewDocument = new TypedDocumentString(`
+    query QuoteBoardOverview {
+  quoteBoardOverview {
+    awaitingQuotes
+    quoting
+    belowMinimum
+    awaitingApproval
+  }
+}
+    `) as unknown as TypedDocumentString<QuoteBoardOverviewQuery, QuoteBoardOverviewQueryVariables>;
 export const PurchaseRequestsDocument = new TypedDocumentString(`
     query PurchaseRequests($filter: PurchaseRequestFilterInput, $page: PageInput) {
   purchaseRequests(filter: $filter, page: $page) {
@@ -7448,6 +7871,10 @@ export const PurchaseRequestsDocument = new TypedDocumentString(`
     brandName
     note
   }
+  quoteCount
+  chosenQuoteId
+  choiceJustification
+  chosenAt
   cancelReason
   cancelledAt
   createdAt
@@ -7483,6 +7910,10 @@ export const PurchaseRequestDocument = new TypedDocumentString(`
     brandName
     note
   }
+  quoteCount
+  chosenQuoteId
+  choiceJustification
+  chosenAt
   cancelReason
   cancelledAt
   createdAt
@@ -7543,6 +7974,10 @@ export const CreatePurchaseRequestDocument = new TypedDocumentString(`
     brandName
     note
   }
+  quoteCount
+  chosenQuoteId
+  choiceJustification
+  chosenAt
   cancelReason
   cancelledAt
   createdAt
@@ -7578,6 +8013,10 @@ export const UpdatePurchaseRequestDocument = new TypedDocumentString(`
     brandName
     note
   }
+  quoteCount
+  chosenQuoteId
+  choiceJustification
+  chosenAt
   cancelReason
   cancelledAt
   createdAt
@@ -7613,6 +8052,10 @@ export const CancelPurchaseRequestDocument = new TypedDocumentString(`
     brandName
     note
   }
+  quoteCount
+  chosenQuoteId
+  choiceJustification
+  chosenAt
   cancelReason
   cancelledAt
   createdAt
@@ -8115,6 +8558,16 @@ export const SupplierOverviewDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<SupplierOverviewQuery, SupplierOverviewQueryVariables>;
+export const SupplierOptionsDocument = new TypedDocumentString(`
+    query SupplierOptions {
+  supplierOptions {
+    id
+    name
+    categories
+    categoryOther
+  }
+}
+    `) as unknown as TypedDocumentString<SupplierOptionsQuery, SupplierOptionsQueryVariables>;
 export const SupportPageDocument = new TypedDocumentString(`
     query SupportPage($page: PageInput) {
   supportQuota {
