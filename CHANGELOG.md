@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.20.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.19.0...v0.20.0) (2026-11-24)
+
+
+### Features
+
+* **purchases:** approval by alçada and purchase summary ([b602539](https://github.com/StanleyBack-dev/frontend-dora/commit/b60253990f189e71df8af926cd33d86875d9cb2e))
+* **purchases:** approval by alçada and purchase summary ([160dd71](https://github.com/StanleyBack-dev/frontend-dora/commit/160dd71c125a6b4e12be0de8c10ec53f2168fb52))
+* **purchases:** Compras module ([912087a](https://github.com/StanleyBack-dev/frontend-dora/commit/912087a9b6c1b06a6121c413ee69b703d308628f))
+* **purchases:** indicators and residents' accounts ([9629a68](https://github.com/StanleyBack-dev/frontend-dora/commit/9629a68779b8df9a6692dc67d60e3f5e6efd9cdc))
+* **purchases:** indicators and residents' accounts ([c9d5250](https://github.com/StanleyBack-dev/frontend-dora/commit/c9d5250b3c342054932413d6fbcb6f32ae0879a6))
+* **purchases:** purchase orders, deliveries and payments ([495c814](https://github.com/StanleyBack-dev/frontend-dora/commit/495c814394de303d813b2652d55f954eaa76894b))
+* **purchases:** purchase orders, deliveries and payments ([04b837a](https://github.com/StanleyBack-dev/frontend-dora/commit/04b837a1ba66cd58f06469cc1fdcfeacf3a16b23))
+* **purchases:** purchase requests, the catalog pages and suppliers apart ([7a39aa0](https://github.com/StanleyBack-dev/frontend-dora/commit/7a39aa058595839128c39674a2b150961bf6ee99))
+* **purchases:** purchase requests, the catalog pages and suppliers apart ([26f0a93](https://github.com/StanleyBack-dev/frontend-dora/commit/26f0a934c73195cd8d1e994d4baed971815d55fd))
+* **purchases:** purchases menu and the suppliers page ([2a60fd8](https://github.com/StanleyBack-dev/frontend-dora/commit/2a60fd8a827c84fb3e8e447958aa5597359e855a))
+* **purchases:** purchases menu and the suppliers page ([84330c6](https://github.com/StanleyBack-dev/frontend-dora/commit/84330c63eb958152a5fb31c39a30cc99266f3c4b))
+* **purchases:** quotes, comparison map and sharing ([088f8e2](https://github.com/StanleyBack-dev/frontend-dora/commit/088f8e22a0c64aa8468d3fedaefa89a9636cbbc7))
+* **purchases:** quotes, comparison map and sharing ([660add4](https://github.com/StanleyBack-dev/frontend-dora/commit/660add49420c7472bf39846396cc38caddff8350))
+
+
+### Bug Fixes
+
+* **design-system:** keep the active form tab in view on phones ([fcb59b7](https://github.com/StanleyBack-dev/frontend-dora/commit/fcb59b74480f0b636381404f4e2a1ec25036604c))
+
 ## [0.19.0](https://github.com/StanleyBack-dev/frontend-dora/compare/v0.18.0...v0.19.0) (2026-11-21)
 
 
