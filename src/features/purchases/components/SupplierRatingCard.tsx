@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { Button, cn } from "@/design-system";
-import { OrderSection } from "@/features/purchases/components/OrderSection";
+import { SectionCard } from "@/features/purchases/components/SectionCard";
 import { SupplierRatingDrawer } from "@/features/purchases/components/SupplierRatingDrawer";
 import type { PurchaseOrderRating } from "@/shared/contracts/purchase-orders";
 import { formatDateTime } from "@/shared/lib/datetime";
@@ -27,7 +27,7 @@ export function SupplierRatingCard({
   const [editing, setEditing] = useState(false);
 
   return (
-    <OrderSection
+    <SectionCard
       icon={<Star />}
       title="Avaliação do fornecedor"
       description={`Como foi comprar de ${supplierName}: prazo, qualidade e atendimento.`}
@@ -81,6 +81,6 @@ export function SupplierRatingCard({
           onClose={() => setEditing(false)}
         />
       )}
-    </OrderSection>
+    </SectionCard>
   );
 }

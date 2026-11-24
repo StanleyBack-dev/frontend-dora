@@ -695,13 +695,19 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Em Compras > Aprovações, “Alterar” na regra de aprovação define se toda compra passa pelo aprovador ou se, até um valor (a alçada), ela segue aprovada ao escolher a cotação. Vale para as próximas escolhas.",
         },
         {
-          text: "Gestão: em Compras > Pedidos, “Fazer pedido” numa compra aprovada gera a ordem de compra (OC-0001) com a cotação escolhida: informe a entrega prevista e o vencimento da primeira parcela (as demais vencem mês a mês). Abra a linha do pedido para baixar a “Ordem de compra (PDF)”, usar “Enviar ao fornecedor” (e-mail com o PDF em anexo) ou, enquanto nada chegou nem foi pago, “Cancelar pedido” (com o motivo), que volta a compra para aprovada.",
+          text: "Gestão: em Compras > Pedidos, “Fazer pedido” numa compra aprovada gera a ordem de compra (OC-0001) com a cotação escolhida: informe a entrega prevista e o vencimento da primeira parcela (as demais vencem mês a mês). Abra a linha do pedido para baixar a “Ordem de compra (PDF)”, usar “Enviar ao fornecedor” (WhatsApp ou e-mail, com o PDF em anexo) ou, enquanto nada chegou nem foi pago, “Cancelar pedido” (com o motivo): a compra volta para aprovada, para um novo pedido, ou volta às cotações, para escolher outro fornecedor. Os pedidos cancelados ficam listados na página da compra.",
         },
         {
           text: "Em Compras > Recebimentos ficam os pedidos aguardando entrega (os atrasados em destaque). Quando a entrega chegar, use “Registrar entrega” com o que veio de cada item (pode vir em partes), a nota fiscal (número, valor, data e o arquivo) e uma observação. A portaria e a zeladoria também registram, sem ver os valores. A compra fica “Recebida” quando todos os itens chegam.",
         },
         {
           text: "Em Compras > Pagamentos ficam as contas a pagar de todos os pedidos, pelo vencimento (vencidas e as que vencem em 7 dias em destaque). Use “Pagar” em cada parcela, com a data e o comprovante, ou “Vencimento” para mudar a data de uma parcela em aberto. Recebida e paga por completo, a compra fica “Concluída” e a gestão avalia o fornecedor de 1 a 5 estrelas (“Avaliar fornecedor”, ao abrir a linha em Pedidos); a média aparece no cadastro do fornecedor e na escolha das cotações.",
+        },
+        {
+          text: "Gestão e aprovadores: em Compras > Indicadores, escolha o ano (e, se quiser, o mês) para ver o que foi pago por categoria, por mês e por fornecedor, o comprometido (parcelas a pagar hoje) e o processo: economia frente à maior cotação, compras com 3 ou mais cotações, tempo da solicitação ao pedido e do pedido à entrega e entregas atrasadas. “Relatório em PDF” gera o documento do período.",
+        },
+        {
+          text: "Prestação de contas aos moradores: fica desligada até um aprovador usar “Publicar” no card de Compras > Indicadores. Publicada, todos os moradores veem em Compras > Prestação de contas o gasto por categoria e por mês e as compras concluídas (fornecedor, valor e cotações), sem anexos, com o PDF do período. “Retirar” esconde de novo.",
         },
       ],
       rules: [

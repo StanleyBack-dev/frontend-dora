@@ -531,6 +531,13 @@ export type GuestRulesInput = {
   max?: number | null | undefined;
 };
 
+/** Um ano ou um mês dele. */
+export type IndicatorPeriodInput = {
+  /** 1–12 (vazio: o ano). */
+  month?: number | null | undefined;
+  year: number;
+};
+
 /** Período do limite de reservas por unidade. */
 export type LimitPeriod =
   | 'DAY'
@@ -602,6 +609,7 @@ export type NotificationType =
   | 'PURCHASE_REQUEST_CANCELLED'
   | 'PURCHASE_REQUEST_CREATED'
   | 'PURCHASE_RETURNED'
+  | 'PURCHASE_TRANSPARENCY_PUBLISHED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
   | 'SUPPORT_REQUESTED'
@@ -2686,6 +2694,47 @@ export type PurchaseSummaryPdfQueryVariables = Exact<{
 
 
 export type PurchaseSummaryPdfQuery = { purchaseSummaryPdf: { fileName: string, mimeType: string, base64Content: string } };
+
+export type PurchaseIndicatorsQueryVariables = Exact<{
+  period: IndicatorPeriodInput;
+}>;
+
+
+export type PurchaseIndicatorsQuery = { purchaseIndicators: { paidCents: number, paidInstallments: number, purchases: number, period: { year: number, month: number | null }, committed: { cents: number, installments: number, orders: number }, byCategory: Array<{ category: Category, cents: number, purchases: number }>, byMonth: Array<{ month: number, cents: number }>, bySupplier: Array<{ supplierId: string | null, supplierName: string, cents: number, purchases: number, ratingAverage: number | null, ratingCount: number }>, process: { orders: number, savingsCents: number, withThreeQuotes: number, avgDaysToOrder: number | null, avgDaysToDeliver: number | null, lateDeliveries: number } } };
+
+export type PurchaseIndicatorsPdfQueryVariables = Exact<{
+  period: IndicatorPeriodInput;
+}>;
+
+
+export type PurchaseIndicatorsPdfQuery = { purchaseIndicatorsPdf: { fileName: string, mimeType: string, base64Content: string } };
+
+export type PurchaseTransparencyStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PurchaseTransparencyStatusQuery = { purchaseTransparencyStatus: { enabled: boolean, updatedAt: string | null, updatedByName: string | null, canManage: boolean, canPreview: boolean } };
+
+export type PurchaseTransparencyQueryVariables = Exact<{
+  period: IndicatorPeriodInput;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type PurchaseTransparencyQuery = { purchaseTransparency: { paidCents: number, purchases: number, period: { year: number, month: number | null }, byCategory: Array<{ category: Category, cents: number, purchases: number }>, byMonth: Array<{ month: number, cents: number }> }, transparencyPurchases: { total: number, page: number, limit: number, totalPages: number, items: Array<{ number: number, title: string, categories: Array<Category>, categoryOther: string | null, supplierName: string, totalCents: number, completedOn: string, quoteCount: number }> } };
+
+export type PurchaseTransparencyPdfQueryVariables = Exact<{
+  period: IndicatorPeriodInput;
+}>;
+
+
+export type PurchaseTransparencyPdfQuery = { purchaseTransparencyPdf: { fileName: string, mimeType: string, base64Content: string } };
+
+export type PublishPurchaseTransparencyMutationVariables = Exact<{
+  enabled: boolean;
+}>;
+
+
+export type PublishPurchaseTransparencyMutation = { publishPurchaseTransparency: { enabled: boolean, updatedAt: string | null, updatedByName: string | null, canManage: boolean, canPreview: boolean } };
 
 export type PurchaseOrderViewFieldsFragment = { canManage: boolean, canSeeMoney: boolean, request: { id: string, number: number, title: string, description: string | null, categories: Array<Category>, categoryOther: string | null, priority: PurchasePriority, spaceId: string | null, location: string | null, neededBy: string | null, status: PurchaseRequestStatus, requestedById: string, requestedByName: string, quoteCount: number, chosenQuoteId: string | null, choiceJustification: string | null, chosenAt: string | null, chosenByName: string | null, cancelReason: string | null, cancelledAt: string | null, createdAt: string, updatedAt: string, items: Array<{ id: string, productId: string, productName: string, quantity: number, unit: string, brandId: string | null, brandName: string | null, note: string | null }> }, order: { id: string, number: number, supplierName: string, supplierEmail: string | null, supplierPhone: string | null, itemsCents: number | null, totalCents: number | null, paymentMethod: PaymentMethod | null, paymentTerms: string | null, expectedOn: string | null, notes: string | null, orderedByName: string | null, orderedAt: string, completedAt: string | null, receipts: Array<{ id: string, receivedOn: string, invoiceNumber: string | null, invoiceCents: number | null, invoiceDate: string | null, fileUrl: string | null, fileIsPdf: boolean | null, note: string | null, receivedById: string | null, receivedByName: string | null, createdAt: string, items: Array<{ requestItemId: string, quantity: number }> }>, installments: Array<{ id: string, number: number, amountCents: number, dueOn: string, paidOn: string | null, paidByName: string | null, proofUrl: string | null, proofIsPdf: boolean | null, note: string | null }>, rating: { rating: number, comment: string | null, ratedByName: string | null, ratedAt: string } | null } | null, lines: Array<{ requestItemId: string, productName: string, brandName: string | null, note: string | null, unit: string, quantity: number, received: number, pending: number, unitPriceCents: number | null, lineCents: number | null }>, plan: { supplierName: string, itemsCents: number, totalCents: number, paymentMethod: PaymentMethod | null, paymentTerms: string | null, deliveryDays: number | null, installmentValues: Array<number> } | null, cancelledOrders: Array<{ number: number, supplierName: string, totalCents: number | null, orderedAt: string, cancelledAt: string, cancelledByName: string | null, reason: string }> };
 
@@ -8122,6 +8171,126 @@ export const PurchaseSummaryPdfDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<PurchaseSummaryPdfQuery, PurchaseSummaryPdfQueryVariables>;
+export const PurchaseIndicatorsDocument = new TypedDocumentString(`
+    query PurchaseIndicators($period: IndicatorPeriodInput!) {
+  purchaseIndicators(period: $period) {
+    period {
+      year
+      month
+    }
+    paidCents
+    paidInstallments
+    purchases
+    committed {
+      cents
+      installments
+      orders
+    }
+    byCategory {
+      category
+      cents
+      purchases
+    }
+    byMonth {
+      month
+      cents
+    }
+    bySupplier {
+      supplierId
+      supplierName
+      cents
+      purchases
+      ratingAverage
+      ratingCount
+    }
+    process {
+      orders
+      savingsCents
+      withThreeQuotes
+      avgDaysToOrder
+      avgDaysToDeliver
+      lateDeliveries
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<PurchaseIndicatorsQuery, PurchaseIndicatorsQueryVariables>;
+export const PurchaseIndicatorsPdfDocument = new TypedDocumentString(`
+    query PurchaseIndicatorsPdf($period: IndicatorPeriodInput!) {
+  purchaseIndicatorsPdf(period: $period) {
+    fileName
+    mimeType
+    base64Content
+  }
+}
+    `) as unknown as TypedDocumentString<PurchaseIndicatorsPdfQuery, PurchaseIndicatorsPdfQueryVariables>;
+export const PurchaseTransparencyStatusDocument = new TypedDocumentString(`
+    query PurchaseTransparencyStatus {
+  purchaseTransparencyStatus {
+    enabled
+    updatedAt
+    updatedByName
+    canManage
+    canPreview
+  }
+}
+    `) as unknown as TypedDocumentString<PurchaseTransparencyStatusQuery, PurchaseTransparencyStatusQueryVariables>;
+export const PurchaseTransparencyDocument = new TypedDocumentString(`
+    query PurchaseTransparency($period: IndicatorPeriodInput!, $page: PageInput) {
+  purchaseTransparency(period: $period) {
+    period {
+      year
+      month
+    }
+    paidCents
+    purchases
+    byCategory {
+      category
+      cents
+      purchases
+    }
+    byMonth {
+      month
+      cents
+    }
+  }
+  transparencyPurchases(period: $period, page: $page) {
+    items {
+      number
+      title
+      categories
+      categoryOther
+      supplierName
+      totalCents
+      completedOn
+      quoteCount
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    `) as unknown as TypedDocumentString<PurchaseTransparencyQuery, PurchaseTransparencyQueryVariables>;
+export const PurchaseTransparencyPdfDocument = new TypedDocumentString(`
+    query PurchaseTransparencyPdf($period: IndicatorPeriodInput!) {
+  purchaseTransparencyPdf(period: $period) {
+    fileName
+    mimeType
+    base64Content
+  }
+}
+    `) as unknown as TypedDocumentString<PurchaseTransparencyPdfQuery, PurchaseTransparencyPdfQueryVariables>;
+export const PublishPurchaseTransparencyDocument = new TypedDocumentString(`
+    mutation PublishPurchaseTransparency($enabled: Boolean!) {
+  publishPurchaseTransparency(enabled: $enabled) {
+    enabled
+    updatedAt
+    updatedByName
+    canManage
+    canPreview
+  }
+}
+    `) as unknown as TypedDocumentString<PublishPurchaseTransparencyMutation, PublishPurchaseTransparencyMutationVariables>;
 export const PurchaseOrderDocument = new TypedDocumentString(`
     query PurchaseOrder($requestId: ID!) {
   purchaseOrder(requestId: $requestId) {

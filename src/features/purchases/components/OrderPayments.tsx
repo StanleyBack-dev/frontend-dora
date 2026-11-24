@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Wallet } from "lucide-react";
 import { Badge, FileLink } from "@/design-system";
 import { InstallmentActions } from "@/features/purchases/components/InstallmentActions";
-import { OrderSection } from "@/features/purchases/components/OrderSection";
+import { SectionCard } from "@/features/purchases/components/SectionCard";
 import {
   INSTALLMENT_BADGES,
   installmentName,
@@ -37,7 +37,7 @@ export function OrderPayments({
   const openCents = sum(false);
 
   return (
-    <OrderSection
+    <SectionCard
       icon={<Wallet />}
       title="Pagamento"
       description={`${paymentLabel(order, installments.length)} · pago ${formatCents(sum(true))}${openCents > 0 ? ` · em aberto ${formatCents(openCents)}` : ""}`}
@@ -96,6 +96,6 @@ export function OrderPayments({
           );
         })}
       </ul>
-    </OrderSection>
+    </SectionCard>
   );
 }
