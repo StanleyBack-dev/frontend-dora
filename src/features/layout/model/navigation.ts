@@ -25,6 +25,7 @@ import {
   Megaphone,
   PartyPopper,
   Receipt,
+  ReceiptText,
   ScrollText,
   ScanSearch,
   SearchCheck,
@@ -57,7 +58,15 @@ export type NavItem = {
   unless?: Permission[];
   /** An optional module (contracted apart): shown only while it is on. */
   module?: AppModule;
+  /** Shown only while this condominium setting is on (see NavFeature). */
+  feature?: NavFeature;
 };
+
+/**
+ * Condominium settings that show a menu entry to everyone (worked out by
+ * the layout): the purchases accounts once the approvers publish them.
+ */
+export type NavFeature = "purchasesTransparency";
 
 /**
  * The entry of a menu the address belongs to: the most specific one when
@@ -77,8 +86,10 @@ export const canSee = (
   item: NavItem,
   permissions: readonly Permission[],
   modules: readonly AppModule[] = [],
+  features: readonly NavFeature[] = [],
 ) =>
   (!item.module || modules.includes(item.module)) &&
+  (!item.feature || features.includes(item.feature)) &&
   (!item.permission || permissions.includes(item.permission)) &&
   (!item.anyPermission ||
     item.anyPermission.some((permission) =>
@@ -302,6 +313,21 @@ export const SIDEBAR: SidebarEntry[] = [
         icon: Wallet,
         anyPermission: ["PURCHASES_MANAGE", "PURCHASES_APPROVE"],
       },
+      // The purchases in figures (and publishing the accounts).
+      {
+        href: "/compras/indicadores",
+        label: "Indicadores",
+        icon: ChartColumn,
+        anyPermission: ["PURCHASES_MANAGE", "PURCHASES_APPROVE"],
+      },
+      // Everyone, once the approvers publish it (the management and the
+      // approvers reach it from Indicadores before that).
+      {
+        href: "/compras/prestacao-de-contas",
+        label: "Prestação de contas",
+        icon: ReceiptText,
+        feature: "purchasesTransparency",
+      },
       {
         href: "/compras/fornecedores",
         label: "Fornecedores",
@@ -423,14 +449,15 @@ export const SIDEBAR: SidebarEntry[] = [
 export function visibleSidebar(
   permissions: readonly Permission[],
   modules: readonly AppModule[],
+  features: readonly NavFeature[] = [],
 ): SidebarEntry[] {
   return SIDEBAR.flatMap((entry): SidebarEntry[] => {
     if (!isSection(entry)) {
-      return canSee(entry, permissions, modules) ? [entry] : [];
+      return canSee(entry, permissions, modules, features) ? [entry] : [];
     }
     if (entry.module && !modules.includes(entry.module)) return [];
     const items = entry.items.filter((item) =>
-      canSee(item, permissions, modules),
+      canSee(item, permissions, modules, features),
     );
     if (items.length === 0) return [];
     if (items.length === 1) {

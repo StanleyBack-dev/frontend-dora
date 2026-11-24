@@ -1,7 +1,7 @@
 import { FileText } from "lucide-react";
 import { Badge, FactList } from "@/design-system";
 import { OrderActions } from "@/features/purchases/components/OrderActions";
-import { OrderSection } from "@/features/purchases/components/OrderSection";
+import { SectionCard } from "@/features/purchases/components/SectionCard";
 import { ReceiptPdfButton } from "@/features/signature/components/ReceiptPdfButton";
 import {
   orderCode,
@@ -64,7 +64,7 @@ export function OrderSummaryCard({
   ];
 
   return (
-    <OrderSection
+    <SectionCard
       icon={<FileText />}
       title={`Pedido ${code}`}
       description="A ordem de compra enviada ao fornecedor."
@@ -103,6 +103,6 @@ export function OrderSummaryCard({
           <span className="text-muted">Observações:</span> {order.notes}
         </p>
       )}
-    </OrderSection>
+    </SectionCard>
   );
 }

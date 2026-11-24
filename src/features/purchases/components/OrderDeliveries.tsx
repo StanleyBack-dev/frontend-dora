@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PackageCheck, Truck } from "lucide-react";
 import { Badge, Button } from "@/design-system";
-import { OrderSection } from "@/features/purchases/components/OrderSection";
+import { SectionCard } from "@/features/purchases/components/SectionCard";
 import { ReceiptDrawer } from "@/features/purchases/components/ReceiptDrawer";
 import { ReceiptList } from "@/features/purchases/components/ReceiptList";
 import {
@@ -41,7 +41,7 @@ export function OrderDeliveries({
   const open = lines.filter((line) => line.pending > 0);
 
   return (
-    <OrderSection
+    <SectionCard
       icon={<Truck />}
       title="Entregas"
       description={
@@ -118,6 +118,6 @@ export function OrderDeliveries({
           }}
         />
       )}
-    </OrderSection>
+    </SectionCard>
   );
 }

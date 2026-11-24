@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ClipboardCheck } from "lucide-react";
 import { Alert, Button } from "@/design-system";
-import { OrderSection } from "@/features/purchases/components/OrderSection";
+import { SectionCard } from "@/features/purchases/components/SectionCard";
 import { PlaceOrderDrawer } from "@/features/purchases/components/PlaceOrderDrawer";
 import { paymentLabel } from "@/features/purchases/model/order-labels";
 import type { PurchaseOrderPlan } from "@/shared/contracts/purchase-orders";
@@ -41,7 +41,7 @@ export function PlaceOrderCard({
   const count = plan.installmentValues.length;
 
   return (
-    <OrderSection
+    <SectionCard
       icon={<ClipboardCheck />}
       title="Fazer o pedido"
       description={
@@ -82,6 +82,6 @@ export function PlaceOrderCard({
           onClose={() => setPlacing(false)}
         />
       )}
-    </OrderSection>
+    </SectionCard>
   );
 }

@@ -2,11 +2,12 @@ import type { ReactNode } from "react";
 import { Card } from "@/design-system";
 
 /**
- * A part of the order page (the order, the deliveries, the payments, the
- * rating) in a card: a header with the icon, title, one line of help and
- * its actions (stacked under it on a phone), and the content below.
+ * A part of a purchases page (the order, the deliveries, the payments, the
+ * rating, the indicators) in a card: a header with the icon, title, one
+ * line of help and its actions (stacked under it on a phone), and the
+ * content below.
  */
-export function OrderSection({
+export function SectionCard({
   icon,
   title,
   description,

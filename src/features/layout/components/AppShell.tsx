@@ -55,6 +55,7 @@ import {
   PLATFORM_NAV,
   sidebarPages,
   SUPPORT_PROJECT_NAV,
+  type NavFeature,
   visibleSidebar,
   type NavItem,
   type NavSection,
@@ -195,11 +196,14 @@ function TabLink({
 // over the content with menu search and notifications.
 /** Stable empty list: no optional module on. */
 const NO_MODULES: readonly AppModule[] = [];
+/** Stable empty list: no condominium setting on. */
+const NO_FEATURES: readonly NavFeature[] = [];
 
 export function AppShell({
   user,
   showAdmin,
   showSupportProject = false,
+  features = NO_FEATURES,
   unreadNotifications,
   children,
 }: {
@@ -218,6 +222,8 @@ export function AppShell({
   showAdmin: boolean;
   /** "Apoie o Dora" in the Conta menu (only when PIX is configured). */
   showSupportProject?: boolean;
+  /** Settings of the condominium that show menu entries to everyone. */
+  features?: readonly NavFeature[];
   /** Server-side count; the bell keeps it fresh afterwards. */
   unreadNotifications: number;
   children: ReactNode;
@@ -259,7 +265,7 @@ export function AppShell({
   // with what this person can open; for the platform administrator,
   // Administração right below Início.
   const modules = user.condominium?.modules ?? NO_MODULES;
-  const byModule = visibleSidebar(user.permissions, modules);
+  const byModule = visibleSidebar(user.permissions, modules, features);
   const entries = canRunPlatform(user)
     ? [...byModule.slice(0, 1), ADMIN_NAV, ...byModule.slice(1)]
     : byModule;

@@ -166,11 +166,16 @@ export const NOTIFICATION_TYPE_LABELS: Record<
   PURCHASE_ORDER_CANCELLED: {
     label: "Pedido cancelado",
     description:
-      "A gestão cancelou o pedido feito ao fornecedor, com o motivo; a compra volta a aprovada para um novo pedido.",
+      "A gestão cancelou o pedido feito ao fornecedor, com o motivo; a compra volta a aprovada para um novo pedido ou às cotações.",
   },
   PURCHASE_COMPLETED: {
     label: "Compra concluída",
     description: "A compra foi toda recebida e paga ao fornecedor.",
+  },
+  PURCHASE_TRANSPARENCY_PUBLISHED: {
+    label: "Prestação de contas de compras",
+    description:
+      "Para os moradores: o condomínio publicou o que gastou em compras (por categoria, por mês e as compras concluídas).",
   },
   FOUND_ITEM_EXPIRING: {
     label: "Item achado perto do fim da guarda",
