@@ -1,14 +1,21 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { EyeOff, PackagePlus } from "lucide-react";
+import {
+  Camera,
+  EyeOff,
+  MapPin,
+  Package,
+  PackagePlus,
+  UserRound,
+} from "lucide-react";
 import {
   Button,
   Combobox,
   DraftNotice,
   Drawer,
   Field,
-  FormSection,
+  CollapsibleSection,
   Select,
   TextArea,
   cn,
@@ -265,10 +272,11 @@ export function FoundItemRegisterDrawer({
         </DrawerActions>
       }
     >
-      <form id={FORM_ID} onSubmit={submit} className="space-y-6">
+      <form id={FORM_ID} onSubmit={submit} className="space-y-4">
         {draft.restored && <DraftNotice onDiscard={draft.discard} />}
 
-        <FormSection
+        <CollapsibleSection
+          icon={<UserRound />}
           title="De quem é? (opcional)"
           description="Se a portaria sabe de quem é, só a unidade, o morador ou o funcionário é avisado e vê o item."
         >
@@ -307,9 +315,9 @@ export function FoundItemRegisterDrawer({
               }))
             }
           />
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection title="O item">
+        <CollapsibleSection icon={<Package />} title="O item">
           <div className="grid items-start gap-3 sm:grid-cols-2">
             <Select
               label="Categoria"
@@ -352,9 +360,9 @@ export function FoundItemRegisterDrawer({
             value={form.privateDetails}
             onChange={(event) => set("privateDetails")(event.target.value)}
           />
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection title="Onde e quando">
+        <CollapsibleSection icon={<MapPin />} title="Onde e quando">
           <div className="grid items-start gap-3 sm:grid-cols-2">
             <Combobox
               label="Onde foi achado"
@@ -392,9 +400,10 @@ export function FoundItemRegisterDrawer({
             value={form.storageLocation || null}
             onSelect={(value) => set("storageLocation")(value ?? "")}
           />
-        </FormSection>
+        </CollapsibleSection>
 
-        <FormSection
+        <CollapsibleSection
+          icon={<Camera />}
           title="Foto (opcional)"
           description="Ajuda o dono a reconhecer o item."
         >
@@ -426,7 +435,7 @@ export function FoundItemRegisterDrawer({
               </span>
             </label>
           )}
-        </FormSection>
+        </CollapsibleSection>
       </form>
     </Drawer>
   );

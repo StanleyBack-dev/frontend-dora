@@ -150,6 +150,16 @@ export function Combobox({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   });
 
+  // Bring the opened list into view (phones: it may open near the bottom
+  // of the screen, under the keyboard).
+  useEffect(() => {
+    if (!open) return;
+    const frame = requestAnimationFrame(() =>
+      listRef.current?.parentElement?.scrollIntoView({ block: "nearest" }),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [open]);
+
   // Keep the highlighted option visible while navigating with the keyboard.
   useEffect(() => {
     if (activeIndex < 0) return;
@@ -321,7 +331,7 @@ export function Combobox({
             id={listId}
             role="listbox"
             aria-label={label}
-            className="max-h-72 overflow-y-auto py-1"
+            className="max-h-[min(18rem,50dvh)] touch-pan-y overflow-y-auto overscroll-contain py-1"
           >
             {options.length === 0 ? (
               <li className="px-3 py-6 text-center text-sm text-muted">

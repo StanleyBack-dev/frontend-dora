@@ -92,3 +92,22 @@ export function centsOf(masked: string): number | null {
 /** 150000 cents → "1.500,00" for a masked field. */
 export const moneyField = (cents: number | null): string =>
   cents === null ? "" : maskMoney(String(cents));
+
+/** Digits and one comma with up to two decimals ("2,5"). */
+export function maskDecimal(value: string): string {
+  const [whole, ...rest] = value.replace(/[^\d,]/g, "").split(",");
+  return rest.length ? `${whole},${rest.join("").slice(0, 2)}` : whole;
+}
+
+/**
+ * "2,5" or "2.5" → 2.5 ("1.000,5" → 1000.5): with a comma, dots group
+ * thousands; without one, a dot is the decimal. Null when not a number with
+ * up to two decimals.
+ */
+export function parseDecimal(value: string): number | null {
+  const raw = value.trim();
+  const text = raw.includes(",")
+    ? raw.replace(/\./g, "").replace(",", ".")
+    : raw;
+  return /^\d+(\.\d{1,2})?$/.test(text) ? Number(text) : null;
+}

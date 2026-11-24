@@ -1,6 +1,6 @@
 import type { Booking, BookingStatus } from "@/shared/contracts/bookings";
 import type { Space } from "@/shared/contracts/spaces";
-import { dayRange, localDay, TIME_ZONE } from "@/shared/lib/datetime";
+import { addDays, dayRange, localDay, TIME_ZONE } from "@/shared/lib/datetime";
 
 // The manager's calendar of bookings: weeks (Sunday to Saturday, as the
 // Brazilian calendar) and months, in Goiás time. Days are "YYYY-MM-DD".
@@ -8,12 +8,7 @@ import { dayRange, localDay, TIME_ZONE } from "@/shared/lib/datetime";
 export const CALENDAR_VIEWS = ["semana", "mes", "lista"] as const;
 export type CalendarView = (typeof CALENDAR_VIEWS)[number];
 
-const DAY_MS = 86_400_000;
 const noon = (day: string) => new Date(`${day}T12:00:00Z`);
-
-/** The day `count` days after (or before) `day`. */
-export const addDays = (day: string, count: number) =>
-  new Date(noon(day).getTime() + count * DAY_MS).toISOString().slice(0, 10);
 
 /** 0 = Sunday … 6 = Saturday. */
 export const weekdayOf = (day: string) => noon(day).getUTCDay();

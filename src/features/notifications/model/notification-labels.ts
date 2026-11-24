@@ -123,6 +123,60 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Um vizinho viu o aviso no mural e diz que achou o item: quem perdeu e a portaria são avisados.",
   },
+  PURCHASE_REQUEST_CREATED: {
+    label: "Nova solicitação de compra",
+    description:
+      "Para a gestão: alguém da equipe pediu uma compra; confira os itens e comece as cotações.",
+  },
+  PURCHASE_REQUEST_CANCELLED: {
+    label: "Solicitação de compra cancelada",
+    description:
+      "Uma solicitação de compra que você fez foi cancelada pela gestão, com o motivo.",
+  },
+  PURCHASE_APPROVAL_REQUESTED: {
+    label: "Compra aguardando aprovação",
+    description:
+      "Para quem aprova as compras: uma cotação escolhida passou da alçada (ou toda compra passa por aprovação) e espera a sua decisão.",
+  },
+  PURCHASE_APPROVED: {
+    label: "Compra aprovada",
+    description:
+      "Uma compra foi aprovada, por quem aprova ou dentro da alçada: quem pediu e a gestão são avisados.",
+  },
+  PURCHASE_RETURNED: {
+    label: "Compra devolvida para cotação",
+    description:
+      "Quem aprova devolveu a compra para cotação, com o motivo: a gestão ajusta e escolhe de novo.",
+  },
+  PURCHASE_REJECTED: {
+    label: "Compra reprovada",
+    description:
+      "Quem aprova reprovou a compra, com o motivo, e a solicitação foi encerrada.",
+  },
+  PURCHASE_ORDERED: {
+    label: "Pedido feito",
+    description:
+      "A gestão fez o pedido da compra aprovada ao fornecedor (ordem de compra), com a entrega prevista.",
+  },
+  PURCHASE_RECEIVED: {
+    label: "Entrega recebida",
+    description:
+      "Chegou a entrega de uma compra, toda ou em parte, registrada pela gestão ou pela portaria.",
+  },
+  PURCHASE_ORDER_CANCELLED: {
+    label: "Pedido cancelado",
+    description:
+      "A gestão cancelou o pedido feito ao fornecedor, com o motivo; a compra volta a aprovada para um novo pedido ou às cotações.",
+  },
+  PURCHASE_COMPLETED: {
+    label: "Compra concluída",
+    description: "A compra foi toda recebida e paga ao fornecedor.",
+  },
+  PURCHASE_TRANSPARENCY_PUBLISHED: {
+    label: "Prestação de contas de compras",
+    description:
+      "Para os moradores: o condomínio publicou o que gastou em compras (por categoria, por mês e as compras concluídas).",
+  },
   FOUND_ITEM_EXPIRING: {
     label: "Item achado perto do fim da guarda",
     description:

@@ -67,7 +67,8 @@ export function Drawer({
         if (event.target === ref.current && !busy) onClose();
       }}
       className={cn(
-        "m-0 ml-auto h-dvh max-h-dvh w-full max-w-full overflow-hidden border-0 border-l border-border bg-surface p-0 text-fg shadow-pop",
+        "m-0 ml-auto h-dvh max-h-dvh w-full max-w-full overflow-hidden whitespace-normal text-left font-normal normal-case tracking-normal",
+        "border-0 border-l border-border bg-surface p-0 text-fg shadow-pop",
         "backdrop:bg-black/45",
         "translate-x-0 transition-transform duration-200 starting:open:translate-x-full",
         widths[width],

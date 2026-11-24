@@ -8,7 +8,8 @@ export type AppModule =
   | 'BOOKINGS'
   | 'EVENTS'
   | 'LOST_AND_FOUND'
-  | 'PARCELS';
+  | 'PARCELS'
+  | 'PURCHASES';
 
 /** Quem é a pessoa do pedido: eu, um dependente ou outra pessoa. */
 export type AttendeeSource =
@@ -32,6 +33,29 @@ export type BookingWhen =
 export type BroadcastAudience =
   | 'GRUPO'
   | 'TODOS';
+
+/** Categoria de uma compra, de um fornecedor ou de outro registro (manutenção, elétrica, limpeza, alimentação…); o que não estiver na lista é OTHER, com o texto digitado. */
+export type Category =
+  | 'CLEANING'
+  | 'CONSTRUCTION'
+  | 'ELECTRICAL'
+  | 'ELEVATORS'
+  | 'EVENTS'
+  | 'FOOD'
+  | 'FURNITURE'
+  | 'GARDENING'
+  | 'GAS'
+  | 'MAINTENANCE'
+  | 'OFFICE'
+  | 'OTHER'
+  | 'PAINTING'
+  | 'PEST_CONTROL'
+  | 'PLUMBING'
+  | 'POOL'
+  | 'PROFESSIONAL'
+  | 'SECURITY'
+  | 'TECHNOLOGY'
+  | 'UNIFORMS';
 
 /** Situação do condomínio na plataforma. */
 export type CondominiumStatus =
@@ -242,6 +266,17 @@ export type NotificationType =
   | 'PARCEL_RECEIVED'
   | 'PARCEL_REMINDER'
   | 'PARCEL_RETURNED'
+  | 'PURCHASE_APPROVAL_REQUESTED'
+  | 'PURCHASE_APPROVED'
+  | 'PURCHASE_COMPLETED'
+  | 'PURCHASE_ORDERED'
+  | 'PURCHASE_ORDER_CANCELLED'
+  | 'PURCHASE_RECEIVED'
+  | 'PURCHASE_REJECTED'
+  | 'PURCHASE_REQUEST_CANCELLED'
+  | 'PURCHASE_REQUEST_CREATED'
+  | 'PURCHASE_RETURNED'
+  | 'PURCHASE_TRANSPARENCY_PUBLISHED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
   | 'SUPPORT_REQUESTED'
@@ -253,6 +288,17 @@ export type ParcelStatus =
   | 'PICKED_UP'
   | 'RECEIVED'
   | 'RETURNED';
+
+/** Forma de pagamento de uma cotação: PIX, dinheiro, cartão de débito ou de crédito, boleto, transferência, faturado ou outra (digitada). */
+export type PaymentMethod =
+  | 'BANK_TRANSFER'
+  | 'BOLETO'
+  | 'CASH'
+  | 'CREDIT_CARD'
+  | 'DEBIT_CARD'
+  | 'INVOICE'
+  | 'OTHER'
+  | 'PIX';
 
 /** Capacidade verificada pela API. */
 export type Permission =
@@ -268,6 +314,9 @@ export type Permission =
   | 'PARCELS_MANAGE'
   | 'PAYMENTS_MANAGE'
   | 'PERMISSIONS_MANAGE'
+  | 'PURCHASES_APPROVE'
+  | 'PURCHASES_MANAGE'
+  | 'PURCHASES_REQUEST'
   | 'RESIDENTS_READ'
   | 'SPACES_MANAGE'
   | 'SUPPORTERS_MANAGE'
@@ -282,6 +331,44 @@ export type PixKeyType =
   | 'EMAIL'
   | 'PHONE'
   | 'RANDOM';
+
+/** Decisão sobre uma compra: aprovada na alçada (ao escolher), aprovada, devolvida para cotação ou reprovada. */
+export type PurchaseApprovalDecision =
+  | 'APPROVED'
+  | 'AUTO_APPROVED'
+  | 'REJECTED'
+  | 'RETURNED';
+
+/** Como o condomínio aprova as compras: toda compra passa pelo aprovador (ALWAYS) ou, até o limite (alçada), segue aprovada ao escolher a cotação (LIMIT). */
+export type PurchaseApprovalMode =
+  | 'ALWAYS'
+  | 'LIMIT';
+
+/** Parcela a pagar: em aberto, vencida, vencendo em até 7 dias ou paga. */
+export type PurchaseInstallmentState =
+  | 'DUE_SOON'
+  | 'OPEN'
+  | 'OVERDUE'
+  | 'PAID';
+
+/** Prioridade de uma solicitação de compra. */
+export type PurchasePriority =
+  | 'HIGH'
+  | 'LOW'
+  | 'NORMAL'
+  | 'URGENT';
+
+/** Solicitação de compra: aguardando cotação, em cotação, aguardando aprovação, aprovada, pedido feito, recebida, concluída, reprovada ou cancelada. */
+export type PurchaseRequestStatus =
+  | 'APPROVED'
+  | 'AWAITING_APPROVAL'
+  | 'CANCELLED'
+  | 'COMPLETED'
+  | 'OPEN'
+  | 'ORDERED'
+  | 'QUOTING'
+  | 'RECEIVED'
+  | 'REJECTED';
 
 /** Localização do aparelho na assinatura: obtida, recusada ou indisponível. */
 export type SignatureLocationStatus =
@@ -306,6 +393,11 @@ export type SpaceKind =
   | 'OTHER'
   | 'PARTY_ROOM'
   | 'POOL';
+
+/** Fornecedor com CNPJ (empresa) ou CPF (autônomo). */
+export type SupplierDocumentType =
+  | 'CNPJ'
+  | 'CPF';
 
 /** Do que se trata a solicitação de suporte. */
 export type SupportCategory =

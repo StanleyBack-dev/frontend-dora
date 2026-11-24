@@ -21,6 +21,8 @@ import {
   type LucideIcon,
   ScrollText,
   Blocks,
+  Truck,
+  ClipboardList,
 } from "lucide-react";
 import type { Permission, AppModule } from "@/shared/contracts/api";
 
@@ -644,6 +646,174 @@ export const HELP_TOPICS: HelpTopic[] = [
       access: [
         {
           text: "Portaria e gestores cuidam dos achados e perdidos (permissão “Registrar itens achados, conferir pedidos e devolver”); o gestor pode ajustar quem tem essa permissão.",
+        },
+      ],
+    },
+  },
+  {
+    id: "solicitacoes-de-compra",
+    href: "/compras/solicitacoes",
+    title: "Solicitações de compra",
+    icon: ClipboardList,
+    module: "PURCHASES",
+    anyPermission: ["PURCHASES_MANAGE", "PURCHASES_REQUEST"],
+    area: "main",
+    tour: "Peça o que precisa ser comprado ou contratado e acompanhe cada pedido até a entrega.",
+    sections: {
+      howto: [
+        {
+          text: "Toque em “Nova solicitação”, diga o que precisa, marque as categorias (uma ou mais; ou “Outros (digitar)”) e escolha a prioridade e, se quiser, onde vai ser usado (um espaço do condomínio ou “Outro local (digitar)”) e até quando precisa.",
+        },
+        {
+          text: "Em “Itens”, escolha o produto do catálogo (não achou? cadastre com o “+”), a quantidade, a unidade e, se quiser, a marca (ou “Qualquer marca”) e uma observação. Use “Adicionar item” para mais de um.",
+        },
+        {
+          text: "Ao enviar, a solicitação ganha um número (SC-0001…) e a gestão é avisada para fazer as cotações.",
+        },
+        {
+          text: "Enquanto aguarda cotação, use “Editar” na linha da solicitação para mudar tudo, ou abra a linha para “Cancelar solicitação” com o motivo. Em cotação, “Editar” ainda muda a prioridade, o local e a data; o título, os detalhes, os itens e as categorias ficam como estão.",
+        },
+        {
+          text: "A lista mostra as pendentes (aguardando cotação, em cotação ou aprovação); as aprovadas, reprovadas e canceladas aparecem pelo filtro “Situação”. Filtre também pela solicitação, categoria e prioridade. Os cards mostram o que aguarda cotação, as urgentes, as com prazo em até 7 dias e as atrasadas.",
+        },
+        {
+          text: "Gestão: em Compras > Cotações, use “Abrir cotação” na solicitação e “Adicionar cotação” para cada fornecedor (os que atendem as categorias da solicitação aparecem primeiro), com o preço de cada item (vazio quando o fornecedor não tem), frete, um ou mais encargos (escolha o tipo e informe o valor), desconto em valor ou porcentagem, pagamento (parcelas e juros ao mês, com a simulação), prazo, validade e o orçamento em PDF ou foto; o extrato mostra a nota da cotação. A lista de Cotações mostra quantas cotações cada solicitação tem, a mais barata e a escolhida; o mapa de cotação (tela e PDF) fica na página de cotação de cada uma, e dá para baixá-lo ou usar “Compartilhar” para mandar por WhatsApp ou e-mail com o PDF em anexo. Em Solicitações, cada linha abre os dados da solicitação, com “Editar” e “Abrir cotação”.",
+        },
+        {
+          text: "O mapa compara os fornecedores item a item: o menor preço de cada item fica em verde e a cotação completa mais barata é marcada. Baixe o “Mapa de cotação (PDF)” para arquivar ou apresentar.",
+        },
+        {
+          text: "Use “Escolher” na vencedora. Pela regra do condomínio, a compra segue aprovada na hora (total dentro da alçada) ou passa a aguardar aprovação. Depois de escolher, abre a página de aprovação da compra (também em “Ver aprovação” na cotação). Enquanto aguarda, “Reabrir cotações” desfaz a escolha.",
+        },
+        {
+          text: "Quem aprova as compras: em Compras > Aprovações, veja o que aguarda a sua decisão e abra cada compra para “Aprovar” (com observação opcional), “Devolver para cotação” ou “Reprovar” (os dois com o motivo). Quem pediu e a gestão são avisados.",
+        },
+        {
+          text: "Na página de aprovação, “Resumo da compra (PDF)” gera um documento para arquivar ou prestar contas: a solicitação, as cotações, a escolhida e a justificativa, a decisão, a linha do tempo e as assinaturas.",
+        },
+        {
+          text: "Em Compras > Aprovações, “Alterar” na regra de aprovação define se toda compra passa pelo aprovador ou se, até um valor (a alçada), ela segue aprovada ao escolher a cotação. Vale para as próximas escolhas.",
+        },
+        {
+          text: "Gestão: em Compras > Pedidos, “Fazer pedido” numa compra aprovada gera a ordem de compra (OC-0001) com a cotação escolhida: informe a entrega prevista e o vencimento da primeira parcela (as demais vencem mês a mês). Abra a linha do pedido para baixar a “Ordem de compra (PDF)”, usar “Enviar ao fornecedor” (WhatsApp ou e-mail, com o PDF em anexo) ou, enquanto nada chegou nem foi pago, “Cancelar pedido” (com o motivo): a compra volta para aprovada, para um novo pedido, ou volta às cotações, para escolher outro fornecedor. Os pedidos cancelados ficam listados na página da compra.",
+        },
+        {
+          text: "Em Compras > Recebimentos ficam os pedidos aguardando entrega (os atrasados em destaque). Quando a entrega chegar, use “Registrar entrega” com o que veio de cada item (pode vir em partes), a nota fiscal (número, valor, data e o arquivo) e uma observação. A portaria e a zeladoria também registram, sem ver os valores. A compra fica “Recebida” quando todos os itens chegam.",
+        },
+        {
+          text: "Em Compras > Pagamentos ficam as contas a pagar de todos os pedidos, pelo vencimento (vencidas e as que vencem em 7 dias em destaque). Use “Pagar” em cada parcela, com a data e o comprovante, ou “Vencimento” para mudar a data de uma parcela em aberto. Recebida e paga por completo, a compra fica “Concluída” e a gestão avalia o fornecedor de 1 a 5 estrelas (“Avaliar fornecedor”, ao abrir a linha em Pedidos); a média aparece no cadastro do fornecedor e na escolha das cotações.",
+        },
+        {
+          text: "Gestão e aprovadores: em Compras > Indicadores, escolha o ano (e, se quiser, o mês) para ver o que foi pago por categoria, por mês e por fornecedor, o comprometido (parcelas a pagar hoje) e o processo: economia frente à maior cotação, compras com 3 ou mais cotações, tempo da solicitação ao pedido e do pedido à entrega e entregas atrasadas. “Relatório em PDF” gera o documento do período.",
+        },
+        {
+          text: "Prestação de contas aos moradores: fica desligada até um aprovador usar “Publicar” no card de Compras > Indicadores. Publicada, todos os moradores veem em Compras > Prestação de contas o gasto por categoria e por mês e as compras concluídas (fornecedor, valor e cotações), sem anexos, com o PDF do período. “Retirar” esconde de novo.",
+        },
+      ],
+      rules: [
+        {
+          text: "Depois que as cotações começam, a solicitação não pode ser cancelada e o título, os detalhes, os itens e as categorias não mudam mais (as cotações foram feitas sobre eles). Com uma cotação escolhida, nada muda.",
+        },
+        {
+          text: "A primeira cotação põe a solicitação “Em cotação”; sem nenhuma, ela volta a aguardar cotação. Cada fornecedor tem uma cotação por solicitação.",
+        },
+        {
+          text: "Escolher uma cotação que não é a completa mais barata, ou com menos de 3 cotações, exige justificativa: ela fica registrada e aparece no mapa.",
+        },
+        {
+          text: "Só quem tem a permissão de aprovar compras decide e muda a alçada; por padrão, a gestão. O condomínio pode deixar só o síndico com ela (Gestão > Equipe > permissões).",
+        },
+        {
+          text: "Quem escolheu a cotação pode também aprová-la, se tiver a permissão: o histórico e o mapa em PDF mostram quem escolheu e quem aprovou.",
+        },
+        {
+          text: "Devolvida para cotação, a escolha é desfeita e a gestão pode ajustar e escolher de novo; reprovada, a solicitação é encerrada.",
+        },
+        {
+          text: "Se a gestão cancelar uma solicitação sua, você é avisado com o motivo.",
+        },
+        {
+          text: "Fechar o formulário de uma nova solicitação guarda o que foi digitado; só “Cancelar” limpa.",
+        },
+      ],
+      access: [
+        {
+          text: "A portaria e os gestores podem pedir compras (permissão “Pedir compras”) e veem as próprias solicitações; quem cuida das compras (gestores) vê todas.",
+        },
+      ],
+    },
+  },
+  {
+    id: "produtos-e-marcas",
+    href: "/compras/produtos",
+    title: "Produtos e marcas",
+    icon: Package,
+    module: "PURCHASES",
+    permission: "PURCHASES_MANAGE",
+    area: "main",
+    tour: "Mantenha o catálogo de produtos e marcas que a equipe usa nas solicitações de compra.",
+    sections: {
+      howto: [
+        {
+          text: "Em Compras > Produtos, use “Cadastrar produto” com o nome, a unidade de costume (un, cx, kg…) e, se quiser, uma descrição (medida, modelo). Em Compras > Marcas, “Cadastrar marca”.",
+        },
+        {
+          text: "Quem pede compras também cadastra pelo “+” ao lado do produto ou da marca de um item: o cadastro já fica escolhido no item.",
+        },
+        {
+          text: "Use “Editar” para corrigir e “Desativar” para tirar dos novos itens sem perder o histórico; “Reativar” traz de volta. Os cards mostram os ativos, os usados em solicitações, o mais pedido e os inativos.",
+        },
+      ],
+      rules: [
+        {
+          text: "Cada nome é cadastrado uma vez no condomínio (maiúsculas e minúsculas não contam). Produtos e marcas não são apagados, só desativados.",
+        },
+        {
+          text: "O catálogo é do condomínio e poderá ser usado por outros módulos (estoque, manutenção…).",
+        },
+      ],
+      access: [
+        {
+          text: "Gestores cuidam do catálogo (permissão “Cuidar das compras”); quem pode pedir compras consulta e cadastra pelos itens.",
+        },
+      ],
+    },
+  },
+  {
+    id: "fornecedores",
+    href: "/compras/fornecedores",
+    title: "Fornecedores",
+    icon: Truck,
+    module: "PURCHASES",
+    permission: "PURCHASES_MANAGE",
+    area: "main",
+    tour: "Cadastre quem o condomínio contrata ou de quem compra, com o contato e o PIX para pagamento.",
+    sections: {
+      howto: [
+        {
+          text: "Toque em “Cadastrar fornecedor”, escolha CNPJ (empresa) ou CPF (autônomo), informe o documento, a razão social ou o nome e marque o que ele atende (uma ou mais: manutenção, elétrica, limpeza, alimentação e bebidas…). Não está na lista? Marque “Outros (digitar)” e escreva, por exemplo, “Dedetização”.",
+        },
+        {
+          text: "Se quiser, preencha o contato (nome, telefone ou WhatsApp, e-mail), a cidade e a chave PIX: ela fica à mão quando a compra for paga.",
+        },
+        {
+          text: "Na lista, filtre pelo nome, contato, CNPJ/CPF, categoria ou situação. Toque na linha para ver o e-mail, o PIX e as observações.",
+        },
+        {
+          text: "Use “Editar” para corrigir os dados e “Desativar” para tirar da lista de novas cotações sem perder o histórico; “Reativar” traz de volta.",
+        },
+      ],
+      rules: [
+        {
+          text: "Cada CNPJ/CPF é cadastrado uma vez no condomínio. Um fornecedor não é apagado, só desativado.",
+        },
+        {
+          text: "Fechar o formulário de cadastro guarda o que foi digitado; só “Cancelar” limpa.",
+        },
+      ],
+      access: [
+        {
+          text: "Gestores cuidam das compras (permissão “Cuidar das compras”); o gestor pode dar essa permissão a outros membros da equipe.",
         },
       ],
     },

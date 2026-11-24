@@ -2,13 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { EyeOff, Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  EyeOff,
+  HeartHandshake,
+  Pencil,
+  Plus,
+  Trash2,
+  Wallet,
+  X,
+} from "lucide-react";
 import {
   Badge,
   Button,
   Card,
   CardBody,
   CardHeader,
+  CollapsibleSection,
   Drawer,
   Field,
   Modal,
@@ -264,62 +273,74 @@ export function SupportersManager({
       >
         {draft && (
           <div className="space-y-4">
-            <Field
-              label="Nome do apoiador"
-              required
-              maxLength={60}
-              list="supporter-names"
-              autoComplete="off"
-              value={draft.name}
-              onChange={(event) => set("name", event.target.value)}
-            />
-            <datalist id="supporter-names">
-              {supporters.map((supporter) => (
-                <option key={supporter.id} value={supporter.name} />
-              ))}
-            </datalist>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <CollapsibleSection
+              icon={<HeartHandshake />}
+              title="Apoiador"
+              description="Quem apoiou e se o nome aparece no ranking."
+            >
               <Field
-                label="Valor (R$)"
+                label="Nome do apoiador"
                 required
-                inputMode="numeric"
-                placeholder="0,00"
-                value={draft.amount}
-                onChange={(event) =>
-                  set("amount", maskMoney(event.target.value))
-                }
+                maxLength={60}
+                list="supporter-names"
+                autoComplete="off"
+                value={draft.name}
+                onChange={(event) => set("name", event.target.value)}
               />
-              <Field
-                label="Recebido em"
-                type="date"
-                required
-                max={today}
-                value={draft.receivedOn}
-                onChange={(event) => set("receivedOn", event.target.value)}
-              />
-            </div>
-            <label className="flex cursor-pointer items-start gap-2 text-sm text-fg select-none">
-              <input
-                type="checkbox"
-                className="mt-0.5 size-4 accent-[var(--accent)]"
-                checked={draft.showName}
-                onChange={(event) => set("showName", event.target.checked)}
-              />
-              <span>
-                Mostrar o nome no ranking
-                <span className="block text-xs text-muted">
-                  Desmarcado, aparece como “Apoiador anônimo”. Confirme com a
-                  pessoa antes de mostrar o nome.
+              <datalist id="supporter-names">
+                {supporters.map((supporter) => (
+                  <option key={supporter.id} value={supporter.name} />
+                ))}
+              </datalist>
+              <label className="flex cursor-pointer items-start gap-2 text-sm text-fg select-none">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 size-4 accent-[var(--accent)]"
+                  checked={draft.showName}
+                  onChange={(event) => set("showName", event.target.checked)}
+                />
+                <span>
+                  Mostrar o nome no ranking
+                  <span className="block text-xs text-muted">
+                    Desmarcado, aparece como “Apoiador anônimo”. Confirme com a
+                    pessoa antes de mostrar o nome.
+                  </span>
                 </span>
-              </span>
-            </label>
-            <TextArea
-              label="Observação (interna)"
-              rows={2}
-              maxLength={200}
-              value={draft.note}
-              onChange={(event) => set("note", event.target.value)}
-            />
+              </label>
+            </CollapsibleSection>
+            <CollapsibleSection
+              icon={<Wallet />}
+              title="Apoio"
+              description="Quanto, quando e uma observação interna."
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field
+                  label="Valor (R$)"
+                  required
+                  inputMode="numeric"
+                  placeholder="0,00"
+                  value={draft.amount}
+                  onChange={(event) =>
+                    set("amount", maskMoney(event.target.value))
+                  }
+                />
+                <Field
+                  label="Recebido em"
+                  type="date"
+                  required
+                  max={today}
+                  value={draft.receivedOn}
+                  onChange={(event) => set("receivedOn", event.target.value)}
+                />
+              </div>
+              <TextArea
+                label="Observação (interna)"
+                rows={2}
+                maxLength={200}
+                value={draft.note}
+                onChange={(event) => set("note", event.target.value)}
+              />
+            </CollapsibleSection>
           </div>
         )}
       </Drawer>
@@ -349,22 +370,28 @@ export function SupportersManager({
         }
       >
         <div className="space-y-4">
-          <Field
-            label="Nome"
-            required
-            maxLength={60}
-            value={editName}
-            onChange={(event) => setEditName(event.target.value)}
-          />
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-fg select-none">
-            <input
-              type="checkbox"
-              className="size-4 accent-[var(--accent)]"
-              checked={editShow}
-              onChange={(event) => setEditShow(event.target.checked)}
+          <CollapsibleSection
+            icon={<HeartHandshake />}
+            title="Apoiador"
+            description="O nome e se ele aparece no ranking."
+          >
+            <Field
+              label="Nome"
+              required
+              maxLength={60}
+              value={editName}
+              onChange={(event) => setEditName(event.target.value)}
             />
-            Mostrar o nome no ranking
-          </label>
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-fg select-none">
+              <input
+                type="checkbox"
+                className="size-4 accent-[var(--accent)]"
+                checked={editShow}
+                onChange={(event) => setEditShow(event.target.checked)}
+              />
+              Mostrar o nome no ranking
+            </label>
+          </CollapsibleSection>
         </div>
       </Drawer>
 

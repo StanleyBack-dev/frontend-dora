@@ -41,12 +41,15 @@ export function ParcelsSummary({ overview }: { overview: ParcelOverview }) {
         icon={<PackageCheck className="size-4" />}
         tone="success"
       />
-      <StatCard
-        label="Devolvidas ou canceladas"
-        value={String(count("RETURNED") + count("CANCELLED"))}
-        icon={<Undo2 className="size-4" />}
-        tone="neutral"
-      />
+      {/* Four cards: the perishables, when there are any, take this one's place. */}
+      {overview.perishableWaiting === 0 && (
+        <StatCard
+          label="Devolvidas ou canceladas"
+          value={String(count("RETURNED") + count("CANCELLED"))}
+          icon={<Undo2 className="size-4" />}
+          tone="neutral"
+        />
+      )}
     </StatGrid>
   );
 }

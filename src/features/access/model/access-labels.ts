@@ -71,6 +71,20 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
       "Registrar itens achados, conferir pedidos e devolver (com assinatura)",
     area: "Gestão",
   },
+  PURCHASES_MANAGE: {
+    label: "Cuidar das compras: fornecedores, solicitações e cotações",
+    area: "Gestão",
+  },
+  PURCHASES_REQUEST: {
+    label:
+      "Pedir compras (solicitações de compra) e registrar as entregas dos pedidos",
+    area: "Gestão",
+  },
+  PURCHASES_APPROVE: {
+    label:
+      "Aprovar, devolver ou reprovar compras e definir a alçada (o valor que dispensa aprovação)",
+    area: "Gestão",
+  },
   EVENTS_MANAGE: {
     label: "Criar, publicar e cancelar eventos",
     area: "Gestão",
